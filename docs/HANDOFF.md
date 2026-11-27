@@ -2477,6 +2477,34 @@ frames, Standard GLB and VRM Bake interchange, and physical headset
 qualification remain open.
 [Native MToon Bake validation](validation/native-mtoon-bake-20261127.json)
 
+### Exact GPU overlay staging budgets
+
+The earlier full Release run's `native-mtoon-physical` and
+`renderer-recovery` budget failures both reproduce independently. The
+complete `6b1d0c48` run recorded 1,356 passes, three failures and zero
+skips. The Save handoff fixture above accounts for the third failure.
+The original log and JUnit report retain each result.
+
+The unbaked overlay forecast counts four four-byte placeholders. Its actual
+upload uses three RGBA8 texels and one R8 texel. The targeted old-header
+fixture reports 699,104 forecast bytes against 699,101 actual bytes.
+
+The overlay now derives the byte forecast and GL allocation from the
+same per-plane upload dimensions and format. The targeted forecast and
+the measured store ledger both report 699,101 bytes. Ordinary and FLOAT
+Bakes also match their actual upload stores. The unmodified higher-level
+GPU tests now admit the exact cold typed frame and the same mixed scene
+with an injected late failure. The tests preserve one-byte-short refusal,
+pending debt, accepted frame identity, successful retry after retirement,
+and the existing guards against host readback and blocking GPU waits.
+The corrected application also passes the nested DomeD Wayland Bake,
+Save, Clear and Undo sequence. The software Release and ASan/UBSan
+suites preserve the previous native projects and Editable GLB bytes.
+Both affected suites and the focused overlay checks also pass on Intel
+Arc A770. The 19-check synthetic OpenXR replay uses the same hardware
+and writes byte-identical native projects to the earlier software run.
+[Exact GPU overlay budget validation](validation/exact-overlay-gpu-budget-20261127.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete

@@ -1,0 +1,174 @@
+{
+  "arc": {
+    "overlay": {
+      "checks": 46,
+      "renderer": "GL_VENDOR=Intel GL_RENDERER=Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+    },
+    "physical": {
+      "checks": 707,
+      "renderer": "GPU Intel / Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+    },
+    "recovery": {
+      "checks": 831,
+      "renderer": "GL_RENDERER Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+    }
+  },
+  "arc_openxr": {
+    "checks": 19,
+    "native_sha256": {
+      "accept": "3840bb393dceb07f022228961663763fb333d2aac9dfb5876104b85ca0e1494a",
+      "cancel": "0fc7eefce52b1bea3965712446bba4118366b67ea7662d4b16d9df5c4fce82b8",
+      "focus": "0fc7eefce52b1bea3965712446bba4118366b67ea7662d4b16d9df5c4fce82b8",
+      "reference": "3840bb393dceb07f022228961663763fb333d2aac9dfb5876104b85ca0e1494a",
+      "source": "0fc7eefce52b1bea3965712446bba4118366b67ea7662d4b16d9df5c4fce82b8"
+    },
+    "physical_headset": false,
+    "render_node": "/dev/dri/renderD129"
+  },
+  "archive": {
+    "filename": "exact-overlay-gpu-budget-20261127.tar.gz",
+    "files": {
+      "arc-xr/accept.json": "62d832e8482866fbf5a6e99f6327bd53c0e65ad84e18eb4d95087f98affe1f78",
+      "arc-xr/cancel.json": "bf48b49280cbf5e3c17664bbef942d16b6386b3df8eb5313336ddd9c88ecdffb",
+      "arc-xr/focus.json": "23a1d649c6b85adcd08ae4d204e091df8c4135100695bacb5e8be8b9ee80804c",
+      "arc-xr/report.json": "ecd52fa581764d6b0f34802dc9fa8c211c03455ef60255bade0e2e1a736964d8",
+      "arc-xr/run.log": "3d8fc8283fa7fe97a174b70138fb326b0909ebeea660dc1707e7210002c8d512",
+      "arc/overlay.log": "ae4924e2a64be9dc7ff6b26c8fcc8608bbf2ffd6d3c1e57186b997f5e8d44907",
+      "arc/physical.log": "a5170446c4e15fe6b9dcec654b84f9c480de94fabb20f9edbf9d6bff6001f683",
+      "arc/recovery.log": "72e141c883bb29466476abe5ad1b08456fb5fdf79ce0346678c01fc97a60bfd2",
+      "asan/app-link.log": "b28e528f5d4be052f86bd6d9931134d26553534c78e55e010daac1ef49acc9b1",
+      "asan/archive.log": "edcd21f39d3643b771bf39cddb6642bf537249c9049ffa50edd499beaf634e57",
+      "asan/baked-emission-gpu.log": "4cb94112f4f63b946aeda4885a068c6207550511eb76ef260537ecd6382a9d2c",
+      "asan/mtoon-render.log": "cae56d6870f8672afb017000de9f1dae55d0d6f696c6008c6d0324303b9e8d2f",
+      "asan/native-mtoon-physical.log": "7879d5590bafccfbdaf48e30ab68f0e8e5e4d7abbad4ddcbcd10cbe6a32ec7fd",
+      "asan/paint-overlay-gpu.log": "fa2f8df8009cbf65f745c6c48de925fd37cfbe453d627c566600cb1d3bbb5603",
+      "asan/render-store-ledger.log": "0be0a79bfd880229f0911d76670ffb2b9512e6f842244f6e47be4b7efce16b52",
+      "asan/render.cpp-compile.log": "108da37cdfebe284f64be45356baa6763f493027b3672b0b19fbe9c39dbdecdb",
+      "asan/renderer-recovery.log": "7965830e5a67aa4bbc38b7909682c9a035b3ba873f100a1d1fd60ad055749f7f",
+      "baseline/forecast.log": "c5a9e404f1a4e3e9f525c7644a20a182445dcae840cdf5210325dac95d2f33b1",
+      "baseline/physical.log": "e962c117becaf12046315f509669d8a13133cb956dff4d20ae78b7110d755920",
+      "baseline/recovery.log": "069622f5eaa5c82526cb01ecdf4fe167c3710f17ce186188fe176a7d9c5a627f",
+      "full-release/ctest.log": "31a056a954c2b522cac123f4504baa8bc7e5681965ab23d43e09bb64d882af44",
+      "full-release/full.xml": "2bd5b53faef621bd5f8ac2490ea33faca1f377c115266fa57a00ca21d19234a6",
+      "full-release/status.json": "8ea0a9cd7a68a7c785030ef4548f5117cfea127e662c75e1f0f49cbe7082637c",
+      "registered/ctest.log": "2248ff47b9aec6f26b9803b60bbe5f4b5dee998795d60e2f5517f7139b7138d9",
+      "registered/ctest.xml": "9f71da7347983a0d51e2301ea831a8830c74128442d0dc97714180270ce5dd52",
+      "release/app-link.log": "6e3009dce8177491882a751638b951bfdf0bb4c67b5be498a8410c4a215b3794",
+      "release/archive.log": "78c3690910dea0173625c39ac132f735a8bbf62f84cfb2bd29d65c2665f4275b",
+      "release/baked-emission-gpu.log": "8e8a6380fb7fe0c0f4b17313d22abc0649e118128e295601f74db1e31f9c19cb",
+      "release/mtoon-render.log": "26daf48d7312e73146bdd4a61ae697a20524916d1669ca1349e69c02e1e25225",
+      "release/native-mtoon-physical.log": "21bf93a57502917c73918face8665878971d82fb6200c29eba091b147efdf30e",
+      "release/paint-overlay-gpu.log": "5cb46ecf72e1930e767538ca34e3fa9eb38c39b67ff6f4136ca23d7ab3197d6c",
+      "release/render-store-ledger.log": "da51033a228c894a2d00a1307b7fc6b6cd64059ee31fbdec8726b1bdce169181",
+      "release/render.cpp-compile.log": "d377918efad78da03b7eef5c5fad27adf68b040520ac0e031756b144e30f2d14",
+      "release/renderer-recovery.log": "9442fd9598942dcb41a81751cab674197c9871e1ce36625d3e16475f12986e5a",
+      "scripts/arc-xr-replay.py": "554c456a56ea6d1c5101f6c9af880c2a5ebbb2f610f758a3e4bb4b2670b6544f",
+      "scripts/arc-xr.py": "ac8e8e5edd54d7c051323dab243fb41fc650119742b5913376cada869f431e62",
+      "scripts/arc.py": "182c0392bf5475dc2e3cb7b3d55c7d1469f9e0943bdf17051060b586380036cd",
+      "scripts/build.py": "f1dfcfd98215f61e0c5858931eccb5cb93f47eeb7dbdfe23155379ae24ab2831",
+      "scripts/wayland.py": "efdda0ba5168600b87ef8cc75c12e4ae819f55d3b1b8855635362d9ea3cff914",
+      "wayland/report.json": "8f51ae17c4e3d3aad1bed83a5512a964747e23f041fa4291a81b0b5638ceff5f",
+      "wayland/run.log": "e81fad6cdfd2bb046b1835162b68ac871d0d59cd812f236743e99359dd0b9881"
+    },
+    "sha256": "11e913b0383f90d5c323085853405256b9bdfbb49dd9c366626c1df282673507"
+  },
+  "forecast_unbaked": {
+    "actual_store_bytes": 699101,
+    "fixed": 699101,
+    "old": 699104
+  },
+  "native_projects_and_packages_sha256": {
+    "gain/baked.dsculpt": "57b845c815a98528856028c2e47d32c1d7b35d9a8808d0d8f93e301d27a46f0c",
+    "gain/editable.glb": "c80fccb6bb403d7e09e118f6902a9925f67f763fd3987f2065d117c5098f30c7",
+    "gain/recall.dsculpt": "977289f2d51fd78ed9d2bd2128c27e4e13a1d79f31b1d707a635517b2ada1aa2",
+    "hdr/baked.dsculpt": "7c491fd93deb309812cea8b30758b4ba2d131ca68935f00f1d25d9cf38a08661",
+    "hdr/editable.glb": "11e8cd0fa68ebe03cbba269e3864196df34fedf0804c1c761da509344928d012",
+    "hdr/recall.dsculpt": "ab2fe4e380f369627d54dad16c5e61825aad59a49a81b2efb7e3a8ee5f1c0a5c",
+    "ldr/baked.dsculpt": "0b88c4389b4b093380dbee39254d0b6b3ce343305364466206db6a7aa5448b07",
+    "ldr/editable.glb": "4f0cc17fb0df4fe45f38f991dc6160c00275446bd3bee32eff148c117036eaec",
+    "ldr/recall.dsculpt": "79cd842a247c4aee007ba69eadaf565be6afd9c75608f0cca1d9c1b08018e965"
+  },
+  "prior_full_release": {
+    "app_sha256": "ddae996d541f12d456c6d5460941e29696c336a6f06ad8168e810e065b68b0fd",
+    "cache_sha256": "3a78be26db84fc17bb90c3920a76db5e5cd131aeaf1bb726ce9ae2a41ad129b1",
+    "candidate": "6b1d0c481475ec0caee28927cbf908653b9449bb",
+    "configure": [
+      "cmake",
+      "-S",
+      "/home/blux/de-xr/dome-sculpt/artifacts/current-integrated-full-release-20261127/source",
+      "-B",
+      "/home/blux/de-xr/dome-sculpt/artifacts/current-integrated-full-release-20261127/build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DDOME_COMPUTE_BACKEND=CPU",
+      "-DFLTK_DIR=/opt/fltk-vr/toolkit/share/fltk"
+    ],
+    "elapsed_seconds": 8390.956,
+    "exit": 8,
+    "failed": [
+      "native-mtoon-physical",
+      "renderer-recovery",
+      "retopology-save-handoff"
+    ],
+    "invocation": "af6f9a343d404660bcb6d1c241599230",
+    "junit_sha256": "2bd5b53faef621bd5f8ac2490ea33faca1f377c115266fa57a00ca21d19234a6",
+    "phase": "complete",
+    "previous_release_service": "ds-hdr-standard-2048-full-release-20261127.service",
+    "registered": 1359,
+    "skipped": [],
+    "terminal": true,
+    "toolkit": "/opt/fltk-vr/toolkit",
+    "totals": {
+      "fail": 3,
+      "pass": 1356,
+      "skip": 0
+    }
+  },
+  "product_revision": "4f4b73f67c5308648a4d4431f30f6a2fda76f774",
+  "registered_release_seconds": {
+    "baked-emission-gpu": 0.137053,
+    "mtoon-baked-texture-sets": 8.58163,
+    "native-mtoon-physical": 2.14776,
+    "paint-overlay-gpu": 0.171931,
+    "render-store-ledger": 0.0477214,
+    "renderer-recovery": 5.92548
+  },
+  "software": {
+    "asan": {
+      "app_sha256": "f729662835bed8bc1c8d19371539c0982a09ee12dbef37951ef3ba65d7f0865d",
+      "archive_members_rebuilt": [
+        "render.cpp.o"
+      ],
+      "checks": {
+        "baked-emission-gpu": 516132,
+        "mtoon-render": 70,
+        "native-mtoon-physical": 707,
+        "paint-overlay-gpu": 46,
+        "render-store-ledger": 106,
+        "renderer-recovery": 828
+      },
+      "renderer_archive_sha256": "c44c34504a369168f87a8887df188e89baa1523e77a916e2fc28ac6ad016de17"
+    },
+    "release": {
+      "app_sha256": "19292c1e48d7779b3e47dd88a17d5dc145199fdea83aced8b25ebe51a9473a55",
+      "archive_members_rebuilt": [
+        "render.cpp.o"
+      ],
+      "checks": {
+        "baked-emission-gpu": 516132,
+        "mtoon-render": 70,
+        "native-mtoon-physical": 707,
+        "paint-overlay-gpu": 46,
+        "render-store-ledger": 106,
+        "renderer-recovery": 828
+      },
+      "renderer_archive_sha256": "a3603d7184ad6aa5fc5b5318cefc52114326e22226f4d192b361cca670841fd1"
+    }
+  },
+  "wayland": {
+    "checks": 16,
+    "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+    "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f"
+  }
+}

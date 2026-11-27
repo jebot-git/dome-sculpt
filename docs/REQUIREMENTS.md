@@ -27,7 +27,9 @@ The layered-normal fixture now verifies authenticated donor Bake directions
 and exact scene history. Both fixtures also pass ASan/UBSan. The broader
 sanitizer group finished with 18 passes and a timeout on the rebaked
 archive. The isolated replay of that archive passed all allocation and
-cancellation checks. The current full Release sweep is running.
+cancellation checks. The `6b1d0c48` full Release sweep finished with
+1,356 passes, three failures and zero skips. The three failed cases have
+passing focused follow-ups. The subsequent combined sweep is separate.
 [Focused regression evidence](validation/layered-normal-retopo-followup-20261127.json)
 [Isolated archive replay](validation/native-mtoon-texture-sets-20261127.json)
 
@@ -40,6 +42,17 @@ retry. It passes the single-CPU reproducer with both Release cores and the
 current ASan/UBSan core. The combined build including current MToon changes
 has a separate full Release run in progress.
 [Retopology Save capacity evidence](validation/retopo-save-queue-20261127.json)
+
+The native MToon and renderer-recovery GPU budget failures reproduce on
+the earlier Release binary. Unbaked overlay preflight charged 699,104
+bytes for 699,101 bytes of actual stores in the isolated fixture. The
+corrected renderer derives preflight and allocation from the same plane
+dimensions and formats, including the single-byte R8 placeholder. Both
+affected suites pass with their original byte limits, and the corrected
+renderer still rejects a byte-short cold allocation and staging work
+while previous stores are pending. The full combined run remains a
+separate qualification gate.
+[Exact GPU overlay budget evidence](validation/exact-overlay-gpu-budget-20261127.json)
 
 Main supports VRM0 export of shaped CC0 VRoid avatars, generated unlit
 grooms, certified UV seam edits and refitted first-person and spring
