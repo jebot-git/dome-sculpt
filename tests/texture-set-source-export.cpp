@@ -9,8 +9,10 @@
 #include "humanoid-sha256.hpp"
 #include "dome/normal-preparation.hpp"
 #include "dome/gltf-export.hpp"
+#include "dome/import-authoring.hpp"
 #include "dome/projection.hpp"
 #include "dome/rig-edit.hpp"
+#include "dome/retopo-authoring.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/source-placement.hpp"
 #include "dome/source-uv-bake.hpp"
@@ -30,6 +32,7 @@
 #include "paint-overlay-sample.hpp"
 #include "paint-emission-sample.hpp"
 #include "emission-exr-owned.hpp"
+#include "emission-paint-access.hpp"
 #include <bit>
 #include <fstream>
 #include <iostream>
@@ -80,10 +83,10 @@ void move(Document&d){
  const auto topology=d.frame().state->polygon->topology;const auto mesh=topology->triangulate().mesh;const auto a=mesh.positions.at(mesh.indices.at(0)),b=mesh.positions.at(mesh.indices.at(1)),c=mesh.positions.at(mesh.indices.at(2));const auto p=a*.2f+b*.3f+c*.5f,n=normalized(cross(b-a,c-a));
  d.polygon_pointer(p+n,n*-1,PolygonAction::BeginDrag);polygon(d);check(d.frame().state->polygon->moving,"Actual selected face ray begins a native Move gesture");const Vec3 delta{.006f,.003f,0};d.polygon_pointer(p+n+delta,n*-1,PolygonAction::Drag);polygon(d);d.polygon_pointer(p+n+delta,n*-1,PolygonAction::EndDrag);polygon(d);
 }
-Scene source(bool prepared,bool reflected,bool floating=false,bool varying=false,bool recipes=false,bool split_grids=false,uint32_t resolution=64){
+Scene source(bool prepared,bool reflected,bool floating=false,bool varying=false,bool recipes=false,bool split_grids=false,uint32_t resolution=64,uint8_t coverage=255){
  Mesh m;m.positions={{-.8f,-.6f,0},{.8f,-.6f,0},{.8f,.6f,0},{-.8f,.6f,0}};m.normals.assign(4,{0,0,1});if(varying)m.normals[1]=normalized(Vec3{.2f,.1f,1});m.uv={{{.1f,.1f}},{{.9f,.1f}},{{.9f,.9f}},{{.1f,.9f}}};m.indices={0,1,2,0,2,3};
  Scene s;auto&o=s.active();o.mesh_active=true;o.material.double_sided=true;o.material.color={.4f,.3f,.2f,1};o.painted=std::make_shared<PaintedMesh>(m,resolution);
- if(prepared){BakedTextures bake;bake.maps.color=solid({90,100,110,255},resolution);bake.maps.metal_rough=solid({255,160,0,255},resolution);bake.maps.emission=solid({0,0,0,255},resolution);bake.maps.normal=solid({128,128,255,255},resolution);bake.coverage.assign(size_t(resolution)*resolution,255);for(size_t y=0;y<resolution;++y)for(size_t x=0;x<resolution;++x){const auto at=(y*resolution+x)*4;bake.maps.normal.rgba[at]=uint8_t(96+16*x/resolution);bake.maps.normal.rgba[at+1]=uint8_t(112+y/3);bake.maps.normal.rgba[at+2]=240;}o.painted->install_bake(std::move(bake));auto converted=convert_canonical_normals({o.painted,{},{},{},o.material,{}});o.painted=std::move(converted.paint);o.material_bindings=std::move(converted.material_bindings);}
+ if(prepared){BakedTextures bake;bake.maps.color=solid({90,100,110,255},resolution);bake.maps.metal_rough=solid({255,160,0,255},resolution);bake.maps.emission=solid({0,0,0,255},resolution);bake.maps.normal=solid({128,128,255,255},resolution);bake.coverage.assign(size_t(resolution)*resolution,coverage);for(size_t y=0;y<resolution;++y)for(size_t x=0;x<resolution;++x){const auto at=(y*resolution+x)*4;bake.maps.normal.rgba[at]=uint8_t(96+16*x/resolution);bake.maps.normal.rgba[at+1]=uint8_t(112+y/3);bake.maps.normal.rgba[at+2]=240;}o.painted->install_bake(std::move(bake));auto converted=convert_canonical_normals({o.painted,{},{},{},o.material,{}});o.painted=std::move(converted.paint);o.material_bindings=std::move(converted.material_bindings);}
  if(floating){PaintSettings ink;ink.front_only=false;ink.channel=PaintChannel::Emission;ink.emission_units=PaintEmissionUnits::Physical;ink.emission={3,.01f,1};Brush b;b.from=b.to={0,0,0};b.normal={0,0,1};b.radius=2;b.strength=1;o.painted->begin_stroke();o.painted->stamp(b,ink);check(o.painted->end_stroke(),"Negative fixture owns a genuine FLOAT stroke");}
  // The N-only positive must contain real byte paint and request the actual
  // KeepPaint UV transition. Empty ordinary Paint correctly uses the legacy
@@ -1691,8 +1694,186 @@ void recipe_reference_remap(bool prepared) {
  refuses([&]{Scene::decode(forged);},"Shared polygon sampling rejects a different geometric recipe");
 
 }
+void retopology_retained_materials(bool reflected) {
+ auto scene=source(true,reflected,false,false,true,true,64,reflected?200:255);
+ const auto guide=scene.active().id;
+ if(!reflected)scene.active().affine_edit.reset();
+ const auto placement=scene.world_matrix(guide);
+ uint64_t imported_donor=0;
+ if(!reflected) {
+  Scene donor;
+  auto mesh=scene.active().painted->mesh();
+  for(auto &p:mesh.positions)p.z+=.012f;
+  auto &o=donor.active();o.mesh_active=true;o.painted=std::make_shared<PaintedMesh>(mesh,64);
+  BakedTextures maps;
+  maps.maps.color=solid({55,157,98,255});
+  maps.maps.normal=solid({161,112,241,255});
+  maps.maps.metal_rough=solid({233,110,28,255});
+  maps.maps.emission=solid({0,0,0,255});
+  maps.coverage.assign(64*64,255);
+  for(size_t i=0;i<64*64;++i)maps.maps.color.rgba[i*4]=uint8_t(52+i%64);
+  o.painted->install_bake(std::move(maps));
+  export_glb(donor.export_surfaces(),"imported-pbr-donor.glb");
+  ImportAuthoringOptions options;options.paint_resolution=64;
+  auto imported=prepare_authoring_import(scene,"imported-pbr-donor.glb",options);
+  check(imported.objects.size()==1,"Actual GLB importer publishes one mapped PBR donor");
+  imported_donor=imported.objects.front();
+  scene=std::move(imported.scene);
+  check(scene.object(imported_donor).appearance && scene.object(imported_donor).appearance->original_bytes &&
+        scene.object(imported_donor).painted->source_maps()->color.image &&
+        scene.object(imported_donor).painted->source_maps()->normal.image,
+        "Imported source owns its original scene bytes, diffuse image and tangent-space normal image");
+  scene.object(imported_donor).visible=false;
+  scene.select(guide);
+  select_texture_set(scene,guide,1);
+  ObjectBakeSettings bake;bake.ao_samples=0;bake.allow_backfaces=true;
+  bake_object(scene,imported_donor,bake);
+  check(texture_set_view(scene.active(),1).bake_recipe->source.object==imported_donor,
+        "The prepared secondary slot receives an actual material Bake from the imported GLB");
+ }
+ for(TextureSetId id : {0u,1u}) {
+  check(edit_texture_set(scene,guide,id,[id,reflected](PaintedMesh &paint,Material &) {
+   Brush brush;
+   brush.from=brush.to={0,0,0};brush.normal={0,0,1};brush.radius=2;brush.strength=.85f;
+   if(reflected) {
+    paint.add_layer("Retained floating light");
+    PaintSettings glow;glow.channel=PaintChannel::Emission;glow.emission_units=PaintEmissionUnits::Physical;
+    glow.front_only=false;glow.emission={3,.01f,1};
+    paint.begin_stroke();paint.stamp(brush,glow);
+    if(!paint.end_stroke())return false;
+   }
+   paint.add_layer(id?"Second retained pigment":"Hidden retained pigment");
+   PaintSettings settings;
+   settings.front_only=false;
+   settings.color=id?std::array<float,4>{.18f,.35f,.97f,1}:std::array<float,4>{.86f,.29f,.12f,1};
+   paint.begin_stroke();paint.stamp(brush,settings);
+   if(!paint.end_stroke())return false;
+   if(!id)paint.layer_properties("Hidden retained pigment",false,.55f);
+   return true;
+  }),"Each original field owns an independent visible or hidden authored layer");
+ }
+ for(const auto &o:scene.objects())if(o.id!=guide)scene.object(o.id).visible=false;
+ const auto exact=scene.encode();
+ scene.save("prepared-guide.dsculpt");
+ const auto &source_mesh=scene.active().painted->mesh();
+ const auto to_world=[&](Vec3 p){const auto q=placement.point({p.x,p.y,p.z});return Vec3{float(q[0]),float(q[1]),float(q[2])};};
+
+ Document document;
+ document.replace(scene);ready(document);
+ document.begin_retopology();
+ check(document.wait_retopology() && document.frame().state->retopology->source,"Native retopology opens the actual prepared guide");
+ const auto wait_draft=[&] {
+  check(document.wait_retopology() && document.frame().state->retopology->error.empty(),"Retopology edit completed");
+ };
+ for(TextureSetId slot : {0u,1u}) {
+  const auto owner=texture_set_view(scene.active(),slot);
+  check(owner.source && owner.source->source_preview()->normal_coordinates()!=owner.source->source_preview()->paint_coordinates(),
+        "Prepared slot has genuinely separate normal and paint coordinates");
+  for(const auto face:owner.domain->triangles()) {
+   std::array<Vec3,3> points;
+   for(size_t k=0;k<3;++k)points[k]=source_mesh.positions[source_mesh.indices[face*3+k]];
+   const auto centre=(points[0]+points[1]+points[2])/3.f;
+   for(auto corner:points) {
+    check(document.begin_desktop(),"Desktop admits a real retopology point gesture");
+    Brush brush;brush.from=brush.to=to_world(centre+(corner-centre)*.84f);brush.radius=.01f;
+    document.stamp_desktop(brush);document.end_desktop();wait_draft();
+   }
+   document.edit_retopology(RetopoAction::Face);wait_draft();
+  }
+ }
+ check(document.frame().state->retopology->topology->faces().size()==2,"Native worker constructs one new triangle on each material region");
+ document.end_retopology(true);
+ document.save_async("prepared-retopo.dsculpt").get();ready(document);
+ const auto after=document.copy_scene();
+ const auto &patch=after.active();
+ check(patch.retopology && patch.retopology->source==guide && !patch.polygon && patch.texture_sets &&
+       !patch.texture_sets->topology()->polygon_ids() && !after.object(guide).visible &&
+       after.object(guide).texture_sets==scene.active().texture_sets,
+       "Transferred patch owns a new triangle atlas and retains the exact hidden source collection");
+ SurfaceQuery query(source_mesh);
+ const auto target_world=after.world_matrix(patch.id);
+ const auto source_from_target=placement.inverse()*target_world;
+ const auto &target=patch.painted->mesh();
+ const auto target_tangents=tangent_corners(target);
+ size_t checked_normals=0;
+ float min_dot=1;
+ for(TextureSetId id : {0u,1u}) {
+  const auto old=texture_set_view(scene.active(),id), field=texture_set_view(patch,id);
+  const auto &old_layer=old.painted->layers().back(), &new_layer=field.painted->layers().back();
+  check(!field.source && !field.material_bindings && field.domain->triangles().size()==1 &&
+        field.painted->baked() && !field.painted->baked()->normal_field &&
+        field.bake_recipe==old.bake_recipe && old_layer.id==new_layer.id && old_layer.name==new_layer.name &&
+        old_layer.opacity==new_layer.opacity && old_layer.visible==new_layer.visible,
+        "Each projected field keeps the painted layers, Bake recipe and native shading independently of the guide");
+  check(std::ranges::any_of(new_layer.tiles,[id](const auto &tile) {
+   return tile && std::ranges::any_of(tile->pixels,[id](const auto &pixel) {
+    return pixel.data[9]>120 && pixel.data[id?2:0]>180 && pixel.data[id?0:2]<155;
+   });
+  }),"The destination has actual independent source layer samples");
+  if(reflected){
+   check(field.painted->has_physical_emission(),"The original floating light layer remains editable in each projected material");
+   const auto &coverage=field.painted->baked()->coverage;
+   check(std::ranges::any_of(coverage,[](auto a){return a==200;}) &&
+         std::ranges::all_of(coverage,[](auto a){return !a || a==200;}),
+         "Reorientation of the prepared normals preserves fractional material Bake coverage");
+  }
+  const auto composite=detail::EmissionExportAccess::other_channels(*field.painted,field.material,{});
+  const auto triangle=field.domain->triangles().front();
+  const auto a=target.uv[target.indices[3*triangle]],b=target.uv[target.indices[3*triangle+1]],c=target.uv[target.indices[3*triangle+2]];
+  const std::array u{b[0]-a[0],b[1]-a[1]},v{c[0]-a[0],c[1]-a[1]};
+  const float area=u[0]*v[1]-u[1]*v[0];
+  const auto size=composite->normal.width;
+  check(size==field.painted->resolution() && field.painted->baked()->coverage.size()==size_t(size)*size,
+        "The new patch has an actual native normal map and corresponding material coverage");
+  for(size_t y=0;y<size;y+=3)for(size_t x=0;x<size;x+=3) {
+   const float dx=(float(x)+.5f)/size-a[0],dy=(float(y)+.5f)/size-a[1];
+   const float w1=(dx*v[1]-dy*v[0])/area,w2=(u[0]*dy-u[1]*dx)/area;
+   const std::array weights{1-w1-w2,w1,w2};
+   if(std::ranges::min(weights)<.12f)continue;
+   Vec3 p{};for(size_t i=0;i<3;++i)p+=target.positions[target.indices[triangle*3+i]]*weights[i];
+   const auto q=source_from_target.point({p.x,p.y,p.z});
+   const auto hit=query.closest({float(q[0]),float(q[1]),float(q[2])});
+   check(old.domain->contains(hit.triangle),"Independent sampler finds the same actual source material for the output texel");
+   const auto &s=hit.barycentric;
+   const auto expected=old.source->normal(hit.triangle,{s[0],s[1],s[2]},placement,true);
+   const auto *rgb=composite->normal.rgba.data()+4*(y*size+x);
+   const auto local=tangent_frame(target,target_tangents,triangle,weights).to_world({rgb[0]/127.5f-1,rgb[1]/127.5f-1,rgb[2]/127.5f-1});
+   const auto actual=unit(target_world.normal({local.x,local.y,local.z}));
+   min_dot=std::min(min_dot,dot(expected,actual));
+   ++checked_normals;
+  }
+ }
+ if(imported_donor)
+  check(after.object(imported_donor).appearance==scene.object(imported_donor).appearance &&
+        texture_set_view(patch,1).bake_recipe->source.object==imported_donor,
+        "Retopology and ordered Save retain the original imported asset and its Bake relationship");
+ std::cout<<"RETOPO_NORMAL samples="<<checked_normals<<" min_dot="<<min_dot<<'\n';
+ check(checked_normals>20 && min_dot>.9997f,"An independent retained PBR sampler agrees with both resampled canonical normal grids");
+ const auto accepted=after.encode();
+ check(Scene::load("prepared-retopo.dsculpt").encode()==accepted && document.undo()&&document.copy_scene().encode()==exact&&
+       document.redo()&&document.copy_scene().encode()==accepted,"Ordered Save, cold Open and Undo/Redo preserve the prepared guide and both new slots");
+ ready(document);
+ document.export_asset("prepared-editable.glb",AssetExportFormat::EditableGlb256).get();
+ check(Scene::load("prepared-editable.glb").encode()==accepted,"Editable GLB reopens both the original prepared fields and their projected patch");
+ document.export_asset("prepared-standard.glb",AssetExportFormat::Glb).get();
+ cgltf_options options{};cgltf_data *data=nullptr;
+ check(cgltf_parse_file(&options,"prepared-standard.glb",&data)==cgltf_result_success,"Independent GLB reader opens the new two-slot patch");
+ std::unique_ptr<cgltf_data,decltype(&cgltf_free)> ownership(data,cgltf_free);
+ check(cgltf_load_buffers(&options,data,"prepared-standard.glb")==cgltf_result_success && cgltf_validate(data)==cgltf_result_success &&
+       data->meshes_count==1 && data->meshes[0].primitives_count==2 &&
+       data->meshes[0].primitives[0].material->normal_texture.texture && data->meshes[0].primitives[1].material->normal_texture.texture,
+       "Standard GLB carries two independent native normal textures on one retopologized mesh");
+}
+
 int main(int argc,char **argv)try {
  const std::string_view mode=argc>1?argv[1]:"";
+ if(argc==4&&mode=="--retained-retopology"){
+  std::filesystem::create_directories(argv[2]);
+  std::filesystem::current_path(argv[2]);
+  retopology_retained_materials(std::string_view(argv[3])=="affine");
+  std::cout<<"PASS "<<checks<<" retained material retopology checks\n";
+  return 0;
+ }
  if(argc==3&&mode=="--retained-skin"){
   const auto out=std::filesystem::absolute(argv[2]);
   std::filesystem::create_directories(out/"skin");

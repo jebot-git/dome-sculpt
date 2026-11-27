@@ -69,15 +69,17 @@ struct RetopoTextureSets {
   std::shared_ptr<PaintedMesh> primary;
   std::shared_ptr<const TextureSetCollection> membership;
   std::shared_ptr<const SourceMaterialBindings> primary_binding;
+  std::optional<std::array<float,3>> primary_emission;
 };
 struct RetopoTextureField {
   std::shared_ptr<PaintedMesh> paint;
   std::shared_ptr<const SourceMaterialBindings> binding;
+  std::optional<std::array<float,3>> emission;
 };
-using RetopoFieldProjector = std::function<RetopoTextureField(const PaintedMesh &,
-    const std::shared_ptr<const SourceMaterialBindings> &,
+using RetopoFieldProjector = std::function<RetopoTextureField(const TextureSetView &,
     const std::shared_ptr<const TextureSetFaceDomain> &)>;
-RetopoTextureSets project_retopology_texture_sets(const PaintedMesh &primary,
+RetopoTextureSets project_retopology_texture_sets(const std::shared_ptr<const PaintedMesh> &primary,
+    const Material &primary_material, const std::shared_ptr<const ObjectBakeRecipe> &primary_recipe,
     const std::shared_ptr<const SourceMaterialBindings> &primary_binding,
     const TextureSetCollection &, std::shared_ptr<const Mesh> replacement,
     std::span<const TextureSetId> assignments, RetopoTransferBudget &, const RetopoFieldProjector &);

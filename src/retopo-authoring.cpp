@@ -728,6 +728,7 @@ public:
     std::shared_ptr<const DeformationState> deformation;
     std::shared_ptr<const SourceMaterialBindings> material;
     std::shared_ptr<const TextureSetCollection> texture_sets;
+    std::optional<std::array<float,3>> emission = {};
   };
 
   RetopoReplacement(std::shared_ptr<const PaintedMesh> grid,const Mesh &original_rest,AffineTransform old_world,
@@ -744,11 +745,13 @@ public:
     grids_.emplace(resolution, first_grid_);
   }
 
-  State project(const PaintedMesh &old_paint, const Material &material,
+  State project(const std::shared_ptr<const PaintedMesh> &primary, const Material &material,
                 const std::shared_ptr<const DeformationState> &old_deformation,
                 const std::shared_ptr<const SourceMaterialBindings> &old_material,
-                const std::shared_ptr<const TextureSetCollection> &old_sets) {
+                const std::shared_ptr<const TextureSetCollection> &old_sets,
+                const std::shared_ptr<const ObjectBakeRecipe> &recipe) {
     stop(budget_.cancelled());
+    const auto &old_paint = *primary;
     auto &projection = query(old_paint);
     std::shared_ptr<const DeformationState> deformation;
     if (old_deformation) {
@@ -768,14 +771,15 @@ public:
       return reproject_color(old_paint,material,*old_material,deformation,projection);
     // Every field of a texture set shares the replacement REST geometry. Its
     // own raster bounds and same-slot source filter preserve material seams.
-    const bool typed = old_sets && old_material && old_material->has_mtoon;
-    auto fields = old_sets ? reproject_sets(old_paint, typed ? old_material : nullptr, *old_sets, projection)
+    const bool owned_set_material = old_sets && (old_sets->primary_source() || (old_material && old_material->has_mtoon));
+    auto fields = old_sets ? reproject_sets(primary, material, recipe, owned_set_material ? old_material : nullptr,
+                                            *old_sets, projection)
                            : detail::RetopoTextureSets{};
     std::shared_ptr<const PaintedMesh> paint = fields.primary ? std::move(fields.primary) : reproject(old_paint, projection);
-    auto binding = typed ? std::move(fields.primary_binding)
-                         : transfer_patch_material(old_paint, old_material, *paint, deformation, projection);
+    auto binding = owned_set_material ? std::move(fields.primary_binding)
+                                      : transfer_patch_material(old_paint, old_material, *paint, deformation, projection);
     return {paint, deformation, std::move(binding),
-            std::move(fields.membership)};
+            std::move(fields.membership), fields.primary_emission};
   }
 
 private:
@@ -883,18 +887,19 @@ private:
     return {std::move(paint),deformation,std::move(material_binding),{}};
   }
 
-  detail::RetopoTextureSets reproject_sets(const PaintedMesh &primary,
+  detail::RetopoTextureSets reproject_sets(const std::shared_ptr<const PaintedMesh> &primary,
+      const Material &primary_material, const std::shared_ptr<const ObjectBakeRecipe> &recipe,
       const std::shared_ptr<const SourceMaterialBindings> &primary_binding, const TextureSetCollection &sets,
                                            detail::RetopoTransfer &projection) {
     const auto cached = std::ranges::find_if(projected_sets_, [&](const ProjectedSets &entry) {
-      return entry.source == &sets && entry.binding == primary_binding.get() && (entry.primary == &primary ||
-             detail::TextureSetPaintAccess::same_current(primary,*entry.primary));
+      return entry.source == &sets && entry.binding == primary_binding.get() && (entry.primary == primary.get() ||
+             detail::TextureSetPaintAccess::same_current(*primary,*entry.primary));
     });
     if (cached != projected_sets_.end()) return cached->projected;
     const auto existing = sets.triangle_sets();
     const auto &mesh = first_grid_->mesh();
     const bool first_patch = old_faces_.empty();
-    if (existing.size() != primary.mesh().indices.size() / 3 || (!first_patch && existing.size() != old_faces_.size()) ||
+    if (existing.size() != primary->mesh().indices.size() / 3 || (!first_patch && existing.size() != old_faces_.size()) ||
         new_faces_.size() != mesh.indices.size() / 3)
       throw std::invalid_argument("Retopology source material slots differ from its genuine mesh");
     budget_.reserve(mesh.indices.size() / 3, sizeof(TextureSetId));
@@ -928,11 +933,13 @@ private:
         throw std::invalid_argument("A patch face is outside the source material surface");
       slots.push_back(hit ? existing[hit->triangle] : 0);
     }
-    auto result = detail::project_retopology_texture_sets(primary, primary_binding, sets,
-        first_grid_->mesh_owner(), slots, budget_, [&](const PaintedMesh &source,
-            const std::shared_ptr<const SourceMaterialBindings> &binding,
+    auto result = detail::project_retopology_texture_sets(primary, primary_material, recipe, primary_binding, sets,
+        first_grid_->mesh_owner(), slots, budget_, [&](const TextureSetView &field,
             const std::shared_ptr<const TextureSetFaceDomain> &domain) {
-          if (binding && !detail::native_texture_set_mtoon(&source,nullptr,binding.get()))
+          const auto &source = *field.painted;
+          const auto &binding = field.material_bindings;
+          if (field.appearance || (field.source && !first_patch) ||
+              (!field.source && binding && !detail::native_texture_set_mtoon(&source,nullptr,binding.get())))
             throw std::invalid_argument("Retopology needs the original texture set's retained material adapter");
           TextureSetLimits limits;
           limits.cancelled = budget_.cancelled();
@@ -941,12 +948,16 @@ private:
           budget_.reserve(1, detail::TextureSetPaintAccess::initial_raster_bytes(size));
           auto output = detail::TextureSetPaintAccess::empty(domain, size, limits);
           charge_raster(*output);
+          if (field.source) {
+            detail::TextureSetPaintAccess::reproject_retopology(source, *output, projection, false, &field);
+            return detail::RetopoTextureField{std::move(output),{},binding->physical_emission};
+          }
           detail::TextureSetPaintAccess::reproject_retopology(source, *output, projection);
-          if (!binding) return detail::RetopoTextureField{std::move(output),{}};
+          if (!binding) return detail::RetopoTextureField{std::move(output),{}, {}};
           return detail::RetopoTextureField{output,detail::TextureSetPaintAccess::reproject_retopology_mtoon(
-              source,*output,binding,projection)};
+              source,*output,binding,projection), {}};
         });
-    projected_sets_.push_back({&primary, &sets, primary_binding.get(), result});
+    projected_sets_.push_back({primary.get(), &sets, primary_binding.get(), result});
     return result;
   }
 
@@ -1020,12 +1031,13 @@ public:
     if (replacement_) {
       // Restore uses the current object's placement. Its old checkpoints
       // belong to that same object-local space, even if the object was moved.
-      const auto state = replacement_->project(*original->paint,original->material,original->deformation,original->material_bindings,
-                                               original->texture_sets);
+      const auto state = replacement_->project(original->paint,original->material,original->deformation,original->material_bindings,
+                                               original->texture_sets,original->bake_recipe);
       mapped->paint = state.paint;
       mapped->deformation = state.deformation;
       mapped->material_bindings = state.material;
       mapped->texture_sets = state.texture_sets;
+      if (state.emission) mapped->material.emissive = *state.emission;
       mapped->world_transform = placement_ ? CanvasTransform{} : world_;
       mapped->placement = placement_;
     }
@@ -1062,6 +1074,7 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
   std::shared_ptr<const DeformationState> deformation;
   std::shared_ptr<const SourceMaterialBindings> material;
   std::shared_ptr<const TextureSetCollection> texture_sets;
+  std::optional<std::array<float,3>> emission;
   const auto patch = std::make_shared<RetopoPatch>(RetopoPatch{source, topology});
   std::shared_ptr<const PolygonOrigin> rig_source, shape_source;
   if (previous.retopology) {
@@ -1115,19 +1128,23 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
       auto grid = PaintedMesh::from_mesh(std::move(triangles.mesh), size, options);
       replacement = std::make_unique<RetopoReplacement>(std::move(grid),old_rest,old_world,new_world,
           old_surface.source_faces, triangles.source_faces, std::move(correspondence), cancelled);
-      auto current = replacement->project(*previous.painted,previous.material,previous.deformation,previous.material_bindings,
-                                          previous.texture_sets);
+      auto current = replacement->project(previous.painted,previous.material,previous.deformation,previous.material_bindings,
+                                          previous.texture_sets,previous.bake_recipe);
       painted = current.paint->snapshot();
       deformation = std::move(current.deformation);
       material = std::move(current.material);
       texture_sets = std::move(current.texture_sets);
+      emission = current.emission;
     }
     RetopoRestoreHistory history(patch, transform, capture_source_placement(staged,id), replacement.get(), cancelled);
     rig_source = history.rebase(previous.rig_source);
     shape_source = history.rebase(previous.shape_source);
   } else {
-    const bool project_materials = previous.id == source && previous.texture_sets &&
-        !previous.texture_sets->topology()->polygon_ids() && detail::texture_set_editable_fields(previous);
+    const auto &sets = previous.texture_sets;
+    const bool retained = sets && sets->topology()->polygon_ids() &&
+        (sets->primary_source() || std::ranges::any_of(sets->additional(),[](const auto &field) { return bool(field.source); }));
+    const bool project_materials = previous.id == source && sets && !previous.appearance &&
+        (retained || (!sets->topology()->polygon_ids() && detail::texture_set_editable_fields(previous)));
     const auto resolution = project_materials ? previous.painted->resolution() : 512;
     unwrap(triangles.mesh, resolution, 4, cancelled);
     PaintSurfaceOptions options;
@@ -1136,15 +1153,17 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
     if (project_materials) {
       RetopoReplacement replacement(painted, previous.painted->mesh(), scene.world_matrix(source), staged.world_matrix(id),
           {}, triangles.source_faces, {}, cancelled,previous.deformation.get());
-      auto current = replacement.project(*previous.painted, previous.material, {}, previous.material_bindings,
-                                          previous.texture_sets);
+      auto current = replacement.project(previous.painted, previous.material, {}, previous.material_bindings,
+                                          sets,previous.bake_recipe);
       painted = current.paint->snapshot();
       material = std::move(current.material);
       texture_sets = std::move(current.texture_sets);
+      emission = current.emission;
     }
   }
   object.painted = std::move(painted); object.mesh_active = true;
   object.material = previous.material; object.retopology = patch;
+  if (emission) object.material.emissive = *emission;
   object.material_bindings = std::move(material);
   if (previous.retopology || texture_sets) object.bake_recipe = previous.bake_recipe;
   object.deformation = std::move(deformation);
