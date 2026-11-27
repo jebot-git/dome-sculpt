@@ -119,7 +119,12 @@ edited shape, retained paint coordinates and Restore state. Both GLB
 workers export independent HDR materials for plain and retained PBR
 texture sets, preserving native membership and FLOAT layers. Standard GLB
 also embeds a separate exact FLOAT OpenEXR resource for each material.
-Typed texture-set materials, alternate source emission coordinates,
+Plain writable HDR sets now pass cold Open, desktop painting and both GLB
+workers with two 1024-square grids. Release and ASan/UBSan also pass both
+exports and exact native reopen with 2048+1024 grids built using an explicit
+fixture creation allowance. Nested DomeD Wayland and synthetic OpenXR
+match the 1024+1024 Standard GLB. Production-size retained and baked sets,
+typed texture-set materials, alternate source emission coordinates,
 texture-set HDR VRM and physical headset verification remain open.
 [Full-resolution writable atlas evidence](validation/native-writable-raster-2048-20261126.json) · [Default AO evidence](validation/default-ao-bake-2048-20261126.json) · [First shapekey evidence](validation/native-writable-first-key-2048-20261126.json) · [Editable GLB evidence](validation/native-editable-glb-2048-20261126.json) · [Physical FLOAT Bake evidence](validation/native-hdr-compact-bake-2048-20261126.json)
 [Shared full-resolution HDR Bake evidence](validation/native-shared-hdr-bake-20261127.json)
@@ -127,6 +132,7 @@ texture-set HDR VRM and physical headset verification remain open.
 [Editable HDR GLB evidence](validation/native-hdr-editable-2048-20261127.json)
 [Texture-set Editable HDR evidence](validation/native-texture-set-hdr-editable-20261127.json)
 [Texture-set Standard HDR evidence](validation/native-texture-set-hdr-standard-20261127.json)
+[Production texture-set HDR evidence](validation/native-texture-set-hdr-production-20261127.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge

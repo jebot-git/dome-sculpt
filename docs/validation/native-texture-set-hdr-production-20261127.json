@@ -1,0 +1,191 @@
+{
+  "archive": {
+    "file": "native-texture-set-hdr-production-20261127.tar.gz",
+    "members": 94,
+    "sha256": "beacffb08195d2b8841f80792c797e9be30c456fc159f7e0640629524b0b1830"
+  },
+  "baseline": "0189eeb328258572c23e6594afe12fdde31cacdd",
+  "baseline_probe": {
+    "initial_log_sha256": "326766f80a05bd78272cb66eb9bcc7e814aa259496541b458311fc97feeb217d",
+    "next_original_refusal_after_preview_fix": "Texture-set export exceeds its working budget",
+    "preview_blocker": "Texture-set field preview exceeds its charged work bound"
+  },
+  "bounds": {
+    "2048_probe_creation_maximum_work": 160000000,
+    "open_preview_and_both_export_workers_use_default_limits": true,
+    "texture_set_maximum_bytes": 268435456,
+    "texture_set_maximum_work": 64000000
+  },
+  "frontends": {
+    "arc": {
+      "app_sha256": "eacff1a346a9566ace3d1ef7ed39d7eba4f7d162be4217f82fa2773752155bf1",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "7a1a18cacd03b60573bf278ba7a799bd88d754b83b3bf04afb49ef1172b644a7",
+      "invocation": "db839d2319d14506b2487f6bff9f6888",
+      "mode": "arc",
+      "native_sha256": "c226f00e586e9a0f6b1729ee49078f6edf51efabdef5c72a0dc2103376f4cc9e",
+      "phase": "complete",
+      "report_sha256": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7",
+      "run_script_sha256": "8acd1aa09712493478daf95679a97dca44d0f9370a38425907934263a129b8ce",
+      "runtime_sha256": "40fa5b55ac329cf6dd77a3bdf5a5eac6f5f840d4ef43efd77678c588538fd8e9",
+      "terminal": true
+    },
+    "software": {
+      "app_sha256": "cc89bfe84cdb9f7180c86514d5050e577ffe34baba0f039104c78105ee0c10c3",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "7a1a18cacd03b60573bf278ba7a799bd88d754b83b3bf04afb49ef1172b644a7",
+      "invocation": "2be5d95fd0fc4345ac4595274692c228",
+      "mode": "software",
+      "native_sha256": "c226f00e586e9a0f6b1729ee49078f6edf51efabdef5c72a0dc2103376f4cc9e",
+      "phase": "complete",
+      "report_sha256": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7",
+      "run_script_sha256": "8acd1aa09712493478daf95679a97dca44d0f9370a38425907934263a129b8ce",
+      "runtime_sha256": "bbb5897e8616b8fafdbd9d22a4bba4f06290e278b37782134867d4b4477c1fac",
+      "terminal": true
+    },
+    "wayland": {
+      "app_sha256": "cc89bfe84cdb9f7180c86514d5050e577ffe34baba0f039104c78105ee0c10c3",
+      "checks": 7,
+      "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+      "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+      "exit": 0,
+      "input_sha256": "7a1a18cacd03b60573bf278ba7a799bd88d754b83b3bf04afb49ef1172b644a7",
+      "invocation": "f6c8fa83dee94cd58ce07eff46a146eb",
+      "mode": "wayland",
+      "native_sha256": "c226f00e586e9a0f6b1729ee49078f6edf51efabdef5c72a0dc2103376f4cc9e",
+      "phase": "complete",
+      "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+      "report_sha256": "1479f58dde45a6650ec4a86a27bfa78dbff2a7235cf3bac585efc465832f849d",
+      "run_script_sha256": "c25dc6ada0d181cee466312b60871fc9c1ceffb6a0f8420c3143ec668f2644c6",
+      "terminal": true
+    }
+  },
+  "khronos": {
+    "release-export/probe-1024-1024/editable.glb": {
+      "bytes": 631852,
+      "errors": 0,
+      "filename": "release-export/probe-1024-1024/editable.glb",
+      "report_sha256": "2de47438a46c1be08684f6ed1bb30e03480ce95e03bd92f75a1b067317af2751",
+      "sha256": "a65a7f8a47cf7f2b53ac6d8d06ab8e045080cfddc291bc89c45fc7639230da06",
+      "validator": "2.0.0-dev.3.10",
+      "warnings": 0
+    },
+    "release-export/probe-1024-1024/standard.glb": {
+      "bytes": 894616,
+      "errors": 0,
+      "filename": "release-export/probe-1024-1024/standard.glb",
+      "report_sha256": "b9c019a9d0554dabb52a9d143ed3468925bc29bd8e3a7af1e1fa3c156260f080",
+      "sha256": "c226f00e586e9a0f6b1729ee49078f6edf51efabdef5c72a0dc2103376f4cc9e",
+      "validator": "2.0.0-dev.3.10",
+      "warnings": 0
+    },
+    "release-export/probe-2048-1024/editable.glb": {
+      "bytes": 1274524,
+      "errors": 0,
+      "filename": "release-export/probe-2048-1024/editable.glb",
+      "report_sha256": "102914ea63d6641a756ee03ca56669fc1e8e3dba8f4ab338f048f40e65586e95",
+      "sha256": "f2df8042ef1efa9f3bfe0fb54e49708f07b78a5933957a1971336391233b60a1",
+      "validator": "2.0.0-dev.3.10",
+      "warnings": 0
+    },
+    "release-export/probe-2048-1024/standard.glb": {
+      "bytes": 1886496,
+      "errors": 0,
+      "filename": "release-export/probe-2048-1024/standard.glb",
+      "report_sha256": "b59d015d4c46fd885009a012d72b5272350dba5d13266a93a4e2f5e1ad6f5c7e",
+      "sha256": "85d4d99c49a07b52354c5123ea34c77060348611b3e4d4caf14ce1e06c633755",
+      "validator": "2.0.0-dev.3.10",
+      "warnings": 0
+    },
+    "release-export/production-editable.glb": {
+      "bytes": 1296276,
+      "errors": 0,
+      "filename": "release-export/production-editable.glb",
+      "report_sha256": "78b872a9ae882aee4e6cf8482bbf55e4c01e345fbc539e79dc9ea4fc53ddbe51",
+      "sha256": "95f68813df7eb5bf09859eda37d1a29fcf50ab81ccb29d3aaa7859b2050b4613",
+      "validator": "2.0.0-dev.3.10",
+      "warnings": 1
+    },
+    "release-export/production-standard.glb": {
+      "bytes": 1552676,
+      "errors": 0,
+      "filename": "release-export/production-standard.glb",
+      "report_sha256": "3ffdf99dc26c982a7955c9caf26d11e1ebeb9ddd47ec318cfd8942135c0afaba",
+      "sha256": "d25716e67e4f4ffbe8b38da1f559c678435ac93f2fb6135675df99b0c8f8aa88",
+      "validator": "2.0.0-dev.3.10",
+      "warnings": 1
+    }
+  },
+  "open": "Production-resolution baked and retained multiset scale, typed MToon sets, alternate original emission coordinates, texture-set HDR VRM, full integrated regression and physical headset verification.",
+  "packages": {
+    "editable-texture-set-hdr.glb": {
+      "identical_to_previous": true,
+      "sha256": "d15b64907c2302463be92e7897fc27f738904ca8e177f627f441e4f39f074d2f"
+    },
+    "final-fixtures/production-editable.glb": {
+      "bytes": 1296276,
+      "sha256": "95f68813df7eb5bf09859eda37d1a29fcf50ab81ccb29d3aaa7859b2050b4613"
+    },
+    "final-fixtures/production-standard.glb": {
+      "bytes": 1552676,
+      "sha256": "d25716e67e4f4ffbe8b38da1f559c678435ac93f2fb6135675df99b0c8f8aa88"
+    },
+    "mixed-standard-hdr.glb": {
+      "identical_to_previous": true,
+      "sha256": "43e151452c8832bc79e79a1a4fa1e7e20ca22743621eff84c63818c4b419c3cd"
+    },
+    "probe-1024-1024/editable.glb": {
+      "bytes": 631852,
+      "sha256": "a65a7f8a47cf7f2b53ac6d8d06ab8e045080cfddc291bc89c45fc7639230da06"
+    },
+    "probe-1024-1024/standard.glb": {
+      "bytes": 894616,
+      "sha256": "c226f00e586e9a0f6b1729ee49078f6edf51efabdef5c72a0dc2103376f4cc9e"
+    },
+    "probe-2048-1024/editable.glb": {
+      "bytes": 1274524,
+      "sha256": "f2df8042ef1efa9f3bfe0fb54e49708f07b78a5933957a1971336391233b60a1"
+    },
+    "probe-2048-1024/standard.glb": {
+      "bytes": 1886496,
+      "sha256": "85d4d99c49a07b52354c5123ea34c77060348611b3e4d4caf14ce1e06c633755"
+    },
+    "standard-texture-set-hdr.glb": {
+      "identical_to_previous": true,
+      "sha256": "e2510bfbc601ddb659e3cb07eb4ba88a5270d8de3da27767efe30d933eaea4fd"
+    }
+  },
+  "product": "81231961e3ed2df56b0f6bbc105556326857a402",
+  "profiles": {
+    "asan": {
+      "application_sha256": "eacff1a346a9566ace3d1ef7ed39d7eba4f7d162be4217f82fa2773752155bf1",
+      "checks": {
+        "current-paint-preview-native": 8425,
+        "final-texture-set-export": 127,
+        "retained-editable": 44,
+        "retained-standard": 50,
+        "texture-set-native": 45,
+        "texture-set-source-export": 6074,
+        "texture-set-surfaces": 72
+      },
+      "core_archive_sha256": "616794d150e533d88d9765cd1e2e575cc0135468d23aec71710cab358f6a15ca"
+    },
+    "release": {
+      "application_sha256": "cc89bfe84cdb9f7180c86514d5050e577ffe34baba0f039104c78105ee0c10c3",
+      "checks": {
+        "current-paint-preview-native": 8425,
+        "final-texture-set-export": 127,
+        "retained-editable": 44,
+        "retained-standard": 50,
+        "texture-set-native": 45,
+        "texture-set-source-export": 6074,
+        "texture-set-surfaces": 72
+      },
+      "core_archive_sha256": "6a31723db9687de1749598e271cf60e8ece9dc70c333b3a6a4a1c1b51c53cd58"
+    }
+  },
+  "scope": "Full-application sparse preview and native desktop painting for two 1024-square writable HDR PBR texture-set fields. Standard and Editable GLB for 1024+1024 and 2048+1024 plain independent fields, exact native reopen and preserved production albedo, alpha and ORM.",
+  "source_patch_sha256": "f39a27ca65cef7f3e8b7e1e76c3367cca06dc9fe588249b7cc6fc01981accb02"
+}

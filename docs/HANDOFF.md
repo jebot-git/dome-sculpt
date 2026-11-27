@@ -2114,6 +2114,36 @@ VRM, production-resolution multi-field budgeting, physical headset checks
 and full integrated regression remain open.
 [Texture-set Standard HDR validation](validation/native-texture-set-hdr-standard-20261127.json)
 
+### Production-size writable HDR texture sets
+
+Product `81231961` opens and paints two independent 1024-square HDR PBR
+fields under the default worker limits. The prior application refused the
+project while forecasting a dense preview. The worker now charges the
+retained grids, sparse paint directories and tiles that can affect alpha.
+Desktop painting uses the same authenticated sparse packet for picking.
+Cold Open and an accepted desktop stroke avoid dense CPU image generation
+and preserve ordered Save and exact Undo/Redo.
+
+Standard and Editable GLB keep each field's full-size portable images.
+On plain unbaked fields the compiler resolves the ordered paint only where
+the actual padded raster references an occupied tile. Empty regions reuse
+their material baseline. Release and ASan/UBSan produce identical files
+and exact native round trips for 1024+1024 and 2048+1024. The latter probe
+raises the fixture creation work limit to construct the initial 2048 grid.
+Open, preview and both exporters use the default limits. The registered
+1024 fixture uses default limits throughout. It verifies every albedo,
+alpha and ORM byte against the original compositor and every FLOAT EXR
+channel bit against the dense sampler. Existing low-resolution GLBs
+remain byte-identical, and the retained HDR controls pass separately.
+
+Nested DomeD Wayland and synthetic OpenXR on software GL and Intel Arc
+match the 1024+1024 Standard GLB. Khronos reports zero errors for all six
+high-resolution outputs and the existing skinned-node warning on the two
+with a rig. Production-resolution baked and retained sets, typed MToon,
+alternate emission coordinates, HDR VRM, full integrated regression and
+physical headset verification remain open.
+[Production texture-set validation](validation/native-texture-set-hdr-production-20261127.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
