@@ -14,10 +14,20 @@ preserves the shape, retained paint and Restore capsule together.
 Standard and Editable GLB carry vertex displacement and the per-corner
 normal and tangent endpoints required by the qualified materials. Release,
 ASan/UBSan, nested DomeD Wayland, independent OpenGL on software and Arc,
-and synthetic OpenXR cover the reported workflows. Posed Bake, skeletal
-deformation and typed MToon for retained sets, nonlinear mixed-weight
-portable lighting, and physical headset acceptance remain open.
+and synthetic OpenXR cover the reported workflows. Skeletal deformation and
+typed MToon for retained sets, nonlinear mixed-weight portable lighting,
+and physical headset acceptance remain open.
 [Retained texture-set shapekey evidence](validation/retained-texture-set-shapekeys-20261127.json)
+
+Retained PBR sets now donate and receive editable Bake data with active
+shapekey weights. Authenticated posed triangles drive ray and matching
+projection, conditional AO and custom cage placement. Normal detail is
+encoded in the original material basis so it continues to follow the shape.
+Native and independently prepared normal targets preserve editable layers,
+separate grids, and FLOAT emission. The Bake recipe restores settings
+and uses the scene's current poses when reapplied. Native project and
+GLB round trips preserve the baked results and the original source history.
+[Posed texture-set Bake evidence](validation/retained-texture-set-posed-bake-20261127.json)
 
 The current combined atlas and HDR cache source passes all 153 checks
 in both software Release and Intel Arc ASan/UBSan OpenXR replays. Its

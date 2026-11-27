@@ -1,0 +1,155 @@
+{
+  "revision": "5997f335bad78f66a2d018b091471a671b76e562",
+  "canonical_domed_revision": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "release_fltk": "/opt/fltk-vr/toolkit",
+  "asan_fltk": "artifacts/sdk-20261126/toolkit-sanitize",
+  "release_application_sha256": "e7301519a83cdf45942e8047155b1163da800cf2d1525985fd0b6be44054421d",
+  "qualification": {
+    "native_ray_ao": "Active morphs on donor and recipient, native N-only recipient",
+    "prepared_matching": "Reflected affine active morphs and separate original paint and normal grids",
+    "prepared_custom_cage": "Reflected active morphs with ordered cage placement and AO"
+  },
+  "native": {
+    "release": {
+      "registered_cases": [
+        "dome-sculpt-texture-set-source-export",
+        "texture-set-prepared-recipe-references",
+        "texture-set-retained-bake-source",
+        "texture-set-retained-bake-target",
+        "texture-set-retained-hdr-editable",
+        "texture-set-retained-hdr-standard",
+        "texture-set-retained-ldr-production-bake",
+        "texture-set-retained-multi-production-bake",
+        "texture-set-retained-native-target",
+        "texture-set-retained-posed-bake",
+        "texture-set-retained-reflected-production-bake",
+        "texture-set-retained-shapekeys"
+      ],
+      "posed_bake_assertions": 216,
+      "native_test_sha256": "d70c595d9b766bc34303cc2818d3b5638182b71d788d8c6be4587ed33b1b543f"
+    },
+    "asan": {
+      "registered_cases": [
+        "dome-sculpt-texture-set-source-export",
+        "texture-set-prepared-recipe-references",
+        "texture-set-retained-bake-source",
+        "texture-set-retained-bake-target",
+        "texture-set-retained-hdr-editable",
+        "texture-set-retained-hdr-standard",
+        "texture-set-retained-native-target",
+        "texture-set-retained-posed-bake",
+        "texture-set-retained-shapekeys"
+      ],
+      "posed_bake_assertions": 216,
+      "native_test_sha256": "40629bd141c615bf3e08022eb0189bf71a692231057237d4d7f80b2311a3324d"
+    }
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  },
+  "nested_domed_wayland_assertions": 15,
+  "synthetic_openxr": {
+    "software": {
+      "assertions": 19,
+      "cases": {
+        "accept": {
+          "gl_renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+          "stereo_submissions": 86,
+          "releases": 172
+        },
+        "cancel": {
+          "gl_renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+          "stereo_submissions": 86,
+          "releases": 172
+        },
+        "focus": {
+          "gl_renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+          "stereo_submissions": 86,
+          "releases": 172
+        }
+      }
+    },
+    "arc": {
+      "assertions": 19,
+      "cases": {
+        "accept": {
+          "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "stereo_submissions": 86,
+          "releases": 172
+        },
+        "cancel": {
+          "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "stereo_submissions": 86,
+          "releases": 172
+        },
+        "focus": {
+          "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "stereo_submissions": 86,
+          "releases": 172
+        }
+      }
+    }
+  },
+  "gltf_validator": {
+    "version": "2.0.0-dev.3.10",
+    "files": 6,
+    "errors": 0,
+    "warnings": 0
+  },
+  "identical_release_asan_files_sha256": {
+    "native-ray/before.dsculpt": "55b0932e66169aa123153c80d1bd6990db46d543c5ac53a8755e7555509a2be0",
+    "native-ray/baked.dsculpt": "c02e63d76cf71d437cda950bcd293faa4acde0b78e0f5e5c97232b3a15989dbe",
+    "native-ray/recall.dsculpt": "42613b6a38826e4829e3afba52e8ac89416b545f0ff348e0bc085583596b34ed",
+    "native-ray/posed-standard.glb": "07a745b97ca587fa130162270ddf5fea785ac75075df400a3f3d5783c36604df",
+    "native-ray/posed-editable.glb": "002483a23391233fb67c458576cbe06c8476d539bc29f8eb35a82d618ee6ffaf",
+    "prepared-matching/before.dsculpt": "6729fd457407a33a714b5f836044185b7d5e42d1baa6c27e75b274a073ca286c",
+    "prepared-matching/baked.dsculpt": "739b909c6b297a0c89e13c41fba7744d68dd77f6962013a7ad039e1325d5eba3",
+    "prepared-matching/recall.dsculpt": "b04ebc08974c6b87e17c978a4f18f37db2ac04a06c4ba561bb6ddc8c6843145b",
+    "prepared-matching/posed-standard.glb": "1612386b379e0644e3c7b82158eeef6caadfe37aa5a9470bba05511cef96894a",
+    "prepared-matching/posed-editable.glb": "2740d1d484fd5ccf7d10fb07fe8314de41465daafe2314a9398813b00c500232",
+    "prepared-cage/before.dsculpt": "75be3866cf5d03032447aaabb61eecb0287ab9a72e765fe33d5bfcf0007651d2",
+    "prepared-cage/baked.dsculpt": "227ddd11c33c56e4c8fa8dcc89ce9539661889344ac34a4a2b3857fb2f79983b",
+    "prepared-cage/recall.dsculpt": "e4f515a49bfcea5050b9c196909c9d473e9c957ea46bd37ec48800171d03e81e",
+    "prepared-cage/posed-standard.glb": "063780c891d9c9b816ed768a000b3184ecd314f50795a1f31c6f2e8f0902b722",
+    "prepared-cage/posed-editable.glb": "046f6ea891ac2293b8eac5cbebada756850c0125b892ce4ccb212521dbef97df"
+  },
+  "physical_headset_tested": false,
+  "archive": {
+    "path": "retained-texture-set-posed-bake-20261127.tar.gz",
+    "sha256": "fa121437f5b8bfdb8f00518df76521e0c0a97cc1b7aa99a5ebda41370c2b5fa0",
+    "members_sha256": {
+      "arc.log": "5133cfd1da906a9ef298e5931d509b6eb53a9278f6e1c057ad77076e070b652e",
+      "arc/accept.json": "95fe693f39297b08a889d95bc4b3b4c8e7a265cc3a5b023a25688126ee0309f1",
+      "arc/cancel.json": "0856105fc3cc805d60b939c1cc1a41af11df86249a7565da256e3d0d8950a9bd",
+      "arc/focus.json": "fd40108c14a3d448e7b130a0c488b45a508e3b8f6f27eda25c47bf347a7ef1e7",
+      "arc/report.json": "45af4653be9fabf404fc9f710ff230775299e93785645a76c7b3710b35fbe13a",
+      "asan-current-build.log": "dd3d513daf9faf4adf793029b1d2cf3bd90fe54ccf555c82ef439f2737b5985c",
+      "asan-current.log": "0f05865c5a3ad74cb4e655f93af091b7cae036a07f08fc478430abb5cf6c3d63",
+      "asan/Testing/Temporary/LastTest.log": "70c11187ae464444d4bde1c789f4d47f2af260503baa66947039c2fc07d9f4c3",
+      "check-profile.sh": "276a0e7c2388b5ac0bc790f28f21c9451ca7260d721be097da760f4df84908c9",
+      "khronos.cjs": "a2ddd6a906d4b130aeb0f9bb139a3a41a3714d0e1fac1da2e381cd4121b126a5",
+      "khronos.json": "aa0f53e6c72df210cba6e6ff93bb5f6122c6e5540c9f9b0061bfa2ad4667ca8e",
+      "khronos.log": "1c1ecc4213a28f85dcaa34768a14c6fa3cb0e7d46f85a6e1926068702c3e1e55",
+      "public-fixtures/baked.dsculpt": "227ddd11c33c56e4c8fa8dcc89ce9539661889344ac34a4a2b3857fb2f79983b",
+      "public-fixtures/recall.dsculpt": "e4f515a49bfcea5050b9c196909c9d473e9c957ea46bd37ec48800171d03e81e",
+      "receipt.py": "1f751b046db8177b2cbb2be6837b9915c1d8ac8971325de171e4f741f6a6846e",
+      "release-current-build.log": "f3185cdc5041f0f8bc87bdf821a71e57d980d59f2734a22ccf8a05ccf1f6e26a",
+      "release-selected.log": "81efc93b79da02a601601c7ab8298252e63356ae545c391305d94a25c97a8b68",
+      "release/Testing/Temporary/LastTest.log": "eaf5d825ecdb2dcd33728279f93208ac7b600850c910ac0873c10194d2ff14e7",
+      "release/texture-set-retained-posed-bake/native-ray/posed-standard.glb": "07a745b97ca587fa130162270ddf5fea785ac75075df400a3f3d5783c36604df",
+      "release/texture-set-retained-posed-bake/prepared-cage/posed-standard.glb": "063780c891d9c9b816ed768a000b3184ecd314f50795a1f31c6f2e8f0902b722",
+      "release/texture-set-retained-posed-bake/prepared-matching/posed-standard.glb": "1612386b379e0644e3c7b82158eeef6caadfe37aa5a9470bba05511cef96894a",
+      "run-public.py": "1775ac897e489862535ac4520ade6551472f5b9c37f17b485b70954fae316db3",
+      "software.log": "5133cfd1da906a9ef298e5931d509b6eb53a9278f6e1c057ad77076e070b652e",
+      "software/accept.json": "2ebbb6316c3e317b93c119f06b17dd6f621a4f33aa14a14e87ca61c53fa39900",
+      "software/cancel.json": "c5d598b366fbe7cf3b6d0d1dbf5d0d7ae2f4e45682c580289aeadaa0f6135914",
+      "software/focus.json": "5403d3a8db9b364946e468df30c3fbbbf3873022e24d0ac68a7c576af86269c9",
+      "software/report.json": "45af4653be9fabf404fc9f710ff230775299e93785645a76c7b3710b35fbe13a",
+      "wayland-bake.py": "8f91e297f9fbca1ca40005aaffbe383b39108c137e2963fb7fe1c2c517a20089",
+      "wayland.log": "73ceb02c01635b06559179321da5b01a986e00d0db7561fe65b8d347340bd3de",
+      "wayland/report.json": "37607002c48a02c531ca0e1b708edfc2187db1aa7d205f3f9bbf8556fb507410",
+      "xr-bake.py": "bae222c8a62074087ac6e2c476098975b9c28a5bd0599c18e9a5e2d7e6a35812"
+    }
+  }
+}

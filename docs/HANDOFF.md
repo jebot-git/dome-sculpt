@@ -36,6 +36,14 @@ reopens and renders the saved pose in both eyes. A fresh combined Release
 run for `9db1ed93` is running separately.
 [Retained texture-set shapekey validation](validation/retained-texture-set-shapekeys-20261127.json)
 
+Bake now projects between active shapekey poses on retained PBR material
+sets. Ray projection with AO, matching triangles and custom cages use the
+posed geometry. Color and FLOAT emission resolve on the selected member's
+original paint grid. Normal detail stores in its original material basis and
+follows subsequent shape edits. Clear and Recall preserve the authored
+shapes. Cold Open shares the original paint seed between live material fields
+and their history. [Posed texture-set Bake validation](validation/retained-texture-set-posed-bake-20261127.json)
+
 Native texture-set accessories can now use Surface Heat, weight transfer, or
 legacy automatic binding against an original VRM 1.0 avatar. Surface Heat keeps
 editable layers and normal and FLOAT emission Bakes in each native material.
