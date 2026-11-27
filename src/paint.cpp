@@ -3063,7 +3063,17 @@ void PaintedMesh::install_bake(BakedTextures incoming) {
 
 void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from,
     PaintedMesh &replacement, RetopoTransfer &transfer) {
-  if (from.in_stroke() || from.source_maps_ || from.sampling_attachment_ || from.texture_set_domain_ ||
+  const auto &old_domain = from.texture_set_domain_;
+  const auto &new_domain = replacement.texture_set_domain_;
+  if (bool(old_domain) != bool(new_domain) || (old_domain && old_domain->set() != new_domain->set()))
+    throw std::invalid_argument("Retopology paint must stay in its own material slot");
+  if (old_domain) {
+    old_domain->authenticate_owner(old_domain);
+    new_domain->authenticate_owner(new_domain);
+    if (!old_domain->matches(from.mesh_owner()) || !new_domain->matches(replacement.mesh_owner()))
+      throw std::invalid_argument("Retopology paint lost its owning material geometry");
+  }
+  if (from.in_stroke() || from.source_maps_ || from.sampling_attachment_ ||
       from.color_projection_ || from.normal_projection_ ||
       from.surface_->options.policy != PaintUvPolicy::Strict)
     throw std::invalid_argument("Retopology cannot reproject this retained material grid yet");
@@ -3145,7 +3155,7 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
     if ((at & 1023) == 0) paint_compute::checkpoint(transfer.cancelled());
     const auto &texel = surface.texels[at];
     if (!texel.covered) continue;
-    const auto hit = transfer.match(texel.position, texel.normal);
+    const auto hit = transfer.match(texel.position, texel.normal, old_domain.get());
     if (!hit) continue;
     ++hits;
     std::array<float, 2> uv{};
@@ -3228,7 +3238,8 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
       }
     }
   }
-  if (!hits) throw std::invalid_argument("No matching old surface for the retopology paint or Bake");
+  if (!hits && (!old_domain || (!old_domain->triangles().empty() && !new_domain->triangles().empty())))
+    throw std::invalid_argument("No matching old surface for the retopology paint or Bake");
   for (const auto &layer : replacement.layers_)
     replacement.allocated_tiles_ += tile_count(layer);
   if (baked) {

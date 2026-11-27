@@ -54,6 +54,29 @@ void authenticate(const DeformationState &target, const AffineTransform &target_
       throw std::invalid_argument("The native attachment's hierarchy or inverse bind differs from the original skin");
   }
 }
+
+void remap_native_joint_slots(DeformationState &deformation, const std::vector<uint32_t> &next_nodes,
+                             const std::function<bool()> &cancelled) {
+  auto &nodes = deformation.source_skin_joints;
+  if (nodes == next_nodes) return;
+  std::vector<uint32_t> remap;
+  remap.reserve(nodes.size());
+  for (const auto node : nodes) {
+    const auto at = std::ranges::find(next_nodes, node);
+    remap.push_back(at == next_nodes.end() ? UINT32_MAX : uint32_t(at - next_nodes.begin()));
+  }
+  for (auto &row : deformation.skin->vertices) {
+    stop(cancelled);
+    for (auto &entry : row) {
+      entry.joint = remap.at(entry.joint);
+      if (entry.joint == UINT32_MAX)
+        throw std::invalid_argument("The edited source rig removes a joint used by the native skin");
+    }
+    // Authoring and serialization require canonical joint-slot ordering.
+    std::ranges::sort(row, {}, &Influence::joint);
+  }
+  nodes = next_nodes;
+}
 } // namespace
 
 bool same_source_skin_instance(const SourceNodePlacement &a, const SourceNodePlacement &b) noexcept {
@@ -151,25 +174,7 @@ void update_native_source_skins(const Scene &before, Scene &after, const SourceN
     authenticate(*target.deformation, before.world_matrix(target.id), *old.deformation,
                  before.world_matrix(old.id), *old.appearance, cancelled);
     auto deformation = std::make_shared<DeformationState>(*target.deformation);
-    auto &nodes = deformation->source_skin_joints;
-    const auto &next_nodes = now.appearance->source_joint_nodes;
-    if (nodes != next_nodes) {
-      std::vector<uint32_t> remap;
-      remap.reserve(nodes.size());
-      for (const auto node : nodes) {
-        const auto at = std::ranges::find(next_nodes, node);
-        remap.push_back(at == next_nodes.end() ? UINT32_MAX : uint32_t(at - next_nodes.begin()));
-      }
-      for (auto &row : deformation->skin->vertices) {
-        stop(cancelled);
-        for (auto &entry : row) {
-          entry.joint = remap.at(entry.joint);
-          if (entry.joint == UINT32_MAX)
-            throw std::invalid_argument("The edited source rig removes a joint used by the native skin");
-        }
-      }
-      nodes = next_nodes;
-    }
+    remap_native_joint_slots(*deformation, now.appearance->source_joint_nodes, cancelled);
     if (old.deformation->skeleton->encode() != now.deformation->skeleton->encode() || old.appearance != now.appearance) {
       deformation->skeleton = accessory_skeleton(*now.deformation->skeleton, world, after.world_matrix(now.id), cancelled);
       deformation->humanoid = now.deformation->humanoid;
@@ -189,5 +194,32 @@ void authenticate_native_source_skin(const ObjectSurface &target, const ObjectSu
                                      const std::function<bool()> &cancelled) {
   authenticate(*target.deformation, target.world_matrix(), *reference.deformation,
                reference.world_matrix(), *reference.appearance, cancelled);
+}
+void authenticate_native_source_skin(const Scene &scene, const SculptObject &target,
+                                     const std::function<bool()> &cancelled) {
+  if (!target.deformation || target.deformation->source_skin_joints.empty()) return;
+  const auto link = source_skin_link(scene.group_path(target.group), *target.deformation);
+  const auto &reference = source_skin_reference(scene, *link);
+  authenticate(*target.deformation, scene.world_matrix(target.id), *reference.deformation,
+               scene.world_matrix(reference.id), *reference.appearance, cancelled);
+}
+void synchronize_restored_source_skin(Scene &scene, uint64_t id, const std::function<bool()> &cancelled) {
+  auto &target = scene.object(id);
+  if (!target.deformation || target.deformation->source_skin_joints.empty()) return;
+  const auto link = source_skin_link(scene.group_path(target.group), *target.deformation);
+  const auto &reference = source_skin_reference(scene, *link);
+  auto restored = std::make_shared<DeformationState>(*target.deformation);
+  remap_native_joint_slots(*restored, reference.appearance->source_joint_nodes, cancelled);
+  const auto world = scene.world_matrix(id), reference_world = scene.world_matrix(reference.id);
+  restored->skeleton = accessory_skeleton(*reference.deformation->skeleton, world, reference_world, cancelled);
+  restored->pose = reference.deformation->pose;
+  restored->humanoid = reference.deformation->humanoid;
+  if (reference.deformation->landmarks) {
+    SkinGeometryWork work(256, cancelled);
+    restored->landmarks = skin_reframe_landmarks(*reference.deformation->landmarks, world.inverse() * reference_world, work);
+  }
+  restored->validate(target.painted->mesh());
+  stop(cancelled);
+  target.deformation = std::move(restored);
 }
 } // namespace dome::detail

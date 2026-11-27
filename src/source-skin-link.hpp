@@ -16,4 +16,9 @@ void update_native_source_skins(const Scene &before, Scene &after, const SourceN
                                 const std::function<bool()> &);
 void authenticate_native_source_skin(const ObjectSurface &, const ObjectSurface &reference,
                                      const std::function<bool()> &);
+void authenticate_native_source_skin(const Scene &, const SculptObject &,
+                                     const std::function<bool()> &);
+// Historical paint/weights use their own snapshot. The linked skeleton still
+// belongs to the live original avatar in the same instance.
+void synchronize_restored_source_skin(Scene &, uint64_t, const std::function<bool()> &);
 } // namespace dome::detail

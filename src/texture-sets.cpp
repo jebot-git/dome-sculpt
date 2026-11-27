@@ -8,6 +8,7 @@
 #include "texture-set-paint-access.hpp"
 #include "texture-set-graph.hpp"
 #include "texture-set-surface.hpp"
+#include "retopo-transfer.hpp"
 #include "text-utf8.hpp"
 #include <algorithm>
 #include <limits>
@@ -167,9 +168,9 @@ struct TextureSetAccess {
    return changed;
   return original;
  }
- static std::shared_ptr<TextureSetCollection>initial(const Mesh&mesh,std::span<const TextureSetId>assignments){
-  auto t=std::shared_ptr<TextureSetTopology>(new TextureSetTopology);t->geometry_=std::make_shared<const Mesh>(mesh);
-  t->faces_.reserve(assignments.size());t->corners_.reserve(mesh.indices.size());
+ static std::shared_ptr<TextureSetCollection>initial(std::shared_ptr<const Mesh> mesh,std::span<const TextureSetId>assignments){
+  auto t=std::shared_ptr<TextureSetTopology>(new TextureSetTopology);t->geometry_=std::move(mesh);
+  t->faces_.reserve(assignments.size());t->corners_.reserve(t->geometry_->indices.size());
   for(size_t f=0;f<assignments.size();++f){t->faces_.push_back(f+1);for(size_t k=0;k<3;++k)t->corners_.push_back(f*3+k+1);}
   auto c=std::shared_ptr<TextureSetCollection>(new TextureSetCollection);c->topology_=std::move(t);c->slots_=std::make_shared<const std::vector<TextureSetId>>(assignments.begin(),assignments.end());return c;
  }
@@ -189,6 +190,32 @@ struct TextureSetAccess {
  }
  static std::shared_ptr<const TextureSetFaceDomain>domain(const std::shared_ptr<const TextureSetTopology>&t,TextureSetId id,const std::shared_ptr<const std::vector<TextureSetId>>&slots){
   auto d=std::shared_ptr<TextureSetFaceDomain>(new TextureSetFaceDomain);d->topology_=t;d->set_=id;d->assignments_=slots;for(size_t f=0;f<slots->size();++f)if((*slots)[f]==id)d->triangles_.push_back(uint32_t(f));std::shared_ptr<const TextureSetFaceDomain>sealed=std::move(d);sealed->self_=sealed;return sealed;
+ }
+ static RetopoTextureSets project_retopology(const PaintedMesh &primary, const TextureSetCollection &old,
+     std::shared_ptr<const Mesh> mesh, std::span<const TextureSetId> assignments,
+     RetopoTransferBudget &budget, const RetopoFieldProjector &project) {
+   if (old.primary_source_ || std::ranges::any_of(old.additional_, [](const auto &field) {
+         return field.source || field.appearance || field.material_bindings;
+       }))
+     throw std::invalid_argument("Retopology needs a retained-source adapter for these material fields");
+   if (old.topology_->polygon_ids() || !old.primary_->matches(primary.mesh_owner()) ||
+       assignments.size() != mesh->indices.size() / 3)
+     throw std::invalid_argument("Retopology material assignments lost their genuine triangle domain");
+   budget.reserve(assignments.size(), 4 * sizeof(uint64_t) + 2 * sizeof(uint32_t));
+   budget.work(assignments.size() * (old.additional_.size() + 2));
+   auto next = initial(std::move(mesh), assignments);
+   next->active_ = old.active_;
+   next->next_ = old.next_;
+   next->primary_ = domain(next->topology_, 0, next->slots_);
+   auto replacement = project(primary, next->primary_);
+   next->additional_.reserve(old.additional_.size());
+   for (const auto &old_field : old.additional_) {
+     auto field = old_field;
+     field.domain = domain(next->topology_, field.id, next->slots_);
+     field.painted = project(*old_field.painted, field.domain);
+     next->additional_.push_back(std::move(field));
+   }
+   return {std::move(replacement), std::move(next)};
  }
  static std::vector<std::shared_ptr<const TextureSetFieldSource>>field_sources(const SculptObject&o,std::span<const TextureSetId>assignments,const TextureSetLimits&l){
   if(o.texture_sets)throw std::invalid_argument("Repartitioning retained material fields needs its existing per-field source adapter");
@@ -229,6 +256,11 @@ struct TextureSetAccess {
 
  }
 };
+RetopoTextureSets project_retopology_texture_sets(const PaintedMesh &primary, const TextureSetCollection &old,
+    std::shared_ptr<const Mesh> replacement, std::span<const TextureSetId> assignments,
+    RetopoTransferBudget &budget, const RetopoFieldProjector &project) {
+  return TextureSetAccess::project_retopology(primary, old, std::move(replacement), assignments, budget, project);
+}
 void stage_texture_set_bake(SculptObject &target,
     const std::shared_ptr<const TextureSetCollection> &membership,
     const TextureSetView &recipient, std::shared_ptr<PaintedMesh> paint,
@@ -307,7 +339,7 @@ void initialize_texture_sets(Scene&scene,uint64_t object,const Mesh&mesh,
   work_items(size_t(std::max(0,x1-x0+1))*std::max(0,y1-y0+1),1);
  }
  // Every forecast/shape/slot check precedes the sole detached geometry copy.
- auto collection=detail::TextureSetAccess::initial(mesh,assignments);collection->next_=fields.size();collection->primary_=detail::TextureSetAccess::domain(collection->topology_,0,collection->slots_);collection->additional_.reserve(fields.size()-1);
+ auto collection=detail::TextureSetAccess::initial(std::make_shared<const Mesh>(mesh),assignments);collection->next_=fields.size();collection->primary_=detail::TextureSetAccess::domain(collection->topology_,0,collection->slots_);collection->additional_.reserve(fields.size()-1);
  auto primary=detail::TextureSetPaintAccess::empty(collection->primary_,fields[0].resolution,limits);
  for(size_t k=1;k<fields.size();++k){stop(limits);auto domain=detail::TextureSetAccess::domain(collection->topology_,TextureSetId(k),collection->slots_);auto paint=detail::TextureSetPaintAccess::empty(domain,fields[k].resolution,limits);collection->additional_.push_back({TextureSetId(k),fields[k].material.name,std::move(paint),fields[k].material,{},{},{},std::move(domain)});}
  auto next=scene;auto&target=next.object(object);target.mesh_active=true;target.painted=std::move(primary);target.material=fields[0].material;target.texture_sets=std::move(collection);

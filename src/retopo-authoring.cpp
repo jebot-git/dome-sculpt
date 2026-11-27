@@ -8,9 +8,11 @@
 #include "normal-bake-frames.hpp"
 #include "retopo-transfer.hpp"
 #include "skin-affine.hpp"
+#include "source-skin-link.hpp"
 #include "text-utf8.hpp"
 #include "texture-set-paint-access.hpp"
 #include <algorithm>
+#include <bit>
 #include <limits>
 #include <map>
 #include <type_traits>
@@ -100,7 +102,7 @@ detail::RetopoTransfer::RetopoTransfer(const Mesh &previous_mesh,
   options_.closest_maximum = .2f;
   options_.triangle_filter = [this](uint32_t face) {
     work();
-    return dot(world_normals_[face], current_normal_) > 0;
+    return (!current_domain_ || current_domain_->contains(face)) && dot(world_normals_[face], current_normal_) > 0;
   };
 }
 
@@ -114,8 +116,10 @@ void detail::RetopoTransferBudget::reserve(size_t count, size_t stride) {
   bytes_left_ -= count * stride;
 }
 
-std::optional<SurfaceHit> detail::RetopoTransfer::match(Vec3 position, Vec3 normal) {
+std::optional<SurfaceHit> detail::RetopoTransfer::match(Vec3 position, Vec3 normal,
+    const TextureSetFaceDomain *source_domain) {
   work();
+  current_domain_ = source_domain;
   current_normal_ = normal_direction(replacement_metric_, normal);
   const auto point = skin_affine_point(replacement_metric_, position);
   if (previous_metric_.matrix() == AffineTransform{}.matrix())
@@ -403,8 +407,6 @@ bool same_patch_surface(const RetopoSurface &a, const RetopoSurface &b) {
 
 std::shared_ptr<DeformationState> transfer_patch_deformation(const DeformationState &before,
     const Mesh &old_mesh, const Mesh &new_mesh, detail::RetopoTransfer &transfer) {
-  if (before.source_skin_instance)
-    throw std::invalid_argument("Retopology cannot reproject a skin linked to imported joints yet");
   const auto vertices = new_mesh.positions.size();
   const size_t targets = before.morphs ? before.morphs->targets.size() : 0;
   if (targets && vertices > 8'000'000 / targets)
@@ -418,6 +420,9 @@ std::shared_ptr<DeformationState> transfer_patch_deformation(const DeformationSt
   result->expressions = before.expressions;
   result->pose = before.pose;
   result->morph_weights = before.morph_weights;
+  result->source_skin_instance = before.source_skin_instance;
+  result->source_skin_node = before.source_skin_node;
+  result->source_skin_joints = before.source_skin_joints;
   const auto &change = transfer.placement_change();
   if (change.matrix() != AffineTransform{}.matrix()) {
     detail::SkinGeometryWork work(500'000'000, transfer.cancelled());
@@ -524,11 +529,14 @@ public:
     std::shared_ptr<const PaintedMesh> paint;
     std::shared_ptr<const DeformationState> deformation;
     std::shared_ptr<const SourceMaterialBindings> material;
+    std::shared_ptr<const TextureSetCollection> texture_sets;
   };
 
   RetopoReplacement(std::shared_ptr<const PaintedMesh> grid, AffineTransform old_world,
-                    AffineTransform new_world, const std::function<bool()> &cancelled)
-      : budget_(cancelled), old_world_(old_world), new_world_(new_world), first_grid_(std::move(grid)) {
+                    AffineTransform new_world, std::span<const TopologyID> old_faces,
+                    std::span<const TopologyID> new_faces, const std::function<bool()> &cancelled)
+      : budget_(cancelled), old_world_(old_world), new_world_(new_world), first_grid_(std::move(grid)),
+        old_faces_(old_faces), new_faces_(new_faces) {
     const auto resolution = first_grid_->resolution();
     budget_.reserve(1, detail::TextureSetPaintAccess::working_bytes(*first_grid_, resolution));
     charge_raster(*first_grid_);
@@ -536,10 +544,14 @@ public:
   }
 
   State project(const PaintedMesh &old_paint, const std::shared_ptr<const DeformationState> &old_deformation,
-                const std::shared_ptr<const SourceMaterialBindings> &old_material) {
+                const std::shared_ptr<const SourceMaterialBindings> &old_material,
+                const std::shared_ptr<const TextureSetCollection> &old_sets) {
     stop(budget_.cancelled());
     auto &projection = query(old_paint);
-    const auto paint = reproject(old_paint, projection);
+    // Every field of a texture set shares the replacement REST geometry. Its
+    // own raster bounds and same-slot source filter preserve material seams.
+    auto fields = old_sets ? reproject_sets(old_paint, *old_sets, projection) : detail::RetopoTextureSets{};
+    std::shared_ptr<const PaintedMesh> paint = fields.primary ? std::move(fields.primary) : reproject(old_paint, projection);
     std::shared_ptr<const DeformationState> deformation;
     if (old_deformation) {
       const auto match = [&](const Deformation &entry) {
@@ -552,13 +564,15 @@ public:
         deformations_.push_back({old_paint.mesh_owner().get(), old_deformation.get(), deformation});
       }
     }
-    return {paint, deformation, transfer_patch_material(old_paint, old_material, *paint, deformation, projection)};
+    return {paint, deformation, transfer_patch_material(old_paint, old_material, *paint, deformation, projection),
+            std::move(fields.membership)};
   }
 
 private:
   detail::RetopoTransferBudget budget_;
   AffineTransform old_world_, new_world_;
   std::shared_ptr<const PaintedMesh> first_grid_;
+  std::span<const TopologyID> old_faces_, new_faces_;
   std::map<uint32_t,std::shared_ptr<const PaintedMesh>> grids_;
   std::map<const Mesh *,std::unique_ptr<detail::RetopoTransfer>> surfaces_;
   struct Paint {const PaintedMesh *source; std::shared_ptr<const PaintedMesh> projected;};
@@ -569,6 +583,61 @@ private:
   };
   std::vector<Paint> paints_;
   std::vector<Deformation> deformations_;
+  struct ProjectedSets {
+    const PaintedMesh *primary;
+    const TextureSetCollection *source;
+    detail::RetopoTextureSets projected;
+  };
+  std::vector<ProjectedSets> projected_sets_;
+
+  detail::RetopoTextureSets reproject_sets(const PaintedMesh &primary, const TextureSetCollection &sets,
+                                           detail::RetopoTransfer &projection) {
+    const auto cached = std::ranges::find_if(projected_sets_, [&](const ProjectedSets &entry) {
+      return entry.source == &sets && (entry.primary == &primary ||
+             detail::TextureSetPaintAccess::same_current(primary,*entry.primary));
+    });
+    if (cached != projected_sets_.end()) return cached->projected;
+    const auto existing = sets.triangle_sets();
+    const auto &mesh = first_grid_->mesh();
+    if (existing.size() != primary.mesh().indices.size() / 3 || existing.size() != old_faces_.size() ||
+        new_faces_.size() != mesh.indices.size() / 3)
+      throw std::invalid_argument("Retopology source material slots differ from its genuine mesh");
+    budget_.reserve(mesh.indices.size() / 3, sizeof(TextureSetId));
+    std::vector<TextureSetId> slots;
+    slots.reserve(mesh.indices.size() / 3);
+    for (size_t c = 0; c < mesh.indices.size(); c += 3) {
+      if ((c & 1023) == 0) stop(budget_.cancelled());
+      budget_.work(2 * std::bit_width(old_faces_.size()) + 2);
+      const auto previous = std::ranges::equal_range(old_faces_, new_faces_[c / 3]);
+      if (!previous.empty()) {
+        const auto fields = existing.subspan(previous.begin() - old_faces_.begin(), previous.size());
+        // A moved face keeps its authored material even when its centre now
+        // overlaps another face. Newly created faces use the rest surface.
+        if (std::ranges::all_of(fields, [&](auto slot) { return slot == fields.front(); })) {
+          slots.push_back(fields.front());
+          continue;
+        }
+      }
+      const auto a = mesh.positions[mesh.indices[c]], b = mesh.positions[mesh.indices[c + 1]],
+                 d = mesh.positions[mesh.indices[c + 2]];
+      const auto hit = projection.match((a + b + d) / 3.f, cross(b - a,d - a));
+      slots.push_back(hit ? existing[hit->triangle] : 0);
+    }
+    auto result = detail::project_retopology_texture_sets(primary, sets, first_grid_->mesh_owner(), slots, budget_,
+        [&](const PaintedMesh &source, const std::shared_ptr<const TextureSetFaceDomain> &domain) {
+          TextureSetLimits limits;
+          limits.cancelled = budget_.cancelled();
+          limits.maximum_work = budget_.remaining_work();
+          const auto size = source.resolution();
+          budget_.reserve(1, detail::TextureSetPaintAccess::initial_raster_bytes(size));
+          auto output = detail::TextureSetPaintAccess::empty(domain, size, limits);
+          charge_raster(*output);
+          detail::TextureSetPaintAccess::reproject_retopology(source, *output, projection);
+          return output;
+        });
+    projected_sets_.push_back({&primary, &sets, result});
+    return result;
+  }
 
   void charge_raster(const PaintedMesh &paint) {
     const auto &raster = paint.surface_diagnostics();
@@ -607,8 +676,10 @@ private:
 class RetopoRestoreHistory {
 public:
   RetopoRestoreHistory(std::shared_ptr<const RetopoPatch> patch, CanvasTransform world,
+                       std::shared_ptr<const SourcePlacementCapsule> placement,
                        RetopoReplacement *replacement, const std::function<bool()> &cancelled)
-      : patch_(std::move(patch)), world_(world), replacement_(replacement), cancelled_(cancelled) {}
+      : patch_(std::move(patch)), world_(world), placement_(std::move(placement)),
+        replacement_(replacement), cancelled_(cancelled) {}
 
   std::shared_ptr<const PolygonOrigin> rebase(const std::shared_ptr<const PolygonOrigin> &original, size_t depth = 1) {
     if (!original) return {};
@@ -621,19 +692,21 @@ public:
       return entry->second;
     }
     if (!original->mesh_active || !original->paint || !original->retopology ||
-        original->retopology->source != patch_->source || original->polygon || original->texture_sets || original->appearance)
+        original->retopology->source != patch_->source || original->polygon || original->appearance)
       throw std::invalid_argument("Retopology cannot rebase a Restore checkpoint from a different surface model");
     auto mapped = std::make_shared<PolygonOrigin>(*original);
     mapped->retopology = patch_;
     if (replacement_) {
       // Restore uses the current object's placement. Its old checkpoints
       // belong to that same object-local space, even if the object was moved.
-      const auto state = replacement_->project(*original->paint, original->deformation, original->material_bindings);
+      const auto state = replacement_->project(*original->paint, original->deformation, original->material_bindings,
+                                               original->texture_sets);
       mapped->paint = state.paint;
       mapped->deformation = state.deformation;
       mapped->material_bindings = state.material;
-      mapped->world_transform = world_;
-      mapped->placement.reset();
+      mapped->texture_sets = state.texture_sets;
+      mapped->world_transform = placement_ ? CanvasTransform{} : world_;
+      mapped->placement = placement_;
     }
     mapped->shape_source = rebase(original->shape_source, depth + 1);
     mapped->rig_source = rebase(original->rig_source, depth + 1);
@@ -644,6 +717,7 @@ public:
 private:
   std::shared_ptr<const RetopoPatch> patch_;
   CanvasTransform world_;
+  std::shared_ptr<const SourcePlacementCapsule> placement_;
   RetopoReplacement *replacement_;
   const std::function<bool()> &cancelled_;
   std::map<const PolygonOrigin *,std::shared_ptr<const PolygonOrigin>> origins_;
@@ -660,37 +734,61 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
   scene.object(source);
   auto triangles = topology.triangulate(cancelled);
   stop(cancelled);
+  Scene staged = scene;
+  const auto id = staged.add(text::utf8_prefix(previous.name,240) + " retopo", Volume{}, transform);
+  auto &object = staged.object(id);
   std::shared_ptr<PaintedMesh> painted;
   std::shared_ptr<const DeformationState> deformation;
   std::shared_ptr<const SourceMaterialBindings> material;
+  std::shared_ptr<const TextureSetCollection> texture_sets;
   const auto patch = std::make_shared<const RetopoPatch>(RetopoPatch{source, topology});
   std::shared_ptr<const PolygonOrigin> rig_source, shape_source;
   if (previous.retopology) {
     if (previous.retopology->source != source || !previous.mesh_active || !previous.painted ||
-        previous.texture_sets || previous.appearance || previous.polygon)
+        previous.appearance || previous.polygon)
       throw std::invalid_argument("Retopology cannot replace this material or topology authority yet");
+    detail::authenticate_native_source_skin(scene, previous, cancelled);
     const auto old_world = scene.world_matrix(previous.id);
-    const auto new_world = affine_similarity(transform);
-    const bool same_surface = old_world.matrix() == new_world.matrix() &&
-                   same_patch_surface(previous.retopology->topology.triangulate(cancelled), triangles);
+    const auto desired_world = affine_similarity(transform);
+    const bool same_placement = old_world.matrix() == desired_world.matrix();
+    // Preserve the actual avatar instance and other parent-local links. The
+    // workspace presents a world similarity, so use the exact affine inverse
+    // of its original parent to express the new mesh in that same hierarchy.
+    object.group = previous.group;
+    if (object.group) {
+      if (same_placement) {
+        object.transform = previous.transform;
+        object.affine_edit = previous.affine_edit;
+      } else {
+        object.transform = {};
+        object.affine_edit = std::make_shared<const NativeAffineEdit>(scene.parent_matrix(previous.id).inverse() * desired_world);
+      }
+    }
+    const auto new_world = staged.world_matrix(id);
+    const auto old_surface = previous.retopology->topology.triangulate(cancelled);
+    const bool same_surface = same_placement && same_patch_surface(old_surface, triangles);
     std::unique_ptr<RetopoReplacement> replacement;
     if (same_surface) {
       painted = previous.painted->snapshot();
       deformation = previous.deformation;
       material = previous.material_bindings;
+      texture_sets = previous.texture_sets;
     } else {
       const auto size = previous.painted->resolution();
       unwrap(triangles.mesh, size, 4, cancelled);
       PaintSurfaceOptions options;
       options.cancelled = cancelled;
       auto grid = PaintedMesh::from_mesh(std::move(triangles.mesh), size, options);
-      replacement = std::make_unique<RetopoReplacement>(std::move(grid), old_world, new_world, cancelled);
-      auto current = replacement->project(*previous.painted, previous.deformation, previous.material_bindings);
+      replacement = std::make_unique<RetopoReplacement>(std::move(grid), old_world, new_world,
+          old_surface.source_faces, triangles.source_faces, cancelled);
+      auto current = replacement->project(*previous.painted, previous.deformation, previous.material_bindings,
+                                          previous.texture_sets);
       painted = current.paint->snapshot();
       deformation = std::move(current.deformation);
       material = std::move(current.material);
+      texture_sets = std::move(current.texture_sets);
     }
-    RetopoRestoreHistory history(patch, transform, replacement.get(), cancelled);
+    RetopoRestoreHistory history(patch, transform, capture_source_placement(staged,id), replacement.get(), cancelled);
     rig_source = history.rebase(previous.rig_source);
     shape_source = history.rebase(previous.shape_source);
   } else {
@@ -699,9 +797,6 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
     options.cancelled = cancelled;
     painted = PaintedMesh::from_mesh(std::move(triangles.mesh), 512, options);
   }
-  Scene staged = scene;
-  auto id = staged.add(text::utf8_prefix(previous.name,240) + " retopo", Volume{}, transform);
-  auto &object = staged.object(id);
   object.painted = std::move(painted); object.mesh_active = true;
   object.material = previous.material; object.retopology = patch;
   object.material_bindings = std::move(material);
@@ -709,8 +804,10 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
   object.deformation = std::move(deformation);
   object.rig_source = std::move(rig_source);
   object.shape_source = std::move(shape_source);
+  object.texture_sets = std::move(texture_sets);
   staged.object(previous.id).visible = false;
   if (source != previous.id) staged.object(source).visible = false;
+  detail::authenticate_native_source_skin(staged, object, cancelled);
   staged.validate(false);
   stop(cancelled);
   scene = std::move(staged);

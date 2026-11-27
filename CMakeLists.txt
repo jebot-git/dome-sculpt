@@ -3344,6 +3344,9 @@ if(BUILD_TESTING)
   add_test(NAME vrm1-retained-skinned-accessory COMMAND dome-sculpt-vrm1-source-export-test
     --retained-skinned-accessory ${CMAKE_CURRENT_BINARY_DIR}/vrm1-retained-skinned-accessory)
   set_tests_properties(vrm1-retained-skinned-accessory PROPERTIES TIMEOUT 300)
+  add_test(NAME retopology-linked-vrm1 COMMAND dome-sculpt-vrm1-source-export-test
+    --linked-retopology ${CMAKE_CURRENT_BINARY_DIR}/retopology-linked-vrm1)
+  set_tests_properties(retopology-linked-vrm1 PROPERTIES TIMEOUT 480)
   set_tests_properties(vrm1-source-export PROPERTIES TIMEOUT 180 FIXTURES_SETUP vrm1-source-model)
   if(TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND Python3_Interpreter_FOUND)
     add_test(NAME vrm1-attachment-openxr COMMAND ${Python3_EXECUTABLE}

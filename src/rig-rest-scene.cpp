@@ -91,7 +91,7 @@ void restore_rig_source(Scene &scene,uint64_t id,RigRestOptions options,const st
    if(options.linked)throw std::invalid_argument("Restore an originally unskinned source on the active part; turn off linked fitting");
    const auto &origin=*selected.rig_source;
    if(!origin.volume||!origin.mesh_active||!origin.paint)throw std::invalid_argument("Original unskinned source capsule is incomplete");
-   Scene next=scene;restore(next.object(id),origin);next.validate();stop(cancelled);scene=std::move(next);return;
+   Scene next=scene;restore(next.object(id),origin);detail::synchronize_restored_source_skin(next,id,cancelled);next.validate();stop(cancelled);scene=std::move(next);return;
   }
  }
  const auto linked_objects=options.linked_objects.empty()?rig_rest_linked_objects(scene,id):options.linked_objects;
@@ -101,6 +101,7 @@ void restore_rig_source(Scene &scene,uint64_t id,RigRestOptions options,const st
  for(const auto &object:scene.objects()){
   stop(cancelled);if(object.id!=id&&(!options.linked||std::find(linked_objects.begin(),linked_objects.end(),object.id)==linked_objects.end()||!group||boundary(scene,object)!=group||!object.rig_source||!object.rig_source->deformation||!object.rig_source->deformation->skeleton||object.rig_source->deformation->skeleton->encode()!=key))continue;
   editable(object,object.id==id);restore(next.object(object.id),*object.rig_source);
+  detail::synchronize_restored_source_skin(next,object.id,cancelled);
  }
  next.validate();stop(cancelled);scene=std::move(next);
 }

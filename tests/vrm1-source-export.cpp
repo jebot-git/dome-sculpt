@@ -5,6 +5,7 @@
 #include "dome/import-authoring.hpp"
 #include "dome/rig-edit.hpp"
 #include "dome/rig-rest.hpp"
+#include "dome/retopo-authoring.hpp"
 #include "dome/tangents.hpp"
 #include "dome/texture-sets.hpp"
 #include "dome/vrm.hpp"
@@ -914,20 +915,7 @@ void surface_heat_texture_accessory(const std::filesystem::path &out, Scene scen
         "Editable VRM replays the painted weights and baked FLOAT emission together");
 }
 
-void skinned_texture_accessory(const std::filesystem::path &out, Scene initial) {
-  const auto accessory = initial.active().id;
-  initial.active().name = "Native skinned collar";
-  initial.active().transform.position = {.48f, .10f, -.045f};
-  initial.active().transform.scale = .86f;
-  ShapeKeyEdit key;
-  key.name = "Flare";
-  author_shapekey(initial, accessory, key);
-  key.action = ShapeKeyAction::Replace;
-  key.positions = initial.active().painted->mesh().positions;
-  key.positions[2].z += .04f;
-  author_shapekey(initial, accessory, key);
-  const auto paint = initial.active().texture_sets;
-
+std::filesystem::path linked_skin_fixture(const std::filesystem::path &out) {
   auto fixture = metadata_source();
   auto &used = fixture.j["extensionsUsed"].get_ref<J::array_t &>();
   for (const auto *extension : {"VRMC_springBone", "VRMC_node_constraint"}) std::erase(used, J(extension));
@@ -944,6 +932,234 @@ void skinned_texture_accessory(const std::filesystem::path &out, Scene initial) 
     skin["joints"][1] = hips;
   const auto source_path = out / "skinned-source.vrm";
   fixture.save(source_path);
+  return source_path;
+}
+
+void linked_retopology(const std::filesystem::path &out) {
+  std::filesystem::create_directories(out);
+  Scene scene;
+  const auto donor = scene.active().id;
+  Mesh mesh;
+  mesh.positions = {{.21f,.10f,.041f},{.69f,.10f,.041f},{.69f,.50f,.041f},{.21f,.50f,.041f}};
+  mesh.normals.assign(4,{0,0,1});
+  mesh.uv = {{0,0},{1,0},{1,1},{0,1}};
+  mesh.indices = {0,1,2,0,2,3};
+  scene.active().name = "Linked collar";
+  scene.active().mesh_active = true;
+  scene.active().painted = std::make_shared<PaintedMesh>(mesh,64);
+  RetopoMesh patch;
+  const auto a = patch.add_vertex({{.25f,.14f,.018f}});
+  const auto b = patch.add_vertex({{.65f,.14f,.018f}});
+  const auto c = patch.add_vertex({{.65f,.46f,.018f}});
+  const auto d = patch.add_vertex({{.25f,.46f,.018f}});
+  patch.add_face(std::array{a,b,c});
+  patch.add_face(std::array{a,c,d});
+  const auto original = publish_retopology(scene, patch, donor, {});
+  const auto second = create_texture_set(scene,original,std::array<uint64_t,1>{2},"Cool trim",64);
+  auto pigment = [&](TextureSetId slot,std::array<float,4> rgba) {
+    check(edit_texture_set(scene,original,slot,[&](PaintedMesh &paint,Material &) {
+      paint.add_layer(slot ? "Cool pigment" : "Warm pigment");
+      PaintSettings settings;
+      settings.color = rgba;
+      settings.front_only = false;
+      Brush brush;
+      brush.from = brush.to = {.45f,.30f,.018f};
+      brush.radius = .29f;
+      brush.normal = {0,0,1};
+      brush.strength = 1;
+      paint.begin_stroke();
+      paint.stamp(brush,settings);
+      return paint.end_stroke();
+    }),"Each material has its own edited pigment layer");
+  };
+  pigment(0,{.85f,.13f,.02f,1});
+  pigment(second,{.02f,.13f,.85f,1});
+  ImportAuthoringOptions options;
+  options.paint_resolution = 64;
+  const auto imported = prepare_authoring_import(scene,linked_skin_fixture(out),options);
+  scene = imported.scene;
+  const auto rig = imported.objects.front();
+  scene.select(original);
+  const auto identity = detail::source_rig_instance(scene,scene.object(rig));
+  scene.group(identity->source_instance).affine_edit = std::make_shared<const NativeAffineEdit>(
+      AffineTransform(std::array<double,16>{1.12,.06,0,0,.08,.92,0,0,0,0,1.04,0,.03,-.02,.01,1}));
+
+  Document document;
+  auto settled = [&] {
+    if (!document.wait_asset() || !document.wait_mesh() || !document.frame().state->error.empty())
+      throw std::runtime_error("Linked retopology worker: " + document.frame().state->error);
+  };
+  auto drafted = [&] {
+    if (!document.wait_retopology() || !document.frame().state->retopology ||
+        !document.frame().state->retopology->error.empty())
+      throw std::runtime_error("Linked retopology draft: " + document.frame().state->error);
+  };
+  document.replace(scene);
+  settled();
+  ObjectBakeSettings bake;
+  bake.front_mm = bake.back_mm = 65;
+  bake.ao_samples = 2;
+  bake.allow_backfaces = true;
+  document.bake_from_object(donor,bake);
+  settled();
+  SkinAuthoringOptions bind;
+  bind.mode = SkinAuthoringMode::Transfer;
+  bind.reference = rig;
+  bind.transfer_distance = .5f;
+  document.bind_skin(bind,document.draft_scene().source);
+  settled();
+  auto before_keys = document.copy_scene();
+  const auto &old_model = *before_keys.active().deformation;
+  check(detail::source_skin_link(before_keys.group_path(before_keys.active().group),old_model)==identity &&
+        texture_set_view(before_keys.active(),second).painted->baked(),
+        "A real Bake and bind give the retopology accessory its original imported joint link");
+  ShapeKeyEdit key;
+  key.name = "Collar lift";
+  document.author_shape(key);
+  settled();
+  key.action = ShapeKeyAction::Replace;
+  key.target = 0;
+  key.positions = before_keys.active().painted->mesh().positions;
+  for (auto &position : key.positions) position.z += position.x * .03f;
+  document.author_shape(key);
+  settled();
+  document.edit_scene("Set collar morph", [](Scene &model, const auto &) {
+    auto deformation = *model.active().deformation;
+    deformation.morph_weights = {.35f};
+    model.set_deformation(model.active().id,std::move(deformation));
+  });
+  settled();
+  const auto input = document.copy_scene();
+  document.save_async(out/"linked-before.dsculpt").get();
+  document.begin_retopology();
+  drafted();
+  document.edit_retopology(RetopoAction::MoveMode);
+  drafted();
+  const auto draft = document.frame().state->retopology;
+  const auto initial = draft->topology->vertices().at(b).position;
+  const auto world = ob::transform(draft->transform,ob::Vec3{initial.x,initial.y,initial.z});
+  const Vec3 here{world.x,world.y,world.z};
+  Brush stroke;
+  stroke.from = stroke.to = here;
+  check(document.begin_desktop(),"Actual desktop retopology accepts Move on the linked patch");
+  document.stamp_desktop(stroke);
+  drafted();
+  stroke.to += Vec3{-.032f,.012f,0};
+  document.stamp_desktop(stroke);
+  document.end_desktop();
+  drafted();
+  check(length(document.frame().state->retopology->topology->vertices().at(b).position-initial)>.02f,
+        "The controller-shared worker changed the actual retopology draft");
+  document.end_retopology(true);
+  document.save_async(out/"linked-reapplied.dsculpt").get();
+  settled();
+  const auto applied = document.copy_scene();
+  const auto &current = applied.active();
+  const auto id = current.id;
+  const auto &deformation = *current.deformation;
+  check(id!=original && current.group==input.active().group && !applied.object(original).visible &&
+        applied.object(rig).visible && deformation.source_skin_joints==old_model.source_skin_joints &&
+        detail::source_skin_link(applied.group_path(current.group),deformation)==identity,
+        "Reapply preserves the original source instance and actual joints in its affine hierarchy");
+  check(current.texture_sets->triangle_sets()[0]==0 && current.texture_sets->triangle_sets()[1]==second &&
+        current.texture_sets->active()==second && current.texture_sets->at(second).name=="Cool trim" &&
+        current.shape_source && current.rig_source && current.shape_source->rig_source==current.rig_source,
+        "Reapply retains exact material-slot IDs, active material and both Restore checkpoints");
+  for (const auto slot : std::array<TextureSetId,2>{0,second}) {
+    const auto field = texture_set_view(current,slot);
+    const auto &layers = field.painted->layers();
+    check(layers.back().name==(slot ? "Cool pigment" : "Warm pigment") &&
+          std::ranges::any_of(layers.back().tiles,[&](const auto &tile) {
+            return tile && std::ranges::any_of(tile->pixels,[&](const auto &p) {
+              return p.data[9]>128&&p.data[slot?2:0]>200&&p.data[slot?0:2]<100;
+            });
+          }),"Each replacement material samples its own authored pigment");
+  }
+  const auto field = texture_set_view(current,second);
+  check(field.painted->resolution()==64 && field.painted->baked() && field.bake_recipe &&
+        std::ranges::any_of(field.painted->baked()->coverage,[](uint8_t value){return value>128;}),
+        "Independent field resolution, Bake and source recipe survive the new atlas");
+  check(Scene::load(out/"linked-reapplied.dsculpt").encode()==applied.encode() && document.undo() &&
+        document.copy_scene().encode()==input.encode() && document.redo() && document.copy_scene().encode()==applied.encode(),
+        "Apply and both retained fields survive immediate ordered Save, cold Open and exact Undo/Redo");
+  settled();
+  const auto head = applied.object(rig).deformation->humanoid->joints.at("head");
+  RigEdit pose;
+  pose.linked_pose = true;
+  pose.joint = JointAdjustment{head,{0,11,5},{.005f,0,.01f}};
+  document.edit_scene("Pose original linked joint",[=](Scene &model,const auto &cancelled) {
+    edit_rig(model,id,pose,cancelled);
+  });
+  settled();
+  auto posed = document.copy_scene();
+  const auto &dep = *posed.active().deformation;
+  const auto &original_rig = *posed.object(rig).deformation;
+  check(dep.skeleton->local_matrices(dep.pose)==original_rig.skeleton->local_matrices(original_rig.pose) &&
+        dep.morph_weights==std::vector{.35f} && posed.object(rig).deformation!=applied.object(rig).deformation,
+        "The reprojected accessory follows a real original-joint pose and keeps its independent morph");
+  document.save_async(out/"linked-posed.dsculpt").get();
+  for (auto format : {AssetExportFormat::Avatar, AssetExportFormat::EditableAvatar512}) {
+    const bool editable = format!=AssetExportFormat::Avatar;
+    const auto file = out/(editable?"linked-editable.vrm":"linked-standard.vrm");
+    document.export_asset(file,format).get();
+    cgltf_options reader_options{};
+    cgltf_data *parsed = nullptr;
+    check(cgltf_parse_file(&reader_options,file.c_str(),&parsed)==cgltf_result_success,
+          "Independent cgltf reads the reprojected accessory export");
+    const auto gltf = std::unique_ptr<cgltf_data,decltype(&cgltf_free)>(parsed,cgltf_free);
+    check(cgltf_load_buffers(&reader_options,parsed,file.c_str())==cgltf_result_success &&
+          cgltf_validate(parsed)==cgltf_result_success,
+          "Independent cgltf validates both material primitives and their shared skin");
+    const auto payload = json(file);
+    const auto &nodes = payload.at("nodes");
+    const auto name = posed.active().name+" surface";
+    const auto leaf = std::ranges::find_if(nodes,[&](const J &node){return node.value("name",std::string{})==name&&node.contains("mesh");});
+    const auto shared_head = payload.at("extensions").at("VRMC_vrm").at("humanoid").at("humanBones").at("head").at("node");
+    check(leaf!=nodes.end() && payload.at("skins").at(leaf->at("skin").get<size_t>()).at("joints").at(head)==shared_head &&
+          payload.at("meshes").at(leaf->at("mesh").get<size_t>()).at("primitives").size()==2,
+          "Portable VRM places both replacement materials on the original humanoid joints");
+    if (editable) {
+      const auto replay = extract_native_authoring(bytes(file));
+      auto expected = posed.snapshot();
+      expected.erase(original);
+      check(replay && replay->encode()==expected.encode() && !replay->object(donor).visible &&
+            field.bake_recipe->source.object==donor,
+            "Editable VRM preserves the authored patch and hidden guide without an outside object");
+      RetopoWorkspace workspace(*replay);
+      check(workspace.view().source && workspace.view().topology->faces().size()==patch.faces().size(),
+            "The recovered editable package can open retopology against its genuine guide");
+    }
+  }
+  key.action = ShapeKeyAction::Restore;
+  document.author_shape(key);
+  document.save_async(out/"linked-shape-restored.dsculpt").get();
+  settled();
+  auto restored = document.copy_scene();
+  const auto &restored_model = *restored.active().deformation;
+  check(!restored_model.morphs && restored_model.source_skin_joints==dep.source_skin_joints &&
+        restored_model.skeleton->local_matrices(restored_model.pose)==original_rig.skeleton->local_matrices(original_rig.pose) &&
+        restored.active().retopology->topology.encode()==current.retopology->topology.encode(),
+        "Shape Restore keeps changed retopology and historical weights with the live original pose");
+  restore_rig_source(restored,id,false);
+  check(!restored.active().deformation && restored.active().texture_sets &&
+        restored.active().retopology->topology.encode()==current.retopology->topology.encode(),
+        "Rig Restore recovers the unbound replacement and its original painted fields");
+}
+
+void skinned_texture_accessory(const std::filesystem::path &out, Scene initial) {
+  const auto accessory = initial.active().id;
+  initial.active().name = "Native skinned collar";
+  initial.active().transform.position = {.48f, .10f, -.045f};
+  initial.active().transform.scale = .86f;
+  ShapeKeyEdit key;
+  key.name = "Flare";
+  author_shapekey(initial, accessory, key);
+  key.action = ShapeKeyAction::Replace;
+  key.positions = initial.active().painted->mesh().positions;
+  key.positions[2].z += .04f;
+  author_shapekey(initial, accessory, key);
+  const auto paint = initial.active().texture_sets;
+  const auto source_path = linked_skin_fixture(out);
   ImportAuthoringOptions options;
   options.paint_resolution = 64;
   const auto imported = prepare_authoring_import(initial, source_path, options);
@@ -1473,6 +1689,11 @@ void bone_accessory(const std::filesystem::path &out) {
 int main(int argc, char **argv) try {
   if (argc < 3)
     return 2;
+  if (argc == 3 && std::string_view(argv[1]) == "--linked-retopology") {
+    linked_retopology(argv[2]);
+    std::cout << "PASS original-joint retopology reapply\n";
+    return 0;
+  }
   if (argc == 3 && std::string_view(argv[1]) == "--retained-skinned-accessory") {
     retained_skinned_accessory(argv[2]);
     std::cout << "PASS retained VRM 1.0 skinned accessory\n";

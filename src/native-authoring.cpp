@@ -7,6 +7,8 @@
 #include "native-scene-payload.hpp"
 #include "emission-package.hpp"
 #include "emission-authority.hpp"
+#include "dome/polygon-scene.hpp"
+#include "dome/retopo-authoring.hpp"
 #include "gltf-document.hpp"
 #include "humanoid-sha256.hpp"
 #include <charconv>
@@ -47,6 +49,52 @@ std::span<const uint8_t> resource(const Json &j,std::span<const uint8_t> binary,
  if(!count||count>binary.size()-offset)throw std::invalid_argument("Native authoring payload exceeds captured BIN");const auto bytes=binary.subspan(offset,count);
  if(record.at("sha256").get_ref<const std::string&>()!=hash(bytes))throw std::invalid_argument("Native authoring resource digest mismatch");return bytes;
 }
+
+std::set<uint64_t> retopology_closure(const Scene &scene, const std::set<uint64_t> &emitted,
+                                      const std::function<bool()> &cancelled) {
+  auto retained = emitted;
+  std::vector<uint64_t> pending(emitted.begin(), emitted.end());
+  std::set<const PolygonOrigin *> visited;
+  auto retain_source = [&](const std::shared_ptr<const RetopoPatch> &patch) {
+    // Older projects can already have a deleted reference. Preserve that
+    // state, and retain any reference that still has an actual scene owner.
+    if (patch && std::ranges::any_of(scene.objects(), [&](const auto &o) { return o.id == patch->source; }) &&
+        retained.insert(patch->source).second)
+      pending.push_back(patch->source);
+  };
+  auto visit_origin = [&](auto &&visit, const std::shared_ptr<const PolygonOrigin> &origin, size_t depth) -> void {
+    if (!origin || !visited.insert(origin.get()).second) return;
+    stop(cancelled);
+    if (depth > 64) throw std::length_error("Native retopology reference history exceeds its depth limit");
+    retain_source(origin->retopology);
+    if (origin->polygon) visit(visit, origin->polygon->origin, depth + 1);
+    visit(visit, origin->rig_source, depth + 1);
+    visit(visit, origin->shape_source, depth + 1);
+  };
+  for (size_t index = 0; index < pending.size(); ++index) {
+    stop(cancelled);
+    const auto &object = scene.object(pending[index]);
+    retain_source(object.retopology);
+    if (object.polygon) visit_origin(visit_origin, object.polygon->origin, 1);
+    visit_origin(visit_origin, object.rig_source, 1);
+    visit_origin(visit_origin, object.shape_source, 1);
+  }
+  return retained;
+}
+
+Scene authoring_subset(const Scene &scene, std::span<const uint64_t> ids,
+                       const std::function<bool()> &cancelled) {
+  const std::set<uint64_t> emitted(ids.begin(), ids.end());
+  if (emitted.size() != ids.size()) throw std::invalid_argument("Duplicate native export subset object");
+  const auto retained = retopology_closure(scene, emitted, cancelled);
+  const std::vector<uint64_t> objects(retained.begin(), retained.end());
+  auto subset = detail::emission_export_subset(scene, objects);
+  for (auto id : retained)
+    if (!emitted.contains(id)) subset.object(id).visible = false;
+  if (!emitted.contains(subset.active().id)) subset.select(ids.front());
+  return subset;
+}
+
 void attach(detail::GltfDocument &document,const detail::NativeAuthoringCapture &capture,size_t maximum,const std::function<bool()> &cancelled){
  stop(cancelled);auto &j=document.json;if(j.contains("extras")&&!j.at("extras").is_object())throw std::invalid_argument("Native authoring cannot replace nonobject extras");
  if(j.contains("extras")&&(j.at("extras").contains(marker)||j.at("extras").contains(hdr_marker)))throw std::invalid_argument("Competing native package authority");tables(j);
@@ -76,7 +124,9 @@ std::shared_ptr<const NativeAuthoringCapture> NativeAuthoringCapture::create(con
  stop(cancelled);if(!policy.max_working_bytes||policy.max_working_bytes>512*1024*1024)throw std::invalid_argument("Invalid native authoring working budget");if(!options.scene||!options.allow_portable_fallback)throw std::invalid_argument("Native authoring requires an immutable Scene and explicit portable-view permission");
  if(options.scope!=NativeAuthoringExport::Scope::WholeScene&&options.scope!=NativeAuthoringExport::Scope::ExportedObjects)throw std::invalid_argument("Unknown native authoring export scope");
  if((options.scope==NativeAuthoringExport::Scope::WholeScene&&!options.objects.empty())||(options.scope==NativeAuthoringExport::Scope::ExportedObjects&&options.objects.empty()))throw std::invalid_argument("Native authoring scope and object selection disagree");
- auto scene=options.scene->snapshot();if(options.scope==NativeAuthoringExport::Scope::ExportedObjects)scene=emission_export_subset(scene,options.objects);scene.validate();scene.require_exportable_sources();stop(cancelled);
+ auto scene=options.scope==NativeAuthoringExport::Scope::ExportedObjects?
+   authoring_subset(*options.scene,options.objects,cancelled):options.scene->snapshot();
+ scene.validate();scene.require_exportable_sources();stop(cancelled);
  // No caller-provided surface or changed-surface equivalence flag enters here.
  // These are actual native preview/source owners, not an offline UV0 HDR
  // raster. A pristine raw source has no writable padding or sparse overlay;
@@ -129,6 +179,20 @@ std::optional<Scene> extract_native_authoring(std::span<const uint8_t> bytes,con
  const size_t at=20+length;if(at>bytes.size()||bytes.size()-at<8||word(bytes,at+4)!=0x004e4942)throw std::invalid_argument("Native authoring has no captured BIN");const size_t count=word(bytes,at);if(count%4||count!=bytes.size()-at-8)throw std::invalid_argument("Native authoring BIN framing mismatch");const auto binary=bytes.subspan(at+8,count);if(!j.at("buffers").is_array()||j.at("buffers").size()!=1||integer(j.at("buffers")[0].at("byteLength"),binary.size(),"Invalid native authoring buffer length")!=binary.size())throw std::invalid_argument("Native authoring buffer declaration mismatch");
  if(package.at("binarySha256").get_ref<const std::string&>()!=hash(binary)||package.at("documentSha256").get_ref<const std::string&>()!=document_hash(j))throw std::invalid_argument("Native authoring core/resource binding mismatch");const auto &maps=package.at("objects");if(!maps.is_array()||maps.empty()||maps.size()>limits.max_objects)throw std::length_error("Native authoring object remaps exceed limits");std::set<uint64_t> identities;std::set<size_t> nodes;
  for(const auto &map:maps){stop(limits.cancelled);if(!map.is_object()||map.size()!=4||!identities.insert(object_id(map.at("object"))).second)throw std::invalid_argument("Invalid native authoring object remap");const auto node=integer(map.at("node"),j.at("nodes").size(),"Invalid native authoring node"),mesh=integer(map.at("mesh"),j.at("meshes").size(),"Invalid native authoring mesh"),material=integer(map.at("material"),j.at("materials").size(),"Invalid native authoring material");if(node>=j.at("nodes").size()||mesh>=j.at("meshes").size()||material>=j.at("materials").size()||!nodes.insert(node).second||integer(j.at("nodes").at(node).at("mesh"),j.at("meshes").size(),"Invalid native authoring node mesh")!=mesh)throw std::invalid_argument("Native authoring object remap references invalid resources");const auto &primitives=j.at("meshes").at(mesh).at("primitives");if(!primitives.is_array()||primitives.empty()||integer(primitives.at(0).at("material"),j.at("materials").size(),"Invalid native authoring primitive material")!=material)throw std::invalid_argument("Native authoring material remap does not match emitted primitive");}
- const auto &native=package.at("native");const size_t expanded=integer(native.at("decodedBytes"),limits.max_decoded_native_bytes,"Native authoring expanded limit exceeded");const auto stored=resource(j,binary,native);if(stored.size()>limits.max_native_bytes)throw std::length_error("Native authoring stored limit exceeded");auto scene=detail::restore_native_scene_payload(stored,encoding=="scene-cbor-deflate",expanded,limits.max_decoded_native_bytes,limits.cancelled);for(auto id:identities)scene.object(id);if(scope=="exportedObjects"&&scene.objects().size()!=identities.size())throw std::invalid_argument("Native authoring subset contains unexported outside objects");stop(limits.cancelled);return scene;
+ const auto &native=package.at("native");
+ const size_t expanded=integer(native.at("decodedBytes"),limits.max_decoded_native_bytes,"Native authoring expanded limit exceeded");
+ const auto stored=resource(j,binary,native);
+ if(stored.size()>limits.max_native_bytes) throw std::length_error("Native authoring stored limit exceeded");
+ auto scene=detail::restore_native_scene_payload(stored,encoding=="scene-cbor-deflate",expanded,
+                                                limits.max_decoded_native_bytes,limits.cancelled);
+ for(auto id:identities) scene.object(id);
+ if(scope=="exportedObjects") {
+   const auto retained=retopology_closure(scene,identities,limits.cancelled);
+   for(const auto &object:scene.objects())
+     if(!identities.contains(object.id) && (object.visible || !retained.contains(object.id)))
+       throw std::invalid_argument("Native authoring subset contains unexported outside objects");
+ }
+ stop(limits.cancelled);
+ return scene;
 }
 }

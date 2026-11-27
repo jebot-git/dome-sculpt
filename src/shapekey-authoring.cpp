@@ -1,6 +1,7 @@
 #include "dome/texture-sets.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/shapekey-authoring.hpp"
+#include "source-skin-link.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "normal-bake-frames.hpp"
@@ -116,6 +117,7 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
   o.volume=std::make_shared<Volume>(origin.volume->geometry_snapshot());o.painted=origin.paint?origin.paint->snapshot():nullptr;
   o.mesh_active=origin.mesh_active;o.material=origin.material;o.deformation=origin.deformation;o.appearance=origin.appearance;
   o.material_bindings=origin.material_bindings;o.retopology=origin.retopology;o.polygon=origin.polygon;o.shape_source=origin.shape_source;o.rig_source=origin.rig_source;o.bake_recipe=origin.bake_recipe;o.texture_sets=origin.texture_sets;
+  detail::synchronize_restored_source_skin(next,object,cancelled);
   next.validate();stop(cancelled);scene=std::move(next);return {0,true};
  }
  if(source.texture_sets&&!detail::texture_set_shape_editable(source))
