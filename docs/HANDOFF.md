@@ -91,8 +91,19 @@ late cancellation, Undo/Redo, native frame replay and GLB skin/morph export.
 All 15 selected Release and seven ASan/UBSan tests passed. Nested DomeD
 Wayland covers reopen, Move, Cancel and exact Save. Synthetic OpenXR
 renders the replacement in both eyes on software GL and Intel Arc A770.
-Prepared and retained material grids, imported joint links and new Restore
-capsules for changed geometry remain open. [Retopology reapply validation](validation/retopology-reapply-20261127.json)
+Prepared and retained material grids and imported joint links remain open.
+[Retopology reapply validation](validation/retopology-reapply-20261127.json)
+
+Rig Restore and Shapekey Restore now preserve the replacement topology after
+reapply. Apply reprojects each native historical checkpoint on the new atlas
+with the checkpoint's own paint resolution, Bake and deformation. The rig
+and shape history keeps its original order and shared earlier checkpoints.
+Restore uses that checkpoint while keeping the current placement and any
+later wire-only edits. Both operation orders pass after cold Open, including
+ordered Save and Undo/Redo. Nested DomeD Wayland verifies Cancel as the
+default Shapekey Restore confirmation and matches the saved native worker
+output for Restore, Undo and Redo.
+[Retopology Restore validation](validation/retopology-restore-20261127.json)
 
 Surface Heat also binds meshes after independent frame and shapekey
 authoring. Retention accounts for the actual POSITION correspondences,

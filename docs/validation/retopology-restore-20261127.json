@@ -1,0 +1,120 @@
+{
+  "revision": "02494c1670a38cf3824445f2dafe4e21a86363be",
+  "canonical_domed_revision": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "release_fltk": "/opt/fltk-vr/toolkit",
+  "asan_fltk": "artifacts/sdk-20261126/toolkit-sanitize",
+  "release": {
+    "tests": [
+      "retopology-restore-affine",
+      "retopology-reapply-affine",
+      "retopology-save-handoff",
+      "retopology-reapply-plain",
+      "retopology-restore-plain",
+      "rig-rest-authoring",
+      "shapekey-authoring",
+      "retopology-surface-heat-plain",
+      "retopology-affine",
+      "shapekey-document",
+      "retopology-authoring",
+      "retopology-surface-heat-affine"
+    ],
+    "app_sha256": "ace26f87e8d0db58854f436e672505d7e0df15351adde1a666a7ff9c42a6b774",
+    "native_test_sha256": "ca146b88a522cb796e6d2f0376e4610c36d81cb3d57971459a0c00cb40be6ea9"
+  },
+  "sanitizer": {
+    "tests": [
+      "retopology-restore-affine",
+      "retopology-reapply-plain",
+      "retopology-reapply-affine",
+      "retopology-save-handoff",
+      "retopology-surface-heat-plain",
+      "retopology-restore-plain",
+      "retopology-surface-heat-affine",
+      "retopology-authoring",
+      "retopology-affine"
+    ],
+    "core_sha256": "3ec56e38556b639db6deeb28a1b8492f37ab0599a355036cea3696952bb7c7e2",
+    "native_test_sha256": "24d29a3e79453f52240499c89f6775ce1362c666a1bafc52d3e7bc6cc6ba51cb",
+    "asan_options": "detect_leaks=1:halt_on_error=1",
+    "ubsan_options": "halt_on_error=1:print_stacktrace=1",
+    "fixture_build": "Final fixture compiled and linked with the generated CMake ASan/UBSan commands against the same strict core"
+  },
+  "native_restore_assertions_per_placement": 28,
+  "fixture_cases": {
+    "plain": "Rig before shapekey, older actual normal/material Bake, same resolution",
+    "affine": "Shapekey before rig under reflected/sheared source placement; the earlier shape checkpoint keeps its 256-square grid and the current/rig states stay at 512"
+  },
+  "release_files_sha256": {
+    "plain/history-before": "b36aedf3dde8d76435b85402810a8ba9775c03eb337e2ee1008dc02e31b8373a",
+    "plain/history-reapplied": "c7074d3c53f7d2f18f7c3b53ee913e6e9a7a528952ac3ebd0ad04dc953e3b83a",
+    "plain/history-restore-latest": "cb5e0a1c8d2749ad82feb8a97e2fc4b6d6de88abc6c38d60e0fc508997f899d6",
+    "plain/history-restore-first": "6260575cc5ea439d4f76854f95b618e2fcaed7ac8c082d210f330dcbdee1e618",
+    "affine/history-before": "e3c1da848cd2d9ef07ddf6bcc1ede1c9652c249de672c2626909cff845dc9c03",
+    "affine/history-reapplied": "245cc3b2ab75f43bc71b374f2ab287bbd2e646be2cea0afad09aed7dae8e1b5f",
+    "affine/history-restore-latest": "da7f4ebb18ccb3a1a94582cc28e9f693b539bf08d5ba15d6b771fffe81d7e052",
+    "affine/history-restore-first": "a8dafdab7a1ecc0b52a915398cfc401e9d8cbbe5069f81cc2539622154e9b672"
+  },
+  "sanitizer_files_sha256": {
+    "plain/history-before": "b36aedf3dde8d76435b85402810a8ba9775c03eb337e2ee1008dc02e31b8373a",
+    "plain/history-reapplied": "c7074d3c53f7d2f18f7c3b53ee913e6e9a7a528952ac3ebd0ad04dc953e3b83a",
+    "plain/history-restore-latest": "cb5e0a1c8d2749ad82feb8a97e2fc4b6d6de88abc6c38d60e0fc508997f899d6",
+    "plain/history-restore-first": "6260575cc5ea439d4f76854f95b618e2fcaed7ac8c082d210f330dcbdee1e618",
+    "affine/history-before": "e3c1da848cd2d9ef07ddf6bcc1ede1c9652c249de672c2626909cff845dc9c03",
+    "affine/history-reapplied": "245cc3b2ab75f43bc71b374f2ab287bbd2e646be2cea0afad09aed7dae8e1b5f",
+    "affine/history-restore-latest": "da7f4ebb18ccb3a1a94582cc28e9f693b539bf08d5ba15d6b771fffe81d7e052",
+    "affine/history-restore-first": "a8dafdab7a1ecc0b52a915398cfc401e9d8cbbe5069f81cc2539622154e9b672"
+  },
+  "release_sanitizer_exact_matches": [
+    "affine/history-before",
+    "affine/history-reapplied",
+    "affine/history-restore-first",
+    "affine/history-restore-latest",
+    "plain/history-before",
+    "plain/history-reapplied",
+    "plain/history-restore-first",
+    "plain/history-restore-latest"
+  ],
+  "nested_domed_wayland": {
+    "assertions": 8,
+    "default_cancel": true,
+    "restore_undo_redo_exact": true,
+    "matches_native_worker": true
+  },
+  "synthetic_openxr": {
+    "software": {
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "before_after_rgb_differences_per_eye": [
+        30701,
+        30583
+      ],
+      "stereo_submissions_per_state": 6,
+      "image_releases_per_state": 12,
+      "exact_save_after_reopen": true
+    },
+    "arc": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "before_after_rgb_differences_per_eye": [
+        31119,
+        31564
+      ],
+      "stereo_submissions_per_state": 6,
+      "image_releases_per_state": 12,
+      "exact_save_after_reopen": true
+    }
+  },
+  "physical_headset_tested": false,
+  "archive": {
+    "sha256": "8b327cfae768e41e68e479ff9e69eb7ca7c977de20c0f7fd10ce1982e1ee3227",
+    "members_sha256": {
+      "release.log": "a3d35db816a42334e9b3501808e4858e919748479936aaec8493e82b159badba",
+      "asan.log": "4707f80f3a1f08daa3e1f65421f5854b2dce67ee6a8c2bceca601697ee960ee0",
+      "asan-fixture-compile.log": "0c813ccbe6024649d025bff5696f9e78ad89f2950277b7bc19750c2bf6009f39",
+      "release-assertions.log": "6158bc5c08b7c310f383e65d40844444be3337c4fb862c937da45ecbb55e4f2b",
+      "asan-assertions.log": "4a667f75be290823591cd44ba34556a2461e146107570324be1b75860bff2549",
+      "wayland.json": "7f10cb2bae0458a6edad274b1335bc1be6e0e4f1aa4e3c379b968b4599c3d431",
+      "wayland-harness.log": "1e08fc8df727e0d9c7195e2c6a61caffd2fef268501fb7ec3d812a3f75e8dae3",
+      "software-openxr.json": "46b679a2f87ba55c42e980c9180cfde0bfd0be6f27d00a3b5d9e2dded2601459",
+      "arc-openxr.json": "13fc8fa9bf6d1db2d7b837e495318bf9501c90c40397781dacbd4245ea5007f5"
+    }
+  }
+}
