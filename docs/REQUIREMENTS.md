@@ -163,9 +163,17 @@ now export Core PBR and a selectable typed MToon 1 GLB material. Explicit
 derivative tangents serve both independent normal images. Metallic and
 roughness paint stay on the Core PBR material. Independent re-import and
 stereo replay verify the two material interpretations, and Editable GLB keeps
-the original native data. Typed VRM, visible colour and emission paint, access
-to animated sampling and deformed or physically baked variants remain required.
+the original native data.
 [Portable MToon retopology evidence](validation/retopology-portable-mtoon-20261127.json)
+
+Visible colour and material-relative emission now reach that GLB variant on
+aligned static grids. The portable texture compiler resolves paint separately
+for Base, shared Shade and emission and checks the filtered result against the
+native shader. Independent Shade maps retain their original owner. Both HDR
+and lower-strength authored emitters preserve their original multiplier.
+Different grid resolutions, cutoff-crossing paint, animated sampling, absolute
+emission, physically baked and deformed variants, and typed VRM remain required.
+[Painted portable MToon evidence](validation/retopology-portable-paint-20261127.json)
 
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.

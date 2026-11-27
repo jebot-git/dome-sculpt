@@ -1,0 +1,1377 @@
+{
+  "product": "394b1d420c6c092c25df72dc00c96e0832051f06",
+  "previous_main": "2010f4dc36e4ac80723e89aba9de321f38e66a97",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "release_application_sha256": "aa86b553c517d6ef9243c42db0fb2e2b79dba424d99f352be33053406710f7b4",
+  "asan_test_sha256": "82d83bbfb61e6cc9b396df73102918840d180127fdf6454743081ebba9c080c2",
+  "asan_build": "Same native sanitizer toolchain and baseline core, with both changed compiler objects and the fixture rebuilt from the frozen final source",
+  "source_patch_sha256": "b07de4e19ac0a7269143f909b40c922765b8d2565d0af74add5296bd49b3093e",
+  "baseline": {
+    "app_sha256": "9418cbde2eee0563c55f5bc51bc50451894f048855b454c24a724d4c4371bb16",
+    "file_sha256": "14b2d6490ed094cd9feaaf87f251ea4ba6bdf11c0744da894aa1a3875234cd97",
+    "material_variants": false,
+    "unchanged_core_view_png_sha256": {
+      "color": "4b6c7dc4d612efb068d6da2d6b55e8c4cf4ba3340a0a1565bd3082083f76f88f",
+      "orm": "24f3e61f8d7feb39ac883f593d0c5f262f3cc1e95e1ea35590694b05cdc38ad1",
+      "normal": "36750c793d7ec6d2b1557aeb59cd11f8a291134b4a9f073dcda19f9bace072d2",
+      "occlusion": "24f3e61f8d7feb39ac883f593d0c5f262f3cc1e95e1ea35590694b05cdc38ad1",
+      "emission": "ca7edee9cb0d79ae9c1f8863f6d0f410a255f044ea1bd4561457bfc58877e8fd"
+    }
+  },
+  "tests": {
+    "release": [
+      "mtoon-texture-sets",
+      "retopology-mtoon-affine",
+      "retopology-mtoon-detached",
+      "retopology-mtoon-plain",
+      "retopology-mtoon-v0",
+      "retopology-first-material-posed-affine",
+      "retopology-first-material-affine",
+      "retopology-imported-mtoon-painted",
+      "native-mtoon-preview-contracts",
+      "retopology-imported-mtoon-unprepared",
+      "retopology-imported-prior-bake",
+      "retopology-first-material-posed-plain",
+      "retopology-imported-mtoon-tinted",
+      "retopology-imported-pbr",
+      "retopology-first-material-plain",
+      "native-mikk-export",
+      "mtoon-painted-texture-sets",
+      "mtoon-baked-texture-sets"
+    ],
+    "exact-v5-asan": [
+      "retopology-first-material-posed-plain",
+      "retopology-first-material-plain",
+      "retopology-first-material-affine",
+      "retopology-first-material-posed-affine",
+      "retopology-mtoon-v0",
+      "retopology-mtoon-plain",
+      "retopology-imported-pbr",
+      "retopology-mtoon-affine",
+      "retopology-imported-prior-bake",
+      "retopology-imported-mtoon-tinted",
+      "retopology-imported-mtoon-painted",
+      "native-mikk-export",
+      "retopology-imported-mtoon-unprepared",
+      "retopology-mtoon-detached"
+    ]
+  },
+  "native_checks": {
+    "painted": 180,
+    "tinted": 150,
+    "unprepared": 153
+  },
+  "identical_release_and_asan_sha256": {
+    "retopology-imported-mtoon-painted/original-import.glb": "924b184d05375c778de14fb0594a7c9035d45e20c7a27ed0f41acf5f3ef55ff6",
+    "retopology-imported-mtoon-painted/raw-guide.dsculpt": "4d0fdb2761a9c94d9f1763342903ed448b346c7eeefdec87a4b68a6e2ad644be",
+    "retopology-imported-mtoon-painted/raw-patch.dsculpt": "40ccdf057148d5bef37bcf68f6f970d7dd07a92cad794162a1ca95d209a61073",
+    "retopology-imported-mtoon-painted/raw-standard.glb": "05f9ac98d5b5db8d271f4b73c02b29007cf10ae199494ae40890ce9c93d757ae",
+    "retopology-imported-mtoon-painted/raw-editable.glb": "d9ac59ef67f402438df216c79dfaf72efc706c79992862e21f320287ff7494fa",
+    "retopology-imported-mtoon-painted/visible-paint.dsculpt": "3f97806961153ff4a37cfcd4ce6a417b17384e01fa4d5982da29156eccbb0964",
+    "retopology-imported-mtoon-painted/visible-standard.glb": "d19faf41af909a8b08c6d2ccc48faaed1e58d18bbc91f87a66971b80d2c60860",
+    "retopology-imported-mtoon-painted/visible-editable.glb": "a593c5ccc904366e4b1f81683c68d6f9302ae156b86809cf0434a76b729769f1",
+    "retopology-imported-mtoon-tinted/original-import.glb": "ba577eebedf3ba6aa16a3ce04d8e63312218b0ca3e11dba38d3bbfcce36e6175",
+    "retopology-imported-mtoon-tinted/raw-guide.dsculpt": "db5bc566ccc77cf7734e3c5ce62a850dd5d82081058e44639d174e333388716a",
+    "retopology-imported-mtoon-tinted/raw-patch.dsculpt": "804b02390636d022eec55d52bf57251419f990a1a3beac7e5709bcff95a0c8a0",
+    "retopology-imported-mtoon-tinted/raw-standard.glb": "bd9e4577c23a1dfc4d6866f74593fafd1ebfc553238a8cefdaf68dfe1742ac25",
+    "retopology-imported-mtoon-tinted/raw-editable.glb": "8f5393c140597b7940606a9c233358dee596452aa440310edb94e0c79fc9dee4",
+    "retopology-imported-mtoon-tinted/visible-paint.dsculpt": "de49c80adff3548b0aa99b362ef4ce3ff277b865214fd226a44c40e7e9fa3b87",
+    "retopology-imported-mtoon-tinted/visible-standard.glb": "5c6bfe84d0319cf8c1cff95b1704ebfaac2a0b42a5ce81b99e7a30ee953b2cd5",
+    "retopology-imported-mtoon-tinted/visible-editable.glb": "530a70e6336ebca3eafb7e91d5dd8f581c86f94a5c5b8ad9721ccf09933c0f40",
+    "retopology-imported-mtoon-unprepared/original-import.glb": "9401091518406eacc818bf95c5913978ce2ef827940b5ca3304eff9323229eeb",
+    "retopology-imported-mtoon-unprepared/raw-guide.dsculpt": "4a807c8d5ae56705be80fd7f8fd4f625fc2e39f3b3e164e8e31cef4a20e3e44c",
+    "retopology-imported-mtoon-unprepared/raw-patch.dsculpt": "a6bf3e362d7f4f934647b2196ac352473669d9aa97d65b0fb11a4f0dd187873a",
+    "retopology-imported-mtoon-unprepared/raw-standard.glb": "2de9f12cf490f1edbc49639cb82a83accfe051354daf580e6141f8cec910ab74",
+    "retopology-imported-mtoon-unprepared/raw-editable.glb": "c39ff31cb018ec17c4df81ffc5fd4833d0f7c06ea9e616f9cfdafc993748c3ad",
+    "retopology-imported-mtoon-unprepared/visible-paint.dsculpt": "fd8d577819582609beaef225e29dcad990054987e5c11b3b4111d44dab8b076f",
+    "retopology-imported-mtoon-unprepared/visible-standard.glb": "db5c81d5af52a00c62544a802961196e0328bb290234ef75fc55e78645a42ff4",
+    "retopology-imported-mtoon-unprepared/visible-editable.glb": "7d3079b7e2eb09c1451abbdb23c26e3358a6f94e28ca8c6818344afde02f8e04"
+  },
+  "portable_paint_bounds": {
+    "painted": {
+      "emissiveStrength": 6.0,
+      "maximumAlphaError": 2e-06,
+      "maximumLinearColorError": 0.002800199653625488,
+      "maximumLinearEmissionError": 0.01885869086041049,
+      "maximumLinearShadeError": 0.006954285766601563,
+      "maximumShadeInterpolationError": 0.003834405830488878,
+      "maximumSourceFilterError": 0.0011177398343310393,
+      "sampling": "clamp-linear-level-zero",
+      "version": 1
+    },
+    "tinted": {
+      "emissiveStrength": 6.0,
+      "maximumAlphaError": 0.0020473671664744675,
+      "maximumLinearColorError": 0.0029093221990629512,
+      "maximumLinearEmissionError": 0.01885869086041049,
+      "maximumLinearShadeError": 0.006954285766601563,
+      "maximumShadeInterpolationError": 0.002909478793180484,
+      "maximumSourceFilterError": 0.0011851003182986497,
+      "sampling": "clamp-linear-level-zero",
+      "version": 1
+    },
+    "unprepared": {
+      "emissiveStrength": 1.149999976158142,
+      "maximumAlphaError": 2e-06,
+      "maximumLinearColorError": 0.002800199653625488,
+      "maximumLinearEmissionError": 0.003722803968305089,
+      "maximumSourceFilterError": 7.566297397257017e-05,
+      "sampling": "clamp-linear-level-zero",
+      "version": 1
+    }
+  },
+  "package_free_graphics": {
+    "painted": {
+      "software": {
+        "renderer": "llvmpipe",
+        "pixels": 5754,
+        "max_mtoon_8_bit_error": 2,
+        "max_core_8_bit_error": 1,
+        "mtoon_rms": 0.556192,
+        "core_rms": 0.166057
+      },
+      "arc": {
+        "renderer": "Arc(tm) A770",
+        "pixels": 5754,
+        "max_mtoon_8_bit_error": 2,
+        "max_core_8_bit_error": 1,
+        "mtoon_rms": 0.46391,
+        "core_rms": 0.165708
+      }
+    },
+    "tinted": {
+      "software": {
+        "renderer": "llvmpipe",
+        "pixels": 5754,
+        "max_mtoon_8_bit_error": 2,
+        "max_core_8_bit_error": 1,
+        "mtoon_rms": 0.568095,
+        "core_rms": 0.170872
+      },
+      "arc": {
+        "renderer": "Arc(tm) A770",
+        "pixels": 5754,
+        "max_mtoon_8_bit_error": 2,
+        "max_core_8_bit_error": 1,
+        "mtoon_rms": 0.467394,
+        "core_rms": 0.172726
+      }
+    },
+    "unprepared": {
+      "software": {
+        "renderer": "llvmpipe",
+        "pixels": 5754,
+        "max_mtoon_8_bit_error": 1,
+        "max_core_8_bit_error": 1,
+        "mtoon_rms": 0.458762,
+        "core_rms": 0.00761122
+      },
+      "arc": {
+        "renderer": "Arc(tm) A770",
+        "pixels": 5754,
+        "max_mtoon_8_bit_error": 1,
+        "max_core_8_bit_error": 0,
+        "mtoon_rms": 0.366763,
+        "core_rms": 0.0
+      }
+    }
+  },
+  "synthetic_openxr_differences": {
+    "software": [
+      {
+        "components": 83005,
+        "maximum_channel_difference": 2
+      },
+      {
+        "components": 81168,
+        "maximum_channel_difference": 2
+      }
+    ],
+    "arc": [
+      {
+        "components": 55611,
+        "maximum_channel_difference": 2
+      },
+      {
+        "components": 56595,
+        "maximum_channel_difference": 2
+      }
+    ]
+  },
+  "physical_headset": false,
+  "wayland": {
+    "checks": [
+      {
+        "passed": true,
+        "check": "Native retopology editor publishes the canonical Dome Sculpt Wayland identity"
+      },
+      {
+        "passed": true,
+        "check": "The universal menu exposes editing on the reopened painted patch"
+      },
+      {
+        "passed": true,
+        "check": "Universal Save keeps the editable quad patch and hidden guide"
+      },
+      {
+        "passed": true,
+        "check": "Portable Core PBR keeps its projected textures and explicit tangent attribute"
+      },
+      {
+        "passed": true,
+        "check": "The universal-menu export includes a selectable MToon material on the same primitive"
+      },
+      {
+        "passed": true,
+        "check": "Universal export compiles the visible colour and emission using the typed shader"
+      },
+      {
+        "passed": true,
+        "check": "Native client releases the compositor and export worker on close"
+      }
+    ],
+    "complete": true
+  },
+  "khronos": {
+    "validator": "2.0.0-dev.3.10",
+    "results": [
+      {
+        "file": "wayland-painted/wayland-patch.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 8,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/17"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/18"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/5"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/9"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/10"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "d19faf41af909a8b08c6d2ccc48faaed1e58d18bbc91f87a66971b80d2c60860"
+      },
+      {
+        "file": "v5-painted/raw-standard.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 7,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/16"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/17"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/7"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/9"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "05f9ac98d5b5db8d271f4b73c02b29007cf10ae199494ae40890ce9c93d757ae"
+      },
+      {
+        "file": "v5-painted/raw-editable.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 6,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/17"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/9"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/10"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "d9ac59ef67f402438df216c79dfaf72efc706c79992862e21f320287ff7494fa"
+      },
+      {
+        "file": "v5-painted/visible-standard.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 8,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/17"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/18"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/5"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/9"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/10"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "d19faf41af909a8b08c6d2ccc48faaed1e58d18bbc91f87a66971b80d2c60860"
+      },
+      {
+        "file": "v5-painted/visible-editable.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 7,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/17"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/5"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/9"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/10"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "a593c5ccc904366e4b1f81683c68d6f9302ae156b86809cf0434a76b729769f1"
+      },
+      {
+        "file": "v5-painted/selected-mtoon.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 9,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/17"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/18"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/materials/0"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/5"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/9"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/10"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "6aa1cb55b1f6fdc479efad4097e69d6d0b5173a0da365147dbac8c9db109727d"
+      },
+      {
+        "file": "v5-painted/selected-core.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 9,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/17"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/18"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/materials/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/5"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/9"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/10"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "08be98c091791fd72d935f67e4e4d9157f52b06ab75a78850cdf498521bb87f8"
+      },
+      {
+        "file": "v5-tinted/raw-standard.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 7,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/16"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/17"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/7"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/9"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "bd9e4577c23a1dfc4d6866f74593fafd1ebfc553238a8cefdaf68dfe1742ac25"
+      },
+      {
+        "file": "v5-tinted/raw-editable.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 6,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/17"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/9"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/10"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "8f5393c140597b7940606a9c233358dee596452aa440310edb94e0c79fc9dee4"
+      },
+      {
+        "file": "v5-tinted/visible-standard.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 8,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/17"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/18"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/5"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/9"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/10"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "5c6bfe84d0319cf8c1cff95b1704ebfaac2a0b42a5ce81b99e7a30ee953b2cd5"
+      },
+      {
+        "file": "v5-tinted/visible-editable.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 7,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/17"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/5"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/9"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/10"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "530a70e6336ebca3eafb7e91d5dd8f581c86f94a5c5b8ad9721ccf09933c0f40"
+      },
+      {
+        "file": "v5-tinted/selected-mtoon.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 9,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/17"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/18"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/materials/0"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/5"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/9"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/10"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "e37725c3098edf985b68b40e9259307630abfb3eb8f623fb3feed7716f868ab6"
+      },
+      {
+        "file": "v5-tinted/selected-core.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 9,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/17"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/18"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/materials/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/5"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/9"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/10"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "b78de5f136763a7e3cf58ca39ec40bd3f9caa625b8c0a7ca39130760f741c8cc"
+      },
+      {
+        "file": "v5-unprepared/raw-standard.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 8,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/17"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/18"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/5"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/9"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/10"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "2de9f12cf490f1edbc49639cb82a83accfe051354daf580e6141f8cec910ab74"
+      },
+      {
+        "file": "v5-unprepared/raw-editable.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 7,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/18"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/6"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/9"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/10"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/11"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "c39ff31cb018ec17c4df81ffc5fd4833d0f7c06ea9e616f9cfdafc993748c3ad"
+      },
+      {
+        "file": "v5-unprepared/visible-standard.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 6,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/16"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/5"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/9"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/10"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "db5c81d5af52a00c62544a802961196e0328bb290234ef75fc55e78645a42ff4"
+      },
+      {
+        "file": "v5-unprepared/visible-editable.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 6,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/16"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/5"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/9"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/10"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "7d3079b7e2eb09c1451abbdb23c26e3358a6f94e28ca8c6818344afde02f8e04"
+      },
+      {
+        "file": "v5-unprepared/selected-mtoon.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 7,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/16"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/materials/0"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/5"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/9"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/10"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "df22474165961649b4fd773041892e6775d71e0e986aae007d70a97b4d23e7f1"
+      },
+      {
+        "file": "v5-unprepared/selected-core.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 7,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "severity": 2,
+              "pointer": "/extensionsUsed/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/16"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/materials/1"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/5"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/9"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/10"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "54bb69dc60d4ede653a169a235f4d0a2f28e2e4edcb88b12bdb46cdf1ae26b13"
+      }
+    ]
+  },
+  "mtoon_schema_valid_materials": 10,
+  "archive_sha256": "cf33b4ac1662228b0eadf77149289c82b35846137b4fe33d8859abbbc2648528",
+  "archive_members_sha256": {
+    "record.py": "30bd5bdf45f5176a6a09e857eac86644a74bfc0a6a023bdff8cf22a6556ce869",
+    "check-v5.sh": "ba40f027a90f56dd7b348b225e3596fc2f48194b7617ca72554dc65fc0d4cdbb",
+    "check-v5-asan.py": "433290665f18b8db6a3d7aff93b84515717c0ee042d7e5f6909068ad844f0bc1",
+    "release-v4-build.log": "342b362ff36e3b508e2e6cc5d3e67a4f31f0f9d7c16d0cab88ef5f08f624059c",
+    "release-v5-build.log": "958d30d91c481fcafcc44d94814f3364d9c748c69f1474b13f8a68885c046f9e",
+    "release-v5-tests.log": "e598d62c4daea0f20c4e4bd2e981f49cd9a98d4f22c4c247dce31905943fe617",
+    "asan-v5-tests.log": "0a0eeb27deb2bbf43d3f306a4a536257e75202bf8911f7537e9e1f2bf4397408",
+    "render-portable.cpp": "baf83d893343ad0195e6e2ee9f2bb22b1bacc8f5bcc0c073fc4887181b29be4d",
+    "render-portable.py": "011ea801d3777992cf039cbbaab430770dca61102e4d19c8ee6327edff6ee806",
+    "select-variant.py": "53d9e7d1f94f060b608d008c73c3ba41ebc9498d01296f70e6b91e75d7d03a33",
+    "run-render.py": "5be192ec76f6fd3e133069ea1e36a0e7c503af5e3731431f16a32283e569e8ce",
+    "xr-portable.py": "622b9a586462c6f06b4cf62eb00f4e0c50ea8f61042c98a4579d58f7780981c3",
+    "run-wayland-painted.py": "284f1098dbc6cddd18d15ab819b54bf4c05f6b86acb1c9a730d04443e4c8ece1",
+    "wayland-painted.py": "670968b9c2b74269e662bc265f1ebf3b585733a20168b4df9f8569aa2c625b71",
+    "bind-wayland.log": "e2b782d663b65c4d72cec06cedb1d164f383d62ab9554124a1f076860f7261e4",
+    "wayland-painted/report.json": "60be26553832862b7d479caa9fe5906822dc98ef4be454ec8989387606a81805",
+    "khronos.cjs": "8a8116fec3929002d4af9722521656843c4558dfb39de64879c355a04ae85cf5",
+    "khronos.json": "d2e93c71cdecdb3ee5feeeb0c95327cdf038658e4e0008b95f4744482ada06fb",
+    "khronos.log": "9fa80c26606f59bdcb89f48eea208d2b9ced2403729a698790382d1a1874325d",
+    "mtoon-schemas.log": "0c93356ccf106b0776e8a8f73fc4e9974b3a2ccaaf16780918b42ee7cfb06b92",
+    "mtoon-schemas.json": "4915db964a1a41989056569b077854b343695bd0cb86880f2b9a9eb8d68681d2",
+    "exact-v5-asan/texture-set-export.cpp.build.log": "b964b314faf16f03f6db1a03b359de69f451cc84068c40c483cc932c84e9125c",
+    "exact-v5-asan/export.cpp.build.log": "8ea87d8c8fa010787cfb5a773405c7b164a435dd9743d2879347645712554b00",
+    "exact-v5-asan/texture-set-source-export.cpp.build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "release-painted-native-controls.log": "2a1b68aa73b7db2df12641fbb2d85867f3662142687d0a962b468e814d852236",
+    "release-tinted-native-controls.log": "bc19a6237ff11a0eb3a07beb9eaabc401a77c82a217b42a2450bbc76464404e7",
+    "release-unprepared-native-controls.log": "309ed3b667123b17df6142a916568817f56427e248bae3e74f698fda0dfa65fa",
+    "exact-v5-asan-painted-native-controls.log": "445fd01389239fef9c59cc3d0003926d89f62455aaa9540e7162515e9da1bca2",
+    "exact-v5-asan-tinted-native-controls.log": "cec1339f891cf7d2563cb6bca55878432f2d0b78f799b1f89f8dc50f73836205",
+    "exact-v5-asan-unprepared-native-controls.log": "9dd2e2a5a0fde2aba829816586c5b78dd18d0ad7e20ff4f0b2b49f6581e4a111",
+    "v5-painted/render-portable-software.log": "f9509a55b00ac50977fa7745b6a2ed3f1c685264838c38900047488acb8a2ad3",
+    "v5-painted/render-portable-arc.log": "93ba34a896af151a4c34affac5c22074edea9a892e83f5bb0ec9897167e59975",
+    "v5-tinted/render-portable-software.log": "55724db306c1341898bc12ef9412b15b57d4bed238cafcfd9026265b12114c85",
+    "v5-tinted/render-portable-arc.log": "f38aba9ce0a05a30b789fd01b88d7cd9e89dcd5111bc7f5266dd6e86e13f3ed3",
+    "v5-unprepared/render-portable-software.log": "86520ee3703942fd61c7d39d95e934a4bc15f032a6cc9cc4a752d8693466a545",
+    "v5-unprepared/render-portable-arc.log": "6eaa87a6c88286d915b667601470f00df68f4fbeea0bc4cb249c0b1906b081c4",
+    "xr-software-v5-painted/compare.json": "358747384df76f4ef874ea1861c6220acc1e28e2fd56ff06e7e26fd0520d8aec",
+    "v5-painted/verified-stereo-software.log": "1b8122fbc41ecbfd6ff2c78c1cde6e379b17b6af59b6cb39bbe10010cb4e1f48",
+    "xr-arc-v5-painted/compare.json": "94c8ebf4b7ceab16be71ac05caa1ea9de849117c256bfb13407a8795cda69c13",
+    "v5-painted/verified-stereo-arc.log": "a3250b401226118b377c0ae0cdffc2a984dc303134a798c692368cc8412009db"
+  }
+}

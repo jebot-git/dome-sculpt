@@ -278,9 +278,25 @@ eight nested Wayland checks pass. Khronos validates 13 files with zero errors
 or warnings, and nine typed materials pass their MToon schema. The selectable
 material reimports without embedded authoring data and matches native MToon
 within one 8-bit value in each synthetic OpenXR eye on llvmpipe and Intel Arc.
-Visible colour and emission paint, active deformations, animated sampling,
-physical Bake, typed VRM and physical headset acceptance remain required.
 [Portable MToon retopology validation](validation/retopology-portable-mtoon-20261127.json)
+
+The portable variant now compiles visible colour and material-relative
+emission for the static atlas cases in which the filter error can be bounded.
+It replaces shared Base and Shade with separate resolved images where ink
+changes those roles differently. The typed emissive image uses the actual
+native emission path and retains the authored strength. Core PBR export uses
+its original independent material and Editable GLB retains the layers. The
+compiler checks the full bilinear cells, including the native branch at zero
+coverage and the change in slope when the shared shade contribution reaches
+zero. All 18 selected Release and 14 ASan/UBSan tests pass. Seven nested
+Wayland checks cover reopening the painted patch and exporting through the
+universal menu. Khronos validated 19 files without warnings, and ten materials
+pass the MToon schema. Package-free MToon reimport stays within two 8-bit RGB
+levels in independent OpenGL and synthetic stereo on Intel Arc and llvmpipe.
+Active deformation, animated sampling, separate atlas resolutions, absolute
+emission and physical Bake, typed VRM and physical headset acceptance remain
+required.
+[Painted portable MToon evidence](validation/retopology-portable-paint-20261127.json)
 
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and
