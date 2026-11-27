@@ -3,11 +3,14 @@
 #include "dome/document.hpp"
 #include "dome/import.hpp"
 #include "dome/native-authoring.hpp"
+#include "dome/polygon-scene.hpp"
 #include "dome/rig-edit.hpp"
 #include "dome/rig-rest.hpp"
 #include "dome/shapekey-authoring.hpp"
 #include "dome/source-placement.hpp"
 #include "native-surface-heat.hpp"
+#include "texture-set-paint-access.hpp"
+#include "texture-set-resample.hpp"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -46,6 +49,31 @@ void touch(Document &document, Vec3 p) {
   document.stamp_desktop(brush);
   document.end_desktop();
   drafted(document);
+}
+
+std::shared_ptr<const RetopoView> move_patch(Document &document, bool affine) {
+  document.begin_retopology();
+  drafted(document);
+  document.edit_retopology(RetopoAction::MoveMode);
+  drafted(document);
+  const auto start = document.frame().state->retopology;
+  const auto &vertices = start->topology->vertices();
+  const auto &[corner, vertex] = *std::ranges::find_if(vertices, [](const auto &v) { return !v.second.pinned; });
+  const auto original_world = point(affine_similarity(start->transform), vertex.position);
+  const auto toward_center = original_world + (affine ? Vec3{.04f,.02f,0} : Vec3{-.035f,.025f,0});
+  check(document.begin_desktop(), "Desktop retopology admits the patch Move gesture");
+  Brush drag;
+  drag.from = drag.to = original_world;
+  document.stamp_desktop(drag);
+  drafted(document);
+  drag.to = toward_center;
+  document.stamp_desktop(drag);
+  document.end_desktop();
+  drafted(document);
+  const auto draft = document.frame().state->retopology;
+  check(length(draft->topology->vertices().at(corner).position-vertex.position)>.02f,
+        "Controller-shared workspace changes a real patch vertex before Apply");
+  return draft;
 }
 
 Scene reference(bool affine) {
@@ -358,29 +386,7 @@ void reapply_patch(bool affine, const std::filesystem::path &out) {
   Document document;
   document.replace(scene);
   settled(document);
-  document.begin_retopology();
-  drafted(document);
-  document.edit_retopology(RetopoAction::MoveMode);
-  drafted(document);
-  const auto start = document.frame().state->retopology;
-  const auto &vertices = start->topology->vertices();
-  const auto &[corner, vertex] = *std::ranges::find_if(vertices, [](const auto &v) { return !v.second.pinned; });
-  auto original_world = point(affine_similarity(start->transform),vertex.position);
-  auto toward_center = original_world + Vec3{-.035f,.025f,0};
-  if (affine) toward_center = original_world + Vec3{.04f,.02f,0};
-  check(document.begin_desktop(), "Desktop retopology admits the patch Move gesture");
-  Brush drag;
-  drag.from = drag.to = original_world;
-  document.stamp_desktop(drag);
-  drafted(document);
-  drag.from = original_world;
-  drag.to = toward_center;
-  document.stamp_desktop(drag);
-  document.end_desktop();
-  drafted(document);
-  const auto draft = document.frame().state->retopology;
-  check(length(draft->topology->vertices().at(corner).position-vertex.position)>.02f,
-        "Controller-shared workspace changes a real patch vertex before Apply");
+  const auto draft = move_patch(document, affine);
   document.end_retopology(true);
   document.save_async(out/"reapplied.dsculpt").get();
   settled(document);
@@ -480,17 +486,176 @@ void reapply_patch(bool affine, const std::filesystem::path &out) {
   check(Scene::decode(framed.encode()).encode()==framed.encode(),
         "Cold replay authenticates the reshaped project's native frame ownership");
 }
+
+void paint_checkpoint(Scene &scene, std::string name, std::array<float,4> color) {
+  auto &object = scene.active();
+  object.painted = object.painted->snapshot();
+  auto &paint = *object.painted;
+  paint.add_layer(std::move(name));
+  PaintSettings settings;
+  settings.color = color;
+  settings.front_only = false;
+  Brush brush;
+  brush.normal = {0,0,1};
+  brush.radius = .19f;
+  brush.strength = 1;
+  paint.begin_stroke();
+  paint.stamp(brush, settings);
+  check(paint.end_stroke(), "Checkpoint owns distinct authored pigment");
+}
+
+void restore_patch_history(bool affine, const std::filesystem::path &out) {
+  auto scene = author_patch(affine, out);
+  const auto old_id = scene.active().id;
+  const auto donor = scene.active().retopology->source;
+  const bool shape_first = affine;
+  auto bind = [&] {
+    paint_checkpoint(scene, "Before rig", {.12f,.34f,.78f,1});
+    SkinAuthoringOptions skin;
+    skin.reference = donor;
+    skin.mode = SkinAuthoringMode::SurfaceHeat;
+    skin.seed_distance = affine ? .65f : .30f;
+    check(author_skin(scene,old_id,skin) && scene.active().rig_source, "Surface Heat captures the real pre-rig checkpoint");
+  };
+  auto sculpt_key = [&] {
+    paint_checkpoint(scene, "Before key", {.71f,.24f,.11f,1});
+    scene.active().painted->clear_bake();
+    ShapeKeyEdit edit;
+    edit.name = "Lift shape";
+    const auto added = author_shapekey(scene,old_id,edit);
+    edit.action = ShapeKeyAction::Replace;
+    edit.target = added.target;
+    edit.positions = scene.active().painted->mesh().positions;
+    for (auto &position : edit.positions) position.z += .03f + .02f * position.x;
+    check(added.changed && author_shapekey(scene,old_id,edit).changed && scene.active().shape_source,
+          "Shapekey edits capture the real pre-key checkpoint");
+    auto posed = *scene.active().deformation;
+    posed.morph_weights = {.4f};
+    scene.set_deformation(old_id,std::move(posed));
+  };
+  if (shape_first) {
+    auto &paint = scene.active().painted;
+    paint = paint->snapshot();
+    paint->clear_bake();
+    paint = detail::TextureSetPaintAccess::resize_unpainted(*paint,256,detail::native_texture_grid_limits());
+    sculpt_key();
+    // Native archive fixtures can retain a different raster resolution in
+    // an earlier checkpoint while sharing the same immutable REST mesh.
+    TextureSetResolutionOptions options;
+    options.resolution = 512;
+    TextureSetResolutionReport report;
+    scene.active().painted = detail::TextureSetPaintAccess::resample_plain(
+        *scene.active().painted, options, detail::native_texture_grid_limits(), report);
+    bind();
+  } else { bind(); sculpt_key(); }
+  paint_checkpoint(scene, "After both", {.12f,.92f,.27f,1});
+  const auto before = scene.encode();
+  scene.save(out/"history-before.dsculpt");
+
+  Document document;
+  document.open_async(out/"history-before.dsculpt").get();
+  settled(document);
+  const auto draft = move_patch(document, affine);
+  document.end_retopology(true);
+  document.save_async(out/"history-reapplied.dsculpt").get();
+  settled(document);
+  const auto changed = document.copy_scene();
+  const auto &current = changed.active();
+  const auto topology = draft->topology->encode();
+  check(current.id!=old_id && current.shape_source && current.rig_source &&
+        current.retopology==current.shape_source->retopology && current.retopology==current.rig_source->retopology &&
+        current.shape_source->paint->mesh_owner()==current.painted->mesh_owner() &&
+        current.rig_source->paint->mesh_owner()==current.painted->mesh_owner(),
+        "Both independently projected checkpoints own the replacement topology and display atlas");
+  check(shape_first ? current.rig_source->shape_source==current.shape_source
+                    : current.shape_source->rig_source==current.rig_source,
+        "The checkpoint DAG keeps the original rig/shape edit order and shared earlier node");
+  check(current.shape_source->paint->resolution()==(shape_first ? 256 : 512) &&
+        current.rig_source->paint->resolution()==current.painted->resolution() &&
+        current.painted->resolution()==512,
+        "Current and historical paint retain their own grid resolutions");
+  const auto live_color = current.painted->composite(current.material);
+  const auto rig_color = current.rig_source->paint->composite(current.rig_source->material);
+  check(live_color->color.rgba!=rig_color->color.rgba &&
+        current.painted->composite(current.material)->color.rgba==live_color->color.rgba,
+        "A warmed live composite cannot replace historical pigment on the same raster");
+  const auto after = changed.encode();
+  check(document.undo() && document.copy_scene().encode()==before && document.redo() &&
+        document.copy_scene().encode()==after,
+        "Geometry reapply and Restore checkpoint propagation are one Undo transaction");
+
+  document.open_async(out/"history-reapplied.dsculpt").get();
+  settled(document);
+  check(document.copy_scene().encode()==after && document.frame().state->can_restore_shapes,
+        "Cold reopen restores both editing actions and their independent checkpoint data");
+  auto perform_restore = [&](bool rig, const std::filesystem::path &file) {
+    const auto prior = document.copy_scene();
+    const auto &p = prior.active();
+    const auto origin = rig ? p.rig_source : p.shape_source;
+    if (!origin) throw std::runtime_error("Following the earlier edit lost its Restore checkpoint");
+    if (rig) {
+      document.begin_rig_fit();
+      auto view = *document.frame().state->rig_fit;
+      view.restore_source = true;
+      view.linked_rest = false;
+      document.configure_rig_fit(view);
+      document.accept_rig_fit();
+    } else {
+      ShapeKeyEdit edit;
+      edit.action = ShapeKeyAction::Restore;
+      document.author_shape(edit);
+    }
+    document.save_async(file).get();
+    settled(document);
+    const auto actual = document.copy_scene();
+    const auto &a = actual.active();
+    check(a.id==p.id && actual.world_matrix(a.id).matrix()==prior.world_matrix(p.id).matrix() &&
+          a.retopology->topology.encode()==topology && a.painted->mesh().indices==p.painted->mesh().indices,
+          "Restore keeps the replacement placement and newly accepted topology");
+    check(a.painted->encode()==origin->paint->encode() && a.bake_recipe==origin->bake_recipe &&
+          a.deformation==origin->deformation && a.material_bindings==origin->material_bindings &&
+          a.painted->layers().back().name==(rig ? "Before rig" : "Before key"),
+          "Restore selects the actual historical paint and deformation endpoint");
+    check(Scene::load(file).encode()==actual.encode() && document.undo() && document.copy_scene().encode()==prior.encode() &&
+          document.redo() && document.copy_scene().encode()==actual.encode(),
+          "Ordered Save and one Undo/Redo preserve the selected Restore endpoint");
+    settled(document);
+  };
+  perform_restore(shape_first,out/"history-restore-latest.dsculpt");
+  auto restored = document.copy_scene();
+  check(shape_first ? (!restored.active().deformation->skeleton && restored.active().deformation->morphs->targets.size()==1)
+                    : (bool(restored.active().deformation->skeleton) && !restored.active().deformation->morphs),
+        "The other edit survives when it preceded the selected Restore checkpoint");
+  perform_restore(!shape_first,out/"history-restore-first.dsculpt");
+  restored = document.copy_scene();
+  check(!restored.active().rig_source && !restored.active().shape_source &&
+        !restored.active().deformation && bool(restored.active().painted->baked())==!shape_first,
+        "The earliest endpoint restores its original Bake status and fully unedited rig/key state");
+
+  auto wire_only = changed;
+  auto edited = current.retopology->topology;
+  const auto wire = edited.add_vertex({edited.vertices().begin()->second.position + Vec3{.05f,.07f,0}});
+  publish_retopology(wire_only,edited,donor,current.transform);
+  ShapeKeyEdit revert;
+  revert.action = ShapeKeyAction::Restore;
+  author_shapekey(wire_only,wire_only.active().id,revert);
+  check(wire_only.active().retopology->topology.vertices().contains(wire) &&
+        wire_only.active().painted->mesh_owner()==current.painted->mesh_owner(),
+        "Restore retains a later wire-only edit and reuses the existing raster geometry");
+}
 }
 
 int main(int argc,char **argv) try {
   if (argc!=3) return 2;
   const std::string_view mode = argv[2];
-  if (mode!="plain" && mode!="affine" && mode!="reapply-plain" && mode!="reapply-affine") return 2;
+  if (mode!="plain" && mode!="affine" && mode!="reapply-plain" && mode!="reapply-affine" &&
+      mode!="restore-plain" && mode!="restore-affine") return 2;
   const std::filesystem::path out = argv[1];
   std::filesystem::create_directories(out);
   setenv("XDG_STATE_HOME",(out/"state").c_str(),1);
   setenv("XDG_CONFIG_HOME",(out/"config").c_str(),1);
-  if (mode.starts_with("reapply-")) reapply_patch(mode.ends_with("affine"),out);
+  if (mode.starts_with("restore-")) restore_patch_history(mode.ends_with("affine"),out);
+  else if (mode.starts_with("reapply-")) reapply_patch(mode.ends_with("affine"),out);
   else bind_patch(mode=="affine",out);
   std::cout << "PASS " << checks << " retopology Surface Heat controls\n";
 } catch(const std::exception &error) {

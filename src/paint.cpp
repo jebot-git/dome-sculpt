@@ -3078,9 +3078,10 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
   const auto texels = surface.texels.size();
   const auto tile_slots = surface.tiles.size();
   const auto resolution = surface.resolution;
-  transfer.reserve(1, working_bytes(replacement, resolution));
   transfer.reserve(from.layers_.size(), sizeof(PaintLayer) + 4 * tile_slots * sizeof(std::shared_ptr<const PaintTile>));
   if (from.revision_ == UINT64_MAX) throw std::overflow_error("Paint revision exhausted");
+  replacement.composite_cache_ = std::make_shared<PaintedMesh::CompositeCache>();
+  replacement.composite_token_ = next_composite_token();
   replacement.active_ = from.active_;
   replacement.next_ = from.next_;
   replacement.revision_ = from.revision_ + 1;

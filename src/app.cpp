@@ -1327,7 +1327,12 @@ struct App {
     } else if(label=="New shapekey..."||label=="Capture shape mix..."||label=="Duplicate shapekey..."||label=="Mirror shapekey..."||label=="Rename shapekey..."){
       edit_shapekey_dialog(canvas.document,label=="Capture shape mix..."?ShapeKeyAction::CaptureMix:label=="Duplicate shapekey..."?ShapeKeyAction::Duplicate:label=="Mirror shapekey..."?ShapeKeyAction::Mirror:label=="Rename shapekey..."?ShapeKeyAction::Rename:ShapeKeyAction::Create);
     } else if(label=="Restore before shape authoring..."){
-      if(fl_choice("Restore the complete mesh state from before shapekey authoring, including paint, rig and material?","Cancel","Restore",nullptr)==1){ShapeKeyEdit edit;edit.action=ShapeKeyAction::Restore;canvas.document.author_shape(std::move(edit));}
+      if (fl_choice_n("Restore the saved state from before shapekey authoring, including paint, rig and material?",
+                      "Restore", "Cancel", nullptr) == 0) {
+        ShapeKeyEdit edit;
+        edit.action = ShapeKeyAction::Restore;
+        canvas.document.author_shape(std::move(edit));
+      }
     } else if (label == "Attach accessory to avatar bone...") {
       attach_avatar_accessory_dialog(canvas.document);
     } else if (label == "Rig and shapekeys...") {
