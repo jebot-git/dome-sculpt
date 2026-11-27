@@ -4,7 +4,7 @@
 #include "dome/texture-sets.hpp"
 
 namespace mtoon_paint_fixture {
-enum class Background { Default, Uniform, SharedShade };
+enum class Background { Default, Uniform, SharedShade, Varying, Sharp };
 inline void author(dome::Scene &scene,dome::TextureSetId set,dome::Vec3 center,
                    bool unsafe_mask=false,Background background=Background::Default){
  using namespace dome;
@@ -63,8 +63,32 @@ inline void author(dome::Scene &scene,dome::TextureSetId set,dome::Vec3 center,
   material.roles[size_t(MToonSlot::Emission)].image=
       std::make_shared<const Image>(Image{1,1,{75,180,112,255}});
  }
+ if(background==Background::Varying||background==Background::Sharp){
+  const auto resolution=texture_set_view(scene.active(),set).painted->resolution();
+  Image base{resolution,resolution,std::vector<uint8_t>(size_t(resolution)*resolution*4,255)};
+  Image emission=base;
+  for(uint32_t y=0;y<resolution;++y)for(uint32_t x=0;x<resolution;++x){
+   const size_t at=(size_t(y)*resolution+x)*4;
+   const auto u=uint8_t(x*15/resolution),v=uint8_t(y*15/resolution);
+   base.rgba[at]=background==Background::Sharp?(x%2?255:0):uint8_t(112+u+v);
+   base.rgba[at+1]=160+u;
+   base.rgba[at+2]=192+v;
+   emission.rgba[at]=75+v;
+   emission.rgba[at+1]=180+u;
+   emission.rgba[at+2]=112+u+v;
+  }
+  auto &base_role=material.roles[size_t(MToonSlot::Base)];
+  auto &emission_role=material.roles[size_t(MToonSlot::Emission)];
+  base_role.image=std::make_shared<const Image>(std::move(base));
+  emission_role.image=std::make_shared<const Image>(std::move(emission));
+  for(auto *role:{&base_role,&emission_role}){
+   role->wrap_s=role->wrap_t=33071;
+   role->min_filter=role->mag_filter=9729;
+  }
+  source["pbrMetallicRoughness"]["baseColorTexture"]={{"index",1}};
+ }
  auto &shade=material.roles[size_t(MToonSlot::Shade)];
- if(background==Background::SharedShade){
+ if(background==Background::SharedShade||background==Background::Varying||background==Background::Sharp){
   auto &toon=source["extensions"]["VRMC_materials_mtoon"];
   toon["shadeMultiplyTexture"]=source["pbrMetallicRoughness"]["baseColorTexture"];
   toon["shadingShiftFactor"]=-.8f;

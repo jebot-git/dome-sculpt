@@ -244,6 +244,57 @@ void mtoon_shared_shade_authoring(){
  const auto larger_editable=extract_native_authoring(bytes("shared-shade-512-editable.glb"));
  check(larger_editable&&larger_editable->encode()==exact_larger,"The larger texture set retains exact native paint at the original resolution");
 }
+void mtoon_varying_authoring(){
+ using mtoon_paint_fixture::Background;
+ auto scene=fixture();
+ mtoon_paint_fixture::author(scene,1,{0,-.08f,.5f},false,Background::Varying);
+ const auto exact=scene.encode();
+ Document doc;
+ doc.replace(scene);
+ check(doc.wait_mesh()&&doc.frame().state->error.empty(),"Real varying typed sources render with their editable paint");
+ doc.export_asset("varying-mtoon-standard.glb",AssetExportFormat::Glb).get();
+ doc.export_asset("varying-mtoon-editable.glb",AssetExportFormat::EditableGlb256).get();
+ consumer("varying-mtoon-standard.glb",2);
+ consumer("varying-mtoon-editable.glb",2);
+ const auto standard=bytes("varying-mtoon-standard.glb");
+ const auto replay=extract_native_authoring(bytes("varying-mtoon-editable.glb"));
+ check(replay&&replay->encode()==exact,"The editable payload retains original varied source pixels and layered paint");
+ const auto portable=detail::make_gltf(scene.export_surfaces());
+ const auto &material=portable.json.at("materials").at(1);
+ const auto &proof=material.at("extras").at("domeSculptMToonPaint");
+ check(proof.at("maximumSourceFilterError").get<double>()>0&&
+       proof.at("maximumLinearColorError").get<double>()<=.005&&
+       proof.at("maximumLinearShadeError").get<double>()<=.005&&
+       proof.at("maximumLinearEmissionError").get<double>()<=.005,
+       "The portable material bounds varying color, shade and emission over the full filter cells");
+ auto changed=*texture_set_view(scene.active(),1).material_bindings;
+ changed.roles[size_t(MToonSlot::Base)].min_filter=9987;
+ check(bind_texture_set_mtoon(scene,scene.active().id,1,changed),"The sampler control uses a genuine positive mip filter");
+ doc.replace(std::move(scene));
+ check(doc.wait_mesh(),"The native viewport remains available for the mipmapped source");
+ refuses([&]{doc.export_asset("varying-mtoon-standard.glb",AssetExportFormat::Glb).get();},
+         "Native mipmap sampling requires a separate painted export representation");
+ auto sharp=fixture();
+ mtoon_paint_fixture::author(sharp,1,{0,-.08f,.5f},false,Background::Sharp);
+ doc.replace(std::move(sharp));
+ check(doc.wait_mesh(),"The sharp source remains valid native MToon");
+ refuses([&]{doc.export_asset("varying-mtoon-standard.glb",AssetExportFormat::Glb).get();},
+         "An unsafe between-texel product is rejected under the same sampling policy");
+ check(bytes("varying-mtoon-standard.glb")==standard,
+       "Both refused varying-source exports preserve the previous destination");
+
+ auto large=fixture(false,512,64);
+ mtoon_paint_fixture::author(large,1,{0,-.08f,.5f},false,Background::Varying);
+ const auto large_native=large.encode();
+ doc.replace(std::move(large));
+ check(doc.wait_mesh()&&doc.frame().state->error.empty(),"Varying source images publish with 512-square paint");
+ doc.export_asset("varying-mtoon-512-standard.glb",AssetExportFormat::Glb).get();
+ doc.export_asset("varying-mtoon-512-editable.glb",AssetExportFormat::EditableGlb256).get();
+ consumer("varying-mtoon-512-standard.glb",2);
+ const auto large_editable=extract_native_authoring(bytes("varying-mtoon-512-editable.glb"));
+ check(large_editable&&large_editable->encode()==large_native,
+       "The 512-square mixed material restores the original varied sources and paint");
+}
 void editable_hdr(){
  auto scene=fixture();
  const auto object=scene.active().id;
@@ -550,4 +601,4 @@ void production_baked_hdr(){
  }
 }
 }
-int main(int argc,char**argv)try{if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}portable();authoring();mtoon_authoring();mtoon_painted_authoring();mtoon_shared_shade_authoring();editable_hdr();authority();production_hdr();production_baked_hdr();std::cout<<"PASS "<<checks<<" texture-set multi-primitive export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+int main(int argc,char**argv)try{if(argc>1){std::filesystem::create_directories(argv[1]);std::filesystem::current_path(argv[1]);}portable();authoring();mtoon_authoring();mtoon_painted_authoring();mtoon_shared_shade_authoring();mtoon_varying_authoring();editable_hdr();authority();production_hdr();production_baked_hdr();std::cout<<"PASS "<<checks<<" texture-set multi-primitive export controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

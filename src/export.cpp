@@ -848,6 +848,8 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
         bounds["maximumLinearShadeError"]=paint->shade_error;
         bounds["maximumShadeInterpolationError"]=paint->shade_interpolation_error;
       }
+      if(paint->source_filter_error>0)
+        output["extras"]["domeSculptMToonPaint"]["maximumSourceFilterError"]=paint->source_filter_error;
     }
     if(!collect_extensions(collect_extensions,output))
       throw std::logic_error("MToon material writing introduced an unknown extension");

@@ -90,7 +90,8 @@ void native_texture_sets(SurfaceRenderer &renderer){
 void painted_texture_sets(SurfaceRenderer &renderer,const std::filesystem::path &output,
                           mtoon_paint_fixture::Background background){
  using mtoon_paint_fixture::Background;
- const bool shared=background==Background::SharedShade;
+ const bool varying=background==Background::Varying;
+ const bool shared=background==Background::SharedShade||varying;
  std::filesystem::create_directories(output);
  Scene scene;
  std::array<TextureSetInitialField,2> fields;
@@ -106,7 +107,7 @@ void painted_texture_sets(SurfaceRenderer &renderer,const std::filesystem::path 
  const auto frame=document.frame().surface;
  const auto native=draw(renderer,frame);
 
- const auto path=output/(shared?"rendered-shared-shade-mtoon.glb":
+ const auto path=output/(varying?"rendered-varying-mtoon.glb":shared?"rendered-shared-shade-mtoon.glb":
      background==Background::Uniform?"rendered-uniform-painted-mtoon.glb":"rendered-painted-mtoon.glb");
  export_glb(scene.export_surfaces(),path);
  std::ifstream file(path,std::ios::binary);
@@ -189,7 +190,7 @@ int main(int argc,char**argv)try{
  if(argc==3&&std::string(argv[1])=="--painted-texture-sets"){
   Fbo test;SurfaceRenderer renderer;
   using mtoon_paint_fixture::Background;
-  for(auto background:{Background::Default,Background::Uniform,Background::SharedShade})
+  for(auto background:{Background::Default,Background::Uniform,Background::SharedShade,Background::Varying})
    painted_texture_sets(renderer,argv[2],background);
   std::cout<<"PASS "<<checks<<" painted MToon texture-set graphics checks\n";
   return 0;

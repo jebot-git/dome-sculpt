@@ -28,7 +28,7 @@ struct PortableMToonSetPaint {
   std::shared_ptr<const Image> color, shade, emission;
   // Max component errors for clamp-to-edge bilinear reads in linear units.
   double color_error=0, shade_error=0, shade_interpolation_error=0,
-      alpha_error=0, emission_error=0;
+      alpha_error=0, emission_error=0, source_filter_error=0;
 };
 std::optional<PortableMToonSetPaint> compile_mtoon_set_paint(
     const TextureSetView &,const TextureSetExportField &,const MToonMaterial &,

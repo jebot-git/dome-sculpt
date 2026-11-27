@@ -51,13 +51,55 @@ uint8_t mtoon_srgb_byte(double linear){
  return uint8_t(std::lround(mtoon_linear_to_srgb(float(std::clamp(linear,0.,1.)))*255.));
 }
 
+bool aligned_mtoon_source(const PaintSourceTexture &role,const MToonTexture &texture,
+                          uint32_t resolution){
+ return role.image&&role.image->width==resolution&&role.image->height==resolution&&
+     role.wrap_s==33071&&role.wrap_t==33071&&
+     (!role.min_filter||role.min_filter==9729)&&(!role.mag_filter||role.mag_filter==9729)&&
+     mtoon_coordinate(texture)==0&&texture.offset==std::array<float,2>{}&&
+     texture.scale==std::array<float,2>{1,1}&&texture.rotation==0;
+}
+
+struct MToonPaintSource {
+ const Image *aligned=nullptr;
+ std::array<double,4> constant{};
+ std::array<double,4> sample(size_t offset)const{
+  if(!aligned)return constant;
+  const auto *pixel=aligned->rgba.data()+offset;
+  const auto &linear=mtoon_linear_bytes();
+  return {linear[pixel[0]],linear[pixel[1]],linear[pixel[2]],pixel[3]/255.};
+ }
+};
+
+struct MToonSourceTap {
+ std::array<double,4> background{},error{};
+ double uncovered=0;
+};
+
+double mtoon_source_filter_error(const std::array<const MToonSourceTap *,4> &taps,
+                                size_t channel){
+ double min_source=taps[0]->background[channel],max_source=min_source;
+ double min_uncovered=taps[0]->uncovered,max_uncovered=min_uncovered;
+ for(const auto *tap:taps){
+  min_source=std::min(min_source,tap->background[channel]);
+  max_source=std::max(max_source,tap->background[channel]);
+  min_uncovered=std::min(min_uncovered,tap->uncovered);
+  max_uncovered=std::max(max_uncovered,tap->uncovered);
+ }
+ // The difference between filtering source*uncovered and multiplying
+ // their filtered values is a weighted covariance. Cauchy-Schwarz and
+ // the maximum variance of a bounded scalar apply to all four tap weights.
+ return (max_source-min_source)*(max_uncovered-min_uncovered)*.25;
+}
+
 struct MToonShadeTap {
- std::array<double,3> correction{},error{};
+ std::array<double,3> correction{};
+ MToonSourceTap sampling;
 };
 
 std::shared_ptr<const Image> compose_shared_mtoon_shade(
     const Image &resolved,const Image &coverage,const std::array<float,4> &native,
-    const std::array<float,4> &uniform,Vec3 factor,PortableMToonSetPaint &proof,
+    const MToonPaintSource &source,Vec3 factor,PortableMToonSetPaint &proof,
     const TextureSetLimits &limits){
  const auto width=resolved.width,height=resolved.height;
  auto image=std::make_shared<Image>(Image{width,height,std::vector<uint8_t>(resolved.rgba.size(),255)});
@@ -71,23 +113,26 @@ std::shared_ptr<const Image> compose_shared_mtoon_shade(
    const auto replacement=coverage.rgba[at];
    const double uncovered=1-replacement/255.;
    auto &tap=current[x];
+   const auto original=source.sample(at);
+   tap.sampling.uncovered=uncovered;
    for(size_t k=0;k<3;++k){
-    const double constant=strength[k]*uniform[k];
+    const double background=strength[k]*original[k];
     const double divisor=native[k]!=0?native[k]:1;
     const double paint=(linear[resolved.rgba[at+k]]-native[k]*uncovered)/divisor;
     if(paint>std::numeric_limits<float>::max())return {};
     const double correction=strength[k]*paint;
     // The viewport adds just the positive paint contribution to the source
     // shade. At zero coverage it uses the original shade exactly.
-    const double continuous=constant*uncovered+std::max(0.,correction);
-    const auto encoded=mtoon_srgb_byte(replacement?continuous:constant);
+    const double continuous=background*uncovered+std::max(0.,correction);
+    const auto encoded=mtoon_srgb_byte(replacement?continuous:background);
     image->rgba[at+k]=encoded;
     const auto error=std::abs(linear[encoded]-continuous);
     tap.correction[k]=correction;
-    tap.error[k]=error;
+    tap.sampling.error[k]=error;
+    tap.sampling.background[k]=background;
     proof.shade_error=std::max(proof.shade_error,error);
     if(!replacement)
-     proof.shade_error=std::max(proof.shade_error,std::abs(linear[encoded]-constant));
+     proof.shade_error=std::max(proof.shade_error,std::abs(linear[encoded]-background));
    }
    if(!x||!y)continue;
    const std::array taps{&previous[x-1],&previous[x],&current[x-1],&tap};
@@ -96,13 +141,16 @@ std::shared_ptr<const Image> compose_shared_mtoon_shade(
     for(const auto *corner:taps){
      low=std::min(low,corner->correction[k]);
      high=std::max(high,corner->correction[k]);
-     quantization=std::max(quantization,corner->error[k]);
+     quantization=std::max(quantization,corner->sampling.error[k]);
     }
     // Interpolating max(0,t) at the taps can overestimate max(0,t) in
     // the shader. For t in [low,high], the worst gap is the secant at 0.
     const double kink=low<0&&high>0?-low*high/(high-low):0;
+    const double product=source.aligned?mtoon_source_filter_error(
+        {&taps[0]->sampling,&taps[1]->sampling,&taps[2]->sampling,&taps[3]->sampling},k):0;
     proof.shade_interpolation_error=std::max(proof.shade_interpolation_error,kink);
-    proof.shade_error=std::max(proof.shade_error,quantization+kink);
+    proof.source_filter_error=std::max(proof.source_filter_error,product);
+    proof.shade_error=std::max(proof.shade_error,quantization+kink+product);
    }
   }
   previous.swap(current);
@@ -561,8 +609,13 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
     charge(work,pixels,24,limits.maximum_work);
    }
    for(auto role:{MToonSlot::Base,MToonSlot::Emission})
-    if(const auto &image=field.material_bindings->roles[size_t(role)].image)
+    if(const auto &image=field.material_bindings->roles[size_t(role)].image){
      charge(work,size_t(image->width)*image->height,1,limits.maximum_work);
+     if(aligned_mtoon_source(field.material_bindings->roles[size_t(role)],typed.textures[size_t(role)],resolution)){
+      charge(bytes,resolution,2*sizeof(MToonSourceTap),limits.maximum_bytes);
+      charge(work,pixels,18,limits.maximum_work);
+     }
+    }
   }
   if(hdr&&(!measured_physical||field.material.toon||field.appearance||
       (field.material_bindings&&field.material_bindings->has_mtoon)))
@@ -632,25 +685,35 @@ std::optional<PortableMToonSetPaint> compile_mtoon_set_paint(
  const bool color=covered(maps->color_coverage),emission=covered(maps->emission_coverage);
  if((color||emission)&&(params.scroll!=std::array<float,2>{}||params.rotation_speed!=0))
   return {};
- const auto uniform=[&](MToonSlot role)->std::optional<std::array<float,4>>{
-  const auto &image=binding.roles[size_t(role)].image;
-  if(!image)return mtoon_default_texel(role);
+ const auto background_source=[&](MToonSlot role)->std::optional<MToonPaintSource>{
+  const auto &view=binding.roles[size_t(role)];
+  const auto &image=view.image;
+  MToonPaintSource source;
+  if(!image){
+   const auto fallback=mtoon_default_texel(role);
+   std::copy(fallback.begin(),fallback.end(),source.constant.begin());
+   return source;
+  }
   image->validate();
   for(size_t at=4;at<image->rgba.size();at+=4){
    if((at&16383)==0)stop(limits);
-   if(!std::equal(image->rgba.begin(),image->rgba.begin()+4,image->rgba.begin()+at))return {};
+   if(!std::equal(image->rgba.begin(),image->rgba.begin()+4,image->rgba.begin()+at)){
+    if(!aligned_mtoon_source(view,effective.textures[size_t(role)],field.painted->resolution()))
+     return {};
+    source.aligned=image.get();
+    return source;
+   }
   }
-  std::array<float,4> value{};
   for(size_t k=0;k<4;++k){
    const float unit=image->rgba[k]/255.f;
-   value[k]=k<3?mtoon_srgb_to_linear(unit):unit;
+   source.constant[k]=k<3?mtoon_srgb_to_linear(unit):unit;
   }
-  return value;
+  return source;
  };
 
  PortableMToonSetPaint out;
  const auto compose=[&](const Image &resolved,const Image &coverage,
-     std::array<float,4> background,const std::array<float,4> &native,
+     const MToonPaintSource &source,const std::array<float,4> &factor,const std::array<float,4> &native,
      bool use_alpha,double &rgb_error)->std::shared_ptr<const Image>{
   const auto resolution=field.painted->resolution();
   if(resolved.width!=resolution||resolved.height!=resolution||
@@ -658,58 +721,72 @@ std::optional<PortableMToonSetPaint> compile_mtoon_set_paint(
    throw std::logic_error("MToon material lost the current paint grid");
   resolved.validate();coverage.validate();
   const bool visible_alpha=use_alpha&&params.alpha!=MToonAlpha::Opaque;
-  // Alpha changes away from zero coverage must retain the original byte
-  // curve exactly on a mask or a transparent surface.
-  if(visible_alpha&&background[3]!=native[3])return {};
   const auto pass_alpha=[&](double alpha){
    return params.alpha==MToonAlpha::Mask?alpha>=params.alpha_cutoff:alpha>0;
   };
   auto result=std::make_shared<Image>(resolved);
   const auto &linear=mtoon_linear_bytes();
-  for(size_t at=0;at<resolved.rgba.size();at+=4){
-   if((at&16383)==0)stop(limits);
-   const double cover=coverage.rgba[at]/255.;
-   for(size_t k=0;k<(use_alpha?4u:3u);++k){
-    const auto before=resolved.rgba[at+k];
-    const double decoded=k<3?linear[before]:before/255.;
-    // With a constant authored role, this unbounded correction is affine
-    // in the two filtered images. Its bilinear error is bounded at the taps.
-    const double corrected=decoded+(double(background[k])-native[k])*(1-cover);
-    const double clamped=std::clamp(corrected,0.,1.);
-    const auto quantized=k<3?mtoon_srgb_byte(clamped):uint8_t(std::lround(clamped*255.));
-    const double restored=k<3?linear[quantized]:quantized/255.;
-    if(visible_alpha&&k==3&&(quantized!=before||
-       (cover==0&&pass_alpha(restored)!=pass_alpha(background[k]))))return {};
-    double &error=k<3?rgb_error:out.alpha_error;
-    error=std::max(error,std::abs(restored-corrected));
-    // Zero filtered coverage uses an alternate uniform branch. Every tap
-    // with nonzero filter weight then has zero coverage as well.
-    if(cover==0)error=std::max(error,std::abs(restored-background[k]));
-    result->rgba[at+k]=quantized;
+  const auto channels=use_alpha?4u:3u;
+  std::vector<MToonSourceTap> previous(source.aligned?resolution:0),row(previous.size());
+  for(size_t y=0;y<resolution;++y){
+   stop(limits);
+   for(size_t x=0;x<resolution;++x){
+    const size_t at=(y*resolution+x)*4;
+    const auto original=source.sample(at);
+    MToonSourceTap tap;
+    tap.uncovered=1-coverage.rgba[at]/255.;
+    for(size_t k=0;k<channels;++k){
+     const auto before=resolved.rgba[at+k];
+     const double decoded=k<3?linear[before]:before/255.;
+     const auto background=static_cast<float>(original[k])*factor[k];
+     const double corrected=decoded+(double(background)-native[k])*tap.uncovered;
+     const double clamped=std::clamp(corrected,0.,1.);
+     const auto quantized=k<3?mtoon_srgb_byte(clamped):uint8_t(std::lround(clamped*255.));
+     const double restored=k<3?linear[quantized]:quantized/255.;
+     // The alpha curve under paint must stay byte-identical. At zero
+     // filtered coverage, all participating taps use the original alpha.
+     if(visible_alpha&&k==3&&(background!=native[k]||quantized!=before||
+        (!coverage.rgba[at]&&pass_alpha(restored)!=pass_alpha(background))))return {};
+     tap.background[k]=background;
+     tap.error[k]=std::abs(restored-corrected);
+     double &error=k<3?rgb_error:out.alpha_error;
+     error=std::max(error,tap.error[k]);
+     if(!coverage.rgba[at])error=std::max(error,std::abs(restored-background));
+     result->rgba[at+k]=quantized;
+    }
+    if(!source.aligned)continue;
+    row[x]=tap;
+    if(!x||!y)continue;
+    const std::array<const MToonSourceTap*,4> taps{&previous[x-1],&previous[x],&row[x-1],&row[x]};
+    for(size_t k=0;k<channels;++k){
+     const auto product=mtoon_source_filter_error(taps,k);
+     const double quantization=std::max({taps[0]->error[k],taps[1]->error[k],taps[2]->error[k],taps[3]->error[k]});
+     double &error=k<3?rgb_error:out.alpha_error;
+     error=std::max(error,quantization+product);
+     out.source_filter_error=std::max(out.source_filter_error,product);
+    }
    }
+   previous.swap(row);
   }
   return result;
  };
  if(color){
-  auto original=uniform(MToonSlot::Base);
+  const auto original=background_source(MToonSlot::Base);
   if(!original)return {};
-  const auto shared=*original;
-  for(size_t k=0;k<4;++k)(*original)[k]*=params.base_color[k];
-  out.color=compose(maps->color,maps->color_coverage,*original,field.material.color,true,out.color_error);
+  out.color=compose(maps->color,maps->color_coverage,*original,params.base_color,field.material.color,true,out.color_error);
   if(!out.color)return {};
   if(shared_mtoon_shade(binding)){
    out.shade=compose_shared_mtoon_shade(maps->color,maps->color_coverage,field.material.color,
-                                        shared,params.shade_color,out,limits);
+                                        *original,params.shade_color,out,limits);
    if(!out.shade)return {};
   }
  }
  if(emission){
-  auto original=uniform(MToonSlot::Emission);
+  const auto original=background_source(MToonSlot::Emission);
   if(!original)return {};
-  const std::array factor{params.emission.x,params.emission.y,params.emission.z};
-  for(size_t k=0;k<3;++k)(*original)[k]*=factor[k];
+  const std::array factor{params.emission.x,params.emission.y,params.emission.z,1.f};
   const auto &native=field.material.emissive;
-  out.emission=compose(maps->emission,maps->emission_coverage,*original,
+  out.emission=compose(maps->emission,maps->emission_coverage,*original,factor,
                        {native[0],native[1],native[2],1},false,out.emission_error);
   if(!out.emission)return {};
  }
