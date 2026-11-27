@@ -5,6 +5,7 @@
 #include "affine-factor.hpp"
 #include "dome/source-placement.hpp"
 #include "dome/material-bindings.hpp"
+#include "dome/material-visibility.hpp"
 #include "dome/scene.hpp"
 #include "dome/gltf-export.hpp"
 #include "dome/humanoid-creator.hpp"
@@ -708,6 +709,100 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     j["textures"].push_back({{"source",source},{"sampler",sampler}});
     texture_ids[key2]=index; return index;
   };
+  const auto write_set_mtoon=[&](const TextureSetView &field,size_t object,int material_id){
+    const auto &binding=field.material_bindings;
+    if(!binding||!binding->has_mtoon)return false;
+    auto retain_native=[&]{
+      if(!raw_authority)
+        throw std::invalid_argument("This MToon texture set needs an exact portable material adapter. Editable GLB preserves the native material and paint.");
+      j["materials"][material_id]["extras"]["domeSculptNativeMaterial"]="MToon in embedded authoring data";
+      return false;
+    };
+    if(field.source||field.painted->has_paint_data()||binding->material.version()!=MToonVersion::V1||
+       binding->physical_emission)
+      return retain_native();
+
+    const auto &attributes=j["meshes"][result.objects[object].mesh]["primitives"][0]["attributes"];
+    if(binding->roles[size_t(MToonSlot::Normal)].image&&attributes.contains("TANGENT"))
+      return retain_native();
+
+    (void)binding->material.copy_working_bytes(12*1024*1024,cancelled);
+    auto typed=binding->material;
+    auto original=typed.source_json();
+    if(original.contains("occlusionTexture")||
+       (original.contains("pbrMetallicRoughness")&&original.at("pbrMetallicRoughness").contains("metallicRoughnessTexture")))
+      return retain_native();
+
+    // Source JSON retains independent metadata. Remap only extensions whose
+    // wire semantics are known here, including transforms on individual slots.
+    std::set<std::string> extensions;
+    const auto collect_extensions=[&](auto &&self,const nlohmann::json &value)->bool{
+      if(value.is_array())return std::all_of(value.begin(),value.end(),[&](const auto &child){return self(self,child);});
+      if(!value.is_object())return true;
+      for(const auto &[name,child]:value.items()){
+        if(name=="extras")continue;
+        if(name=="extensions"){
+          for(const auto &[extension,body]:child.items()){
+            (void)body;
+            if(extension!="VRMC_materials_mtoon"&&extension!="KHR_texture_transform"&&
+               extension!="KHR_materials_emissive_strength")
+              return false;
+            extensions.insert(extension);
+          }
+        }
+        if(!self(self,child))return false;
+      }
+      return true;
+    };
+    if(!collect_extensions(collect_extensions,original))return retain_native();
+    const auto &native=binding->native_reference;
+    const auto &current=field.material;
+    auto &params=typed.parameters;
+    const auto unit=[](float value){return std::isfinite(value)&&value>=0&&value<=1;};
+    for(size_t channel=0;channel<4;++channel){
+      auto &factor=params.base_color[channel];
+      factor=mtoon_factor(factor,native.color[channel],current.color[channel]);
+      if(!unit(factor))return retain_native();
+    }
+    std::array emission{params.emission.x,params.emission.y,params.emission.z};
+    for(size_t channel=0;channel<emission.size();++channel){
+      auto &factor=emission[channel];
+      factor=mtoon_factor(factor,native.emission[channel],current.emissive[channel]);
+      if(!unit(factor))return retain_native();
+    }
+    params.emission={emission[0],emission[1],emission[2]};
+    if(current.double_sided!=native.double_sided)
+      params.cull=current.double_sided?MToonCull::Off:MToonCull::Back;
+    if(current.alpha!=Material::AlphaMode::Automatic&&int(current.alpha)!=native.alpha){
+      params.alpha=current.alpha==Material::AlphaMode::Opaque?MToonAlpha::Opaque:
+          current.alpha==Material::AlphaMode::Mask?MToonAlpha::Mask:MToonAlpha::Blend;
+      const bool blend=params.alpha==MToonAlpha::Blend;
+      params.depth_write=!blend;
+      params.source_blend=blend?5:1;
+      params.destination_blend=blend?10:0;
+      params.queue_offset=0;
+      params.render_queue=blend?3000:params.alpha==MToonAlpha::Mask?2450:2000;
+    }
+    if(current.alpha_cutoff!=native.alpha_cutoff)params.alpha_cutoff=current.alpha_cutoff;
+    for(size_t role=0;role<binding->roles.size();++role){
+      if(binding->roles[role].image&&role!=size_t(MToonSlot::Matcap)&&typed.textures[role].texcoord)
+        return retain_native();
+    }
+    for(size_t role=0;role<binding->roles.size();++role){
+      stop();
+      const auto &view=binding->roles[role];
+      if(view.image)typed.textures[role].index=texture(*view.image,view);
+    }
+    auto output=typed.source_json();
+    output["name"]=field.name;
+    output["pbrMetallicRoughness"]["metallicFactor"]=current.metallic;
+    output["pbrMetallicRoughness"]["roughnessFactor"]=current.roughness;
+    if(!collect_extensions(collect_extensions,output))
+      throw std::logic_error("MToon material writing introduced an unknown extension");
+    for(const auto &extension:extensions)use_extension(extension.c_str());
+    j["materials"][material_id]=std::move(output);
+    return true;
+  };
   std::array<bool,8> uv_available{};
   auto source_info = [&](const PaintSourceTexture &slot) {
     slot.validate(8);
@@ -832,12 +927,22 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
   };
   for(size_t i=0;i<objects.size();++i){
     const auto *field=bundles[i]?&bundles[i]->fields.front():nullptr;
+    if(field){
+      const auto owners=objects[i].texture_set_surface->fields();
+      const auto original=std::ranges::find(owners,field->set,&TextureSetView::id);
+      if(original==owners.end())throw std::logic_error("Exported material set lost its owning field");
+      if(write_set_mtoon(*original,i,result.objects[i].material))continue;
+    }
     write_textures(object_at(i),i,result.objects[i].material,
         field&&!bundles[i]->paint_coordinates.empty(),field&&field->normal_role,
         field&&field->emission?&*field->emission:nullptr);
   }
   for(const auto&extra:extra_materials){
     stop();const auto&field=bundles[extra.object]->fields[extra.field];ObjectSurface material_view;
+    const auto owners=objects[extra.object].texture_set_surface->fields();
+    const auto original=std::ranges::find(owners,field.set,&TextureSetView::id);
+    if(original==owners.end())throw std::logic_error("Exported material set lost its owning field");
+    if(write_set_mtoon(*original,extra.object,extra.material))continue;
     material_view.material=field.material;material_view.textures=field.textures;
     write_textures(material_view,extra.object,extra.material,!bundles[extra.object]->paint_coordinates.empty(),field.normal_role,field.emission?&*field.emission:nullptr);
   }

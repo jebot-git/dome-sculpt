@@ -62,21 +62,100 @@ void mtoon_authoring(){
  const auto native=texture_set_view(scene.active(),1).material;
  SourceMaterialBindings binding;
  binding.material=MToonMaterial::from_vrm1({
-  {"pbrMetallicRoughness",{{"baseColorTexture",{{"index",0}}}}},
-  {"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"},{"shadeColorFactor",{.3,.1,.7}}}}}}
- },1);
+  {"alphaMode","MASK"},{"alphaCutoff",.45f},{"doubleSided",true},
+  {"pbrMetallicRoughness",{{"baseColorTexture",{{"index",1}}}}},
+  {"extensions",{{"VRMC_materials_mtoon",{
+     {"specVersion","1.0"},{"shadeColorFactor",{.3,.1,.7}},
+     {"shadeMultiplyTexture",{{"index",0},{"extensions",{{"KHR_texture_transform",{{"offset",{.125,.25}}}}}}}},
+     {"uvAnimationScrollXSpeedFactor",.15f}
+  }}}}
+ },2);
  binding.native_reference={native.color,native.emissive,int(native.alpha),native.alpha_cutoff,native.double_sided};
- binding.roles[size_t(MToonSlot::Base)].image=std::make_shared<const Image>(Image{1,1,{203,78,152,255}});
+ auto &base=binding.roles[size_t(MToonSlot::Base)];
+ base.image=std::make_shared<const Image>(Image{2,1,{203,78,152,0,116,28,110,255}});
+ base.wrap_s=33071;
+ base.mag_filter=9728;
+ auto &shade=binding.roles[size_t(MToonSlot::Shade)];
+ shade.image=std::make_shared<const Image>(Image{1,1,{29,126,193,255}});
+ shade.wrap_t=33648;
  check(bind_texture_set_mtoon(scene,object,1,binding),"The editable export fixture owns an actual MToon field");
+ check(edit_texture_set(scene,object,1,[](PaintedMesh &,Material &m){m.color[0]*=.5f;return true;}),
+       "The typed export consumes the current native color adjustment");
  const auto exact=scene.encode();
+ const auto portable=detail::make_gltf(scene.export_surfaces());
+ inspect(portable,2);
+ const auto &json=portable.json;
+ const auto &primitives=json.at("meshes")[0].at("primitives");
+ const auto &pbr=json.at("materials").at(primitives[0].at("material").get<size_t>());
+ const auto &toon=json.at("materials").at(primitives[1].at("material").get<size_t>());
+ check(!pbr.contains("extensions")&&toon.at("extensions").contains("VRMC_materials_mtoon"),
+       "Only the authored typed primitive declares the MToon extension");
+ const auto &body=toon.at("extensions").at("VRMC_materials_mtoon");
+ const auto read=MToonMaterial::from_vrm1(toon,json.at("textures").size());
+ check(read.parameters.alpha==MToonAlpha::Mask&&read.parameters.alpha_cutoff==.45f&&read.parameters.cull==MToonCull::Off&&
+       read.parameters.base_color[0]==.5f&&read.parameters.shade_color.z==.7f&&read.parameters.scroll[0]==.15f,
+       "The actual portable material retains authored alpha, shading, animation and the current native factor");
+ auto role=[&](const nlohmann::json &slot,const PaintSourceTexture &original){
+   const auto &tex=json.at("textures").at(slot.at("index").get<size_t>());
+   const auto &view=json.at("images").at(tex.at("source").get<size_t>());
+   const auto &chunk=json.at("bufferViews").at(view.at("bufferView").get<size_t>());
+   const auto first=chunk.at("byteOffset").get<size_t>(),length=chunk.at("byteLength").get<size_t>();
+   const auto pixels=original.image->png();
+   const auto &sampler=json.at("samplers").at(tex.at("sampler").get<size_t>());
+   check(first+length<=portable.binary.size()&&length==pixels.size()&&
+         std::equal(pixels.begin(),pixels.end(),portable.binary.begin()+first)&&
+         sampler.at("wrapS")==original.wrap_s&&sampler.at("wrapT")==original.wrap_t&&
+         sampler.value("magFilter",0)==original.mag_filter,
+         "The emitted role references the original image bytes and exact sampler");
+ };
+ role(toon.at("pbrMetallicRoughness").at("baseColorTexture"),base);
+ role(body.at("shadeMultiplyTexture"),shade);
+ check(read.textures[size_t(MToonSlot::Shade)].offset==std::array<float,2>{.125f,.25f},
+       "The native shade role retains its independent UV transform");
+ const auto &used=json.at("extensionsUsed");
+ check(std::find(used.begin(),used.end(),"VRMC_materials_mtoon")!=used.end()&&
+       std::find(used.begin(),used.end(),"KHR_texture_transform")!=used.end(),
+       "The emitted document declares all material and sampler extensions it uses");
+ auto unrigged=scene;
+ unrigged.active().deformation.reset();
+ const auto static_doc=detail::make_gltf(unrigged.export_surfaces());
+ check(!static_doc.json.contains("skins")&&static_doc.json.at("materials").at(1)==toon,
+       "The same authored MToon material exports from an ordinary unrigged mesh");
+ export_glb(unrigged.export_surfaces(),"mtoon-static.glb");
  Document doc;
  doc.replace(std::move(scene));
  check(doc.wait_mesh()&&doc.frame().state->error.empty(),"MToon and PBR publish together on a rigged mesh");
+ doc.export_asset("mtoon-standard.glb",AssetExportFormat::Glb).get();
+ consumer("mtoon-standard.glb",2);
+ const auto standard=bytes("mtoon-standard.glb");
  doc.export_asset("mtoon-editable.glb",AssetExportFormat::EditableGlb256).get();
  consumer("mtoon-editable.glb",2);
  const auto restored=extract_native_authoring(bytes("mtoon-editable.glb"));
  check(restored&&restored->encode()==exact&&doc.copy_scene().encode()==exact,
        "The editable package preserves the typed graph, image, skin, morph and independent native grids");
+ auto painted=doc.copy_scene();
+ check(edit_texture_set(painted,object,1,[](PaintedMesh &paint,Material &){
+   Brush brush;
+   brush.from=brush.to={0,0,.5f};
+   brush.normal={0,0,1};
+   brush.radius=.25f;
+   PaintSettings settings;
+   settings.front_only=false;
+   settings.color={1,0,0,1};
+   paint.begin_stroke();
+   paint.stamp(brush,settings);
+   return paint.end_stroke();
+ }),"An authored MToon paint layer requires its own portable composition");
+ const auto with_paint=painted.encode();
+ doc.replace(std::move(painted));
+ check(doc.wait_mesh()&&doc.frame().state->error.empty(),"The real MToon paint remains usable in the document");
+ refuses([&]{doc.export_asset("mtoon-standard.glb",AssetExportFormat::Glb).get();},
+         "Standard GLB refuses unresolved painted MToon before replacing the destination");
+ check(bytes("mtoon-standard.glb")==standard,"Refused portability preserves the previous output");
+ doc.export_asset("mtoon-painted-editable.glb",AssetExportFormat::EditableGlb256).get();
+ const auto replay=extract_native_authoring(bytes("mtoon-painted-editable.glb"));
+ check(replay&&replay->encode()==with_paint,
+       "Editable GLB preserves the unresolved MToon paint and source material together");
 }
 void editable_hdr(){
  auto scene=fixture();
