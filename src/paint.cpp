@@ -2161,11 +2161,11 @@ std::shared_ptr<PaintedMesh>detail::TextureSetPaintAccess::bind(const PaintedMes
   if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Texture-set paint binding cancelled");return result;
 }
 std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::resample_plain(const PaintedMesh&before,
-    const TextureSetResolutionOptions&options,const TextureSetLimits&limits,TextureSetResolutionReport&report){
+    const TextureSetResolutionOptions&options,const TextureSetLimits&limits,TextureSetResolutionReport&report,bool native_mtoon){
  options.validate();limits.validate();const auto domain=before.texture_set_domain_;
  if(domain)domain->authenticate_owner(domain);
  if((!domain&&!can_resize_raw(before))||(domain&&(!valid_raster(before)||before.in_stroke()||!domain->matches(before.mesh_owner())||
-    before.paint_sampling_domain()||before.source_maps_||before.source_sampling_prepared()||
+    before.paint_sampling_domain()||(before.source_maps_&&(!native_mtoon||before.source_maps_->uses_alternate_uv()))||before.source_sampling_prepared()||
     before.sampling_attachment_||before.color_projection_||before.normal_projection_||!resizable_canonical_bake(before.baked_.get())||
     before.surface_->original_sampling||before.surface_->source_capture_only)))
   throw std::invalid_argument("Resampling requires actual plain member geometry/grid owners");
@@ -2205,9 +2205,9 @@ std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::resample_plain(const
   if(candidate_bytes>limits.maximum_bytes||candidates>(limits.maximum_bytes-candidate_bytes)/stride)throw std::length_error("Texture-set candidate storage exceeds its prospective byte bound");candidate_bytes+=candidates*stride;
  }
  if(candidate_bytes>=filter_limits.maximum_bytes)throw std::length_error("Texture-set candidates exhaust its peak budget");filter_limits.maximum_bytes-=candidate_bytes;
- // Refinement of a baked grid keeps its paint cells aligned with the exact
- // replicated Bake footprint. Keep legacy interpolation for unbaked sets.
- auto layers=detail::resample_texture_set_layers(before,options,filter_limits,report,!domain||before.baked_);report.peak_bytes+=candidate_bytes;
+ // Keep Bake layers aligned with the exact replicated footprint. Native
+ // MToon also needs whole paint cells, including its alpha and shade coverage.
+ auto layers=detail::resample_texture_set_layers(before,options,filter_limits,report,!domain||before.baked_||native_mtoon);report.peak_bytes+=candidate_bytes;
  auto raster_options=before.surface_->options;raster_options.cancelled=limits.cancelled;
  raster_options.max_raster_samples=std::min({raster_options.max_raster_samples,std::max(size_t(1),samples),limits.maximum_work-report.work});
  raster_options.max_candidate_checks=std::min(raster_options.max_candidate_checks,std::max(size_t(1),max_checks));

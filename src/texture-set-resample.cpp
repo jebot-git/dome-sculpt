@@ -6,6 +6,7 @@
 #include "paint-overlay-sample.hpp"
 #include "texture-set-graph.hpp"
 #include "texture-set-paint-access.hpp"
+#include "texture-set-surface.hpp"
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -469,7 +470,7 @@ void material_quality(const PaintedMesh &before, const PaintedMesh &after,
 void native_overlay_quality(const PaintedMesh &before, const PaintedMesh &after,
                             const TextureSetResolutionOptions &options,
                             const TextureSetLimits &limits,
-                            TextureSetResolutionReport &report) {
+                            TextureSetResolutionReport &report, bool pbr = false) {
   const auto old = PaintOverlayFactory::capture(before, limits.cancelled);
   const auto now = PaintOverlayFactory::capture(after, limits.cancelled);
   // Compare the actual composed fields on their common coarser footprints.
@@ -527,7 +528,7 @@ void native_overlay_quality(const PaintedMesh &before, const PaintedMesh &after,
           if (owner < 0 || (!packet.baked() && !tiles.at(size_t(owner / grid / 32) * (grid / 32) + owner % grid / 32)))
             return;
           work(report, (packet.layers().size() + 1) * 32, limits);
-          const auto sample = sample_overlay_texel_values(packet, int(sx), int(sy), false);
+          const auto sample = sample_overlay_texel_values(packet, int(sx), int(sy), pbr);
           for (size_t plane = 0; plane < widths.size(); ++plane)
             for (size_t c = 0; c < widths[plane]; ++c)
               values[plane][c] += weight * sample[plane][c];
@@ -547,7 +548,8 @@ void native_overlay_quality(const PaintedMesh &before, const PaintedMesh &after,
         }
     }
   }
-  report.material_rms_error = count ? std::sqrt(squares / count) : 0;
+  if (count)
+    report.material_rms_error = std::max(report.material_rms_error, std::sqrt(squares / count));
   if (report.material_rms_error > options.maximum_rms_error ||
       std::ranges::any_of(report.material_error, [&](double error) {
         return error > options.maximum_component_error;
@@ -919,9 +921,11 @@ resample_texture_set(Scene &scene, uint64_t object, TextureSetId set,
         "Resolution editing needs an actual material-set collection");
   object_before.texture_sets->validate(object_before, true, limits);
   const auto field = texture_set_view(object_before, set);
-  if (field.source || field.material_bindings || field.appearance ||
+  const bool typed = detail::native_texture_set_mtoon(
+      field.painted.get(), field.appearance.get(), field.material_bindings.get());
+  if (field.source || (!typed && (field.material_bindings || field.painted->source_maps())) ||
+      field.appearance ||
       field.painted->paint_sampling_domain() ||
-      field.painted->source_maps() ||
       field.painted->source_sampling_prepared() ||
       field.painted->color_projection() || field.painted->normal_projection() ||
       !detail::resizable_canonical_bake(field.painted->baked().get()))
@@ -946,10 +950,10 @@ resample_texture_set(Scene &scene, uint64_t object, TextureSetId set,
   const bool physical = field.painted->has_physical_emission() ||
       std::any_of(field.material.emissive.begin(), field.material.emissive.end(),
                   [](float v) { return v > 1; });
-  const size_t material_bytes = (before_pixels + after_pixels) *
+  const size_t material_bytes = typed ? 0 : (before_pixels + after_pixels) *
                                (128 + (physical ? layer_count * 32 + sizeof(std::array<double, 4>) : 0)) +
       (physical ? 2 * sizeof(std::vector<std::array<double, 4>>) : 0);
-  const size_t material_work =
+  const size_t material_work = typed ? 0 :
       (before_pixels + after_pixels) * (field.painted->layers().size() + 1) *
           32 +
       14 * (before_pixels + std::max(after_pixels, 4 * before_pixels)) +
@@ -970,10 +974,22 @@ resample_texture_set(Scene &scene, uint64_t object, TextureSetId set,
       scene, object, set,
       [&](PaintedMesh &paint, Material &material) {
         const auto resized = detail::TextureSetPaintAccess::resample_plain(
-            paint, options, transfer_limits, report);
-        report.peak_bytes += material_bytes;
-        detail::material_quality(paint, *resized, material, options, limits,
-                                 report);
+            paint, options, transfer_limits, report, typed);
+        if (typed) {
+          // The original MToon and PBR role images still sample the same UVs.
+          // Certify the independently composed paint and coverage fields.
+          if (resized->source_maps() != paint.source_maps())
+            throw std::invalid_argument("Texture-set resolution changed its original image owner");
+          detail::charge(report.peak_bytes, 2, detail::TextureSetPaintAccess::snapshot_bytes(paint), limits);
+          detail::charge(report.peak_bytes, 2, detail::TextureSetPaintAccess::snapshot_bytes(*resized), limits);
+          detail::native_overlay_quality(paint, *resized, options, limits, report);
+          if ((paint.baked() && paint.baked()->color_interpretation == BakedColorInterpretation::ResolvedPbr) ||
+              std::ranges::any_of(paint.layers(), [](const auto &layer) { return !layer.pbr_tiles.empty(); }))
+            detail::native_overlay_quality(paint, *resized, options, limits, report, true);
+        } else {
+          report.peak_bytes += material_bytes;
+          detail::material_quality(paint, *resized, material, options, limits, report);
+        }
         paint = *resized;
         return true;
       },

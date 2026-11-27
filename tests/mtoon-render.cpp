@@ -602,7 +602,7 @@ void baked_texture_set(SurfaceRenderer &renderer, const std::filesystem::path &d
 }
 
 void painted_texture_sets(SurfaceRenderer &renderer,const std::filesystem::path &output,
-                          mtoon_paint_fixture::Background background){
+                          mtoon_paint_fixture::Background background,bool resize=false){
  using mtoon_paint_fixture::Background;
  const bool varying=background==Background::Varying;
  const bool shared=background==Background::SharedShade||varying;
@@ -614,10 +614,46 @@ void painted_texture_sets(SurfaceRenderer &renderer,const std::filesystem::path 
  initialize_texture_sets(scene,scene.active().id,set_triangles(),fields,
                          std::array<TextureSetId,2>{0,1});
  mtoon_paint_fixture::author(scene,1,{.44f,-.19f,0},false,background);
+ if(resize)select_texture_set(scene,scene.active().id,1);
  Document document;
  document.replace(scene);
  check(document.wait_mesh()&&document.frame().state->error.empty(),
        "The painted material and adjacent PBR mesh render through the native document");
+ uint32_t resolution=64;
+ if(resize){
+  const auto before=document.copy_scene();
+  const auto field=active_texture_set(before.active());
+  const auto sibling=texture_set_view(before.active(),0);
+  const auto original=draw(renderer,document.frame().surface);
+  const auto input=output/"painted-original.dsculpt";
+  const auto saved=output/"painted-resized.dsculpt";
+  before.save(input);
+  TextureSetEdit edit;
+  edit.action=TextureSetAction::Resolution;
+  edit.set=field.id;
+  edit.resolution=resolution=128;
+  document.edit_texture_set(edit);
+  document.save_async(saved).get();
+  check(document.wait_asset()&&document.wait_mesh()&&document.frame().state->error.empty(),
+        "The native worker publishes the resized painted MToon grid");
+  scene=document.copy_scene();
+  const auto current=active_texture_set(scene.active());
+  check(current.domain==field.domain&&current.painted->resolution()==resolution&&
+        current.material_bindings==field.material_bindings&&
+        current.material_bindings->roles[size_t(MToonSlot::Base)].image->width==64&&
+        detail::TextureSetPaintAccess::same_current(*texture_set_view(scene.active(),0).painted,*sibling.painted),
+        "Only the authored grid changes while the varied base, shade, glow and adjacent field keep their owners");
+  const auto resized=draw(renderer,document.frame().surface);
+  for(int y=0;y<Fbo::size;++y)for(int x=0;x<Fbo::size/2;++x)
+   if(at(original,x,y)!=at(resized,x,y))throw std::runtime_error("A sibling pixel changed during MToon resize");
+  const auto encoded=scene.encode();
+  check(Scene::load(saved).encode()==encoded&&document.undo()&&document.copy_scene().encode()==before.encode()&&
+        document.redo()&&document.copy_scene().encode()==encoded&&document.wait_mesh(),
+        "Ordered Save and exact Undo and Redo preserve the resized material partition");
+  const auto editable=output/"painted-resized-editable.glb";
+  document.export_asset(editable,AssetExportFormat::EditableGlb256).get();
+  check(Scene::load(editable).encode()==encoded,"Editable GLB keeps the original images and resized writable layers");
+ }
  const auto frame=document.frame().surface;
  const auto native=draw(renderer,frame);
 
@@ -649,9 +685,9 @@ void painted_texture_sets(SurfaceRenderer &renderer,const std::filesystem::path 
   view.wrap_s=slot.wrap_s;view.wrap_t=slot.wrap_t;
   view.min_filter=slot.min_filter;view.mag_filter=slot.mag_filter;
  }
- check(binding.roles[size_t(MToonSlot::Base)].image->width==64&&
-       binding.roles[size_t(MToonSlot::Emission)].image->width==64&&
-       binding.roles[size_t(MToonSlot::Shade)].image->width==(shared?64u:2u),
+ check(binding.roles[size_t(MToonSlot::Base)].image->width==resolution&&
+       binding.roles[size_t(MToonSlot::Emission)].image->width==resolution&&
+       binding.roles[size_t(MToonSlot::Shade)].image->width==(shared?resolution:2u),
        "The independent file read resolves base, glow and the actual shade image");
  check(binding.material.textures[size_t(MToonSlot::Base)].offset==std::array<float,2>{},
        "A generated paint grid uses its current UVs and clamp sampler without the old transform");
@@ -701,6 +737,13 @@ void painted_texture_sets(SurfaceRenderer &renderer,const std::filesystem::path 
 int main(int argc,char**argv)try{
  NativeGraphics graphics;std::string device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<device<<'\n';check(argc<2||std::string(argv[1])!="--hardware"||(device.find("llvmpipe")==std::string::npos&&device.find("softpipe")==std::string::npos),"Production renderer runs on requested hardware");
  if(argc>=2&&std::string(argv[1])=="--texture-sets"){Fbo test;SurfaceRenderer renderer;native_texture_sets(renderer);std::cout<<"PASS "<<checks<<" native MToon texture-set graphics checks\n";return 0;}
+ if(argc==3&&std::string(argv[1])=="--resized-texture-set"){
+  Fbo test;
+  SurfaceRenderer renderer;
+  painted_texture_sets(renderer,argv[2],mtoon_paint_fixture::Background::Varying,true);
+  std::cout<<"PASS "<<checks<<" resized MToon texture-set graphics checks\n";
+  return 0;
+ }
  if(argc==3&&std::string(argv[1])=="--baked-texture-sets"){
   Fbo test;
   SurfaceRenderer renderer;

@@ -1605,6 +1605,9 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
   add_test(NAME mtoon-painted-texture-sets COMMAND dome-sculpt-mtoon-render-test
     --painted-texture-sets ${CMAKE_CURRENT_BINARY_DIR}/mtoon-painted-texture-sets)
   set_tests_properties(mtoon-painted-texture-sets PROPERTIES ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2" TIMEOUT 90)
+  add_test(NAME mtoon-resized-texture-set COMMAND dome-sculpt-mtoon-render-test
+    --resized-texture-set ${CMAKE_CURRENT_BINARY_DIR}/mtoon-resized-texture-set)
+  set_tests_properties(mtoon-resized-texture-set PROPERTIES ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2" TIMEOUT 90)
   add_test(NAME mtoon-baked-texture-sets COMMAND dome-sculpt-mtoon-render-test
     --baked-texture-sets ${CMAKE_CURRENT_BINARY_DIR}/mtoon-baked-texture-sets)
   set_tests_properties(mtoon-baked-texture-sets PROPERTIES ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2" TIMEOUT 180)
@@ -5315,6 +5318,9 @@ if(BUILD_TESTING)
   add_test(NAME dome-sculpt-texture-set-baked-resolution COMMAND dome-sculpt-texture-set-resolution-test
     ${CMAKE_CURRENT_BINARY_DIR}/texture-set-baked-resolution-output baked)
   set_tests_properties(dome-sculpt-texture-set-baked-resolution PROPERTIES TIMEOUT 300)
+  add_test(NAME dome-sculpt-texture-set-baked-mtoon-resolution COMMAND dome-sculpt-texture-set-resolution-test
+    ${CMAKE_CURRENT_BINARY_DIR}/texture-set-baked-mtoon-resolution-output baked-mtoon)
+  set_tests_properties(dome-sculpt-texture-set-baked-mtoon-resolution PROPERTIES TIMEOUT 300)
 
   add_executable(dome-sculpt-native-paint-resolution-test tests/native-paint-resolution.cpp)
   target_include_directories(dome-sculpt-native-paint-resolution-test PRIVATE src)

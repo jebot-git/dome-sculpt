@@ -2,6 +2,7 @@
 #include "dome/texture-set-resolution.hpp"
 #include "dome/bake-recipe.hpp"
 #include "dome/document.hpp"
+#include "dome/material-bindings.hpp"
 #include "paint-color-access.hpp"
 #include "texture-set-controls.hpp"
 #include "texture-set-paint-access.hpp"
@@ -691,7 +692,7 @@ void native() {
         "publication");
 }
 
-void baked_member() {
+void baked_member(bool typed_mtoon) {
   auto scene=fixture(true);
   const auto target=scene.active().id;
   const auto solid=[](uint32_t resolution,std::array<uint8_t,4> pixel){
@@ -710,6 +711,25 @@ void baked_member() {
     paint.install_bake(std::move(bake));
     return true;
   });
+  if (typed_mtoon) {
+    const auto current = active_texture_set(scene.active()).material;
+    SourceMaterialBindings binding;
+    binding.material = MToonMaterial::from_vrm1({
+        {"pbrMetallicRoughness", {{"baseColorFactor", current.color}, {"baseColorTexture", {{"index", 0}}}}},
+        {"normalTexture", {{"index", 1}}}, {"alphaMode", "OPAQUE"},
+        {"emissiveFactor", current.emissive},
+        {"extensions", {{"VRMC_materials_mtoon", {{"specVersion", "1.0"},
+                           {"shadeMultiplyTexture", {{"index", 2}}}}}}}
+    }, 3);
+    binding.native_reference={current.color,current.emissive,int(current.alpha),current.alpha_cutoff,current.double_sided};
+    auto &base = binding.roles[size_t(MToonSlot::Base)];
+    base.image = std::make_shared<const Image>(Image{2,1,{153,133,94,255,153,133,94,255}});
+    binding.roles[size_t(MToonSlot::Shade)].image =
+        std::make_shared<const Image>(Image{2,1,{114,143,178,255,140,155,164,255}});
+    binding.roles[size_t(MToonSlot::Normal)].image =
+        std::make_shared<const Image>(Image{1,1,{147,156,248,255}});
+    check(bind_texture_set_mtoon(scene,target,1,binding),"Bind independent typed base, shade and normal images");
+  }
   Mesh mesh;
   mesh.positions={{.05f,-.8f,.53f},{.93f,-.8f,.53f},{.93f,.8f,.53f},{.05f,.8f,.53f}};
   mesh.normals.assign(4,{0,0,1});
@@ -774,6 +794,10 @@ void baked_member() {
   check(current.painted->resolution()==256&&current.domain==field.domain&&current.bake_recipe==field.bake_recipe&&
         current.painted->mesh_owner()==field.painted->mesh_owner(),
         "Resize retains the selected face domain, Bake recipe and mesh owner");
+  if (typed_mtoon)
+    check(current.material_bindings==field.material_bindings&&current.material_bindings->has_mtoon&&
+          current.material_bindings->roles[size_t(MToonSlot::Base)].image->width==2,
+          "MToon source roles keep their exact binding, image and sampler owners");
   const auto retained_sibling=texture_set_view(resized.active(),0);
   check(retained_sibling.domain==sibling.domain&&
         detail::TextureSetPaintAccess::same_current(*retained_sibling.painted,*sibling.painted)&&
@@ -818,13 +842,59 @@ void baked_member() {
         primary.active().painted->baked()->maps.emission.width==128&&texture_set_view(primary.active(),1).painted==current.painted,
         "The primary RGB8 Bake resizes without replacing the additional FLOAT member");
 }
+
+void typed_source_grid() {
+  auto mesh = fixture(true).active().painted->mesh();
+  for (size_t i = 0; i < mesh.uv.size(); ++i)
+    mesh.uv[i][0] = .46f * mesh.uv[i][0] + (i < 4 ? .01f : .53f);
+  auto maps = std::make_shared<PaintSourceMaps>();
+  maps->color.image = std::make_shared<const Image>(Image{2,1,{104,172,164,255,146,181,182,255}});
+  Scene scene;
+  auto &object = scene.active();
+  const auto id = object.id;
+  object.mesh_active = true;
+  object.painted = PaintedMesh::from_maps(std::move(mesh), maps, 64);
+  SourceMaterialBindings binding;
+  binding.material = MToonMaterial::from_vrm1({
+      {"pbrMetallicRoughness", {{"baseColorTexture", {{"index", 0}}}}},
+      {"extensions", {{"VRMC_materials_mtoon", {{"specVersion", "1.0"}}}}}
+  }, 1);
+  binding.roles[size_t(MToonSlot::Base)].image = maps->color.image;
+  object.material_bindings = std::make_shared<const SourceMaterialBindings>(std::move(binding));
+  const auto set = create_texture_set(scene, id, std::array<uint64_t,2>{3,4}, "Independent UV0 images", 64);
+  edit_texture_set(scene,id,set,[](PaintedMesh &paint,Material &) {
+    PaintSettings ink;
+    ink.color={.45f,.31f,.17f,1};
+    stamp(paint,ink,.42f);
+    return true;
+  });
+  const auto before=active_texture_set(scene.active());
+  check(before.id==set && before.painted->source_maps() && !before.source,
+        "The native MToon partition has independent generic UV0 sources and real paint");
+  if (compute_backend()!="CPU") {
+    const auto exact=scene.encode();
+    refuses([&]{resample_texture_set(scene,id,set,{128});},"A missing typed resampling backend refuses");
+    check(scene.encode()==exact,"The unavailable backend preserves independent source maps");
+    return;
+  }
+  check(resample_texture_set(scene,id,set,{128}).changed,"Native MToon with independent core images resizes");
+  const auto resized=active_texture_set(scene.active());
+  check(resized.domain==before.domain && resized.material_bindings==before.material_bindings &&
+        resized.painted->source_maps()==before.painted->source_maps() &&
+        resized.painted->resolution()==128 && texture_set_view(scene.active(),0).painted->resolution()==64,
+        "Resize keeps the actual independent UV0 image collection, roles and sibling grid");
+  scene.save("mtoon-core-images.dsculpt");
+  check(Scene::load("mtoon-core-images.dsculpt").encode()==scene.encode(),
+        "Native reopen preserves independent core images and the resized writable grid");
+}
 } // namespace
 int main(int argc, char **argv) try {
   if (argc > 1) {
     std::filesystem::create_directories(argv[1]);
     std::filesystem::current_path(argv[1]);
   }
-  if(argc==3&&std::string_view(argv[2])=="baked")baked_member();
+  if(argc==3&&std::string_view(argv[2])=="baked-mtoon"){baked_member(true);typed_source_grid();}
+  else if(argc==3&&std::string_view(argv[2])=="baked")baked_member(false);
   else {numeric();native();}
   std::cout << "PASS " << checks << " measured texture resolution checks\n";
   return 0;
