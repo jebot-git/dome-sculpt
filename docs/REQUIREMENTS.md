@@ -203,14 +203,25 @@ emission also export when the original images share the paint grid
 and use level-zero clamp-linear UV0. The exporter measures the error
 from filtering the source and paint coverage together. Tested 64 and
 512 square fields preserve exact Editable GLB authoring state.
-Other sampler modes and layouts, live painted UV animation, HDR and
-typed Bake, VRM integration, alternate UVs, original artist frames,
-resampling, and physical verification remain open.
+Native MToon UV0 sets now also accept Bake from supported donors. The
+selected set preserves original material roles, canonical normals at
+projected texels, the original normal at missed texels, editable layers,
+and its own saved recipe. Absolute donor emission stays independent of
+the target's relative emission strength. Native Save and Editable GLB
+restore the exact LDR and FLOAT Bake. Editable GLB supplies a measured
+core PBR fallback for the tested FLOAT fields. Release, ASan/UBSan and
+Intel Arc cover 64- and 512-square fixtures. The native Wayland menu and
+synthetic OpenXR also exercise the selected-field workflow.
+Larger typed Bake previews, original authored frames, typed donor
+partitions, Standard GLB of typed Bake, VRM integration, alternate UVs,
+resampling, live painted animation, other portable sampler modes and
+physical verification remain open.
 [Native MToon texture-set evidence](validation/native-mtoon-texture-sets-20261127.json)
 [Portable MToon texture-set evidence](validation/portable-mtoon-texture-sets-20261127.json)
 [Painted MToon texture-set evidence](validation/painted-mtoon-texture-sets-20261127.json)
 [Shared MToon shade evidence](validation/shared-shade-mtoon-20261127.json)
 [Varying MToon source evidence](validation/varying-role-mtoon-20261127.json)
+[Native MToon Bake evidence](validation/native-mtoon-bake-20261127.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge

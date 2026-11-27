@@ -2444,6 +2444,39 @@ The original full sweep retains its failure. A fresh combined build
 with the corrected fixture and current MToon changes is running separately.
 [Retopology Save capacity validation](validation/retopo-save-queue-20261127.json)
 
+### Native Bake on selected MToon texture sets
+
+The shared Bake worker now accepts eligible native UV0 MToon fields in
+the primary or an additional slot. It retains the exact typed binding,
+original normal role, face domain, layer tiles, and per-field recipe.
+The viewport applies canonical Mikk normals on projected texels, keeps
+original shading at misses, and preserves the neighboring PBR field.
+A donor remains at its own radiance when the recipient has non-unit
+relative emission strength. The typed preview keeps the coverage and
+normal images required by the MToon shader, including with FLOAT Bake.
+Native Save and Editable GLB restore exact authoring state. The portable
+portion of Editable GLB uses a labeled core PBR fallback, with measured
+texel quantization error for FLOAT emission. Standard GLB refuses these
+baked typed materials before replacing its destination.
+
+Release and ASan/UBSan each pass 70 graphics checks in software and on
+Intel Arc A770. All three 64- and 512-square fixtures agree with the CPU
+shader oracle to one byte. Native projects and Editable GLBs match
+across the four runs. Khronos reports zero errors and warnings on all
+three GLBs. Release and ASan/UBSan each pass 19 actual-loader OpenXR
+checks, including Recall, Cancel and focus loss. The second nested
+DomeD Wayland run passes the full menu, ordered Save, Clear and Undo
+workflow. The original Wayland completion-observer timeout is retained.
+
+The earlier full Release sweep also reports a separate
+`native-mtoon-physical` GPU-budget failure. The frozen executable
+reproduces it in isolation at the exact cold-budget step, after the
+one-byte-short rejection succeeds. This milestone does not change
+that budget gate. Typed donors, larger typed previews, authored normal
+frames, Standard GLB and VRM Bake interchange, and physical headset
+qualification remain open.
+[Native MToon Bake validation](validation/native-mtoon-bake-20261127.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
