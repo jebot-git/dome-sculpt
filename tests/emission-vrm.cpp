@@ -5,11 +5,13 @@
 #include "dome/emission-native.hpp"
 #include "dome/gltf-export.hpp"
 #include "dome/vrm.hpp"
+#include "dome/vrm-authoring.hpp"
 #include "dome/creation.hpp"
 #include "dome/bake-recipe.hpp"
 #include "dome/texture-sets.hpp"
 #include "dome/source-placement.hpp"
 #include "emission-export.hpp"
+#include "editable-avatar-eligibility.hpp"
 #include "cgltf.h"
 #include <fstream>
 #include <zlib.h>
@@ -256,6 +258,51 @@ void native_texture_set_accessory(const std::filesystem::path &out) {
  export_vrm(emission_export_surfaces(*owner->scene),again,options);
  check(file_bytes(again)==vrm_data,"Second VRM1 export reproduces every byte from the exact restored native project");
 
+ check(detail::editable_avatar_view(doc.frame()),"The selected accessory enables the shared Editable VRM control");
+ const auto editable_path=out/"native-accessory-editable.vrm";
+ doc.export_asset(editable_path,AssetExportFormat::EditableAvatar512).get();
+ const auto editable_bytes=file_bytes(editable_path);
+ const auto editable=glb_json(editable_path);
+ check(geometry(editable_path)==graph,"Editable VRM preserves the same ordered geometry, actual node placements and morphs as Standard VRM");
+ const auto &editable_package=editable.at("extras").at("domeSculptAuthoring");
+ const auto accessory_map=std::ranges::find_if(editable_package.at("objects"),[&](const auto &entry){
+  return entry.at("object")==std::to_string(accessory);
+ });
+ check(accessory_map!=editable_package.at("objects").end()&&editable_package.at("scope")=="exportedObjects"&&
+       editable.at("nodes").at(accessory_map->at("node").template get<size_t>()).at("name")=="Native baked accessory",
+       "The editable package maps the accessory to its actual portable node in the exported subset");
+ const auto &editable_primitives=editable.at("meshes").at(accessory_map->at("mesh").get<size_t>()).at("primitives");
+ bool same_materials=editable_primitives.size()==primitives.size();
+ const auto material_value=[&](const auto &portable_path,const auto &document,const auto &primitive) {
+  auto view=document.at("materials").at(primitive.at("material").template get<size_t>());
+  const auto bind=[&](J &value,const char *role) {
+   if(value.contains(role)) {
+    auto &slot=value.at(role);
+    slot["index"]=thumbnail(portable_path,document,slot.at("index").get<int>(),true);
+    slot.at("index").at("image").erase("name");
+   }
+  };
+  for(auto role:{"normalTexture","occlusionTexture","emissiveTexture"})bind(view,role);
+  for(auto role:{"baseColorTexture","metallicRoughnessTexture"})bind(view.at("pbrMetallicRoughness"),role);
+  if(view.at("extensions").contains("VRMC_materials_mtoon"))bind(view.at("extensions").at("VRMC_materials_mtoon"),"shadeMultiplyTexture");
+  return view;
+ };
+ for(size_t i=0;same_materials&&i<primitives.size();++i)
+  same_materials=editable_primitives.at(i).at("extras")==primitives.at(i).at("extras")&&
+      material_value(editable_path,editable,editable_primitives.at(i))==material_value(vrm_path,j,primitives.at(i));
+ check(same_materials,"Independent portable images, samplers, FLOAT factors and texture-set membership match Standard VRM");
+ check(editable.at("extensions").at("VRMC_vrm").at("expressions")==j.at("extensions").at("VRMC_vrm").at("expressions"),
+       "Editable VRM does not route original expression bindings to the native accessory");
+ const auto editable_scene=extract_native_authoring(editable_bytes);
+ check(editable_scene&&editable_scene->encode()==expected.encode(),"Editable VRM restores the exact FLOAT bake, source graph and excluded-donor state");
+ Document reopened;
+ reopened.open_async(editable_path).get();
+ check(reopened.wait_mesh()&&detail::editable_avatar_view(reopened.frame())&&reopened.copy_scene().encode()==expected.encode(),
+       "Document Open reopens the exact editable subset and enables export from the accessory");
+ const auto editable_again=out/"native-accessory-editable-second.vrm";
+ reopened.export_asset(editable_again,AssetExportFormat::EditableAvatar512).get();
+ check(file_bytes(editable_again)==editable_bytes,"Reopening and re-exporting Editable VRM reproduces every byte");
+
  auto unrelated=restored->snapshot();
  unrelated.object(accessory).group=unrelated.add_group("Outside the avatar");
  owner->scene=std::make_shared<const Scene>(std::move(unrelated));
@@ -266,6 +313,16 @@ void native_texture_set_accessory(const std::filesystem::path &out) {
   rejected=std::string_view(e.what()).find("outside the original avatar's instance")!=std::string_view::npos;
  }
  check(rejected&&file_bytes(again)==vrm_data,"An unrelated accessory cannot enter the avatar or replace the previous export");
+ NativeAuthoringExport editable_owner;
+ editable_owner.scene=owner->scene;
+ editable_owner.allow_portable_fallback=true;
+ rejected=false;
+ try {
+  export_vrm_authoring(editable_owner,editable_again);
+ } catch(const std::invalid_argument &e) {
+  rejected=std::string_view(e.what()).find("outside the original avatar's instance")!=std::string_view::npos;
+ }
+ check(rejected&&file_bytes(editable_again)==editable_bytes,"Editable VRM also refuses a foreign accessory before replacing the destination");
 }
 }
 int main(int argc,char**argv)try{if(argc!=2&&argc!=3)return 2;std::filesystem::path out=argv[1];std::filesystem::create_directories(out);native_texture_set_accessory(out);if(argc==3){std::cout<<"VRM1 native texture set: "<<checks<<" checks\n";return 0;}for(auto base:{"vroid-beta-female","vroid-beta-male"}){Scene scene;append_humanoid(scene,humanoid_baseline_defaults(base),base,{},64);current(out,std::move(scene),base);}auto f=source(false);import_fixture::Fixture original;for(auto uv:{"TEXCOORD_0","TEXCOORD_1"})f.j["meshes"][0]["primitives"][0]["attributes"][uv]=original.j["meshes"][0]["primitives"][0]["attributes"][uv];f.j["materials"][0]["extensions"].erase("KHR_materials_unlit");auto &used=f.j["extensionsUsed"];for(auto i=used.begin();i!=used.end();)if(i->get_ref<const std::string&>()=="KHR_materials_unlit")i=used.erase(i);else ++i;auto path=out/"independent-v1-source.vrm";canonical_leaf_nodes(f);f.save(path);ImportAuthoringOptions options;options.paint_resolution=64;auto scene=prepare_authoring_import(Scene{},path,options).scene;current(out,std::move(scene),"independent-v1");for(float strength:{0.f,5.f})strength_case(out,strength);std::cout<<"HDR typed VRM: "<<checks<<" checks\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

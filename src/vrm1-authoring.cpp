@@ -3,9 +3,11 @@
 #include "dome/vrm-authoring.hpp"
 #include "vrm1-export.hpp"
 #include "vrm1-metadata.hpp"
+#include "vrm-source-graph.hpp"
 #include "source-paint-export.hpp"
 #include "paint-overlay-sample.hpp"
 #include "emission-authority.hpp"
+#include "texture-set-export.hpp"
 #include "dome/source-paint-bake.hpp"
 #include <numeric>
 namespace dome::detail {
@@ -31,19 +33,37 @@ std::shared_ptr<const Vrm1AuthoringCompilation> compile_vrm1_authoring(
  size_t maximum_output,const std::function<bool()> &cancelled){
  auto stop=[a=cancelled,b=policy.cancelled]{return (a&&a())||(b&&b());};auto check=[&]{if(stop())throw std::runtime_error("VRM1 authoring compilation cancelled");};check();
  if(!capture||capture->originals().empty())throw std::invalid_argument("VRM1 authoring needs genuine native source surfaces");
- auto result=std::shared_ptr<Vrm1AuthoringCompilation>(new Vrm1AuthoringCompilation);result->capture_=std::move(capture);result->original_=original_json(result->capture_->originals().front(),stop);
+ const auto &originals=capture->originals();
+ const auto source=std::ranges::find_if(originals,[](const auto &surface){return bool(surface.appearance);});
+ if(source==originals.end())throw std::invalid_argument("VRM1 authoring requires immutable original metadata");
+ auto result=std::shared_ptr<Vrm1AuthoringCompilation>(new Vrm1AuthoringCompilation);result->capture_=std::move(capture);result->original_=original_json(*source,stop);
  size_t working=sizeof(Scene)+sizeof(Vrm1AuthoringCompilation),images=0,samples=0,raster=0;
  auto reserve=[&](size_t n,size_t unit){if(working>policy.max_working_bytes||n>(policy.max_working_bytes-working)/unit)throw std::length_error("VRM1 authoring geometry staging exceeds working budget");working+=n*unit;};
- reserve(result->capture_->originals().size(),sizeof(ObjectSurface));reserve(result->capture_->scene().objects().size(),sizeof(SculptObject));reserve(result->capture_->scene().groups().size(),sizeof(SceneGroup));
- for(const auto &surface:result->capture_->originals()){
+ reserve(originals.size(),sizeof(ObjectSurface));reserve(result->capture_->scene().objects().size(),sizeof(SculptObject));reserve(result->capture_->scene().groups().size(),sizeof(SceneGroup));
+ for(const auto &surface:originals){
   check();const auto &m=surface.mesh;reserve(m.positions.size()+m.normals.size(),sizeof(Vec3));reserve(m.indices.size(),sizeof(uint32_t));reserve(m.uv.size(),sizeof(std::array<float,2>));reserve(surface.name.size()+1,1);reserve(surface.groups.size(),sizeof(SceneGroup));
-  if(!surface.appearance||surface.appearance->asset!=result->capture_->originals().front().appearance->asset||surface.appearance->original_bytes!=result->capture_->originals().front().appearance->original_bytes)throw std::invalid_argument("VRM1 authoring cannot mix independent original avatars");
+  if(native_vrm_texture_set_accessory(surface)) {
+   TextureSetLimits limits;
+   limits.maximum_bytes=std::min(limits.maximum_bytes,policy.max_working_bytes-working);
+   limits.maximum_work=std::min(limits.maximum_work,policy.max_sample_operations);
+   limits.cancelled=stop;
+   reserve(texture_set_export_working_bound(surface,limits,true),1);
+   continue;
+  }
+  if(!surface.appearance||surface.appearance->asset!=source->appearance->asset||surface.appearance->original_bytes!=source->appearance->original_bytes)throw std::invalid_argument("VRM1 authoring cannot mix independent original avatars");
  }
  auto staged=result->capture_->scene();
  struct View {std::shared_ptr<const TextureMaps> texture;std::shared_ptr<const SourceMaterialBindings> material;};std::map<uint64_t,View> views;
  const size_t image_limit=std::min(maximum_output,policy.max_output_bytes);
- for(const auto &surface:result->capture_->originals()){
-  check();const auto &object=result->capture_->scene().object(surface.id);if(!object.painted)throw std::invalid_argument("VRM1 authoring source has no captured native paint");
+ for(const auto &surface:originals){
+  check();
+  if(native_vrm_texture_set_accessory(surface)) {
+   // Reuse the captured mesh and material plan unchanged after previewing the
+   // independently compiled source parts. No source material ID belongs here.
+   staged.object(surface.id).visible=false;
+   continue;
+  }
+  const auto &object=result->capture_->scene().object(surface.id);if(!object.painted)throw std::invalid_argument("VRM1 authoring source has no captured native paint");
   if(object.material_bindings&&(object.material_bindings->canonical_attributes||object.material_bindings->canonical_uv||object.material_bindings->native_paint_sampling))
     throw std::invalid_argument("VRM1 retained normal/native paint authoring requires its exact typed owning adapter");
   if(object.painted->has_physical_emission()||hdr_emission(object.material.emissive)||(object.material_bindings&&physical_emission(*object.material_bindings)))throw std::invalid_argument("VRM1 physical authoring requires its precision-qualified typed adapter");
@@ -94,9 +114,24 @@ std::shared_ptr<const Vrm1AuthoringCompilation> compile_vrm1_authoring(
   if(images>image_limit||samples>policy.max_sample_operations||raster>policy.max_raster_samples)throw std::length_error("VRM1 compiled material exceeds cumulative output/work budget");
   result->compiled_.insert(object.id);result->diagnostics_.push_back("Object "+std::to_string(object.id)+": explicit typed V1 portable material, complete original Scene retained");
  }
- check();staged.validate();result->surfaces_=staged.preview_surfaces(stop);
- if(result->surfaces_.size()!=result->capture_->ids().size())throw std::invalid_argument("VRM1 compilation changed native emitted membership");
- for(size_t i=0;i<result->surfaces_.size();++i){auto &surface=result->surfaces_[i];if(surface.id!=result->capture_->ids()[i])throw std::invalid_argument("VRM1 compilation changed native emitted order");if(result->expression_layers_.contains(surface.id)){const auto &object=result->capture_->scene().object(surface.id);vrm1_expression_background(*object.painted,surface,stop);}else if(result->compiled_.contains(surface.id)){if(auto at=views.find(surface.id);at!=views.end()){surface.textures=at->second.texture;surface.material_bindings=at->second.material;}}else{const auto &object=result->capture_->scene().object(surface.id);if(object.painted&&object.painted->source_sampling_prepared())source_paint_export(*object.painted,surface,stop);}}
+ check();staged.validate();auto compiled=staged.preview_surfaces(stop);
+ auto next=compiled.begin();
+ result->surfaces_.reserve(originals.size());
+ for(const auto &original:originals){
+  check();
+  if(native_vrm_texture_set_accessory(original)) {
+   result->surfaces_.push_back(original);
+   continue;
+  }
+  if(next==compiled.end()||next->id!=original.id)throw std::invalid_argument("VRM1 compilation changed native emitted order or membership");
+  auto &surface=result->surfaces_.emplace_back(std::move(*next++));
+  const auto &object=result->capture_->scene().object(surface.id);
+  if(result->expression_layers_.contains(surface.id))vrm1_expression_background(*object.painted,surface,stop);
+  else if(result->compiled_.contains(surface.id)){
+   if(auto at=views.find(surface.id);at!=views.end()){surface.textures=at->second.texture;surface.material_bindings=at->second.material;}
+  }else if(object.painted&&object.painted->source_sampling_prepared())source_paint_export(*object.painted,surface,stop);
+ }
+ if(next!=compiled.end())throw std::invalid_argument("VRM1 compilation added an unowned native surface");
  check();return result;
 }
 }
@@ -132,7 +167,7 @@ VrmExportReport export_vrm_authoring(const NativeAuthoringExport &owner,
   vertices+=mesh.positions.size();triangles+=mesh.indices.size()/3;
   charge(mesh.positions.size()+mesh.normals.size(),sizeof(Vec3)*2);charge(mesh.indices.size(),sizeof(uint32_t)*2);charge(mesh.uv.size(),sizeof(std::array<float,2>)*2);
  }
- auto capture=detail::NativeAuthoringCapture::create(owner,options.cancelled);
+ auto capture=detail::NativeAuthoringCapture::create(owner,options.cancelled,policy);
  auto compiled=detail::compile_vrm1_authoring(std::move(capture),policy,options.max_output_bytes,options.cancelled);
  return detail::export_vrm1_authoring(*compiled,path,options);
 }

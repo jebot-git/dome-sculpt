@@ -89,6 +89,9 @@ uint64_t original_avatar_root(std::span<const SceneGroup> path, const CreatorApp
   }
   return 0;
 }
+bool rigid_avatar_accessory_candidate(const SculptObject &object) {
+  return object.texture_sets && !object.appearance && !object.deformation && !object.rig_source;
+}
 uint64_t avatar_group(const Scene &scene, uint64_t object) {
   const auto &active = scene.object(object);
   const auto path = scene.group_path(active.group);
@@ -98,7 +101,7 @@ uint64_t avatar_group(const Scene &scene, uint64_t object) {
   if (retained_avatar(active))
     if (const auto instance = original_avatar_root(path, *active.appearance))
       return instance;
-  if (active.texture_sets && !active.appearance && !active.deformation && !active.rig_source) {
+  if (rigid_avatar_accessory_candidate(active)) {
     size_t deepest = 0;
     uint64_t selected = 0;
     for (const auto &part : scene.objects()) {
@@ -743,6 +746,11 @@ void Document::publish_locked(bool force,bool checkpoint) {
   auto avatar = avatar_group(scene_, active.id);
   state_.can_export_avatar = avatar && std::any_of(scene_.objects().begin(), scene_.objects().end(),
       [&](const auto &o) { return retained_avatar(o) && in_group(scene_, o, avatar); });
+  state_.can_export_editable_avatar = state_.can_export_avatar && active.visible &&
+      (detail::editable_avatar_source(active) || (rigid_avatar_accessory_candidate(active) &&
+          std::any_of(scene_.objects().begin(), scene_.objects().end(), [&](const auto &o) {
+            return o.visible && detail::editable_avatar_source(o) && in_group(scene_, o, avatar);
+          })));
   state_.sculpt_settings = volume().sculpt_settings();
   state_.sculpt_transform = scene_.has_affine_placement(active.id)?CanvasTransform{}:scene_.world_transform(active.id);
   state_.can_configure_sculpt = sculpt_target_ready_locked();
@@ -3191,7 +3199,7 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
   if(expression_command(command))return expression_command_enabled_locked(command);
   if(state_.expressions&&!preview_command(command)&&command!=SpatialCommand::CancelWork&&command!=SpatialCommand::Center)return false;
   if(editable_avatar_export_command(command))return
-      detail::editable_avatar_source(scene_.active())&&command_enabled_locked(SpatialCommand::ExportAvatar);
+      state_.can_export_editable_avatar&&command_enabled_locked(SpatialCommand::ExportAvatar);
   if(command>=SpatialCommand::EmissionRelative&&command<=SpatialCommand::EmissionBlack)return !control_before_&&!action_active_locked()&&!state_.asset_busy&&!state_.recovery_busy&&object_editable_locked(scene_.active().id);
   if(editable_export_command(command))return command_enabled_locked(SpatialCommand::Export);
   if(rig_fit_command(command))return rig_fit_command_enabled_locked(command);

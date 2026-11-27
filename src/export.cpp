@@ -75,10 +75,11 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
   auto stop=[&]{if(cancelled && cancelled())throw std::runtime_error("glTF export cancelled");};
   size_t work=0;auto checkpoint=[&]{if((++work&1023)==0)stop();};
   stop();
+  const auto *texture_set_owner=normal_owner?&normal_owner->capture():raw_authority;
   for(const auto&object:input_objects)if(object.textures&&object.textures->current_grid_preview)
     throw std::invalid_argument("Render-only current-grid preview is not export image authority; materialize actual native field images");
   for(const auto &object:input_objects)if((object.textures&&object.textures->overlay)||detail::hdr_emission(object.material.emissive)||(object.material_bindings&&detail::physical_emission(*object.material_bindings))) {
-    if(object.texture_set_surface&&(raw_authority||(physical&&matches_texture_set_emission_surface(*physical,object))))continue;
+    if(object.texture_set_surface&&(texture_set_owner||(physical&&matches_texture_set_emission_surface(*physical,object))))continue;
     if(!(physical&&matches_native_emission_surface(*physical,object,cancelled))&&(!raw_authority||(!native_paint_compiled_emission(*raw_authority,object,cancelled)&&!raw_source_emission(*raw_authority,object,cancelled))))
       throw std::invalid_argument("Physical emission requires a precision-qualified export adapter");
   }
@@ -101,8 +102,8 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     if(bundle_working_bytes>=limits.maximum_bytes)throw std::length_error("Aggregate texture-set export budget exhausted");
     limits.maximum_bytes-=bundle_working_bytes;
     bool measured=physical&&matches_texture_set_emission_surface(*physical,objects[i]);
-    if(raw_authority){
-      const auto &originals=raw_authority->originals();
+    if(texture_set_owner){
+      const auto &originals=texture_set_owner->originals();
       const auto original=std::find_if(originals.begin(),originals.end(),[&](const auto &entry){return entry.id==objects[i].id;});
       const auto &plan=objects[i].texture_set_surface;
       if(original==originals.end()||original->texture_set_surface!=plan||

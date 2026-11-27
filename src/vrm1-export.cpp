@@ -89,9 +89,8 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
   for (const auto &object : objects) {
     stop(options);
     if (native_vrm_texture_set_accessory(object)) {
-      require(!authoring && !object.deformation && !object.rig_source &&
-                  !object.source_dormant,
-              "texture-set accessory needs a current rigid native Standard VRM1 mesh");
+      require(!object.deformation && !object.rig_source && !object.source_dormant,
+              "texture-set accessory needs a current rigid native VRM1 mesh");
       require(std::ranges::none_of(object.texture_set_surface->fields(),
                   [](const auto &field) { return field.source || field.appearance; }),
               "texture-set accessory cannot borrow retained source material identities");

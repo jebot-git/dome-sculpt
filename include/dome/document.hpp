@@ -135,7 +135,7 @@ struct EditorState {
   uint64_t weight_gesture = 0;
   size_t weight_samples = 0;
   bool can_voxel_remesh = false;
-  bool can_export_avatar = false;
+  bool can_export_avatar = false, can_export_editable_avatar = false;
   float voxel_size_mm = 30;
   std::array<bool, 12> menu_enabled{true, true, true, true, true, true,
                                     true, true, true, true, true, true};
