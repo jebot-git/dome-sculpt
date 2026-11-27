@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "object-editor.hpp"
 #include "emission-source-info.hpp"
+#include "source-rigid-pose.hpp"
 #include "dome/material-bindings.hpp"
 #include "appearance.h"
 #include "ui-conventions.hpp"
@@ -14,6 +15,7 @@
 #include <FL/Fl_Value_Input.H>
 #include <FL/fl_ask.H>
 #include <cstdio>
+#include <set>
 namespace dome {
 bool recover_project(Document &document) {
   auto state = document.frame().state;
@@ -53,6 +55,67 @@ void edit_visibility(Document &document){
  for(const auto &object:state->objects){entries.push_back({&document,object.id,state->generation});auto *check=new Fl_Check_Button(16,y,width-48,row,object.name.c_str());check->copy_label(object.name.c_str());check->value(object.visible);
   check->callback([](Fl_Widget*w,void*p){auto &e=*static_cast<Entry*>(p);try{if(e.document->frame().state->generation!=e.generation)throw std::logic_error("The document changed; reopen visibility controls");e.document->object_visibility(e.id,static_cast<Fl_Check_Button*>(w)->value(),{e.generation,0,e.id,0});}catch(const std::exception&error){fl_alert("%s",error.what());}},&entries.back());y+=row;}
  scroll.end();Fl_Button close(width/2-70,height-row*1.5,140,row,"Close");close.callback([](Fl_Widget*w,void*){w->window()->hide();});window.end();window.set_modal();dx::style(&window);window.show();while(window.shown())Fl::wait();
+}
+void attach_avatar_accessory_dialog(Document &document) {
+  const auto draft = document.draft_scene();
+  struct Rig { uint64_t object; std::string name; const Skeleton *skeleton; };
+  std::vector<Rig> rigs;
+  std::set<uint64_t> instances;
+  for (const auto &object : draft.scene.objects()) {
+    if (!object.visible || !object.deformation || !object.deformation->skin ||
+        !object.deformation->skeleton) continue;
+    const auto source = detail::source_rig_instance(draft.scene, object);
+    if (!source || source->model->asset->avatar_version != ImportedAvatarVersion::Vrm1 ||
+        !instances.insert(source->source_instance).second) continue;
+    rigs.push_back({object.id, draft.scene.group(source->source_instance).name,
+                    &*object.deformation->skeleton});
+  }
+  if (rigs.empty()) throw std::invalid_argument("Open a skinned VRM 1.0 avatar to attach an accessory");
+
+  int sx, sy, sw, sh;
+  Fl::screen_work_area(sx, sy, sw, sh);
+  const int row = std::max(32, dx::size + 16), width = std::min(std::max(460, dx::size * 32), sw - 40);
+  const int label = width / 4, height = std::min(5 * row, sh - 40);
+  DomeDialog window(width, height, "Attach accessory to avatar bone");
+  Fl_Choice avatar(label, row / 2, width - label - 20, row, "Avatar");
+  Fl_Choice joint(label, row * 2, width - label - 20, row, "Bone");
+  std::vector<Fl_Menu_Item> avatars(rigs.size() + 1);
+  for (size_t i = 0; i < rigs.size(); ++i) avatars[i].label(rigs[i].name.c_str());
+  avatar.copy(avatars.data());
+  avatar.value(0);
+  struct Choices {
+    const std::vector<Rig> &rigs;
+    Fl_Choice &joint;
+    void update(size_t index) {
+      const auto &bones = rigs.at(index).skeleton->bones;
+      std::vector<Fl_Menu_Item> items(bones.size() + 1);
+      for (size_t i = 0; i < bones.size(); ++i) items[i].label(bones[i].name.c_str());
+      joint.copy(items.data());
+      joint.value(0);
+    }
+  } choices{rigs, joint};
+  choices.update(0);
+  avatar.callback([](Fl_Widget *widget, void *data) {
+    const int index = static_cast<Fl_Choice *>(widget)->value();
+    if (index >= 0) static_cast<Choices *>(data)->update(size_t(index));
+  }, &choices);
+  const int button = std::min(140, width / 2 - 22);
+  Fl_Button cancel(width / 2 - button - 10, height - row - 12, button, row, "Cancel");
+  Fl_Button attach(width / 2 + 10, height - row - 12, button, row, "Attach");
+  bool accepted = false;
+  cancel.callback([](Fl_Widget *widget, void *) { widget->window()->hide(); });
+  attach.callback([](Fl_Widget *widget, void *data) {
+    *static_cast<bool *>(data) = true;
+    widget->window()->hide();
+  }, &accepted);
+  window.end();
+  window.set_modal();
+  dx::style(&window);
+  window.show();
+  cancel.take_focus();
+  while (window.shown()) Fl::wait();
+  if (accepted && avatar.value() >= 0 && joint.value() >= 0)
+    document.attach_avatar_accessory(rigs.at(size_t(avatar.value())).object, uint32_t(joint.value()), draft.source);
 }
 void edit_object(Document &document) {
   auto state = document.frame().state;

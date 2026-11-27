@@ -52,6 +52,15 @@ void edit_rig(Scene &scene, uint64_t object, const RigEdit &edit,
     throw std::invalid_argument("Invalid shapekey target or weight");
   auto group = rig_group(scene, source);
   auto imported = detail::source_rig_instance(scene, source);
+  if (pose_edit && imported && !edit.linked_pose) {
+    for (const auto &part : scene.objects()) {
+      check_cancel(cancelled);
+      if (!detail::native_texture_set_accessory(part)) continue;
+      const auto bone = detail::source_accessory_attachment(scene.group_path(part.group));
+      if (bone && bone->model == imported->model && bone->source_instance == imported->source_instance)
+        throw std::invalid_argument("Pose all linked rig parts when an accessory is attached to an avatar bone");
+    }
+  }
   detail::weight_surface::Budget native_work{0,500'000'000,cancelled};
   auto native_scope=pose_edit&&edit.linked_pose&&!imported
       ?detail::native_rig_pose_scope(scene,source,native_work)
@@ -181,6 +190,8 @@ void edit_rig(Scene &scene, uint64_t object, const RigEdit &edit,
       check_cancel(cancelled);
       if (o.deformation && o.deformation->skin) continue;
       auto other = detail::source_rig_instance(scene, o);
+      if (!other && detail::native_texture_set_accessory(o))
+        other = detail::source_accessory_attachment(scene.group_path(o.group));
       if (!other || other->model != imported->model ||
           other->source_instance != imported->source_instance) continue;
       auto frame = [&](const Scene &state) {

@@ -5,6 +5,7 @@
 #include "import-skin.hpp"
 #include "source-morph.hpp"
 #include "source-rest-graph.hpp"
+#include "source-rigid-pose.hpp"
 #include "dome/polygon-scene.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "bone-metadata.hpp"
@@ -450,9 +451,29 @@ std::vector<int> emit_vrm_source_graph(
                       }),
               "native texture-set accessory is outside the original avatar's instance");
       int parent = avatar_root;
-      for (auto group = object.groups.begin() + graph.prefix.size(); group != object.groups.end(); ++group) {
+      auto group = object.groups.begin() + graph.prefix.size();
+      if (const auto bone = source_accessory_attachment(object.groups)) {
+        require(bone->model == graph.model && bone->source_instance == graph.instance,
+                "native accessory bone belongs to a different original avatar");
+        AffineTransform captured = prefix_world;
+        for (; group != object.groups.end() && group->source_placement; ++group)
+          captured = captured * group_local_matrix(*group);
+        const auto &endpoint = *std::prev(group);
+        if (const auto found = accessory_groups.find(endpoint.id); found != accessory_groups.end()) {
+          parent = found->second;
+        } else {
+          parent = nodes.at(bone->source_node);
+          // The Scene stores the exact current world placement. Express its
+          // original parent frame relative to the emitted current joint.
+          const auto local = source_world.at(bone->source_node).inverse() * captured;
+          if (local.matrix() != AffineTransform{}.matrix())
+            parent = matrix(parent, local, endpoint.name + " accessory placement");
+          accessory_groups.emplace(endpoint.id, parent);
+        }
+      }
+      for (; group != object.groups.end(); ++group) {
         require(!group->source_placement && !group->humanoid,
-                "native texture-set accessory needs ordinary groups under the avatar root");
+                "native accessory path must follow the original source chain before native groups");
         if (const auto found = accessory_groups.find(group->id); found != accessory_groups.end()) {
           parent = found->second;
           continue;

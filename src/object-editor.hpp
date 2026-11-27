@@ -5,5 +5,6 @@ namespace dome {
 bool recover_project(Document &);
 void edit_object(Document &);
 void edit_visibility(Document &);
+void attach_avatar_accessory_dialog(Document &);
 void edit_sculpt_layer(Document &);
 } // namespace dome

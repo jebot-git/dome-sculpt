@@ -136,6 +136,7 @@ struct EditorState {
   size_t weight_samples = 0;
   bool can_voxel_remesh = false;
   bool can_export_avatar = false, can_export_editable_avatar = false;
+  bool can_attach_avatar_accessory = false;
   float voxel_size_mm = 30;
   std::array<bool, 12> menu_enabled{true, true, true, true, true, true,
                                     true, true, true, true, true, true};
@@ -407,6 +408,7 @@ public:
   void bind_skin(SkinAuthoringOptions, AssetSource expected = {});
   void bind_skin_selected(SkinAuthoringOptions,AssetSource expected={},
                           std::vector<uint64_t> expected_selection={});
+  void attach_avatar_accessory(uint64_t rig, uint32_t joint, AssetSource expected = {});
   void fit_humanoid_rig(HumanLandmarks, RigFitOptions = {}, AssetSource expected = {});
   void begin_rig_fit();
   void configure_rig_fit(RigFitView);

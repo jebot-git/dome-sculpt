@@ -3,7 +3,14 @@
 #include "dome/document.hpp"
 #include "dome/import-authoring.hpp"
 #include "dome/rig-edit.hpp"
+#include "dome/rig-rest.hpp"
+#include "dome/texture-sets.hpp"
 #include "dome/vrm.hpp"
+#include "dome/emission-native.hpp"
+#include "dome/native-authoring.hpp"
+#include "dome/source-placement.hpp"
+#include "emission-export.hpp"
+#include "source-rigid-pose.hpp"
 #include "vrm1-metadata.hpp"
 #include <fstream>
 #include <iostream>
@@ -391,11 +398,202 @@ void independent(const Scene &scene, const std::filesystem::path &output) {
             !emitted["extensions"].contains("VRM"),
         "Output preserves actual VRM1 version without legacy relabel");
 }
+void bone_accessory(const std::filesystem::path &out) {
+  using namespace dome;
+  std::filesystem::create_directories(out);
+  auto fixture = metadata_source();
+  for (auto &node : fixture.j["nodes"]) {
+    if (!node.contains("extensions")) continue;
+    node["extensions"].erase("VRMC_node_constraint");
+    if (node["extensions"].empty()) node.erase("extensions");
+  }
+  auto &used = fixture.j["extensionsUsed"].get_ref<J::array_t &>();
+  std::erase(used, J("VRMC_node_constraint"));
+  const auto source_path = out / "bone-source.vrm";
+  fixture.save(source_path);
+
+  Scene initial;
+  const auto accessory = initial.active().id;
+  initial.active().name = "Native head light";
+  initial.active().transform.position = {.13f, .14f, -.12f};
+  Mesh mesh;
+  mesh.positions = {{-.1f, -.1f, 0}, {.1f, -.1f, 0}, {.1f, .1f, 0}, {-.1f, .1f, 0}};
+  mesh.normals.assign(4, {0, 0, 1});
+  mesh.uv = {{{.1f, .1f}}, {{.9f, .1f}}, {{.9f, .9f}}, {{.1f, .9f}}};
+  mesh.indices = {0, 1, 2, 0, 2, 3};
+  std::array<TextureSetInitialField, 2> fields;
+  fields[0].resolution = fields[1].resolution = 64;
+  fields[0].material.color = {.4f, .3f, .2f, 1};
+  fields[1].material.emissive = {1.5f, .5f, .125f};
+  initialize_texture_sets(initial, accessory, mesh, fields, std::array<TextureSetId, 2>{0, 1});
+
+  ImportAuthoringOptions settings;
+  settings.paint_resolution = 64;
+  auto imported = prepare_authoring_import(initial, source_path, settings);
+  auto &scene = imported.scene;
+  const auto rig = imported.objects.front();
+  const auto head = scene.object(rig).deformation->humanoid->joints.at("head");
+  const auto original_world = scene.world_matrix(accessory);
+  scene.select(accessory);
+  Document doc;
+  doc.replace(scene);
+  doc.save_async(out / "pre-attach.dsculpt").get();
+  doc.attach_avatar_accessory(rig, 0, doc.draft_scene().source);
+  doc.save_async(out / "default-bone.dsculpt").get();
+  check(doc.wait_asset() && doc.frame().state->error.empty() && doc.undo() &&
+        doc.copy_scene().encode() == scene.encode(), "Default bone attachment and ordered Save have one exact Undo");
+  check(doc.wait_mesh() && doc.frame().state->can_attach_avatar_accessory,
+        "Document enables the attachment tool for a selected native mesh beside a real avatar");
+  doc.attach_avatar_accessory(rig, head, doc.draft_scene().source);
+  const auto attached_path = out / "head-attached.dsculpt";
+  doc.save_async(attached_path).get();
+  check(doc.wait_asset() && doc.frame().state->error.empty(), "Real attachment worker completes before ordered Save");
+  const auto attached = doc.copy_scene();
+  const auto endpoint = detail::source_accessory_attachment(attached.group_path(attached.object(accessory).group));
+  const auto near = [](const auto &a, const auto &b) {
+    for (size_t i = 0; i < a.size(); ++i) if (std::abs(a[i] - b[i]) > 4e-6) return false;
+    return true;
+  };
+  check(endpoint && endpoint->source_node == scene.object(rig).appearance->source_joint_nodes[head] &&
+        near(original_world.matrix(), attached.world_matrix(accessory).matrix()) &&
+        Scene::load(attached_path).encode() == attached.encode(),
+        "Attachment preserves exact native records and current placement under the real head bone");
+  check(doc.undo() && doc.copy_scene().encode() == scene.encode() && doc.redo() &&
+        doc.copy_scene().encode() == attached.encode(), "Attachment is a single exact native Undo and Redo");
+  doc.attach_avatar_accessory(rig, head, doc.draft_scene().source);
+  check(doc.wait_asset() && doc.copy_scene().encode() == attached.encode() && doc.undo() &&
+        doc.copy_scene().encode() == scene.encode() && doc.redo(), "Reattaching to the same bone adds no history entry");
+  auto other_bone = scene.snapshot();
+  const auto hand = scene.object(rig).deformation->humanoid->joints.at("rightHand");
+  detail::attach_source_accessory(other_bone, accessory, rig, hand, {});
+  const auto hand_endpoint = detail::source_accessory_attachment(other_bone.group_path(other_bone.object(accessory).group));
+  check(hand_endpoint && hand_endpoint->source_node == scene.object(rig).appearance->source_joint_nodes[hand] &&
+        other_bone.groups().size() > scene.groups().size() && near(original_world.matrix(), other_bone.world_matrix(accessory).matrix()),
+        "A non-rendered source joint gains its actual missing placement chain without moving the accessory");
+
+  RigEdit pose;
+  pose.joint = JointAdjustment{head, {0, 15, 8}, {.02f, 0, -.01f}};
+  doc.select_object(rig);
+  doc.edit_scene("Edit rig and shapekeys", [rig, pose](Scene &value, const auto &cancelled) {
+    edit_rig(value, rig, pose, cancelled);
+  }, doc.draft_scene().source);
+  check(doc.wait_asset() && doc.frame().state->error.empty(), "Native rig editor worker publishes the linked pose");
+  doc.select_object(accessory);
+  const auto posed = doc.copy_scene();
+  auto bone_world = [&](const Scene &state) {
+    const auto &deformation = *state.object(rig).deformation;
+    return state.world_matrix(rig) * AffineTransform(deformation.skeleton->world(deformation.pose).at(head));
+  };
+  const auto predicted = bone_world(posed) * bone_world(attached).inverse() * attached.world_matrix(accessory);
+  check(!near(original_world.matrix(), predicted.matrix()) && near(predicted.matrix(), posed.world_matrix(accessory).matrix()),
+        "Linked joints move the painted rigid accessory using the actual posed bone transform");
+  check(posed.encode().at("texture_set_geometry") == attached.encode().at("texture_set_geometry") &&
+        posed.object(accessory).texture_sets == attached.object(accessory).texture_sets,
+        "Moving the original joint preserves accessory paint owners and fields");
+  auto locked = attached.snapshot();
+  locked.object(accessory).locked = true;
+  const auto locked_before = locked.encode();
+  bool refused = false;
+  try { edit_rig(locked, rig, pose); } catch (const std::invalid_argument &) { refused = true; }
+  check(refused && locked.encode() == locked_before, "A locked attached mesh refuses the whole linked pose");
+  auto unlinked = attached.snapshot();
+  auto separate = pose;
+  separate.linked_pose = false;
+  refused = false;
+  try { edit_rig(unlinked, rig, separate); } catch (const std::invalid_argument &) { refused = true; }
+  check(refused && unlinked.encode() == attached.encode(), "An attached accessory requires one shared pose across linked skin views");
+
+  check(doc.wait_mesh() && doc.frame().state->can_export_avatar && doc.frame().state->can_export_editable_avatar,
+        "The selected bone attachment enables both ordinary and editable export");
+  doc.save_async(out / "head-posed.dsculpt").get();
+  auto ids = imported.objects;
+  ids.push_back(accessory);
+  const auto subset = detail::emission_export_subset(posed, ids);
+  export_vrm(detail::emission_export_subset(posed, imported.objects).export_surfaces(), out / "head-source-only.vrm");
+  const auto verify_attachment = [&](const auto &path, const J &vrm, const AffineTransform &expected) {
+    const auto joint = vrm.at("humanoid").at("humanBones").at("head").at("node").get<size_t>();
+    cgltf_options options{};
+    cgltf_data *raw = nullptr;
+    check(cgltf_parse_file(&options, path.c_str(), &raw) == cgltf_result_success,
+          "Independent cgltf opens the exported bone attachment");
+    const auto owner = std::unique_ptr<cgltf_data, decltype(&cgltf_free)>(raw, cgltf_free);
+    check(joint < raw->nodes_count && cgltf_load_buffers(&options, raw, path.c_str()) == cgltf_result_success &&
+          cgltf_validate(raw) == cgltf_result_success, "Independent reader validates the emitted skin and accessory resources");
+    const auto *find = std::find_if(raw->nodes, raw->nodes + raw->nodes_count, [](const auto &node) {
+      return node.mesh && node.name && std::string_view(node.name) == "Native head light";
+    });
+    check(find != raw->nodes + raw->nodes_count && !find->skin && find->mesh->primitives_count == 2,
+          "Both material partitions remain on one genuinely rigid accessory node");
+    bool child = false;
+    for (auto parent = find->parent; parent; parent = parent->parent) child |= parent == raw->nodes + joint;
+    std::array<float, 16> world;
+    cgltf_node_transform_world(find, world.data());
+    check(child && near(world, expected.float_matrix()), "Portable accessory is a real child of the posed head and has the same complete affine transform");
+    return joint;
+  };
+  for (const auto format : {AssetExportFormat::Avatar, AssetExportFormat::EditableAvatar512}) {
+    const bool editable = format != AssetExportFormat::Avatar;
+    const auto path = out / (editable ? "head-editable.vrm" : "head-standard.vrm");
+    doc.export_asset(path, format).get();
+    const auto j = json(path);
+    const auto &vrm = j.at("extensions").at("VRMC_vrm");
+    const auto joint = verify_attachment(path, vrm, predicted);
+    const auto &spring = j.at("extensions").at("VRMC_springBone").at("springs").at(0);
+    check(spring.at("center") == joint && spring.at("joints").size() == 2 &&
+          vrm.at("expressions").at("preset").at("happy").at("materialColorBinds").size() == imported.objects.size(),
+          "Original spring and expression references remain on their imported owners");
+    const auto restored = editable ? extract_native_authoring(bytes(path)) : extract_native_emission(bytes(path));
+    check(restored && restored->encode() == subset.encode(), "Export reopens with the exact attachment, paint and source hierarchy");
+  }
+
+  fixture.j["extensions"].erase("VRMC_springBone");
+  std::erase(used, J("VRMC_springBone"));
+  const auto fitted_source = out / "fitted-source.vrm";
+  fixture.save(fitted_source);
+  auto fitted_import = prepare_authoring_import(initial, fitted_source, settings);
+  auto &fitted = fitted_import.scene;
+  check(fitted_import.objects.front() == rig, "The fitted accessory fixture keeps the same native rig identity and slots");
+  detail::attach_source_accessory(fitted, accessory, rig, head, {});
+  const auto fit_before = fitted.world_matrix(accessory);
+  const auto pivot = bone_world(fitted).point({0, 0, 0});
+  RigRestJointEdit fit;
+  fit.joint = head;
+  fit.world_position = Vec3{float(pivot[0] + .006), float(pivot[1] + .002), float(pivot[2])};
+  check(author_rig_rest(fitted, rig, {&fit, 1}) && fitted.world_matrix(accessory).matrix() == fit_before.matrix(),
+        "Fitting the original rest pivot preserves the exact current accessory placement");
+  const auto fitted_bone = bone_world(fitted);
+  edit_rig(fitted, rig, pose);
+  const auto fitted_predicted = bone_world(fitted) * fitted_bone.inverse() * fit_before;
+  check(near(fitted_predicted.matrix(), fitted.world_matrix(accessory).matrix()),
+        "A linked pose uses the fitted head's actual pivot to move the native accessory");
+  fitted.select(accessory);
+  doc.replace(fitted);
+  for (const auto format : {AssetExportFormat::Avatar, AssetExportFormat::EditableAvatar512}) {
+    const bool editable = format != AssetExportFormat::Avatar;
+    const auto path = out / (editable ? "fitted-editable.vrm" : "fitted-standard.vrm");
+    doc.export_asset(path, format).get();
+    verify_attachment(path, json(path).at("extensions").at("VRMC_vrm"), fitted_predicted);
+    const auto restored = editable ? extract_native_authoring(bytes(path)) : extract_native_emission(bytes(path));
+    check(restored && restored->encode() == detail::emission_export_subset(fitted, ids).encode(),
+          "Fitted export restores the exact current and first-rest owners with the attached mesh");
+  }
+  RigEdit reset;
+  reset.reset_pose = true;
+  edit_rig(fitted, rig, reset);
+  check(near(fit_before.matrix(), fitted.world_matrix(accessory).matrix()) &&
+        Scene::decode(fitted.encode()).encode() == fitted.encode(),
+        "Reset follows the fitted rest attachment and the result survives a native restart");
+}
 } // namespace
 #ifndef DOME_VRM1_SOURCE_EXPORT_NO_MAIN
 int main(int argc, char **argv) try {
   if (argc < 3)
     return 2;
+  if (std::string_view(argv[1]) == "--bone-accessory") {
+    bone_accessory(argv[2]);
+    std::cout << "PASS native VRM1 bone accessory workflow\n";
+    return 0;
+  }
   if (std::string_view(argv[1]) == "--fixture") {
     source(false).save(argv[2]);
     return 0;
@@ -792,6 +990,7 @@ int main(int argc, char **argv) try {
                 kinematic.redo() &&
                 kinematic.copy_scene().encode() == current.encode(),
             "Linked kinematic V1 pose remains one exact native Undo/Redo");
+      bone_accessory(output.parent_path() / "bone-accessory");
     }
     return argc > 3 ? 1 : 0;
   } catch (const std::exception &e) {

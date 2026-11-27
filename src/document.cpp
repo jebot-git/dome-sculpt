@@ -33,6 +33,7 @@
 #include "dome/vrm.hpp"
 #include "dome/vrm-authoring.hpp"
 #include "editable-avatar-eligibility.hpp"
+#include "source-rigid-pose.hpp"
 #include "dome/gltf-export.hpp"
 #include "dome/mesh-processing.hpp"
 #include "dome/mesh-authoring.hpp"
@@ -89,9 +90,6 @@ uint64_t original_avatar_root(std::span<const SceneGroup> path, const CreatorApp
   }
   return 0;
 }
-bool rigid_avatar_accessory_candidate(const SculptObject &object) {
-  return object.texture_sets && !object.appearance && !object.deformation && !object.rig_source;
-}
 uint64_t avatar_group(const Scene &scene, uint64_t object) {
   const auto &active = scene.object(object);
   const auto path = scene.group_path(active.group);
@@ -101,7 +99,8 @@ uint64_t avatar_group(const Scene &scene, uint64_t object) {
   if (retained_avatar(active))
     if (const auto instance = original_avatar_root(path, *active.appearance))
       return instance;
-  if (rigid_avatar_accessory_candidate(active)) {
+  if (detail::native_texture_set_accessory(active)) {
+    const auto bone = detail::source_accessory_attachment(path);
     size_t deepest = 0;
     uint64_t selected = 0;
     for (const auto &part : scene.objects()) {
@@ -111,8 +110,12 @@ uint64_t avatar_group(const Scene &scene, uint64_t object) {
       const auto source_path = scene.group_path(part.group);
       const auto instance = original_avatar_root(source_path, *part.appearance);
       const auto root = std::ranges::find(path, instance, &SceneGroup::id);
-      if (root == path.end() || (selected && size_t(root - path.begin()) <= deepest) ||
-          std::any_of(root + 1, path.end(), [](const auto &group) { return bool(group.source_placement); }))
+      if (root == path.end() || (selected && size_t(root - path.begin()) <= deepest))
+        continue;
+      if (bone && (bone->source_instance != instance || bone->model->asset != part.appearance->asset ||
+                   bone->model->original_bytes != part.appearance->original_bytes))
+        continue;
+      if (!bone && std::any_of(root + 1, path.end(), [](const auto &group) { return bool(group.source_placement); }))
         continue;
       deepest = size_t(root - path.begin());
       selected = instance;
@@ -747,10 +750,14 @@ void Document::publish_locked(bool force,bool checkpoint) {
   state_.can_export_avatar = avatar && std::any_of(scene_.objects().begin(), scene_.objects().end(),
       [&](const auto &o) { return retained_avatar(o) && in_group(scene_, o, avatar); });
   state_.can_export_editable_avatar = state_.can_export_avatar && active.visible &&
-      (detail::editable_avatar_source(active) || (rigid_avatar_accessory_candidate(active) &&
+      (detail::editable_avatar_source(active) || (detail::native_texture_set_accessory(active) &&
           std::any_of(scene_.objects().begin(), scene_.objects().end(), [&](const auto &o) {
             return o.visible && detail::editable_avatar_source(o) && in_group(scene_, o, avatar);
           })));
+  state_.can_attach_avatar_accessory = !(state_.isolate_held && state_.held_object) && object_editable_locked(active.id) &&
+      detail::native_texture_set_accessory(active) && std::ranges::any_of(scene_.objects(), [](const auto &o) {
+        return o.visible && detail::editable_avatar_source(o) && o.deformation && o.deformation->skin;
+      });
   state_.sculpt_settings = volume().sculpt_settings();
   state_.sculpt_transform = scene_.has_affine_placement(active.id)?CanvasTransform{}:scene_.world_transform(active.id);
   state_.can_configure_sculpt = sculpt_target_ready_locked();

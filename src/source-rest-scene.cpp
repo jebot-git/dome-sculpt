@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "source-rest-scene.hpp"
 #include "polygon-conversion.hpp"
+#include "source-rigid-pose.hpp"
 #include <set>
 namespace dome::detail {
 namespace {
@@ -12,11 +13,10 @@ void admission(const Scene &scene,const SourceRestGraph &graph,uint64_t selected
  if(!options.linked_objects.empty()){for(auto id:options.linked_objects)require(actual.insert(id).second,"Repeated linked source target identity");require(actual==expected,"Captured linked targets must include exactly this original model/instance, including its rigid parts");}
 }
 void update_landmarks(DeformationState &deformation){if(deformation.landmarks&&deformation.humanoid){const auto segments=deformation.skeleton->segments();for(auto &[role,point]:deformation.landmarks->points){auto at=deformation.humanoid->joints.find(role);if(at!=deformation.humanoid->joints.end())point=segments.at(at->second)[0];}}}
-AffineTransform frame(const Scene &scene,const SourceRestGraph &graph,const SourceRestPose &pose,uint64_t object,const std::function<bool()> &cancelled){
- const auto part=std::find_if(graph.parts.begin(),graph.parts.end(),[&](const auto &part){return part.object==object;});require(part!=graph.parts.end(),"Rigid attachment lost its actual original part identity");
+AffineTransform frame(const Scene &scene,const SourceRestGraph &graph,const SourceRestPose &pose,uint64_t object,uint32_t node,const std::function<bool()> &cancelled){
  AffineTransform value;std::optional<AffineTransform> source_node;
- for(const auto &group:scene.group_path(scene.object(object).group)){stop(cancelled);value=value*group_local_matrix(group);const auto &placement=group.source_placement;if(placement&&placement->model==graph.model&&placement->source_instance==graph.instance&&placement->source_node==part->mesh_node)source_node=value;}
- require(source_node.has_value(),"Rigid attachment lost its native source-node placement endpoint");const auto node=part->mesh_node;
+ for(const auto &group:scene.group_path(scene.object(object).group)){stop(cancelled);value=value*group_local_matrix(group);const auto &placement=group.source_placement;if(placement&&placement->model==graph.model&&placement->source_instance==graph.instance&&placement->source_node==node)source_node=value;}
+ require(source_node.has_value(),"Rigid attachment lost its native source-node placement endpoint");
  // The rigid implicit bind obeys exactly the same equation as skin binds.
  // P * inverse(R_current) * R_original is invariant under pure REST fitting,
  // including a mesh on the edited joint itself and an authored reparent.
@@ -26,18 +26,32 @@ AffineTransform frame(const Scene &scene,const SourceRestGraph &graph,const Sour
  const auto original=AffineTransform(graph.model->asset->nodes.at(node).world);
  return *source_node*original.inverse()*AffineTransform(pose.world.at(node))*AffineTransform(graph.rest_world.at(node)).inverse()*original;
 }
+std::optional<uint32_t> accessory_node(const Scene &scene,const SculptObject &object,const SourceRestGraph &graph){
+ if(!native_texture_set_accessory(object))return {};
+ const auto attachment=source_accessory_attachment(scene.group_path(object.group));
+ if(!attachment||attachment->model!=graph.model||attachment->source_instance!=graph.instance)return {};
+ return attachment->source_node;
+}
 void rigid_delta(const Scene &before,Scene &after,const SourceRestGraph &graph,const SourceRestPose &old_pose,const SourceRestGraph &next_graph,const SourceRestPose &new_pose,const std::function<bool()> &cancelled,double maximum_world_error=.00002){
  const bool neutral=old_pose.local==graph.rest_local&&new_pose.local==next_graph.rest_local;
- for(const auto &part:graph.parts){stop(cancelled);if(part.original_skin>=0)continue;const auto old=frame(before,graph,old_pose,part.object,cancelled),now=frame(after,next_graph,new_pose,part.object,cancelled);if(old.matrix()==now.matrix())continue;
-  if(neutral&&old_pose.world.at(part.mesh_node)==new_pose.world.at(part.mesh_node)){
+ auto move=[&](uint64_t object,uint32_t node){
+  const auto old=frame(before,graph,old_pose,object,node,cancelled),now=frame(after,next_graph,new_pose,object,node,cancelled);
+  if(old.matrix()==now.matrix())return;
+  if(neutral&&old_pose.world.at(node)==new_pose.world.at(node)){
    // Exact authority, not a small-motion deadzone: both complete local pose
    // tables equal their own REST, and this rigid MODEL global is unchanged.
    // Compensating float locals may recompose slightly differently. Keep the
    // artist transform byte-exact after checking the declared reconstruction
    // bound. Any authored nonneutral delta, however small, takes the full path.
-   for(size_t k=0;k<16;++k)require(std::abs(old.matrix()[k]-now.matrix()[k])<=maximum_world_error,"Neutral rigid attachment exceeds its declared WORLD reconstruction bound");continue;
+   for(size_t k=0;k<16;++k)require(std::abs(old.matrix()[k]-now.matrix()[k])<=maximum_world_error,"Neutral rigid attachment exceeds its declared WORLD reconstruction bound");return;
   }
-  const auto world=now*old.inverse()*before.world_matrix(part.object);auto &target=after.object(part.object);target.affine_edit=std::make_shared<const NativeAffineEdit>(after.parent_matrix(part.object).inverse()*world*affine_similarity(target.transform).inverse());
+  require(!before.object(object).locked,"A rigid source-rig descendant is locked");
+  const auto world=now*old.inverse()*before.world_matrix(object);auto &target=after.object(object);target.affine_edit=std::make_shared<const NativeAffineEdit>(after.parent_matrix(object).inverse()*world*affine_similarity(target.transform).inverse());
+ };
+ for(const auto &part:graph.parts){stop(cancelled);if(part.original_skin<0)move(part.object,part.mesh_node);}
+ for(const auto &object:before.objects()){
+  stop(cancelled);
+  if(const auto node=accessory_node(before,object,graph))move(object.id,*node);
  }
 }
 void restore(SculptObject &object,const PolygonOrigin &origin){
@@ -57,7 +71,12 @@ bool author_source_rig_rest(Scene &scene,uint64_t selected,std::span<const RigRe
  // Pivot fitting must retain current rigid world placement exactly, rather than
  // applying a tiny float reconstruction delta to the user's artist transform.
  const auto checked=capture_source_rest_graph(next,selected,cancelled);const auto new_pose=source_rest_pose(checked,cancelled);
- for(const auto &part:graph.parts)if(part.original_skin<0){const auto a=frame(scene,graph,old_pose,part.object,cancelled),b=frame(next,checked,new_pose,part.object,cancelled);for(size_t k=0;k<16;++k)require(std::abs(a.matrix()[k]-b.matrix()[k])<=options.maximum_world_error,"REST fitting cannot preserve the original rigid attachment within the explicit WORLD bound");}
+ auto preserve=[&](uint64_t object,uint32_t node){const auto a=frame(scene,graph,old_pose,object,node,cancelled),b=frame(next,checked,new_pose,object,node,cancelled);for(size_t k=0;k<16;++k)require(std::abs(a.matrix()[k]-b.matrix()[k])<=options.maximum_world_error,"REST fitting cannot preserve the original rigid attachment within the explicit WORLD bound");};
+ for(const auto &part:graph.parts)if(part.original_skin<0)preserve(part.object,part.mesh_node);
+ for(const auto &object:scene.objects()){
+  stop(cancelled);
+  if(const auto node=accessory_node(scene,object,graph))preserve(object.id,*node);
+ }
  next.validate();stop(cancelled);scene=std::move(next);return true;
 }
 void restore_source_rig_rest(Scene &scene,uint64_t selected,RigRestOptions options,const std::function<bool()> &cancelled){

@@ -645,6 +645,7 @@ struct App {
     menu.add("&Scene/Object and material...", FL_ALT + FL_Enter, command, this);
     menu.add("&Scene/Skin weights...", 0, command, this);
     menu.add("&Scene/Bind or transfer skin...", 0, command, this);
+    menu.add("&Scene/Attach accessory to avatar bone...", 0, command, this);
     menu.add("&Scene/Rig and shapekeys...", 0, command, this);
     menu.add("&Scene/Shapekeys/New shapekey...",0,command,this);
     menu.add("&Scene/Shapekeys/Capture shape mix...",0,command,this);
@@ -864,6 +865,7 @@ struct App {
                      [&](auto &o) { return o.id == s->active_object; });
     enable("&Scene/Skin weights...", !modal && !s->asset_busy && s->can_paint_weights);
     enable("&Scene/Bind or transfer skin...", !modal && s->can_configure_skin);
+    enable("&Scene/Attach accessory to avatar bone...", !modal && !s->asset_busy && s->can_attach_avatar_accessory);
     enable("&Scene/Rig and shapekeys...", !modal && !s->asset_busy &&
            s->mesh_active && bool(s->deformation) && active != s->objects.end() &&
            active->editable);
@@ -1326,6 +1328,8 @@ struct App {
       edit_shapekey_dialog(canvas.document,label=="Capture shape mix..."?ShapeKeyAction::CaptureMix:label=="Duplicate shapekey..."?ShapeKeyAction::Duplicate:label=="Mirror shapekey..."?ShapeKeyAction::Mirror:label=="Rename shapekey..."?ShapeKeyAction::Rename:ShapeKeyAction::Create);
     } else if(label=="Restore before shape authoring..."){
       if(fl_choice("Restore the complete mesh state from before shapekey authoring, including paint, rig and material?","Cancel","Restore",nullptr)==1){ShapeKeyEdit edit;edit.action=ShapeKeyAction::Restore;canvas.document.author_shape(std::move(edit));}
+    } else if (label == "Attach accessory to avatar bone...") {
+      attach_avatar_accessory_dialog(canvas.document);
     } else if (label == "Rig and shapekeys...") {
       edit_rig_dialog(canvas.document);
     } else if(label=="Bake surface..."){edit_bake_dialog(canvas.document);

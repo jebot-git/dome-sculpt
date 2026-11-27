@@ -4,8 +4,20 @@
 #include "dome/rig-fit.hpp"
 #include "rig-fit-metric.hpp"
 #include "document-transaction.hpp"
+#include "source-rigid-pose.hpp"
 #include <nlohmann/json.hpp>
 namespace dome {
+void Document::attach_avatar_accessory(uint64_t rig, uint32_t joint, AssetSource expected) {
+  std::lock_guard lock(model_mutex_);
+  const auto id = scene_.active().id;
+  if (!state_.can_attach_avatar_accessory || !object_editable_locked(id))
+    throw std::logic_error("Select an editable native texture-set accessory and a visible VRM 1.0 avatar");
+  auto changed = std::make_shared<bool>(false);
+  queue_scene_operation_locked("Attach accessory to avatar bone",
+      [id, rig, joint, changed](Scene &scene, const auto &cancelled) {
+        *changed = detail::attach_source_accessory(scene, id, rig, joint, cancelled);
+      }, expected, {}, {}, changed);
+}
 void Document::fit_humanoid_rig(HumanLandmarks landmarks,RigFitOptions options,AssetSource expected){
  options.validate();std::lock_guard lock(model_mutex_);
  const auto id=scene_.active().id;
