@@ -1,0 +1,629 @@
+{
+  "date_utc": "2026-11-27T18:30:39.184074+00:00",
+  "product": "f800d94832ceb28b949a6e5ec74d0149155f8027",
+  "parent": "35e754bb2c2b1cfaa1c995137d36e0ee711792ce",
+  "source_patch_sha256": "7a39ebc79e22e004cd0b153b64bea870a25414a97af20d59c7b948fc3ef88f97",
+  "toolkit": {
+    "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+    "release_prefix": "/opt/fltk-vr/toolkit",
+    "bitmap_prefix": "/opt/fltk-vr/bdf-runtime"
+  },
+  "release": {
+    "binary_sha256": "fe24ca85ed49e7e959653810ab5f7573e0fc647a8256e6a2889424b83f272974",
+    "test_names": [
+      "dome-sculpt-texture-set-source-export",
+      "retopology-imported-pbr",
+      "retopology-imported-bake-resize",
+      "retopology-imported-mtoon-resize",
+      "texture-set-retained-retopology-plain",
+      "texture-set-retained-retopology-affine",
+      "texture-set-retained-shapekeys",
+      "texture-set-retained-resize-matching",
+      "texture-set-retained-resize-split",
+      "texture-set-retained-posed-bake",
+      "texture-set-retained-skin",
+      "texture-set-prepared-recipe-references",
+      "texture-set-retained-bake-source",
+      "texture-set-retained-bake-target",
+      "dome-sculpt-texture-set-resolution",
+      "dome-sculpt-texture-set-baked-resolution",
+      "dome-sculpt-texture-set-baked-mtoon-resolution",
+      "native-empty-paint-resolution",
+      "native-authored-paint-resolution",
+      "native-baked-paint-resolution",
+      "native-retained-paint-resolution"
+    ],
+    "junit_sha256": "c8bb9876f28ed1879ddddb8e0355abdbf5592c83ed335fe4814f3f774eb6581f"
+  },
+  "scoped_ASan_UBSan": {
+    "build": "Changed core translation units and their Scene consumer compiled with strict sanitizer flags on the prior qualified sanitizer archive.",
+    "binary_sha256": "847c9c5a1eb53896b945a9d6a7f2af96d9993507f87fd5ec1fcef7fb7c659267",
+    "results": {
+      "matching": {
+        "sha256": "e77af1dbe6b45ed22a6c24fd0373af65ad471f72efb06e3961a4d80fd5f376be",
+        "pass": [
+          "47 retained polygon paint resolution checks"
+        ]
+      },
+      "split": {
+        "sha256": "e77af1dbe6b45ed22a6c24fd0373af65ad471f72efb06e3961a4d80fd5f376be",
+        "pass": [
+          "47 retained polygon paint resolution checks"
+        ]
+      },
+      "prior-normal": {
+        "sha256": "c7ba07a258c4eda9f73a124b4191d823e18360cdabb53bd5633a886c61d1264f",
+        "pass": [
+          "1534 native-normal retained target checks"
+        ]
+      },
+      "posed": {
+        "sha256": "3cbad4fce96aa2c121abb6481ec67d0870adcc88846e32d3dfabed3171f2ddc9",
+        "pass": [
+          "216 posed retained Bake controls"
+        ]
+      }
+    }
+  },
+  "byte_identical_release_sanitizer_projects": {
+    "matching": {
+      "before.dsculpt": "a2234c7d69ea6d80557bb5d9d3034030c21208c3f131f04cf80e6a5ae01809cf",
+      "resized.dsculpt": "709d7375a7f0587e4abf43d2449f5cc68976ae09760261a1b1e0c7380c2fc028",
+      "rebaked.dsculpt": "7d3c4f85566eb801faad418ea43d46c2891e4e2db73bcc9384e89d5de307afde"
+    },
+    "split": {
+      "before.dsculpt": "938465d8c7e8717500a6676dedd5ba03cdb0fdab42c8b91d64fb819a066358c9",
+      "resized.dsculpt": "16b7e7482777392fc6302cd5745cb8df2ca1d855bdfe6fab2fd6790b2e9ffd92",
+      "rebaked.dsculpt": "942993530ea98d3f2de772f367628b3bfb80032a0ebce5eb6be1fb26d74a0c47"
+    }
+  },
+  "nested_DomeD_Wayland": {
+    "checks": [
+      {
+        "passed": true,
+        "check": "Native Wayland paint client publishes the Dome Sculpt identity"
+      },
+      {
+        "passed": true,
+        "check": "Native Wayland client exports the universal texture-set command"
+      },
+      {
+        "passed": true,
+        "check": "The loaded retained UV atlas enables the universal texture-set command"
+      },
+      {
+        "passed": true,
+        "check": "The FLTK dialog opens on the current 64-pixel grid under the same Wayland identity"
+      },
+      {
+        "passed": true,
+        "check": "DomeD key events stage the 128-pixel choice"
+      },
+      {
+        "passed": true,
+        "check": "Ctrl+W cancels the draft without writing the project"
+      },
+      {
+        "passed": true,
+        "check": "Reopening after cancellation shows the original grid"
+      },
+      {
+        "passed": true,
+        "check": "DomeD keyboard navigation reaches the native Apply button"
+      },
+      {
+        "passed": true,
+        "check": "Ordered native Save matches the complete controller-authored 128-pixel project"
+      },
+      {
+        "passed": true,
+        "check": "Universal Undo and Save restore the exact original project"
+      },
+      {
+        "passed": true,
+        "check": "Universal Redo and Save reproduce the exact enlarged project"
+      },
+      {
+        "passed": true,
+        "check": "Native Wayland client closes after the paint worker and history operations"
+      }
+    ],
+    "complete": true
+  },
+  "synthetic_OpenXR": {
+    "arc": {
+      "complete": true,
+      "checks": [
+        "accepted rendered palette shows the expected history and closes after Save",
+        "accepted controller Save matches the complete native project byte for byte",
+        "undone rendered palette shows the expected history and closes after Save",
+        "undone controller Save matches the complete native project byte for byte",
+        "redone rendered palette shows the expected history and closes after Save",
+        "redone controller Save matches the complete native project byte for byte",
+        "OpenXR app drains and final close persists the exact resized patch",
+        "Real OpenXR loader balances frame, images and both swapchains",
+        "Both eyes render the patch and its actual resolution panel",
+        "Loader delivers actual panel navigation and slider rays",
+        "Requested OpenGL renderer drives the workflow",
+        "Process maps witness the ordinary application and synthetic runtime module"
+      ],
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "runtime": "/home/blux/de-xr/dome-sculpt/artifacts/current-integrated-full-release-20261127/build/libdome-sculpt-texture-resolution-runtime.so",
+      "balanced_frames": 189
+    },
+    "software": {
+      "complete": true,
+      "checks": [
+        "accepted rendered palette shows the expected history and closes after Save",
+        "accepted controller Save matches the complete native project byte for byte",
+        "undone rendered palette shows the expected history and closes after Save",
+        "undone controller Save matches the complete native project byte for byte",
+        "redone rendered palette shows the expected history and closes after Save",
+        "redone controller Save matches the complete native project byte for byte",
+        "OpenXR app drains and final close persists the exact resized patch",
+        "Real OpenXR loader balances frame, images and both swapchains",
+        "Both eyes render the patch and its actual resolution panel",
+        "Loader delivers actual panel navigation and slider rays",
+        "Requested OpenGL renderer drives the workflow",
+        "Process maps witness the ordinary application and synthetic runtime module"
+      ],
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "runtime": "/home/blux/de-xr/dome-sculpt/artifacts/current-integrated-full-release-20261127/build/libdome-sculpt-texture-resolution-runtime.so",
+      "balanced_frames": 167
+    }
+  },
+  "standard_GLb": {
+    "images_and_coordinates": {
+      "matching/before": {
+        "Clay": {
+          "base_color": [
+            64,
+            64,
+            1
+          ],
+          "normal": [
+            64,
+            64,
+            1
+          ],
+          "tangents": true
+        },
+        "Actual current second material": {
+          "base_color": [
+            64,
+            64,
+            1
+          ],
+          "normal": [
+            64,
+            64,
+            1
+          ],
+          "tangents": true
+        }
+      },
+      "matching/resized": {
+        "Clay": {
+          "base_color": [
+            64,
+            64,
+            1
+          ],
+          "normal": [
+            64,
+            64,
+            1
+          ],
+          "tangents": true
+        },
+        "Actual current second material": {
+          "base_color": [
+            128,
+            128,
+            1
+          ],
+          "normal": [
+            64,
+            64,
+            1
+          ],
+          "tangents": true
+        }
+      },
+      "matching/rebaked": {
+        "Clay": {
+          "base_color": [
+            64,
+            64,
+            1
+          ],
+          "normal": [
+            64,
+            64,
+            1
+          ],
+          "tangents": true
+        },
+        "Actual current second material": {
+          "base_color": [
+            128,
+            128,
+            1
+          ],
+          "normal": [
+            64,
+            64,
+            1
+          ],
+          "tangents": true
+        }
+      },
+      "split/before": {
+        "Clay": {
+          "base_color": [
+            64,
+            64,
+            1
+          ],
+          "normal": [
+            64,
+            64,
+            2
+          ],
+          "tangents": true
+        },
+        "Actual current second material": {
+          "base_color": [
+            64,
+            64,
+            1
+          ],
+          "normal": [
+            64,
+            64,
+            2
+          ],
+          "tangents": true
+        }
+      },
+      "split/resized": {
+        "Clay": {
+          "base_color": [
+            64,
+            64,
+            1
+          ],
+          "normal": [
+            64,
+            64,
+            2
+          ],
+          "tangents": true
+        },
+        "Actual current second material": {
+          "base_color": [
+            128,
+            128,
+            1
+          ],
+          "normal": [
+            64,
+            64,
+            2
+          ],
+          "tangents": true
+        }
+      },
+      "split/rebaked": {
+        "Clay": {
+          "base_color": [
+            64,
+            64,
+            1
+          ],
+          "normal": [
+            64,
+            64,
+            2
+          ],
+          "tangents": true
+        },
+        "Actual current second material": {
+          "base_color": [
+            128,
+            128,
+            1
+          ],
+          "normal": [
+            64,
+            64,
+            2
+          ],
+          "tangents": true
+        }
+      }
+    },
+    "validator": {
+      "validator": "2.0.0-dev.3.10",
+      "results": [
+        {
+          "file": "release/texture-set-retained-resize-matching/before.glb",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 0,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/1/attributes/TEXCOORD_0"
+              }
+            ],
+            "truncated": false
+          }
+        },
+        {
+          "file": "release/texture-set-retained-resize-matching/resized.glb",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 0,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/1/attributes/TEXCOORD_0"
+              }
+            ],
+            "truncated": false
+          }
+        },
+        {
+          "file": "release/texture-set-retained-resize-matching/rebaked.glb",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 0,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/1/attributes/TEXCOORD_0"
+              }
+            ],
+            "truncated": false
+          }
+        },
+        {
+          "file": "release/texture-set-retained-resize-split/before.glb",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 0,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/1/attributes/TEXCOORD_0"
+              }
+            ],
+            "truncated": false
+          }
+        },
+        {
+          "file": "release/texture-set-retained-resize-split/resized.glb",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 0,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/1/attributes/TEXCOORD_0"
+              }
+            ],
+            "truncated": false
+          }
+        },
+        {
+          "file": "release/texture-set-retained-resize-split/rebaked.glb",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 0,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/1/attributes/TEXCOORD_0"
+              }
+            ],
+            "truncated": false
+          }
+        }
+      ]
+    }
+  },
+  "editable_GLb": {
+    "exact_reopen_count": 4,
+    "validator": {
+      "validator": "2.0.0-dev.3.10",
+      "results": [
+        {
+          "file": "release/texture-set-retained-resize-matching/resized-editable.glb",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 0,
+            "numInfos": 3,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/1/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/14"
+              }
+            ],
+            "truncated": false
+          }
+        },
+        {
+          "file": "release/texture-set-retained-resize-matching/rebaked-editable.glb",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 0,
+            "numInfos": 3,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/1/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/14"
+              }
+            ],
+            "truncated": false
+          }
+        },
+        {
+          "file": "release/texture-set-retained-resize-split/resized-editable.glb",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 0,
+            "numInfos": 3,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/1/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/15"
+              }
+            ],
+            "truncated": false
+          }
+        },
+        {
+          "file": "release/texture-set-retained-resize-split/rebaked-editable.glb",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 0,
+            "numInfos": 3,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/1/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/15"
+              }
+            ],
+            "truncated": false
+          }
+        }
+      ]
+    }
+  },
+  "large_grid": {
+    "result": "PASS 1024-pixel Document resize and cold Open, with the exact 64-pixel normal owner",
+    "project_sha256": "1bf3d7600180ce52b3bbc6b26216fe9fa477eed6a6fac4b2cb0a17d46ac98ea2"
+  },
+  "scope": "Prepared retained polygon PBR independently resized on CPU. The native N-only lane, broader production geometry, accelerated resampling and physical headsets require further qualification."
+}

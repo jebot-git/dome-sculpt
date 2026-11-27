@@ -425,10 +425,29 @@ llvmpipe save the same project after Apply, Undo and Redo. Standard and
 Editable GLB carry distinct display and paint UVs with explicit tangents.
 The native fixture and its package-free export match exactly in 10,368
 visible framebuffer pixels on both renderers. The three GLBs pass Khronos
-validation with zero errors and warnings. Independently prepared polygon
-material sets, accelerated resampling and physical device acceptance remain
-open.
+validation with zero errors and warnings.
 [Retained native UV grid resize evidence](validation/native-uv-grid-resize-20261127.json)
+
+**Paint resolution** also works on the active prepared PBR slot of a retained
+polygon mesh. The writable raster and Bake material planes change size while
+the independent normal field, sampling coordinates, and neighboring slot
+keep their original owners. Bake projects material and normals on their own
+grids. Clear Bake restores the inherited detail at the chosen paint size.
+The two native fixtures cover matching and split UVs, hidden FLOAT paint and
+masks, cancellation, ordered Save, cold Open, and exact Undo and Redo.
+A separate Document probe resizes the split-UV slot to 1024 pixels and
+cold-opens it with the original 64-pixel normal field intact.
+
+All 21 focused Release tests and four scoped ASan/UBSan workflows passed.
+The DomeD universal menu and synthetic OpenXR on Intel Arc A770 and llvmpipe
+produce byte-identical project saves through Apply, Undo, and Redo. Standard
+GLB exports the changed slot at 128 pixels for color and 64 for its normal
+map, including explicit tangents and a separate normal UV stream in the split
+case. Editable GLB restores the exact scene after resize and rebake. Khronos
+reports zero errors and warnings on all ten exports. The native N-only polygon
+lane, broader production geometry, accelerated resampling, and physical
+headsets remain open.
+[Prepared polygon grid resize evidence](validation/prepared-grid-resize-20261127.json)
 
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and

@@ -214,8 +214,8 @@ Native MToon slots resize layered paint and canonical Bakes while preserving
 the original typed roles and independent UV0 images. The tested MToon 1.0
 fixtures cover varying shared shade, masked color, FLOAT emission, canonical
 normals, exact history, and Standard and Editable GLB. Real DomeD Wayland and
-synthetic OpenXR cover ordered publication. Prepared and source-authority
-grids, wider portable export, larger assets, acceleration and physical device
+synthetic OpenXR cover ordered publication. Original-source material grids,
+wider portable export, larger assets, acceleration, and physical device
 verification remain open.
 [Native MToon grid resize evidence](validation/texture-set-mtoon-resize-20261127.json)
 
@@ -224,8 +224,19 @@ original writable atlas while keeping the authored display UVs and normal
 frame authority. The tested workflows cover canonical and authored-normal
 Bakes, hidden FLOAT paint, cold Open, a second UV edit, Restore, and baking
 again at the new size. Both GLB modes carry the two UV streams and explicit
-tangents. Prepared polygon material-set resampling remains open.
+tangents.
 [Retained native UV grid resize evidence](validation/native-uv-grid-resize-20261127.json)
+
+Retained prepared PBR polygon material slots now resize the writable paint
+and material Bake while preserving the exact independent normal field and
+neighboring slots. The fixtures cover independent UV streams, hidden
+physical paint and masks, dual-grid rebaking and Clear Bake, cold Open,
+desktop and synthetic XR history, Standard GLB texture dimensions and
+tangents, and exact Editable GLB replay. A 1024-pixel Document resize
+retains the original 64-pixel normal field after cold Open. Native N-only
+and other source-authority resizing, broader production geometry,
+accelerated resampling, and physical headset acceptance remain open.
+[Prepared polygon grid resize evidence](validation/prepared-grid-resize-20261127.json)
 
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.
