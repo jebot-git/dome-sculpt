@@ -1,0 +1,176 @@
+{
+  "archive": {
+    "filename": "retopo-save-queue-20261127.tar.gz",
+    "files": {
+      "asan/accepted-publication.log": "8fba7cbde7d94f28cda04584a2e230b12b197a85949dba7ea1bce6cc30611082",
+      "asan/affine.log": "14aa60a75990b949ee820f53e142cc559b5b5bd6e8a6d36442e48b238c7e4d05",
+      "asan/dome-sculpt-retopo-affine-test-compile.log": "3c32ba33e0019654c00f1330ba284b71be6f86d4d9baa6d5456df00d7db28824",
+      "asan/dome-sculpt-retopo-affine-test-link.log": "a512bbe717b279326b5fd5f40422fa9709bc034d810fe402a1ac1f7b31d76910",
+      "asan/dome-sculpt-retopo-held-admission-test-compile.log": "b07928e52ffdee2916168e8d7ea3b58febd174eef8af49ed0cf276e04ef1a57d",
+      "asan/dome-sculpt-retopo-held-admission-test-link.log": "3583163fcb705eeec33f13f133818d75a137b1ad4a7be01b8650e4e4f269ffff",
+      "asan/dome-sculpt-retopo-save-handoff-test-compile.log": "f3832cc47d0647ec9ea8c1cb16b1b9a17540711a0fd446bcda8b43e9169ff09f",
+      "asan/dome-sculpt-retopo-save-handoff-test-link.log": "73e53b35a0fc875cb0b19aa32dcf95d738cb70fdf5b7b6cde6d22d514d4c1807",
+      "asan/dome-sculpt-retopo-worker-faults-test-compile.log": "6f686cd31a8ae0f62c658d42f86647ab098a5403739b8bf8ec89ca9b0127ebc7",
+      "asan/dome-sculpt-retopo-worker-faults-test-link.log": "9a527d9b24324ff3055b55e289b562f8608bc258be2067b73b2a6e9ec147818c",
+      "asan/handoff-0.log": "0e0bfd3958f0258d5f44ce0dbb2769d35d14cdf81628de4f6532f06777007836",
+      "asan/handoff-1.log": "12b15a086830e2604d7b859874792d06a1d7cc066e625d89eb30df3e66b65c88",
+      "asan/handoff-2.log": "53273e1bc9c6000b7056ac8e5c82e6ffc85b37d15b91947f4ef5a52e336cc956",
+      "asan/handoff-3.log": "38d8a50f9b782d96f95d9b235278876c4f2a40eac399adeec30ad31f10e09bca",
+      "asan/held.log": "d9e8691d3500bc1a69ccc0e96739091c05002135c078c5e9a212ed5fbc98db63",
+      "asan/worker-faults.log": "4c66605aa6ada568078d4b5475e9341de72e17041656db7791e15c7bc8a2c7a5",
+      "asan/worker-reporter.log": "1aa37b1d5834f5415c12fa87bac3554625cdfe3aa9846c337c449f30f7d52da7",
+      "baseline/0.log": "a2fadbccfcd0539c117bd539eb33a3c3998b4756134193e80bf77b82f15f29a4",
+      "baseline/1.log": "eb06d699196bdfdb80142ca57a0aa91a74ac90bc4b91817bb171b6ef8995c7b9",
+      "baseline/10.log": "a2fadbccfcd0539c117bd539eb33a3c3998b4756134193e80bf77b82f15f29a4",
+      "baseline/11.log": "eb06d699196bdfdb80142ca57a0aa91a74ac90bc4b91817bb171b6ef8995c7b9",
+      "baseline/2.log": "eb06d699196bdfdb80142ca57a0aa91a74ac90bc4b91817bb171b6ef8995c7b9",
+      "baseline/3.log": "eb06d699196bdfdb80142ca57a0aa91a74ac90bc4b91817bb171b6ef8995c7b9",
+      "baseline/4.log": "eb06d699196bdfdb80142ca57a0aa91a74ac90bc4b91817bb171b6ef8995c7b9",
+      "baseline/5.log": "eb06d699196bdfdb80142ca57a0aa91a74ac90bc4b91817bb171b6ef8995c7b9",
+      "baseline/6.log": "eb06d699196bdfdb80142ca57a0aa91a74ac90bc4b91817bb171b6ef8995c7b9",
+      "baseline/7.log": "a2fadbccfcd0539c117bd539eb33a3c3998b4756134193e80bf77b82f15f29a4",
+      "baseline/8.log": "eb06d699196bdfdb80142ca57a0aa91a74ac90bc4b91817bb171b6ef8995c7b9",
+      "baseline/9.log": "eb06d699196bdfdb80142ca57a0aa91a74ac90bc4b91817bb171b6ef8995c7b9",
+      "frozen-fixed/0.log": "54993d96d29d3ce3f3e216164e2c3def389711b89a5c46129eab8b7357f8e149",
+      "frozen-fixed/1.log": "f9d65917ae30f83134547b3ee88dc3ea600650fa012d0b2c3ef43b89b30fec40",
+      "frozen-fixed/10.log": "4c555a07844877968505b019c6bc86addee4a6648eb43c72e91d56443d65c589",
+      "frozen-fixed/11.log": "5e0c129946c0f89588952328c7053fa0c9b223370424341a3a322586e86d7151",
+      "frozen-fixed/2.log": "0794c617d14c83f0b4a8bd277cc5c13e4e28d5a01cbf17a714c740f0e05934cb",
+      "frozen-fixed/3.log": "32f01dcf2d51def05389dabf73d38fe2efbe0d9132e3df0c2912314095683876",
+      "frozen-fixed/4.log": "5eff05f81831ab77560cdad45d6b214d7bd759eb458dfd5c46ab384346cd93b5",
+      "frozen-fixed/5.log": "c44e398427d47ecaf274f49f0c747eca4d9bea547f6e5e263cd3282f11df3797",
+      "frozen-fixed/6.log": "5580a6e0a151ddbf436f738f564e539864d774f53f16489bc37a34a837c4f5af",
+      "frozen-fixed/7.log": "192d3e2bf90495c6724ee797cd704a96505b4d79ffadb05e4c4b7ac46baf3451",
+      "frozen-fixed/8.log": "ea3c0b9d972ea3ac4554057b482bff8e1b571d05f199c62e10cd8a5750623f5d",
+      "frozen-fixed/9.log": "70dfa19201c85e33a93074b47994325ce1c6bcfd5cc85410f6f864512d54178f",
+      "frozen-fixed/compile.log": "230662f4c5a683829c2b91a3496f2318674c30663c20a684d58e8b0f67bdbcad",
+      "frozen-fixed/link.log": "5afde7fb33be0031bc51397635d9ca153871e7d61c3ffeffb31b299979432551",
+      "integrated.py": "11ec6ca1832f04eea2fc062febbb4f0bebcea64208284e1167c03ff2d5cee0bf",
+      "original-sweep-failure.log": "8a3a2727d0fe6211af5718242f2e2a3c4f5244123bc875ca851ccc1c97d3427b",
+      "qualify.py": "add516a1a8953759da8585a9893fe87d074df9baf0ece1ad376bfb2fc16b381f",
+      "registered-runtime.log": "91b3e6d70f34d93852da6a9cf689c6fe9dae07909eb335d698a6b7cb5561dc47",
+      "registered.xml": "016a05f94454cbccc623c85fcd90a60fecb69b460dd22e87acffab3b89180524",
+      "release/accepted-publication.log": "38dc829acf422ae3254ddb86f36520871d881b5146dc3b5e1e5ae83317fbf4f4",
+      "release/affine.log": "89a21467d736bbee9e203e6cb6c59057c0168f2f365e6bd276ccbb5f8a8ded33",
+      "release/dome-sculpt-retopo-affine-test-compile.log": "4bb78b3475f93c60be1eb76264649251627f01d9f06cb6ca99804cca77e5a9f1",
+      "release/dome-sculpt-retopo-affine-test-link.log": "35eebff88a1db9bfa831620aeba12970d87afec29054aa8d2ab8fe7312714370",
+      "release/dome-sculpt-retopo-held-admission-test-compile.log": "3dacda86a4f6bfe4af18a525a2964e52a38ac90b2621c9bfa9a08b8409b69c8c",
+      "release/dome-sculpt-retopo-held-admission-test-link.log": "2808b7cc2b11aa50f9a5ce343a9d34e6b086a360a01ce275f224d9727d477eaf",
+      "release/dome-sculpt-retopo-save-handoff-test-compile.log": "23d27b96436d5b76183432038e53501869e83107043b5f63d132d8d75834888b",
+      "release/dome-sculpt-retopo-save-handoff-test-link.log": "18eaa665a496228dd80a0ec23755a283847089762b6f148f502c0d97c12b5c2c",
+      "release/dome-sculpt-retopo-worker-faults-test-compile.log": "76740a1261617b2d1b5747bec29c23accd9482472e96ceb9f427560fef4baa5f",
+      "release/dome-sculpt-retopo-worker-faults-test-link.log": "2c4f74149dfd758f8178eda0eb7a608d8880893ab278712ec300da07fa9ca6f9",
+      "release/handoff-0.log": "b21831be9d8431634e4b1ea14bd56d43ec11d0c2e4f4941dd386080137de946c",
+      "release/handoff-1.log": "0edbfd727b87bc6702988b6b33a265d3b187e1c6b1d614f4b583ddd1c8e9b9be",
+      "release/handoff-10.log": "b2d7e08aae642e5f41a1a37ca769bfa37da6ec196b299706f1e065010bfab2d1",
+      "release/handoff-11.log": "62d78ba4fd53b61e2280992d824eef6c62f0d96f8bfa6b8a775026df7191fa28",
+      "release/handoff-12.log": "a31aa52524038e856569ae2537df5c7e0e39ee3050e00a64901d25f7a356c596",
+      "release/handoff-13.log": "24440449685ffd43cf3108ed5be2b853938229187e623e01d5c829fa13f4c5d1",
+      "release/handoff-14.log": "0411869bdd96ddfa14f7da4215a218e50147d5f8ad1abdbcfe22411170dd13f2",
+      "release/handoff-15.log": "95bedf5499fef17cc989b8c18a10b233f651a12b96eb884ce4da4439592fc5e9",
+      "release/handoff-2.log": "f7550987759244281de23988cfb87c84a0dde467db67699c6e9964501ab3c89e",
+      "release/handoff-3.log": "dfdfa15e6600e7240c0ef2cfaf380cab9df718766c180c2dd2803b7f8ced742b",
+      "release/handoff-4.log": "448bcb3d78eb0827d01b0c93594058af3b9b00e3a826652469684698ecc422ca",
+      "release/handoff-5.log": "12fdeba9d75cde71a659289651978c0875b803dde0446838267170314ee978e0",
+      "release/handoff-6.log": "ff28a2a51bc103d2ec61cd9cf7f9e03d15bc1d558348d1d7bcb25eb9d33e2de9",
+      "release/handoff-7.log": "46de003004e1fd0e58b80c035c8ed3a92ffe78feb154c36ac28e41a4c5db5fbc",
+      "release/handoff-8.log": "cadb86c8543a09664e2c919e3fa7c77e9d5dbcd819162ca62face5ae7d4ad9e7",
+      "release/handoff-9.log": "275102926016359b0a9f96bcd926df3917b0122cbc023d3f75093aafaf9787ab",
+      "release/held.log": "f5cd661a90c2404ceeeba746442b14b262623ef9924284a52096d9eb765c84a2",
+      "release/worker-faults.log": "7d55bbde459616e5c21ce0ee34c710edccd27cfa15b71fbebb2054bd1f2620d2",
+      "release/worker-reporter.log": "e8d7ac03ac197c55cb0aab0cc32f3f2c4cdcfbb9dc12e9625c534a757fc26456"
+    },
+    "sha256": "ffeb40800d5eb2f528b483c6cc96ce7daa5f8831038c7760098fa5760c1abe59"
+  },
+  "combined_full_release_at_recording": {
+    "cache_sha256": "7a052e626ae14dbbeb06a4465ed0203f08e2cba506988b71f891d7d317c00ab0",
+    "candidate": "f70483e921ded0d80497f36802e9201b9aebc1c1",
+    "configure": [
+      "cmake",
+      "-S",
+      "/home/blux/de-xr/dome-sculpt/artifacts/retopo-save-queue-20261127/source",
+      "-B",
+      "/home/blux/de-xr/dome-sculpt/artifacts/retopo-save-queue-20261127/build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DDOME_COMPUTE_BACKEND=CPU",
+      "-DFLTK_DIR=/opt/fltk-vr/toolkit/share/fltk"
+    ],
+    "elapsed_seconds": 6.947,
+    "invocation": "2071b31ee3c94cc1a70f57275bd0fcac",
+    "phase": "build all Release targets",
+    "terminal": false,
+    "toolkit": "/opt/fltk-vr/toolkit"
+  },
+  "direct_companions": {
+    "asan": {
+      "accepted-publication": "PASS 102 accepted publication checks",
+      "affine": "PASS 408 affine manual-retopo checks",
+      "held": "PASS 1515 held retopology admission checks",
+      "worker-faults": "PASS 4343 worker checks, refused=253 optional=0",
+      "worker-reporter": "PASS 43 persistent reporter recovery checks"
+    },
+    "release": {
+      "accepted-publication": "PASS 102 accepted publication checks",
+      "affine": "PASS 408 affine manual-retopo checks",
+      "held": "PASS 1515 held retopology admission checks",
+      "worker-faults": "PASS 4343 worker checks, refused=253 optional=0",
+      "worker-reporter": "PASS 43 persistent reporter recovery checks"
+    }
+  },
+  "fixture_revision": "f70483e921ded0d80497f36802e9201b9aebc1c1",
+  "old_fixture": {
+    "outcome": {
+      "FAIL File work queue is full": 9,
+      "PASS 1015 immediate retopo handoff checks": 3
+    },
+    "program_sha256": "60331735288357226e6a0cf7b7b7c85b92840df7b7c85ef94b0bcbd1f13e13e0"
+  },
+  "projects_sha256": {
+    "before_apply": "90562950ad5440f098926f5619ca00a8d57e7348a8d80bb6af71a4aa1a7980ea",
+    "each_dependent_save_and_retried_overflow": "d67da486326912fb11e51e6aed3bba84e76cac244c133d61f31ba4dc37f1e902"
+  },
+  "registered_release_times_seconds": {
+    "retopology-affine": 0.857807,
+    "retopology-held-admission": 3.29993,
+    "retopology-save-handoff": 3.47921,
+    "retopology-worker-accepted-publication": 0.187296,
+    "retopology-worker-faults": 0.408215,
+    "retopology-worker-reporter-recovery": 0.0143669
+  },
+  "runtime_files_changed": false,
+  "stress": {
+    "asan_concurrency": 2,
+    "logical_cpu": 2,
+    "profiles": {
+      "asan": {
+        "address_sanitizer": "detect_leaks=1:halt_on_error=1",
+        "allocation_prefixes_per_run": 76,
+        "checks_per_run": 1019,
+        "core_sha256": "9a6478b92d4ddf3dff17485f97a981e4e09beb48faaff2eba2cfed5cc3eda33b",
+        "executable_sha256": "1dcf018a69476b26b949ee64dfb595ff725d23efba80fc3bb7b16fed29bca55f",
+        "passes": 4,
+        "runtime_revision": "f7a44207ef50fff2b1e75b16072c7d8ce4b96d09",
+        "undefined_behavior_sanitizer": "halt_on_error=1:print_stacktrace=1"
+      },
+      "frozen-fixed": {
+        "allocation_prefixes_per_run": 76,
+        "checks_per_run": 1019,
+        "core_sha256": "0ae025294c353206824f987cf9b60cbc6813ee74ff13e880fb11181ae8ae5062",
+        "executable_sha256": "c88f60cb6e7519a6661f5bd8a9a3a8cc1f8bda013aba1e98e531867fa29db1be",
+        "passes": 12,
+        "runtime_revision": "6b1d0c481475ec0caee28927cbf908653b9449bb"
+      },
+      "release": {
+        "allocation_prefixes_per_run": 76,
+        "checks_per_run": 1019,
+        "core_sha256": "12bbc8a865e0079977979155ac3ee8df390066d7107b1c1450bc0776788dbf49",
+        "executable_sha256": "d4c64731a0ec39ba8a17ac4548b686b07165a434c9e16d858b0acc7e31687427",
+        "passes": 16,
+        "runtime_revision": "f7a44207ef50fff2b1e75b16072c7d8ce4b96d09"
+      }
+    },
+    "release_concurrency": 4
+  }
+}

@@ -31,6 +31,16 @@ cancellation checks. The current full Release sweep is running.
 [Focused regression evidence](validation/layered-normal-retopo-followup-20261127.json)
 [Isolated archive replay](validation/native-mtoon-texture-sets-20261127.json)
 
+The earlier full Release sweep exposed a scheduling assumption in the
+retopology Save capacity fixture. The corrected fixture explicitly holds an
+older Save in file sync, fills the pending queue behind it, and checks the
+eighth dependent Save after Apply leaves the queue. It verifies exact pre-Apply
+and accepted scenes, preservation of the overflow destination, and a successful
+retry. It passes the single-CPU reproducer with both Release cores and the
+current ASan/UBSan core. The combined build including current MToon changes
+has a separate full Release run in progress.
+[Retopology Save capacity evidence](validation/retopo-save-queue-20261127.json)
+
 Main supports VRM0 export of shaped CC0 VRoid avatars, generated unlit
 grooms, certified UV seam edits and refitted first-person and spring
 metadata. Uniform shapes and avatars without spring geometry support a

@@ -2423,6 +2423,27 @@ with the existing non-root skin warning on the rigged files. Earlier
 uniform shared shade packages retain their exact bytes.
 [Varying MToon source validation](validation/varying-role-mtoon-20261127.json)
 
+### Retopology Save queue ordering
+
+The earlier full Release sweep reported a full file queue in
+`retopology-save-handoff`. The input barrier proves topology is still
+working, but the test also needed to account for when the file worker
+dequeues Apply. The old fixture reproduced the error in nine of twelve
+single-CPU runs. The corrected fixture holds an older Save at file sync.
+Apply and seven dependent Saves fill the eight pending slots. Once the
+file worker dequeues Apply, the eighth Save is admitted while topology
+is still held. The test checks the exact old scene, the exact accepted
+scene in each dependent output, preservation of the overflow destination,
+and a successful retry after the queue drains.
+
+All twelve replays on the original Release core, sixteen on the current
+Release core, and four on the current leak-checked ASan/UBSan core pass
+1,019 checks per run, including 76 persistent admission failures and
+their retries. The six registered Release retopology controls also pass.
+The original full sweep retains its failure. A fresh combined build
+with the corrected fixture and current MToon changes is running separately.
+[Retopology Save capacity validation](validation/retopo-save-queue-20261127.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
