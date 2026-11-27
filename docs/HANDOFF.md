@@ -1,4 +1,4 @@
-# Dome Sculpt current handoff — 2026-11-27
+# Dome Sculpt current handoff — 2026-11-28
 
 The full production goal is ACTIVE after the user's Nov26 resume and remains
 incomplete. The Nov18 [assessment](PROGRESS-ASSESSMENT-20261118.md) preserves
@@ -10,7 +10,7 @@ replaces the accumulated checkpoint diary; all previous text is preserved,
 byte-for-byte, in [the historical handoff](HANDOFF-HISTORY-20261117.md).
 Update this current summary at milestones rather than prepending more history.
 
-## Current stage — November 27
+## Current stage — November 27–28
 
 Dome Sculpt now requires hardware OpenGL and an available GPU for the
 selected compute backend. ONEAPI is the default. CUDA and ROCm remain
@@ -115,6 +115,18 @@ checks pass. The scoped sanitizer reference passes. Updated CUDA and ROCm
 compositors compile and explicitly refuse missing hardware. The independent
 source-coordinate and prepared paint adapters still need GPU coverage.
 [Native Bake compositing evidence](validation/native-bake-composite-gpu-20261127.json)
+
+The same selected-device pass now reconstructs tangent normals on eligible
+native Bake grids. The raw padded normal and coverage stay byte-exact. The
+round-to-nearest device math matches the historical binary32 normalization,
+including two one-byte differences found during Arc testing. Six focused Arc
+Release tests and twenty synthetic OpenXR Bake policy checks pass. The
+2048-pixel varied-normal fixture reproduces all eight material images and its
+complete GLB byte for byte. Across three paired fresh processes, median
+compositing time was 0.76 seconds with GPU normals and 0.59 seconds in the
+preceding revision. With the device program warm, the medians were 0.30 and
+0.37 seconds respectively. CUDA and ROCm compile and refuse missing hardware.
+[Native Bake normal evidence](validation/native-bake-normal-gpu-20261128.json)
 
 Dome Sculpt is an integrated authoring candidate. The isolated software
 Release run for `662d889d` passed all 1,366 registered tests. The newer

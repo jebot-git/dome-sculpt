@@ -1,0 +1,219 @@
+{
+  "date": "2026-11-28",
+  "production_commit": "25eff4bc02bc98d5465c1805925db0e42ad35d62",
+  "previous_published_commit": "4f6d75884144f558183784b4b74f41300ca267f0",
+  "domed_toolkit_commit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "arc_release_executable": {
+    "file": "artifacts/native-bake-normal-gpu-20261127/oneapi/dome-sculpt",
+    "sha256": "a32823a7b5202f3d77c04c08707b0edd3075af919714af609a019998097d309c"
+  },
+  "device": "Intel Arc A770 / 0000:03:00.0 / renderD129",
+  "scope": "Eligible 512\u20132048 canonical native Bake material composes its tangent normals with the existing selected-device color, ORM and emission pass. Padded source normals and coverage retain their prior values. Uncovered and unmapped texels retain the legacy flat normal.",
+  "arc_regression": {
+    "file": "artifacts/native-bake-normal-gpu-20261127/oneapi/bake-normal-gpu.xml",
+    "sha256": "035ee60c665c980436c21b7ed5aca7b0a9ab85fb70ccbf021198f4781e8962ab",
+    "passed": 6,
+    "names": [
+      "authoring-journey",
+      "bake",
+      "baked-textures",
+      "paint-overlay-gpu",
+      "paint-composite-compute",
+      "paint-composite-native"
+    ]
+  },
+  "synthetic_bake_policy": {
+    "file": "artifacts/native-bake-normal-gpu-20261127/oneapi/bake-policy-hardware.xml",
+    "sha256": "059451bb70f7535525d2c35b86820d17d4121cb3bab7d99b6f15b71bbcfd1037",
+    "passed": 1,
+    "names": [
+      "bake-policy-openxr"
+    ],
+    "checks": 20,
+    "report": {
+      "file": "artifacts/native-bake-normal-gpu-20261127/oneapi/bake-policy-xr/report.json",
+      "sha256": "5d4fce8613ab15f59b797e104484b0178a7d91102b5a53bd3740dbe6efc44dd4"
+    },
+    "scope": "Real OpenXR loader and hardware OpenGL with synthetic input. Small Bake workflow coverage."
+  },
+  "binary32_boundaries": {
+    "before": {
+      "file": "artifacts/native-bake-normal-gpu-20261127/round.log",
+      "sha256": "ad9c78f99218b62294a9be8e0b1101e775ddb1806c77d06718c691c5f2b725f1"
+    },
+    "after": {
+      "file": "artifacts/native-bake-normal-gpu-20261127/round-exact.log",
+      "sha256": "e541d0b55ad529a648ef19a5b89dc9c4234ca59d070c2e5e8a6b0863db283dfd"
+    },
+    "witnesses": {
+      "1": {
+        "reference_reciprocal_bits": "3f8fd22e",
+        "approximate_gpu_reciprocal_bits": "3f8fd22d",
+        "rounded_gpu_reciprocal_bits": "3f8fd22e",
+        "reference_rgb": "167,109,247",
+        "approximate_gpu_rgb": "166,109,247",
+        "rounded_gpu_rgb": "167,109,247"
+      },
+      "2": {
+        "reference_reciprocal_bits": "3fbda132",
+        "approximate_gpu_reciprocal_bits": "3fbda133",
+        "rounded_gpu_reciprocal_bits": "3fbda132",
+        "reference_rgb": "222,44,108",
+        "approximate_gpu_rgb": "222,44,107",
+        "rounded_gpu_rgb": "222,44,108"
+      }
+    },
+    "initial_native_failure": {
+      "file": "artifacts/native-bake-normal-gpu-20261127/initial-tests.log",
+      "sha256": "3219664a3d99432030833c0451dc3ace26adeb9fb9c447716f6bda8e7ad53771"
+    }
+  },
+  "headless_sanitizers": {
+    "primitive": {
+      "file": "artifacts/native-bake-normal-gpu-20261127/asan/paint-composite-compute.cpp.log",
+      "sha256": "288deffcfcf03d22b026db7a81aebf654ec562f39dd26b9286993b78988e122a"
+    },
+    "producer": {
+      "file": "artifacts/native-bake-normal-gpu-20261127/asan/paint-composite-native.cpp.log",
+      "sha256": "778e7cce48ae5dd4282a1e290fabfde0ff16c7769eb84ecd74c2e7b2df3cfad9"
+    },
+    "scope": "Current CPU paint/compute owners with the preceding headless reference archive. The HIP-only precision implementation is outside the headless reference."
+  },
+  "benchmark": {
+    "fixture": {
+      "file": "artifacts/native-bake-normal-gpu-20261127/project.dsculpt",
+      "sha256": "7e042d197f363756c4e976c1edca3cf4681053ef2d20ff07e4ad12de753feed6"
+    },
+    "fixture_generator": {
+      "file": "artifacts/native-bake-normal-gpu-20261127/probe.cpp",
+      "sha256": "66fc999e29c3744dbc61d8223d70346c761a6a40f04cdbf7d70fdde53299c247"
+    },
+    "scope": "Three paired cold-process measurements, after loading the editable native fixture, including normal readback and material map construction. The preceding broad Arc sweep continued during the measurements.",
+    "resolution": 2048,
+    "before": {
+      "runs": [
+        {
+          "file": "artifacts/native-bake-normal-gpu-20261127/measure-before-1.log",
+          "sha256": "01c95c4f0a7b7b5776026a59173bb6b6e03076e668428c660964a54d025641c8",
+          "elapsed_ns": 676570702
+        },
+        {
+          "file": "artifacts/native-bake-normal-gpu-20261127/measure-before-2.log",
+          "sha256": "53d4d68fe1ba447d0010b312a247ea7391c9a10763abf73819c22bd5f2c09672",
+          "elapsed_ns": 593842080
+        },
+        {
+          "file": "artifacts/native-bake-normal-gpu-20261127/measure-before-3.log",
+          "sha256": "10a09fd9f072b72a8b55f09877484a40d3d978fa4480d8866df98b7056037852",
+          "elapsed_ns": 585591968
+        }
+      ],
+      "median_ns": 593842080
+    },
+    "after": {
+      "runs": [
+        {
+          "file": "artifacts/native-bake-normal-gpu-20261127/measure-after-1.log",
+          "sha256": "d7e9516a07702457ace1e235b98d3978cf5bca85104cfae51b5caebcf5da1549",
+          "elapsed_ns": 759375726
+        },
+        {
+          "file": "artifacts/native-bake-normal-gpu-20261127/measure-after-2.log",
+          "sha256": "dac34e6d9d673e2160390f58023ea303c41271c6882ba03cf6fd19859c4cbb17",
+          "elapsed_ns": 733220163
+        },
+        {
+          "file": "artifacts/native-bake-normal-gpu-20261127/measure-after-3.log",
+          "sha256": "1efdc3c44f71c1f3a4702e19901a1039c4c71f9a4ad393f416eec59590a3a98a",
+          "elapsed_ns": 790799480
+        }
+      ],
+      "median_ns": 759375726
+    }
+  },
+  "warm_benchmark": {
+    "file": "artifacts/native-bake-normal-gpu-20261127/warm.log",
+    "sha256": "31711dc750cf450a3d0ccb69d7c908b731ff39704036eba534a5cef94b6275a3",
+    "before": {
+      "processes_ns": [
+        [
+          518030166,
+          371735212,
+          402751496,
+          309439984,
+          327751886
+        ],
+        [
+          579646936,
+          373064123,
+          399590644,
+          333132910,
+          432873162
+        ]
+      ],
+      "warm_median_ns": 372399667.5
+    },
+    "after": {
+      "processes_ns": [
+        [
+          679564325,
+          338380943,
+          282304009,
+          302090591,
+          376006473
+        ],
+        [
+          754495730,
+          269948821,
+          228891118,
+          380818341,
+          301130354
+        ]
+      ],
+      "warm_median_ns": 301610472.5
+    },
+    "scope": "Four alternating processes, two on each build. Each first measurement is listed but excluded from warm medians. Cache retention is disabled."
+  },
+  "identical_maps": {
+    "color": "ed2cf4e33a49022c",
+    "orm": "36e22263432ac787",
+    "emission": "c02381535d0765d9",
+    "resolved_normal": "d6d2eac3b3c7051",
+    "color_coverage": "df2ed4811fcc9d6a",
+    "emission_coverage": "2a0336e9e5aca07d",
+    "padded_raw_normal": "5b8a3ca1c27f0b75",
+    "raw_normal_coverage": "3423d148030085ed",
+    "transparent": "1"
+  },
+  "byte_identical_glb": {
+    "file": "artifacts/native-bake-normal-gpu-20261127/after.glb",
+    "sha256": "b0df9976e8432779d4cfb1c511303c4fc576f06c1634f13fafd8ca25de014ebc",
+    "normal_png_sha256": "f8e7f44673e913cbc227511ae1ee0f7edfccab2a419a7e951f7aa39c848fe30a",
+    "arc_kernel_trace": {
+      "file": "artifacts/native-bake-normal-gpu-20261127/export-after.log",
+      "sha256": "bc3a2f7de3ea9f43a974e05c22500de6aa5b8c603d93e58714dfbae9c0feb4d9"
+    }
+  },
+  "vendor_missing_device": {
+    "oneapi": {
+      "file": "artifacts/native-bake-normal-gpu-20261127/missing-device.log",
+      "sha256": "a1cf3916320544004330c555f6b65126a7eb9220405dc58db911a926f6ac4b58"
+    },
+    "cuda": {
+      "file": "artifacts/native-bake-normal-gpu-20261127/cuda-missing.log",
+      "sha256": "0f294de72400904e78824185c537b07b42aab6a60302fb6cda983d44ffa5a5b8"
+    },
+    "rocm": {
+      "file": "artifacts/native-bake-normal-gpu-20261127/rocm-missing.log",
+      "sha256": "f5d0b4b62da1b0688d7c7208ffea824157eb7715519fd603276afc2746f421ec"
+    },
+    "scope": "Current CUDA and ROCm backends and the missing-device oracle compiled and linked. Positive target hardware results remain open."
+  },
+  "preceding_full_arc_sweep": {
+    "source": "30eaee642f95ce59fbf2f1743e7c368524147acf",
+    "registered": 1443,
+    "completed_at_receipt": 639,
+    "terminal": false,
+    "live_status": "artifacts/gpu-arc-full-release-20261127/combined-test-status.json"
+  }
+}

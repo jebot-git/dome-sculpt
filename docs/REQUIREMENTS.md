@@ -13,6 +13,11 @@ native normal-map output, and GLB export match the preceding implementation.
 Independent source-coordinate and prepared material adapters and further
 GPU baking work remain open. [Arc Bake evidence](validation/native-bake-composite-gpu-20261127.json)
 
+The same pass now resolves native tangent normals with the original byte
+rounding and padded coverage. Arc Release and the 2048-pixel GLB fixture
+confirm exact output. The CUDA and ROCm paths built and rejected missing
+devices. [Native Bake normal evidence](validation/native-bake-normal-gpu-20261128.json)
+
 ## Current validation — 2026-11-27
 
 The [current handoff](HANDOFF.md) records the exact combined Release, Arc,
