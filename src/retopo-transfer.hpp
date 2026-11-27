@@ -36,6 +36,7 @@ public:
   const auto &previous_metric() const { return previous_metric_; }
   const auto &replacement_metric() const { return replacement_metric_; }
   size_t remaining_bytes() const { return budget_.remaining_bytes(); }
+  size_t remaining_work() const { return budget_.remaining_work(); }
 
 private:
   RetopoTransferBudget &budget_;
@@ -50,10 +51,17 @@ private:
 struct RetopoTextureSets {
   std::shared_ptr<PaintedMesh> primary;
   std::shared_ptr<const TextureSetCollection> membership;
+  std::shared_ptr<const SourceMaterialBindings> primary_binding;
 };
-using RetopoFieldProjector = std::function<std::shared_ptr<PaintedMesh>(
-    const PaintedMesh &, const std::shared_ptr<const TextureSetFaceDomain> &)>;
+struct RetopoTextureField {
+  std::shared_ptr<PaintedMesh> paint;
+  std::shared_ptr<const SourceMaterialBindings> binding;
+};
+using RetopoFieldProjector = std::function<RetopoTextureField(const PaintedMesh &,
+    const std::shared_ptr<const SourceMaterialBindings> &,
+    const std::shared_ptr<const TextureSetFaceDomain> &)>;
 RetopoTextureSets project_retopology_texture_sets(const PaintedMesh &primary,
+    const std::shared_ptr<const SourceMaterialBindings> &primary_binding,
     const TextureSetCollection &, std::shared_ptr<const Mesh> replacement,
     std::span<const TextureSetId> assignments, RetopoTransferBudget &, const RetopoFieldProjector &);
 

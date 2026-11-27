@@ -744,6 +744,274 @@ void mixed_material_quad(const std::filesystem::path &out) {
         "The source raster remains exact after the new material allocation");
 }
 
+SourceMaterialBindings retopo_toon_binding(const TextureSetView &slot,bool trim,bool legacy) {
+  auto info=[](int index) {
+    return nlohmann::json{{"index",index},{"extensions",{{"KHR_texture_transform",{
+        {"rotation",.37},{"offset",{-.15,.16}},{"scale",{1.3,.81}}
+    }}}}};
+  };
+  SourceMaterialBindings binding;
+  auto extension=nlohmann::json{
+    {"specVersion","1.0"},{"shadeColorFactor",{.35,.55,.6}},
+    {"shadeMultiplyTexture",info(1)},{"matcapTexture",info(2)},{"rimMultiplyTexture",info(4)},
+    {"uvAnimationMaskTexture",info(5)},{"shadingShiftTexture",info(6)}
+  };
+  if (trim) {
+    extension["outlineWidthMode"]="worldCoordinates";
+    extension["outlineWidthFactor"]=.012;
+    extension["outlineWidthMultiplyTexture"]=info(7);
+  }
+  auto json=nlohmann::json{
+    {"alphaMode","MASK"},{"alphaCutoff",.33},
+    {"pbrMetallicRoughness",{{"baseColorTexture",info(0)}}},
+    {"emissiveTexture",info(3)},{"emissiveFactor",{.4,.3,.15}},
+    {"extensions",{{"VRMC_materials_mtoon",extension}}}
+  };
+  if (!trim) {
+    json["normalTexture"]=info(7);
+    json["normalTexture"]["scale"]=.67;
+  }
+  if (legacy) {
+    binding.material=MToonMaterial::from_vrm0({
+      {"shader","VRM/MToon"},
+      {"textureProperties",{{"_MainTex",0},{"_ShadeTexture",1},{"_SphereAdd",2},{"_EmissionMap",3},
+                            {"_RimTexture",4},{"_UvAnimMaskTexture",5},{"_ReceiveShadowTexture",6},
+                            {"_ShadingGradeTexture",7},{"_OutlineWidthTexture",8}}},
+      {"floatProperties",{{"_BlendMode",1},{"_Cutoff",.33},{"_OutlineWidthMode",1},{"_OutlineWidth",.012}}},
+      {"vectorProperties",{{"_MainTex",{.16,.31,-1.2,.83}}}}
+    },9);
+  } else {
+    binding.material=MToonMaterial::from_vrm1(json,8);
+  }
+  const auto &native=slot.material;
+  binding.native_reference={native.color,native.emissive,int(native.alpha),native.alpha_cutoff,native.double_sided};
+  for (size_t role=0;role<binding.roles.size();++role) {
+    if (binding.material.textures[role].index<0) continue;
+    Image image;
+    image.width=trim?96:9;
+    image.height=8;
+    image.rgba.resize(size_t(image.width)*image.height*4);
+    for (size_t at=0;at<image.rgba.size()/4;++at) {
+      const size_t x=at%image.width, y=at/image.width;
+      const std::array<uint8_t,4> pixel=role==size_t(MToonSlot::Normal)
+          ? std::array<uint8_t,4>{uint8_t(151+x*3),uint8_t(105+y*5),236,255}
+          : std::array<uint8_t,4>{uint8_t((trim?12:142)+x%15+y),uint8_t(30+role*10+y*21),
+                                 uint8_t(60+role*9+x%70),uint8_t(120+x%101)};
+      std::copy(pixel.begin(),pixel.end(),image.rgba.begin()+at*4);
+    }
+    binding.roles[role].image=std::make_shared<const Image>(std::move(image));
+    binding.roles[role].wrap_t=33648;
+  }
+  return binding;
+}
+
+std::array<float,2> retopo_toon_test_uv(const Mesh &mesh,uint32_t face,std::array<float,3> weights) {
+  std::array<float,2> uv{};
+  for (size_t k=0;k<3;++k)
+    for (size_t axis=0;axis<2;++axis)
+      uv[axis]+=weights[k]*mesh.uv[mesh.indices[face*3+k]][axis];
+  return uv;
+}
+
+Vec3 retopo_toon_test_normal(const TextureSetView &field,const AffineTransform &world,
+    uint32_t face,std::array<float,3> bary) {
+  const auto &mesh=field.painted->mesh();
+  const auto &binding=*field.material_bindings;
+  constexpr auto normal=MToonSlot::Normal;
+  std::array<std::array<float,2>,3> uv{};
+  std::array<Vec3,3> positions{};
+  Vec3 n{};
+  for (size_t c=0;c<3;++c) {
+    const auto vertex=mesh.indices[face*3+c];
+    uv[c]=mtoon_uv(binding.material,normal,mesh.uv[vertex],0);
+    positions[c]=point(world,mesh.positions[vertex]);
+    const auto local=mesh.normals[vertex];
+    const auto placed=world.normal({local.x,local.y,local.z});
+    n+=normalized({float(placed[0]),float(placed[1]),float(placed[2])})*bary[c];
+  }
+  n=normalized(n);
+  const auto du=uv[1][0]-uv[0][0], dv=uv[1][1]-uv[0][1];
+  const auto eu=uv[2][0]-uv[0][0], ev=uv[2][1]-uv[0][1];
+  const auto determinant=du*ev-eu*dv;
+  const auto dx=positions[1]-positions[0], dy=positions[2]-positions[0];
+  auto t=(dx*ev-dy*dv)/determinant;
+  t=normalized(t-n*dot(n,t));
+  const auto b=(dy*du-dx*eu)/determinant;
+  const auto sign=dot(cross(n,t),b)<0?-1.f:1.f;
+  const auto q=mtoon_uv(binding.material,normal,retopo_toon_test_uv(mesh,face,bary),0);
+  const auto sample=sample_source_texture(binding.roles[size_t(normal)],q[0],q[1],false);
+  return mtoon_material_normal(binding.material,n,{t.x,t.y,t.z,sign},{sample[0],sample[1],sample[2]},n,true);
+}
+
+void retopo_toon_materials(bool affine,bool legacy,const std::filesystem::path &out) {
+  auto scene=reference(false);
+  const auto guide=scene.active().id;
+  RetopoMesh patch;
+  const auto a=patch.add_vertex({{-.29f,-.27f,0}});
+  const auto b=patch.add_vertex({{ .29f,-.27f,0}});
+  const auto c=patch.add_vertex({{ .29f, .27f,0}});
+  const auto d=patch.add_vertex({{-.29f, .27f,0}});
+  patch.add_face(std::array{a,b,c,d});
+  const auto previous=publish_retopology(scene,patch,guide,{});
+  const auto trim=create_texture_set(scene,previous,std::array<uint64_t,1>{2},"Toon trim",64);
+  for (const auto slot:{TextureSetId(0),trim}) {
+    const auto typed=retopo_toon_binding(texture_set_view(scene.active(),slot),slot==trim,legacy && slot==trim);
+    check(bind_texture_set_mtoon(scene,previous,slot,typed),"Each retopology slot owns its material through the native MToon edit");
+  }
+  check(edit_texture_set(scene,previous,trim,[](PaintedMesh &paint,Material &) {
+    paint.add_layer("Retopo ink");
+    PaintSettings ink;
+    ink.front_only=false;
+    ink.color={.09f,.28f,.31f,1};
+    Brush brush;
+    brush.from=brush.to={.18f,.18f,0};
+    brush.normal={0,0,1};
+    brush.radius=.19f;
+    brush.strength=1;
+    paint.begin_stroke();
+    paint.stamp(brush,ink);
+    return paint.end_stroke();
+  }),"Trim owns editable paint independent of the typed textures");
+  if (affine)
+    scene.object(previous).affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(
+        std::array<double,16>{-.96,.12,0,0,.11,.96,0,0,0,.13,1.02,0,.02,-.012,.003,1}));
+  Document document;
+  document.replace(scene);
+  settled(document);
+  const auto before=document.copy_scene();
+  document.save_async(out/"mtoon-before.dsculpt").get();
+  const auto draft=move_patch(document,affine);
+  document.end_retopology(true);
+  const auto path=out/"mtoon-retopo.dsculpt";
+  document.save_async(path).get();
+  settled(document);
+  const auto after=document.copy_scene();
+  const auto &active=after.active();
+  check(active.id!=previous && active.texture_sets->triangle_sets()[1]==trim &&
+        active.retopology->topology.encode()!=before.active().retopology->topology.encode() &&
+        !after.object(previous).visible && Scene::load(path).encode()==after.encode(),
+        "Geometry Apply and ordered Save keep two texture sets and the hidden original project");
+  size_t checks_at_texel=0;
+  float role_error=0, normal_error=0;
+  const auto old_world=before.world_matrix(previous), new_world=after.world_matrix(active.id);
+  const SurfaceQuery query(before.active().painted->mesh());
+  for (const auto slot:{TextureSetId(0),trim}) {
+    const auto old=texture_set_view(before.active(),slot);
+    const auto field=texture_set_view(active,slot);
+    const auto &source=*old.material_bindings, &target=*field.material_bindings;
+    const auto r=target.roles[0].image->width;
+    check(r==(slot==trim?128u:512u) && target.roles[0].image!=source.roles[0].image &&
+          target.roles[size_t(MToonSlot::Matcap)].image==source.roles[size_t(MToonSlot::Matcap)].image &&
+          target.material.parameters.alpha==source.material.parameters.alpha &&
+          target.material.version()==source.material.version() &&
+          target.material.parameters.outline==source.material.parameters.outline &&
+          texture_set_view(after.object(previous),slot).material_bindings==old.material_bindings,
+          "Typed roles get slot-local grids while MatCap, alpha, outline and source owners remain intact");
+    if (slot==trim)
+      check(field.painted->resolution()==64 && field.painted->has_paint_data() &&
+            field.painted->layers().back().name=="Retopo ink",
+            "Projected source roles can have a finer raster than the editable paint");
+    SurfaceQueryOptions nearest;
+    nearest.closest_maximum=.2f;
+    nearest.triangle_filter=[&](uint32_t triangle) {return old.domain->contains(triangle);};
+    const auto &mesh=field.painted->mesh();
+    for (const auto face:field.domain->triangles()) {
+      const auto ia=mesh.indices[face*3], ib=mesh.indices[face*3+1], ic=mesh.indices[face*3+2];
+      const auto uv=mesh.uv[ia];
+      const auto u=mesh.uv[ib][0]-uv[0], v=mesh.uv[ib][1]-uv[1];
+      const auto s=mesh.uv[ic][0]-uv[0], t=mesh.uv[ic][1]-uv[1];
+      for (uint32_t y=0;y<r;y+=11) for (uint32_t x=0;x<r;x+=11) {
+        const auto dx=(x+.5f)/r-uv[0], dy=(y+.5f)/r-uv[1];
+        const auto p=(dx*t-dy*s)/(u*t-v*s), q=(dy*u-dx*v)/(u*t-v*s);
+        const std::array w{1-p-q,p,q};
+        if (std::ranges::min(w)<.08f) continue;
+        const auto position=point(new_world,mesh.positions[ia]*w[0]+mesh.positions[ib]*w[1]+mesh.positions[ic]*w[2]);
+        const auto hit=query.nearest_result(position,old_world,nearest);
+        if (!hit) continue;
+        const auto from=hit->surface;
+        const auto source_uv=retopo_toon_test_uv(old.painted->mesh(),from.triangle,from.barycentric);
+        for (size_t role=0;role<source.roles.size();++role) {
+          if (!source.roles[role].image || role==size_t(MToonSlot::Matcap)) continue;
+          if (role==size_t(MToonSlot::Normal))
+            normal_error=std::max(normal_error,length(retopo_toon_test_normal(old,old_world,from.triangle,from.barycentric)-
+                                                    retopo_toon_test_normal(field,new_world,face,w)));
+          else {
+            const bool srgb=source.material.textures[role].encoding==MToonEncoding::Srgb;
+            const auto uv=mtoon_uv(source.material,MToonSlot(role),source_uv,0);
+            const auto expected=sample_source_texture(source.roles[role],uv[0],uv[1],srgb);
+            const auto new_uv=mtoon_uv(target.material,MToonSlot(role),{(x+.5f)/r,(y+.5f)/r},0);
+            const auto result=sample_source_texture(target.roles[role],new_uv[0],new_uv[1],srgb);
+            for (size_t channel=0;channel<4;++channel)
+              role_error=std::max(role_error,std::abs(result[channel]-expected[channel]));
+          }
+          ++checks_at_texel;
+        }
+      }
+    }
+  }
+  std::cout<<"MTOON_TRANSFER samples="<<checks_at_texel<<" role_error="<<role_error
+           <<" normal_error="<<normal_error<<'\n';
+  check(checks_at_texel>200 && role_error<.005f && normal_error<.018f,
+        "Independent same-slot world sampling agrees on typed colors, scalar maps and shading normals");
+  check(document.undo() && document.copy_scene().encode()==before.encode() &&
+        document.redo() && document.copy_scene().encode()==after.encode(),
+        "Undo and Redo keep both typed material generations byte for byte");
+  settled(document);
+  if (!legacy) {
+    const auto glb=out/"mtoon-retopo.glb";
+    document.export_asset(glb,AssetExportFormat::EditableGlb256).get();
+    const auto read=[](const std::filesystem::path &file) {
+      std::ifstream stream(file,std::ios::binary);
+      return std::vector<uint8_t>{std::istreambuf_iterator<char>(stream),{}};
+    };
+    const auto payload=read(glb);
+    const auto reopened=extract_native_authoring(payload);
+    check(reopened && reopened->encode()==after.encode(),"Editable GLB reopens both native typed material fields exactly");
+    auto portable=after.snapshot();
+    check(edit_texture_set(portable,active.id,trim,[](PaintedMesh &paint,Material &) {
+      paint.delete_layer();
+      return !paint.has_paint_data();
+    }),"An independent export control keeps the projected typed roles without its additional ink overlay");
+    Document portable_document;
+    portable_document.replace(portable);
+    settled(portable_document);
+    const auto standard=out/"mtoon-portable.glb";
+    portable_document.export_asset(standard,AssetExportFormat::Glb).get();
+    const auto existing=read(standard);
+    bool refused=false;
+    try {document.export_asset(standard,AssetExportFormat::Glb).get();}
+    catch(const std::invalid_argument &error) {
+      refused=std::string_view(error.what()).find("portable material adapter")!=std::string_view::npos;
+    }
+    check(refused && !existing.empty() && read(standard)==existing,
+          "An unsupported painted portable export preserves the existing typed GLB destination");
+  }
+
+  auto live=before.snapshot();
+  auto animated=*texture_set_view(live.active(),trim).material_bindings;
+  animated.material.parameters.scroll[0]=.1f;
+  bind_texture_set_mtoon(live,previous,trim,animated);
+  const auto exact=live.encode();
+  bool refused=false;
+  try {publish_retopology(live,*draft->topology,guide,draft->transform);}
+  catch(const std::invalid_argument &error) {refused=std::string_view(error.what()).find("animated")!=std::string_view::npos;}
+  check(refused && live.encode()==exact,"Live animated roles refuse geometry Apply without changing the source project");
+  if (!legacy) {
+    auto two_sided=before.snapshot();
+    auto editable=*two_sided.active().material_bindings;
+    editable.material.parameters.cull=MToonCull::Off;
+    bind_texture_set_mtoon(two_sided,previous,0,editable);
+    const auto both_faces=two_sided.encode();
+    bool incompatible=false;
+    try {publish_retopology(two_sided,*draft->topology,guide,draft->transform);}
+    catch(const std::invalid_argument &error) {
+      incompatible=std::string_view(error.what()).find("angular bound")!=std::string_view::npos;
+    }
+    check(incompatible && two_sided.encode()==both_faces,
+          "A typed map that needs different front and back transports fails atomically");
+  }
+}
+
 void paint_checkpoint(Scene &scene, std::string name, std::array<float,4> color) {
   auto &object = scene.active();
   object.painted = object.painted->snapshot();
@@ -906,6 +1174,7 @@ int main(int argc,char **argv) try {
   if (argc!=3) return 2;
   const std::string_view mode = argv[2];
   if (mode!="plain" && mode!="affine" && mode!="affine-wire" && mode!="mixed-material" &&
+      mode!="mtoon-plain" && mode!="mtoon-affine" && mode!="mtoon-v0" &&
       mode!="reapply-plain" && mode!="reapply-affine" && mode!="prepared-plain" && mode!="prepared-affine" &&
       mode!="restore-plain" && mode!="restore-affine") return 2;
   const std::filesystem::path out = argv[1];
@@ -915,6 +1184,7 @@ int main(int argc,char **argv) try {
   if (mode.starts_with("restore-")) restore_patch_history(mode.ends_with("affine"),out);
   else if (mode=="affine-wire") affine_wire_edit(out);
   else if (mode=="mixed-material") mixed_material_quad(out);
+  else if (mode.starts_with("mtoon-")) retopo_toon_materials(mode.ends_with("affine"),mode.ends_with("v0"),out);
   else if (mode.starts_with("prepared-")) prepared_geometry_edit(mode.ends_with("affine"),out);
   else if (mode.starts_with("reapply-")) reapply_patch(mode.ends_with("affine"),out);
   else bind_patch(mode=="affine",out);

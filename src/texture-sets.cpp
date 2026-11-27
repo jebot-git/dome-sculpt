@@ -191,11 +191,12 @@ struct TextureSetAccess {
  static std::shared_ptr<const TextureSetFaceDomain>domain(const std::shared_ptr<const TextureSetTopology>&t,TextureSetId id,const std::shared_ptr<const std::vector<TextureSetId>>&slots){
   auto d=std::shared_ptr<TextureSetFaceDomain>(new TextureSetFaceDomain);d->topology_=t;d->set_=id;d->assignments_=slots;for(size_t f=0;f<slots->size();++f)if((*slots)[f]==id)d->triangles_.push_back(uint32_t(f));std::shared_ptr<const TextureSetFaceDomain>sealed=std::move(d);sealed->self_=sealed;return sealed;
  }
- static RetopoTextureSets project_retopology(const PaintedMesh &primary, const TextureSetCollection &old,
+ static RetopoTextureSets project_retopology(const PaintedMesh &primary,
+     const std::shared_ptr<const SourceMaterialBindings> &primary_binding, const TextureSetCollection &old,
      std::shared_ptr<const Mesh> mesh, std::span<const TextureSetId> assignments,
      RetopoTransferBudget &budget, const RetopoFieldProjector &project) {
    if (old.primary_source_ || std::ranges::any_of(old.additional_, [](const auto &field) {
-         return field.source || field.appearance || field.material_bindings;
+         return field.source || field.appearance;
        }))
      throw std::invalid_argument("Retopology needs a retained-source adapter for these material fields");
    if (old.topology_->polygon_ids() || !old.primary_->matches(primary.mesh_owner()) ||
@@ -207,15 +208,17 @@ struct TextureSetAccess {
    next->active_ = old.active_;
    next->next_ = old.next_;
    next->primary_ = domain(next->topology_, 0, next->slots_);
-   auto replacement = project(primary, next->primary_);
+   auto replacement = project(primary, primary_binding, next->primary_);
    next->additional_.reserve(old.additional_.size());
    for (const auto &old_field : old.additional_) {
      auto field = old_field;
      field.domain = domain(next->topology_, field.id, next->slots_);
-     field.painted = project(*old_field.painted, field.domain);
+     auto projected = project(*old_field.painted, old_field.material_bindings, field.domain);
+     field.painted = std::move(projected.paint);
+     field.material_bindings = std::move(projected.binding);
      next->additional_.push_back(std::move(field));
    }
-   return {std::move(replacement), std::move(next)};
+   return {std::move(replacement.paint), std::move(next), std::move(replacement.binding)};
  }
  static std::vector<std::shared_ptr<const TextureSetFieldSource>>field_sources(const SculptObject&o,std::span<const TextureSetId>assignments,const TextureSetLimits&l){
   if(o.texture_sets)throw std::invalid_argument("Repartitioning retained material fields needs its existing per-field source adapter");
@@ -256,10 +259,12 @@ struct TextureSetAccess {
 
  }
 };
-RetopoTextureSets project_retopology_texture_sets(const PaintedMesh &primary, const TextureSetCollection &old,
+RetopoTextureSets project_retopology_texture_sets(const PaintedMesh &primary,
+    const std::shared_ptr<const SourceMaterialBindings> &primary_binding, const TextureSetCollection &old,
     std::shared_ptr<const Mesh> replacement, std::span<const TextureSetId> assignments,
     RetopoTransferBudget &budget, const RetopoFieldProjector &project) {
-  return TextureSetAccess::project_retopology(primary, old, std::move(replacement), assignments, budget, project);
+  return TextureSetAccess::project_retopology(primary, primary_binding, old, std::move(replacement),
+                                              assignments, budget, project);
 }
 void stage_texture_set_bake(SculptObject &target,
     const std::shared_ptr<const TextureSetCollection> &membership,

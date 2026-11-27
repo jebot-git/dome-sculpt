@@ -3271,6 +3271,215 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
   }
   paint_compute::checkpoint(transfer.cancelled());
 }
+
+namespace {
+using ToonUv = std::array<float,2>;
+
+struct RetopoToonUv {
+  const MToonTexture &texture;
+  double cosine, sine;
+
+  explicit RetopoToonUv(const MToonTexture &t)
+      : texture(t), cosine(std::cos(double(t.rotation))), sine(std::sin(double(t.rotation))) {}
+
+  ToonUv direction(ToonUv uv) const {
+    const double u=double(uv[0])*texture.scale[0], v=double(uv[1])*texture.scale[1];
+    return {float(cosine*u-sine*v),float(sine*u+cosine*v)};
+  }
+  ToonUv point(ToonUv uv) const {
+    auto q=direction(uv);
+    q[0]+=texture.offset[0];
+    q[1]+=texture.offset[1];
+    return q;
+  }
+};
+
+struct RetopoToonDerivative { Vec3 tangent{}, bitangent{}; };
+
+std::vector<RetopoToonDerivative> retopo_toon_derivatives(const Mesh &mesh,
+    const detail::AffineInteractionFrame &placement, const RetopoToonUv &mapping,
+    detail::RetopoTransfer &transfer) {
+  transfer.reserve(mesh.indices.size()/3,sizeof(RetopoToonDerivative));
+  std::vector<RetopoToonDerivative> output(mesh.indices.size()/3);
+  for (size_t face=0;face<output.size();++face) {
+    if ((face&1023)==0) paint_compute::checkpoint(transfer.cancelled());
+    transfer.work(16);
+    const auto a=mesh.indices[face*3], b=mesh.indices[face*3+1], c=mesh.indices[face*3+2];
+    const auto u=mapping.direction({mesh.uv[b][0]-mesh.uv[a][0],mesh.uv[b][1]-mesh.uv[a][1]});
+    const auto v=mapping.direction({mesh.uv[c][0]-mesh.uv[a][0],mesh.uv[c][1]-mesh.uv[a][1]});
+    const auto determinant=u[0]*v[1]-u[1]*v[0];
+    if (std::abs(determinant)<=1e-8f*std::max(std::hypot(u[0],u[1])*std::hypot(v[0],v[1]),1e-20f))
+      continue;
+    const auto x=detail::affine_position(placement.world().direction(detail::affine_vector(mesh.positions[b]-mesh.positions[a])));
+    const auto y=detail::affine_position(placement.world().direction(detail::affine_vector(mesh.positions[c]-mesh.positions[a])));
+    const auto sign=std::copysign(1.f,determinant);
+    output[face]={(x*v[1]-y*u[1])*sign,(y*u[0]-x*v[0])*sign};
+  }
+  return output;
+}
+
+struct RetopoToonFrame {
+  Vec3 t,b,n;
+  bool valid=false;
+  Vec3 mapped(Vec3 normal, float side=1) const {
+    return valid ? normalized(t*normal.x+(b*normal.y+n*normal.z)*side) : n*side;
+  }
+};
+
+RetopoToonFrame retopo_toon_frame(const Mesh &mesh,const detail::AffineInteractionFrame &placement,
+    const RetopoToonDerivative &derivative,size_t face,std::array<float,3> bary) {
+  Vec3 n{};
+  for (size_t k=0;k<3;++k)
+    n+=placed_normal(placement,mesh.normals[mesh.indices[face*3+k]])*bary[k];
+  n=normalized(n);
+  const auto projected=derivative.tangent-n*dot(n,derivative.tangent);
+  if (length(projected)==0) return {{},{},n};
+  const auto t=normalized(projected);
+  const auto b=cross(n,t);
+  return {t,b*(dot(b,derivative.bitangent)<0?-1.f:1.f),n,true};
+}
+
+std::array<float,4> retopo_toon_normal(std::array<float,4> encoded,
+    const RetopoToonFrame &source,const RetopoToonFrame &target,float scale,bool back) {
+  const auto input=mtoon_normal_map({encoded[0],encoded[1],encoded[2]},scale);
+  const auto world=source.mapped(input);
+  std::array<double,3> raw{0,0,dot(target.n,world)};
+  if (scale!=0) {
+    raw[0]=double(dot(target.t,world))/scale;
+    raw[1]=double(dot(target.b,world))/scale;
+  }
+  const auto maximum=std::max({std::abs(raw[0]),std::abs(raw[1]),std::abs(raw[2]),1e-20});
+  for (size_t i=0;i<3;++i) encoded[i]=unit(byte(float(.5+.5*raw[i]/maximum)));
+  const auto result=mtoon_normal_map({encoded[0],encoded[1],encoded[2]},scale);
+  // V1 reverses B and N on back faces. One atlas image can carry both
+  // orientations only when the two angle checks pass after quantization.
+  constexpr float accepted_cosine=.9998f;
+  if (dot(world,target.mapped(result))<accepted_cosine ||
+      (back && dot(source.mapped(input,-1),target.mapped(result,-1))<accepted_cosine))
+    throw std::invalid_argument("MToon retopology cannot preserve the typed normal frame within its angular bound");
+  return encoded;
+}
+}
+
+std::shared_ptr<const SourceMaterialBindings> detail::TextureSetPaintAccess::reproject_retopology_mtoon(
+    const PaintedMesh &from,const PaintedMesh &replacement,
+    const std::shared_ptr<const SourceMaterialBindings> &binding,RetopoTransfer &transfer) {
+  const auto &material=binding->material;
+  const auto &parameters=material.parameters;
+  const bool legacy=material.version()==MToonVersion::V0;
+  const bool animated=parameters.scroll!=ToonUv{} || parameters.rotation_speed!=0;
+  constexpr auto matcap=size_t(MToonSlot::Matcap), normal=size_t(MToonSlot::Normal);
+  std::vector<size_t> roles;
+  uint32_t resolution=replacement.resolution();
+  for (size_t role=0;role<binding->roles.size();++role) {
+    const auto &source=binding->roles[role];
+    if (!source.image || role==matcap) continue;
+    if (animated && role!=size_t(MToonSlot::UvMask) && !(legacy && role==size_t(MToonSlot::OutlineWidth)))
+      throw std::invalid_argument("MToon retopology needs a live sampling adapter for animated texture roles");
+    resolution=std::max({resolution,source.image->width,source.image->height});
+    roles.push_back(role);
+  }
+  if (roles.empty()) return binding;
+  if (resolution>2048) throw std::length_error("MToon retopology role images exceed its atlas resolution limit");
+  resolution=std::bit_ceil(resolution);
+  transfer.reserve(1,sizeof(SourceMaterialBindings)+
+      material.copy_working_bytes(transfer.remaining_bytes(),transfer.cancelled()));
+  transfer.reserve(size_t(resolution)*resolution,4*roles.size());
+  std::shared_ptr<PaintedMesh> separate_grid;
+  if (resolution!=replacement.resolution()) {
+    transfer.reserve(1,initial_raster_bytes(resolution));
+    TextureSetLimits limits;
+    limits.cancelled=transfer.cancelled();
+    limits.maximum_work=transfer.remaining_work();
+    separate_grid=empty(replacement.texture_set_domain_,resolution,limits);
+    const auto &stats=separate_grid->surface_diagnostics();
+    transfer.work(stats.raster_samples+stats.candidate_checks);
+  }
+  const auto &surface=*(separate_grid?separate_grid->surface_:replacement.surface_);
+  const auto &old_mesh=from.mesh(), &new_mesh=replacement.mesh();
+  const AffineInteractionFrame previous(transfer.previous_metric()), next(transfer.replacement_metric());
+  const MToonTexture identity;
+  const auto normal_slot=legacy?size_t(MToonSlot::Base):normal;
+  const bool reorient=binding->roles[normal].image && parameters.normal_enabled;
+  const bool check_back=!legacy && (parameters.cull!=MToonCull::Back ||
+      (parameters.outline!=MToonOutline::None && parameters.outline_width>0 &&
+       parameters.outline_cull!=MToonCull::Back));
+  std::vector<RetopoToonDerivative> old_derivatives,new_derivatives;
+  if (reorient) {
+    old_derivatives=retopo_toon_derivatives(old_mesh,previous,RetopoToonUv(material.textures[normal_slot]),transfer);
+    new_derivatives=retopo_toon_derivatives(new_mesh,next,RetopoToonUv(identity),transfer);
+  }
+  auto result=std::make_shared<SourceMaterialBindings>(*binding);
+  std::array<std::shared_ptr<Image>,size_t(MToonSlot::Count)> images;
+  std::array<std::optional<RetopoToonUv>,size_t(MToonSlot::Count)> mappings;
+  for (const auto role:roles) {
+    mappings[role].emplace(material.textures[legacy?size_t(MToonSlot::Base):role]);
+    auto &image=images[role];
+    image=std::make_shared<Image>(blank_image(resolution));
+    result->roles[role].image=image;
+    result->roles[role].wrap_s=result->roles[role].wrap_t=33071;
+    auto &texture=result->material.textures[role];
+    texture.texcoord=0;
+    texture.transform_texcoord=-1;
+    texture.offset={};
+    texture.scale={1,1};
+    texture.rotation=0;
+  }
+  if (legacy) {
+    auto &main=result->material.textures[size_t(MToonSlot::Base)];
+    main.offset={};
+    main.scale={1,1};
+    main.rotation=0;
+  }
+  size_t hits=0;
+  for (size_t index=0;index<surface.texels.size();++index) {
+    if ((index&1023)==0) paint_compute::checkpoint(transfer.cancelled());
+    transfer.work(1+roles.size());
+    const auto &texel=surface.texels[index];
+    if (!texel.covered && surface.padding[index]>=0) continue;
+    const auto hit=texel.covered ? transfer.match(texel.position,texel.normal,from.texture_set_domain_.get()) : std::nullopt;
+    ToonUv uv{};
+    if (hit) {
+      ++hits;
+      for (size_t c=0;c<3;++c) {
+        const auto &corner=old_mesh.uv[old_mesh.indices[size_t(hit->triangle)*3+c]];
+        for (size_t axis=0;axis<2;++axis) uv[axis]+=hit->barycentric[c]*corner[axis];
+      }
+      transfer.work(16*roles.size()+(reorient?48:0));
+    }
+    for (const auto role:roles) {
+      auto value=mtoon_default_texel(MToonSlot(role));
+      const bool srgb=material.textures[role].encoding==MToonEncoding::Srgb;
+      if (hit) {
+        const auto q=mappings[role]->point(uv);
+        value=sample_source_texture(binding->roles[role],q[0],q[1],srgb);
+        if (role==normal && reorient)
+          value=retopo_toon_normal(value,
+              retopo_toon_frame(old_mesh,previous,old_derivatives[hit->triangle],hit->triangle,hit->barycentric),
+              retopo_toon_frame(new_mesh,next,new_derivatives[texel.face],texel.face,
+                  {texel.bary[0],texel.bary[1],1-texel.bary[0]-texel.bary[1]}),
+              parameters.normal_scale,check_back);
+      }
+      for (size_t channel=0;channel<4;++channel)
+        images[role]->rgba[index*4+channel]=byte(srgb&&channel<3?linear_to_srgb(value[channel]):value[channel]);
+    }
+  }
+  if (!hits && !from.texture_set_domain_->triangles().empty() &&
+      !replacement.texture_set_domain_->triangles().empty())
+    throw std::invalid_argument("No matching old surface for the retopology MToon textures");
+  for (size_t index=0;index<surface.texels.size();++index) {
+    if ((index&1023)==0) paint_compute::checkpoint(transfer.cancelled());
+    if (surface.texels[index].covered || surface.padding[index]<0) continue;
+    transfer.work(roles.size());
+    for (const auto role:roles) {
+      auto &pixels=images[role]->rgba;
+      std::copy_n(pixels.begin()+size_t(surface.padding[index])*4,4,pixels.begin()+index*4);
+    }
+  }
+  result->validate();
+  return result;
+}
+
 std::shared_ptr<const detail::BakedNormalField> detail::TextureSetPaintAccess::reproject_retopology_normals(
     const PaintedMesh &from,const SourceMaterialBindings &before,
     const PaintedMesh &replacement,const SourceMaterialBindings &after,RetopoTransfer &transfer) {

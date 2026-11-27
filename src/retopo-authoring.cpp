@@ -16,6 +16,7 @@
 #include "source-skin-link.hpp"
 #include "text-utf8.hpp"
 #include "texture-set-paint-access.hpp"
+#include "texture-set-surface.hpp"
 #include <algorithm>
 #include <bit>
 #include <limits>
@@ -597,9 +598,13 @@ public:
       return reproject_canonical(old_paint,material,old_deformation,*old_material,deformation,projection);
     // Every field of a texture set shares the replacement REST geometry. Its
     // own raster bounds and same-slot source filter preserve material seams.
-    auto fields = old_sets ? reproject_sets(old_paint, *old_sets, projection) : detail::RetopoTextureSets{};
+    const bool typed = old_sets && old_material && old_material->has_mtoon;
+    auto fields = old_sets ? reproject_sets(old_paint, typed ? old_material : nullptr, *old_sets, projection)
+                           : detail::RetopoTextureSets{};
     std::shared_ptr<const PaintedMesh> paint = fields.primary ? std::move(fields.primary) : reproject(old_paint, projection);
-    return {paint, deformation, transfer_patch_material(old_paint, old_material, *paint, deformation, projection),
+    auto binding = typed ? std::move(fields.primary_binding)
+                         : transfer_patch_material(old_paint, old_material, *paint, deformation, projection);
+    return {paint, deformation, std::move(binding),
             std::move(fields.membership)};
   }
 
@@ -622,6 +627,7 @@ private:
   struct ProjectedSets {
     const PaintedMesh *primary;
     const TextureSetCollection *source;
+    const SourceMaterialBindings *binding;
     detail::RetopoTextureSets projected;
   };
   std::vector<ProjectedSets> projected_sets_;
@@ -664,10 +670,11 @@ private:
     return {std::move(paint),deformation,std::move(material_binding),{}};
   }
 
-  detail::RetopoTextureSets reproject_sets(const PaintedMesh &primary, const TextureSetCollection &sets,
+  detail::RetopoTextureSets reproject_sets(const PaintedMesh &primary,
+      const std::shared_ptr<const SourceMaterialBindings> &primary_binding, const TextureSetCollection &sets,
                                            detail::RetopoTransfer &projection) {
     const auto cached = std::ranges::find_if(projected_sets_, [&](const ProjectedSets &entry) {
-      return entry.source == &sets && (entry.primary == &primary ||
+      return entry.source == &sets && entry.binding == primary_binding.get() && (entry.primary == &primary ||
              detail::TextureSetPaintAccess::same_current(primary,*entry.primary));
     });
     if (cached != projected_sets_.end()) return cached->projected;
@@ -705,8 +712,12 @@ private:
       const auto hit = projection.match((a + b + d) / 3.f, cross(b - a,d - a));
       slots.push_back(hit ? existing[hit->triangle] : 0);
     }
-    auto result = detail::project_retopology_texture_sets(primary, sets, first_grid_->mesh_owner(), slots, budget_,
-        [&](const PaintedMesh &source, const std::shared_ptr<const TextureSetFaceDomain> &domain) {
+    auto result = detail::project_retopology_texture_sets(primary, primary_binding, sets,
+        first_grid_->mesh_owner(), slots, budget_, [&](const PaintedMesh &source,
+            const std::shared_ptr<const SourceMaterialBindings> &binding,
+            const std::shared_ptr<const TextureSetFaceDomain> &domain) {
+          if (binding && !detail::native_texture_set_mtoon(&source,nullptr,binding.get()))
+            throw std::invalid_argument("Retopology needs the original texture set's retained material adapter");
           TextureSetLimits limits;
           limits.cancelled = budget_.cancelled();
           limits.maximum_work = budget_.remaining_work();
@@ -715,9 +726,11 @@ private:
           auto output = detail::TextureSetPaintAccess::empty(domain, size, limits);
           charge_raster(*output);
           detail::TextureSetPaintAccess::reproject_retopology(source, *output, projection);
-          return output;
+          if (!binding) return detail::RetopoTextureField{std::move(output),{}};
+          return detail::RetopoTextureField{output,detail::TextureSetPaintAccess::reproject_retopology_mtoon(
+              source,*output,binding,projection)};
         });
-    projected_sets_.push_back({&primary, &sets, result});
+    projected_sets_.push_back({&primary, &sets, primary_binding.get(), result});
     return result;
   }
 
