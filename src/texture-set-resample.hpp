@@ -9,6 +9,8 @@ struct PaintBilinearTap {
 struct FilteredPaintTexel {
   PaintPixel common;
   PaintEmissionValue emission;
+  std::array<uint8_t,4> pbr{};
+  bool pbr_present = false;
 };
 std::array<PaintBilinearTap,4> paint_bilinear_taps(uint32_t resolution,
     std::array<float,2> uv,std::span<const int32_t> padding);

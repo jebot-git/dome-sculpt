@@ -729,6 +729,7 @@ if(BUILD_TESTING)
   target_link_libraries(dome-sculpt-retopo-surface-heat-test PRIVATE dome-sculpt-core)
   foreach(workflow IN ITEMS affine-wire mixed-material material-seam-plain material-seam-affine
                            subdivide-seam-plain subdivide-seam-affine prepared-detached prepared-detached-affine
+                           prepared-color-plain prepared-color-affine
                            mtoon-plain mtoon-affine mtoon-v0 mtoon-detached)
     add_test(NAME retopology-${workflow} COMMAND dome-sculpt-retopo-surface-heat-test
       ${CMAKE_CURRENT_BINARY_DIR}/retopology-${workflow} ${workflow})

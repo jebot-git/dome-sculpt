@@ -14,6 +14,7 @@
 #include "affine-interaction.hpp"
 #include "baked-normal-field.hpp"
 #include "source-bake-normal.hpp"
+#include "source-color-fixtures.hpp"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -757,6 +758,155 @@ void prepared_geometry_edit(bool affine,const std::filesystem::path &out,bool de
         "A changed patch whose Bake was cleared retains its new prepared frame and stays unbaked");
 }
 
+void prepared_color_edit(bool affine,const std::filesystem::path &out) {
+  auto scene = author_patch(affine,out);
+  const auto previous = scene.active().id;
+  const auto guide = scene.active().retopology->source;
+  auto donor = source_color_fixture::model(false,false).active();
+  donor.id = guide;
+  donor.visible = false;
+  donor.affine_edit = scene.object(guide).affine_edit;
+  scene.object(guide) = std::move(donor);
+  scene.active().painted->clear_bake();
+  scene.active().painted->add_layer("Independent painted color");
+  const auto layer_id = scene.active().painted->active_layer();
+
+  Document document;
+  document.replace(scene);
+  settled(document);
+  ObjectBakeSettings settings;
+  settings.front_mm = settings.back_mm = 35;
+  settings.ao_samples = 0;
+  settings.allow_backfaces = true;
+  settings.prepare_colors = true;
+  document.bake_from_object(guide,settings);
+  settled(document);
+  const auto raw = document.copy_scene();
+  const auto recipe = raw.active().material_bindings->color_preparation;
+  const auto &bake = raw.active().painted->baked();
+  check(recipe && recipe->receipt.source_field==SourceColorField::Identity && bake &&
+        bake->color_interpretation==BakedColorInterpretation::ResolvedPbr &&
+        bake->maps.color.rgba!=bake->maps.pbr_color.rgba,
+        "Bake from original COLOR_0 produces truly different common and PBR pixels on the native patch");
+
+  auto painted = raw.snapshot();
+  auto &paint = *painted.active().painted;
+  const auto &mesh = paint.mesh();
+  const Vec3 center = (mesh.positions[mesh.indices[0]] + mesh.positions[mesh.indices[1]] +
+                       mesh.positions[mesh.indices[2]]) / 3.f;
+  PaintSettings ink;
+  ink.color = {.72f,.09f,.17f,.8f};
+  ink.front_only = false;
+  Brush brush;
+  brush.from = brush.to = center;
+  brush.radius = .18f;
+  brush.normal = {0,0,1};
+  brush.strength = 1;
+  paint.begin_stroke();
+  paint.stamp(brush,ink);
+  check(paint.end_stroke(), "The prepared patch has an actual writable color layer");
+  paint.layer_properties("Independent painted color",false,.625f);
+  auto input = painted.encode();
+  // Give the hidden layer a distinct resolved payload in a valid native file.
+  // The opaque and RGB contributions remain independent of shared coverage.
+  auto &objects = input.at("objects");
+  auto object = std::ranges::find_if(objects,[&](const auto &o){return o.at("id")==previous;});
+  auto &layer = object->at("painted").at("layers").back();
+  for (auto &tile : layer.at("pbr_color_tiles")) {
+    auto &bytes = tile.at("data").get_binary();
+    for (size_t p=0;p<bytes.size();p+=4) {
+      if (bytes[p+3]==0) continue;
+      bytes[p] = 41;
+      bytes[p+2] = 216;
+      bytes[p+3] = 109;
+    }
+  }
+  const auto before = Scene::decode(input);
+  before.save(out/"color-before.dsculpt");
+  document.replace(before);
+  settled(document);
+  std::shared_ptr<const RetopoView> draft;
+  if (affine) draft = relocate_patch(document,before,{.72f,0,0},true);
+  else {
+    draft = move_patch(document,false);
+    document.end_retopology(true);
+  }
+  document.save_async(out/"color-after.dsculpt").get();
+  settled(document);
+  const auto after = document.copy_scene();
+  const auto &patch = after.active();
+  const auto projection = patch.material_bindings ? patch.material_bindings->color_preparation : nullptr;
+  const auto &new_paint = *patch.painted;
+  check(patch.id!=previous && !after.object(previous).visible &&
+        after.object(previous).material_bindings==before.active().material_bindings &&
+        after.object(previous).painted->baked()==before.active().painted->baked() &&
+        projection && projection->projection!=before.active().material_bindings->color_preparation->projection &&
+        projection->original_paint->mesh_owner()==new_paint.mesh_owner() &&
+        projection->receipt.accepted_projection_error==recipe->receipt.accepted_projection_error,
+        "Apply keeps the previous patch and certifies the identity field in the replacement atlas");
+  check(bool(new_paint.baked()), "The new prepared patch has an actual Bake payload");
+  const auto &resolved = *new_paint.baked();
+  const auto &hidden = new_paint.layers().back();
+  check(hidden.id==layer_id && !hidden.visible && hidden.opacity==.625f && new_paint.active_layer()==layer_id,
+        "Layer visibility, opacity and active ID survive color transport");
+  size_t covered=0, independent_bake=0, independent_layer=0;
+  const auto size = new_paint.resolution();
+  for (uint32_t y=0;y<size;++y) for (uint32_t x=0;x<size;++x) {
+    const auto at = size_t(y)*size + x;
+    if (resolved.coverage[at]>240) {
+      ++covered;
+      independent_bake += int(resolved.maps.color.rgba[at*4+3])-resolved.maps.pbr_color.rgba[at*4+3]>25;
+    }
+    const auto &common = new_paint.pixel(layer_id,x,y).data;
+    const auto pbr = new_paint.pbr_pixel(layer_id,x,y);
+    independent_layer += common[9]>190 && common[0]>190 && pbr[0]==41 && pbr[2]==216 && pbr[3]==109;
+  }
+  std::cout << "RESOLVED_COLOR covered=" << covered << " independent_bake=" << independent_bake
+            << " independent_layer=" << independent_layer << '\n';
+  check(covered>1000 && independent_bake>1000 && independent_layer>100,
+        "Replacement coverage retains both independently sampled Bake colors and the hidden editable PBR tile data");
+  const auto encoded = after.encode();
+  check(Scene::load(out/"color-after.dsculpt").encode()==encoded && document.undo() &&
+        document.copy_scene().encode()==before.encode() && document.redo() && document.copy_scene().encode()==encoded,
+        "Ordered Save, cold replay and one Undo/Redo preserve both complete authoring states");
+  settled(document);
+  document.export_asset(out/"color-editable.glb",AssetExportFormat::EditableGlb256).get();
+  std::ifstream file(out/"color-editable.glb",std::ios::binary);
+  const std::vector<uint8_t> portable{std::istreambuf_iterator<char>(file),{}};
+  const auto reopened = extract_native_authoring(portable);
+  check(reopened && reopened->encode()==encoded,
+        "Editable GLB independently reopens the projected PBR Bake and layer owners");
+  document.export_asset(out/"color-standard.glb",AssetExportFormat::Glb).get();
+  ImportLimits limits;
+  limits.mode = ImportMode::PreserveGltf;
+  const auto standard = import_mesh(out/"color-standard.glb",limits);
+  check(standard.primitives.size()==1 && standard.primitives.front().colors.empty(),
+        "Standard GLB emits the revised patch without a second vertex-color multiplier");
+  const auto texture = standard.materials.at(standard.primitives.front().material).color_texture;
+  const auto image = standard.textures.at(size_t(texture)).image;
+  const auto exported = decode_projection_png(standard.images.at(size_t(image)).bytes);
+  const auto composited = new_paint.composite(patch.material);
+  check(exported.width==composited->pbr_color.width && exported.height==composited->pbr_color.height &&
+        exported.rgba==composited->pbr_color.rgba && exported.rgba!=composited->color.rgba,
+        "An independent GLB read gets the exact resolved PBR texture from the new atlas");
+
+  // This render control varies only the resolved Bake, keeping geometry,
+  // common paint, material and coverage fixed across both stereo draws.
+  auto control = after.snapshot();
+  auto fallback = resolved;
+  fallback.maps.pbr_color = fallback.maps.color;
+  control.active().painted->clear_bake();
+  control.active().painted->install_bake(std::move(fallback));
+  control.save(out/"color-common-control.dsculpt");
+
+  auto cleared = before.snapshot();
+  cleared.active().painted->clear_bake();
+  publish_retopology(cleared,*draft->topology,guide,draft->transform);
+  check(!cleared.active().painted->baked() && cleared.active().painted->color_projection() &&
+        cleared.active().painted->layers().back().id==layer_id,
+        "A cleared Bake stays cleared while the prepared editable color remains available");
+}
+
 void mixed_material_quad(const std::filesystem::path &out) {
   auto scene = reference(false);
   const auto donor = scene.active().id;
@@ -1473,6 +1623,7 @@ int main(int argc,char **argv) try {
       mode!="mtoon-plain" && mode!="mtoon-affine" && mode!="mtoon-v0" && mode!="mtoon-detached" &&
       mode!="reapply-plain" && mode!="reapply-affine" && mode!="prepared-plain" && mode!="prepared-affine" &&
       mode!="prepared-detached" && mode!="prepared-detached-affine" &&
+      mode!="prepared-color-plain" && mode!="prepared-color-affine" &&
       mode!="restore-plain" && mode!="restore-affine" && mode!="material-seam-plain" &&
       mode!="material-seam-affine" && mode!="subdivide-seam-plain" && mode!="subdivide-seam-affine") return 2;
   const std::filesystem::path out = argv[1];
@@ -1485,6 +1636,7 @@ int main(int argc,char **argv) try {
   else if (mode.starts_with("material-seam-")) split_material_seam(mode.ends_with("affine"),out);
   else if (mode.starts_with("subdivide-seam-")) split_material_seam(mode.ends_with("affine"),out,true);
   else if (mode.starts_with("mtoon-")) retopo_toon_materials(mode.ends_with("affine"),mode.ends_with("v0"),out,mode=="mtoon-detached");
+  else if (mode.starts_with("prepared-color-")) prepared_color_edit(mode.ends_with("affine"),out);
   else if (mode.starts_with("prepared-")) prepared_geometry_edit(mode.ends_with("affine"),out,mode.starts_with("prepared-detached"));
   else if (mode.starts_with("reapply-")) reapply_patch(mode.ends_with("affine"),out);
   else bind_patch(mode=="affine",out);

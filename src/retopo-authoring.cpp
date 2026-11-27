@@ -735,6 +735,8 @@ public:
     }
     if (old_material && old_material->canonical_attributes && !old_sets)
       return reproject_canonical(old_paint,material,old_deformation,*old_material,deformation,projection);
+    if (old_material && old_material->color_preparation && !old_sets)
+      return reproject_color(old_paint,material,*old_material,deformation,projection);
     // Every field of a texture set shares the replacement REST geometry. Its
     // own raster bounds and same-slot source filter preserve material seams.
     const bool typed = old_sets && old_material && old_material->has_mtoon;
@@ -771,6 +773,40 @@ private:
     detail::RetopoTextureSets projected;
   };
   std::vector<ProjectedSets> projected_sets_;
+
+  State reproject_color(const PaintedMesh &before,const Material &material,
+      const SourceMaterialBindings &binding,
+      const std::shared_ptr<const DeformationState> &deformation,detail::RetopoTransfer &projection) {
+    const auto &recipe = *binding.color_preparation;
+    if (recipe.receipt.source_field != SourceColorField::Identity || recipe.paint_sampling ||
+        recipe.uv_reprojection || before.source_maps() || before.source_sampling_prepared())
+      throw std::invalid_argument("Retopology needs native prepared color with its original identity field");
+    detail::source_paint_pairing(&before,&binding,nullptr,false);
+    budget_.work(recipe.projection->quality_cells);
+    recipe.validate_current(before.mesh(),nullptr,budget_.cancelled());
+    const auto &grid = grid_for(before.resolution());
+    const auto pixels = size_t(grid->resolution()) * grid->resolution();
+    budget_.reserve(pixels,4);
+    budget_.reserve(grid->mesh().positions.size(),sizeof(std::array<float,4>));
+
+    // Certify the new atlas's unpainted identity field. The separate paint and
+    // Bake roles are subsequently transported as live edits on that field.
+    auto raw_binding = std::make_shared<SourceMaterialBindings>(binding);
+    raw_binding->color_preparation.reset();
+    auto rebound = transfer_patch_material(before,raw_binding,*grid,deformation,projection);
+    ColorPreparationOptions options;
+    options.resolve_identity = true;
+    options.max_projection_error = recipe.receipt.accepted_projection_error;
+    options.max_working_bytes = budget_.remaining_bytes();
+    options.max_quality_cells = std::min(options.max_quality_cells,uint64_t(budget_.remaining_work()));
+    options.max_probe_samples = std::min(options.max_probe_samples,uint64_t(budget_.remaining_work()));
+    options.cancelled = budget_.cancelled();
+    auto output = prepare_source_colors({grid,{},rebound,deformation,material,{}},options);
+    const auto &receipt = output.material_bindings->color_preparation->receipt;
+    budget_.work(receipt.tested_quality_cells + receipt.probe_samples);
+    detail::TextureSetPaintAccess::reproject_retopology(before,*output.paint,projection);
+    return {std::move(output.paint),deformation,std::move(output.material_bindings),{}};
+  }
 
   State reproject_canonical(const PaintedMesh &before,const Material &material,
       const std::shared_ptr<const DeformationState> &old_deformation,const SourceMaterialBindings &binding,
@@ -897,7 +933,13 @@ private:
       return entry.source == &source || detail::TextureSetPaintAccess::same_current(*entry.source,source);
     });
     if (existing != paints_.end()) return existing->projected;
-    const auto resolution = source.resolution();
+    auto output = grid_for(source.resolution())->snapshot();
+    detail::TextureSetPaintAccess::reproject_retopology(source, *output, projection,prepared_normals);
+    paints_.push_back({&source, output});
+    return output;
+  }
+
+  const std::shared_ptr<const PaintedMesh> &grid_for(uint32_t resolution) {
     auto &grid = grids_[resolution];
     if (!grid) {
       budget_.reserve(1, detail::TextureSetPaintAccess::working_bytes(*first_grid_, resolution));
@@ -907,10 +949,7 @@ private:
       grid = detail::TextureSetPaintAccess::resize_unpainted(*first_grid_, resolution, limits);
       charge_raster(*grid);
     }
-    auto output = grid->snapshot();
-    detail::TextureSetPaintAccess::reproject_retopology(source, *output, projection,prepared_normals);
-    paints_.push_back({&source, output});
-    return output;
+    return grid;
   }
 };
 

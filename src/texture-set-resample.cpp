@@ -568,7 +568,12 @@ FilteredPaintTexel filter_paint_layer(const PaintLayer &layer,uint32_t resolutio
     for(const auto &tap:taps)
       if(tap.weight!=0)sample(uint32_t(tap.texel%resolution),uint32_t(tap.texel/resolution),tap.weight);
   });
-  return {source.common,source.emission};
+  FilteredPaintTexel result{source.common,source.emission};
+  result.pbr_present = source.pbr_present;
+  if (!layer.pbr_tiles.empty())
+    for (size_t k = 0; k < result.pbr.size(); ++k)
+      result.pbr[k] = byte(k < 3 ? encoded(source.pbr[k]) : source.pbr[k]);
+  return result;
 }
 
 std::vector<PaintLayer> resample_texture_set_layers(

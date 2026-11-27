@@ -3077,14 +3077,16 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
       throw std::invalid_argument("Retopology paint lost its owning material geometry");
   }
   if (from.in_stroke() || from.source_maps_ || (from.sampling_attachment_ && !prepared_normals) ||
-      from.color_projection_ || from.normal_projection_ ||
+      bool(from.color_projection_) != bool(replacement.color_projection_) || from.normal_projection_ ||
       from.surface_->options.policy != PaintUvPolicy::Strict)
     throw std::invalid_argument("Retopology cannot reproject this retained material grid yet");
+  const bool resolved_color = bool(replacement.color_projection_);
   const auto bake = from.baked_;
   if (bake && (bake->normal_authority || bool(bake->normal_field)!=prepared_normals ||
       bake->normal_interpretation != (prepared_normals?BakedNormalInterpretation::PreparedAttributes:
                                        BakedNormalInterpretation::CanonicalMikk) ||
-      bake->color_interpretation != BakedColorInterpretation::VertexComponent))
+      bake->color_interpretation != (resolved_color ? BakedColorInterpretation::ResolvedPbr :
+                                                     BakedColorInterpretation::VertexComponent)))
     throw std::invalid_argument("Retopology cannot reproject this baked material interpretation yet");
   std::vector<std::array<float,2>> writable_coordinates;
   if (const auto domain=from.paint_sampling_domain()) {
@@ -3102,8 +3104,9 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
   const auto texels = surface.texels.size();
   const auto tile_slots = surface.tiles.size();
   const auto resolution = surface.resolution;
-  transfer.reserve(from.layers_.size(), sizeof(PaintLayer) + 4 * tile_slots * sizeof(std::shared_ptr<const PaintTile>));
-  if (from.revision_ == UINT64_MAX) throw std::overflow_error("Paint revision exhausted");
+  transfer.reserve(from.layers_.size(), sizeof(PaintLayer) +
+      (resolved_color ? 6 : 4) * tile_slots * sizeof(std::shared_ptr<const PaintTile>));
+  if (from.revision_ >= UINT64_MAX - bool(bake)) throw std::overflow_error("Paint revision exhausted");
   replacement.composite_cache_ = std::make_shared<PaintedMesh::CompositeCache>();
   replacement.composite_token_ = next_composite_token();
   replacement.active_ = from.active_;
@@ -3116,15 +3119,16 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
     size_t slot;
     std::vector<std::shared_ptr<PaintTile>> common;
     std::vector<std::shared_ptr<PaintEmissionTile>> emission;
+    std::vector<std::shared_ptr<PaintColorTile>> pbr;
   };
   std::vector<WritableLayer> writable;
   for (size_t slot = 0; slot < from.layers_.size(); ++slot) {
     const auto &layer = from.layers_[slot];
     replacement.layers_.push_back({layer.id, layer.name, layer.visible, layer.opacity,
                                    std::vector<std::shared_ptr<const PaintTile>>(tile_slots), {}, {}});
-    if (color_tile_count(layer)) throw std::invalid_argument("Retopology needs the prepared PBR color owner");
+    if (resolved_color) replacement.layers_.back().pbr_tiles.resize(tile_slots);
     if (tile_count(layer) || emission_tile_count(layer)) {
-      writable.push_back({slot, {}, {}});
+      writable.push_back({slot, {}, {}, {}});
       writable.back().common.resize(tile_slots);
     }
   }
@@ -3133,16 +3137,20 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
   std::optional<BakedTextures> baked;
   std::vector<BakedEmissionSample> float_bake;
   std::vector<Tangent> source_tangents, target_tangents;
-  size_t layer_bytes = 0;
+  size_t layer_bytes = resolved_color ? replacement.color_projection_->vertex_rgba->rgba.size() : 0;
   constexpr size_t paint_limit = 128 * 1024 * 1024;
   if (bake) {
     const bool normals = !bake->maps.normal.rgba.empty();
-    transfer.reserve(texels, 13 + ((normals || prepared_normals) ? 4 : 0));
+    transfer.reserve(texels, 13 + ((normals || prepared_normals) ? 4 : 0) + (resolved_color ? 4 : 0));
     baked.emplace();
     baked->coverage.resize(texels);
     baked->maps.color = blank_image(resolution);
     baked->maps.metal_rough = blank_image(resolution);
     baked->maps.emission = blank_image(resolution);
+    if (resolved_color) {
+      baked->color_interpretation = BakedColorInterpretation::ResolvedPbr;
+      baked->maps.pbr_color = blank_image(resolution);
+    }
     if (prepared_normals) baked->maps.normal = blank_image(resolution,true);
     if (normals) {
       transfer.reserve(from.mesh().indices.size() + replacement.mesh().indices.size(), 4 * sizeof(Tangent));
@@ -3184,9 +3192,10 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
         uv[axis] += value[axis] * hit->barycentric[corner];
     }
     const auto taps = paint_bilinear_taps(from.resolution(), uv, from.surface_->padding);
-    transfer.work(32 + 128 * writable.size());
+    transfer.work((resolved_color ? 48 : 32) + 128 * writable.size());
     if (bake) {
       BakedPixel values{};
+      std::array<float,4> pbr{};
       float coverage = 0;
       for (const auto &tap : taps) {
         const auto weight = float(tap.weight);
@@ -3194,6 +3203,11 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
         if (alpha > 0) {
           const auto sample = baked_pixel(*bake, tap.texel);
           for (size_t i = 0; i < values.size(); ++i) values[i] += sample[i] * alpha;
+          if (resolved_color)
+            for (size_t k = 0; k < pbr.size(); ++k) {
+              const auto color = unit(bake->maps.pbr_color.rgba[tap.texel * 4 + k]);
+              pbr[k] += (k < 3 ? srgb_to_linear(color) : color) * alpha;
+            }
           coverage += alpha;
         }
         if (!float_bake.empty() && weight > 0) {
@@ -3227,6 +3241,11 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
         }
         baked->coverage[at] = byte(coverage);
         baked_pixel(*baked, at, values);
+        if (resolved_color)
+          for (size_t k = 0; k < pbr.size(); ++k) {
+            const auto value = pbr[k] / coverage;
+            baked->maps.pbr_color.rgba[at * 4 + k] = byte(k < 3 ? linear_to_srgb(value) : value);
+          }
       }
     }
     const auto x = at % resolution, y = at / resolution;
@@ -3243,7 +3262,7 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
         for (size_t k = 0; k < 3; ++k)
           sample.common.data[6 + k] = byte(linear_to_srgb(sample.emission.legacy[k]));
       }
-      if (sample.common == PaintPixel{} && !emission) continue;
+      if (sample.common == PaintPixel{} && !emission && !sample.pbr_present) continue;
       auto &dest = replacement.layers_[layer.slot];
       auto &common = layer.common[tile];
       allocate_tile(common);
@@ -3255,12 +3274,23 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
         layer.emission[tile]->pixels[pixel] = sample.emission;
         dest.emission_tiles[tile] = layer.emission[tile];
       }
+      if (resolved_color) {
+        // A tile is authoritative for all its pixels, including neighbors
+        // sampled from common-only tiles. The filter supplies their fallback.
+        if (layer.pbr.empty()) layer.pbr.resize(tile_slots);
+        auto &pbr = layer.pbr[tile];
+        allocate_tile(pbr);
+        dest.pbr_tiles[tile] = pbr;
+        pbr->pixels[pixel] = sample.pbr;
+      }
     }
   }
   if (!hits && (!old_domain || (!old_domain->triangles().empty() && !new_domain->triangles().empty())))
     throw std::invalid_argument("No matching old surface for the retopology paint or Bake");
-  for (const auto &layer : replacement.layers_)
+  for (const auto &layer : replacement.layers_) {
     replacement.allocated_tiles_ += tile_count(layer);
+    replacement.allocated_color_tiles_ += color_tile_count(layer);
+  }
   if (baked) {
     if (!float_bake.empty()) {
       const auto other = layer_bytes + baked->storage_bytes() - baked->maps.emission.rgba.size();
