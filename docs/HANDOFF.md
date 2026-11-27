@@ -2327,6 +2327,29 @@ coordinates, typed Bake/resampling, matched Wayland, and physical XR
 remain open.
 [Native MToon validation](validation/native-mtoon-texture-sets-20261127.json)
 
+### Portable MToon 1.0 on unpainted texture sets
+
+The next export checkpoint writes `VRMC_materials_mtoon` for unpainted
+native UV0 MToon 1.0 sets in Standard and Editable GLB. It preserves
+authored alpha, toon factors, UV animation and per-role image bytes,
+samplers and transforms. The adjacent PBR primitive, shared geometry,
+rig and morphs retain their own data. Painted MToon remains editable
+through the exact native data in Editable GLB. The visible fallback
+identifies that embedded material. Standard GLB refuses unsupported
+painted composition before replacing an existing file.
+
+Release and ASan/UBSan each pass 187 export checks. Four exported
+files match byte for byte across profiles. The independent cgltf
+consumer validates the shared rig and morphs. The Khronos validator
+reports zero errors. The unrigged MToon fixture has zero warnings.
+The rigged outputs retain the existing non-root skinned mesh warning
+from the PBR control. Each of the three typed outputs passes the
+pinned MToon schema, including independent missing-index and
+wrong-coordinate-type controls. Larger retained and painted typed
+fields, alternate coordinates, VRM output and full device
+qualification remain open.
+[Portable MToon validation](validation/portable-mtoon-texture-sets-20261127.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete

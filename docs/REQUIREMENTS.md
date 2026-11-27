@@ -175,10 +175,16 @@ material to the chosen field. Native preview, alpha-aware picking and
 desktop painting use that field's UV0, role images and samplers. Scene40
 reopen, Undo/Redo and Editable GLB preserve the exact authoring state.
 The focused Release and ASan/UBSan suites, the Arc render fixture and an
-actual FLTK dialog replay pass. Typed portable GLB and VRM materials,
-original artist frames, alternate UVs, typed Bake and resampling, and
-physical-device verification remain open.
+actual FLTK dialog replay pass. Standard and Editable GLB now emit
+unpainted UV0 MToon 1.0 fields directly, including original role images,
+samplers, transforms, alpha and animation. Editable GLB retains exact
+painted authoring data. Standard export refuses a painted typed material
+whose portable composition is unsupported and preserves the previous
+destination file. Painted portable MToon and VRM materials, original
+artist frames, alternate UVs, typed Bake and resampling, and physical
+verification remain open.
 [Native MToon texture-set evidence](validation/native-mtoon-texture-sets-20261127.json)
+[Portable MToon texture-set evidence](validation/portable-mtoon-texture-sets-20261127.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge

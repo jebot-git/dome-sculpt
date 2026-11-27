@@ -1,0 +1,53 @@
+{
+  "product": "e0e3bc8e4bae32a7814fab5905f16bf62d2d1948",
+  "parent": "3bb26544b562d6988c94762b72b2bbcee6ec679d",
+  "scope": "Standard and Editable GLB material interchange for unpainted resolved MToon 1.0 UV0 sets with original animated base and shade roles on a mixed native PBR mesh. Unrigged and rigged fixtures.",
+  "checks_per_profile": 187,
+  "terminal_success_invocations": {
+    "release": "4b1e07087885461cbebdbc0fdf1c7441",
+    "asan": "f45b7db62134488187e1b0bbfac9c910"
+  },
+  "application_sha256": {
+    "release": "558766963980d308c2cbc19b5d642d4bdf9afe8eb09db4e2a02d7846cb05711d",
+    "asan": "565ac32aaae01d6e8283a6eb5d377948eb52f39923ac022a2ea6d1fa69ea39f5"
+  },
+  "asset_sha256": {
+    "mtoon-static.glb": {
+      "release": "8d2deac83f68fde4afe8efc7fdafb98b7eb2f449116aa8403dd7b6117a7fe686",
+      "asan": "8d2deac83f68fde4afe8efc7fdafb98b7eb2f449116aa8403dd7b6117a7fe686"
+    },
+    "mtoon-standard.glb": {
+      "release": "799cb659cadd10ffc3e46b11404f3548d9fbecfcb52d71b2d13eb295587d9c44",
+      "asan": "799cb659cadd10ffc3e46b11404f3548d9fbecfcb52d71b2d13eb295587d9c44"
+    },
+    "mtoon-editable.glb": {
+      "release": "8328f3fde0f6512e493a2e766b0e7e0b658042b3db8f9f508dde07040ac0bc20",
+      "asan": "8328f3fde0f6512e493a2e766b0e7e0b658042b3db8f9f508dde07040ac0bc20"
+    },
+    "mtoon-painted-editable.glb": {
+      "release": "3fe9cfad62964be6846003c1d425ea69473e2ffd842835966927a70c74ecd7c3",
+      "asan": "3fe9cfad62964be6846003c1d425ea69473e2ffd842835966927a70c74ecd7c3"
+    }
+  },
+  "khronos_version": "2.0.0-dev.3.10",
+  "khronos_qualification": "Zero errors across all five files. The unrigged MToon file has zero warnings. All rigged files, including the plain PBR control, retain the existing NODE_SKINNED_MESH_NON_ROOT warning.",
+  "pinned_mtoon_schema": "Three typed materials and two negative resolver controls pass with zero errors. Unchanged cached Draft4/2020 schemas.",
+  "painted_policy": "Standard GLB reports an unsupported portable composition and preserves the existing destination. Editable GLB preserves exact authoring data and identifies its core fallback.",
+  "archive": {
+    "name": "portable-mtoon-texture-sets-20261127.tar.gz",
+    "sha256": "d88a884b267b371d44a46b0308edfce36dc89953ef66fc572f9aca989736b7e7",
+    "files": {
+      "asan/app-version.log": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b",
+      "asan/runtime.log": "cce23709eb7ef9fcc53b5d6b9b49afb9b4ca7ddcf4a77ee1ef2b827483e0b18e",
+      "khronos/mtoon-editable.glb.json": "a1682a2545443b0c5ad2f25000773f4a694e94201c8306c69048618124443748",
+      "khronos/mtoon-painted-editable.glb.json": "4adf86e17dfc9916d2617b8a51047b5bd38ecf1929a6a6153ed7544a554ea7aa",
+      "khronos/mtoon-standard.glb.json": "e356c28c712b616a16ee25efaa6e0da0644a0508b3af210a062e9f5ca9b9d775",
+      "khronos/mtoon-static.glb.json": "9aff2d3bf9f433ecabd990db75f5095ed4fded08222999980ea868ac630f62d6",
+      "khronos/portable.glb.json": "153d34ae03b0d966f902ce19cab9a53dbfb4f472731a584edc5ff70a198822eb",
+      "khronos/summary.jsonl": "ef58909e8d1bbbcb9714426cc84446f768d232879292ac172e7d9ebb754bab01",
+      "mtoon-schemas.json": "52695408d3fcf299de31c94691f4237c856b30950fb8e2e2ed47a6fd9f295c7a",
+      "release/app-version.log": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b",
+      "release/runtime.log": "4d0f2f0f25330251bb9a6b827102fdff4a99e3a6e17644a297fa2e2b30bd229d"
+    }
+  }
+}
