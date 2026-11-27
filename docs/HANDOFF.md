@@ -43,8 +43,12 @@ independent-corner calculation reopen and resave byte for byte. Their old
 targets stay exact when a new key is edited. The focused Release suite, 77
 independent graphical checks on Intel Arc A770, and the synthetic OpenXR
 accept, cancel and focus workflows pass. All seven selected tests also passed
-in the exact-source ASan/UBSan build. The full Release rerun of `2d171233` uses
-`ds-post-uv-artist-combined-release-20261127.service`.
+in the exact-source ASan/UBSan build. The full Release rerun of `2d171233`
+finished with 1,369 passes, two failures and four skipped dependents. The
+resolution host test passed its isolated retry. The canonical ownership
+fixture was updated to check the actual ownership budget. All nine tests in
+the later focused run passed, including both regressions and the skipped
+archive dependents.
 [Artist-normal validation](validation/post-uv-artist-normal-20261127.json)
 
 Bake now projects between active shapekey poses on retained PBR material
@@ -111,7 +115,7 @@ field samples its own material slot. Rig and Shape Restore preserve the
 replacement patch, and a restored linked shape follows the avatar's live
 pose. Both VRM output modes emit the original humanoid joints. Editable VRM
 also keeps the hidden guide needed to reopen the retopology workspace.
-Prepared and retained-source material grids still need a transfer adapter.
+Prepared texture sets and imported material grids still need a transfer adapter.
 The 21 selected Release tests cover the linked workflow and related
 authoring, Bake recipe, and worker regressions. Three focused ASan/UBSan
 tests pass, and both profiles produce the same six project and export files
@@ -131,12 +135,29 @@ shading through reflection and shear. When a mixed-material quad changes
 shape, surviving triangles keep their material slots by stable corner
 identity even if their centres cross the previous seam. A changed diagonal
 that crosses two existing slots requires an explicit material boundary.
-Reprojection of prepared material grids onto changed face geometry remains open.
 All 13 focused Release tests and four ASan/UBSan workflows pass. The three
 native verification files match across both profiles. Synthetic OpenXR
 reopens the prepared project with identical before and after RGB in both
 eyes on llvmpipe and Intel Arc A770.
 [Affine and material-corner validation](validation/retopology-prepared-affine-20261127.json)
+
+Geometry-changing retopology now transfers native single-material prepared
+normal fields. The worker uses the original placed tangent frame and
+rebuilds the frame on the replacement. It samples the PBR and toon normal
+images in their original coordinates, including across a retained UV edit.
+The normal transfer uses its own coverage. Colour, roughness, emission and
+editable paint layers follow the writable grid. The old patch holds its
+original authoring state and the replacement has a replayable prepared bake
+on its new atlas. An already cleared Bake stays cleared after Apply.
+Prepared imported material sets and typed MToon reprojection remain open.
+All 19 selected Release tests and four ASan/UBSan workflows pass. The six
+native project and Editable GLB files match across both builds. The two
+fixtures compare 5,651 placed
+texels, including 2,739 where material coverage is zero. The maximum
+direction-vector error is 0.00672. Both Editable GLBs pass Khronos validation
+with zero errors and warnings. Synthetic OpenXR reopens and renders the
+changed prepared patch on llvmpipe and Intel Arc A770.
+[Prepared geometry validation](validation/retopology-prepared-reproject-20261127.json)
 
 Surface Heat also binds meshes after independent frame and shapekey
 authoring. Retention accounts for the actual POSITION correspondences,

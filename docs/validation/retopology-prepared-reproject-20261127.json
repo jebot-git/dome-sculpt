@@ -1,0 +1,124 @@
+{
+  "revision": "9acf90d9c35f3ed9d24f88bf68ff5de463cf77f8",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "release_fltk": "/opt/fltk-vr/toolkit",
+  "asan_fltk": "artifacts/sdk-20261126/toolkit-sanitize",
+  "release_tests": [
+    "authoring-native-normal-union",
+    "layered-normal-native",
+    "layered-normal-uv-native",
+    "native-paint32-fixture",
+    "retopology-affine",
+    "retopology-affine-wire",
+    "retopology-authoring",
+    "retopology-linked-vrm1",
+    "retopology-mixed-material",
+    "retopology-prepared-affine",
+    "retopology-prepared-plain",
+    "retopology-reapply-affine",
+    "retopology-reapply-plain",
+    "retopology-restore-affine",
+    "retopology-restore-plain",
+    "retopology-save-handoff",
+    "retopology-surface-heat-affine",
+    "retopology-surface-heat-plain",
+    "retopology-worker-faults"
+  ],
+  "asan_ubsan_workflows": [
+    "prepared-plain",
+    "prepared-affine",
+    "reapply-affine",
+    "restore-affine"
+  ],
+  "asan_ubsan_method": "Compiled changed core translation units and the final public worker fixture with the generated ASan/UBSan CMake commands and relinked using the matching core archive",
+  "sampled_world_direction_error": {
+    "plain": {
+      "interior_texels": 2930,
+      "normal_only_texels": 1407,
+      "max_direction_vector_error": 0.00596964
+    },
+    "affine": {
+      "interior_texels": 2721,
+      "normal_only_texels": 1332,
+      "max_direction_vector_error": 0.00671812
+    }
+  },
+  "release_and_asan_exact_sha256": {
+    "retopology-prepared-plain/prepared-before.dsculpt": "3795a3d7013ff45b33dd37abbb8f7e9bc1e86c177ebadd31c3cf8c8ccf838634",
+    "retopology-prepared-plain/prepared-reapplied.dsculpt": "bf588a3d0c855e19c0e3d138f16431474b03a5182f65b82864e67083124fae13",
+    "retopology-prepared-plain/prepared-editable.glb": "e15489fcdcc9bffbb3bad77dfa10ef0fd48ba3cc27896a2140db58c1790cd9ff",
+    "retopology-prepared-affine/prepared-before.dsculpt": "67a65d9115a35a07d6f0f15809834a463ffd7cee0eda3d2580360870050b87b7",
+    "retopology-prepared-affine/prepared-reapplied.dsculpt": "6a2459d7e9f57ac9f30b268923c58d3d00f5648135f0282e3721057ced31b0a1",
+    "retopology-prepared-affine/prepared-editable.glb": "8db984fc6ae505b376688c383acc71a63beb0abd9a9008ac2340c4c00a58ce37"
+  },
+  "release_app_sha256": "3075b2b4dbb6f422d133c3e3339bddac67ac427e8f81c5cd3fde3e165a4ea9ff",
+  "asan_fixture_sha256": "bee8cd32c0fe2f1ff972b94e26629791fe6b71a8a7457467319e4454a408cb1c",
+  "khronos_editable_glb": {
+    "plain": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "affine": {
+      "errors": 0,
+      "warnings": 0
+    }
+  },
+  "synthetic_stereo_openxr": {
+    "arc": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "changed_rgb_components_per_eye": [
+        14405,
+        13779
+      ],
+      "stereo_submissions_per_project": [
+        6,
+        6
+      ],
+      "exact_native_reopen": true
+    },
+    "software": {
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "changed_rgb_components_per_eye": [
+        14183,
+        13897
+      ],
+      "stereo_submissions_per_project": [
+        6,
+        6
+      ],
+      "exact_native_reopen": true
+    }
+  },
+  "physical_headset": false,
+  "older_combined_regression": {
+    "pass": 1369,
+    "fail": 2,
+    "skip": 4
+  },
+  "older_combined_followup_tests": [
+    "authoring-native-normal-union",
+    "authoring-union-archive-0",
+    "authoring-union-archive-2",
+    "authoring-union-archive-4",
+    "authoring-union-archive-6",
+    "layered-normal-native",
+    "layered-normal-uv-native",
+    "native-paint32-fixture",
+    "resolution-quality-host-aggregate"
+  ],
+  "archive_sha256": "afd1013bb60e3079df9ee82bf86290ae64e409e0d515d843539b9359b28bc21f",
+  "archive_members_sha256": {
+    "release.log": "e2e9cd1a51b9eb93003d8e5462a43e5a972e468151f32dea28267cfb01516bb9",
+    "release-cases.log": "9e2167adc7d2ffb0da790489fbc4f3cb53eb1a90bb5d56c0957dcbdc501d862b",
+    "asan-build.log": "9aee8f7071d66fbb4e71ba891e82173522b1a44b0ad4c014ce6a394c0c57cbe9",
+    "khronos.json": "b8c70413741a297f33715ed2bbef44bf944b4cfdf7b2d66f11cd781c01aa9724",
+    "older-full-release.json": "a3059c49175e0f1302ad0c990bae2b887b4a85197c3db877f6e641866cb854d6",
+    "older-focused-rerun.log": "4ef3c1502ad6a21dfa3592c576a333116d7db6dc90bcc9bb64c90cf24d7963fe",
+    "asan-prepared-plain.log": "a51a45058052301e47acf3be8c94e11cf3cc1baec6dc96afa86d08f7b82bc0e4",
+    "asan-prepared-affine.log": "bf6ce3f15f1432cee5afbbcf8e1d3fdf5f7debf4f9def0e38ef26df41bd421ae",
+    "asan-reapply-affine.log": "a99670917a9a5fefe287ccd0f71ab4482a8d09cf70d7e6ccfa09748b3ec6b48c",
+    "asan-restore-affine.log": "91ea01bfff12e655238ea03ce21998c5eefb55f9f90bac25a4c716927a95bf9f",
+    "arc-xr.json": "660f461860f1e962a8d4261057f81a30282c149646c108cca13accade7412b9e",
+    "software-xr.json": "22e8398a8ab9c4b5e2eb58b99ffc17cc7fe845fe9076de06315a0867c306c79c"
+  }
+}

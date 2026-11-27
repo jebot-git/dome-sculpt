@@ -91,8 +91,8 @@ grids and original VRM 1.0 joint links when Apply changes the patch.
 Linked Shape Restore uses the current pose of the original imported rig.
 Standard and Editable VRM reference the original humanoid joints. The
 Editable package includes genuine hidden retopology guides required by
-the exported parts and their history. Source-authored and prepared
-material reprojection, mixed-material face subdivision and
+the exported parts and their history. Source-authored materials, prepared
+texture sets, mixed-material face subdivision and
 physical-device workflow acceptance remain open.
 [Linked retopology evidence](validation/retopology-linked-skin-20261127.json)
 
@@ -103,6 +103,15 @@ triangles by stable corner IDs across movements that cross the old material
 boundary. Support for subdivision across mixed-material diagonals remains
 required.
 [Affine and material-corner evidence](validation/retopology-prepared-affine-20261127.json)
+
+Changed retopology faces can now carry native single-material prepared
+normal maps under reflected and sheared placements and after independent
+retained UV editing. The two normal roles keep their own sampling and
+coverage. Ordinary material Bake and sparse editable layers remain separate.
+Save, Undo/Redo and Editable GLB retain the prepared role owners. Prepared
+per-material sets, authored source textures, typed MToon and physical XR
+production workflows remain required.
+[Prepared geometry evidence](validation/retopology-prepared-reproject-20261127.json)
 
 The current combined atlas and HDR cache source passes all 153 checks
 in both software Release and Intel Arc ASan/UBSan OpenXR replays. Its
