@@ -2144,6 +2144,35 @@ alternate emission coordinates, HDR VRM, full integrated regression and
 physical headset verification remain open.
 [Production texture-set validation](validation/native-texture-set-hdr-production-20261127.json)
 
+### Production-size baked native HDR texture sets
+
+Product `9dcf0355` applies the existing exact FLOAT storage layouts when
+baking each material member. The generator chooses the smaller layout and
+keeps the dense form when all channels vary. An accepted rebake uses the
+same selection. On the matching-triangle test, paint storage falls from
+43,278,336 to 26,632,224 bytes per 1024-square member. Both members then
+fit the existing Scene40 archive cap. A previously written dense project
+still reproduces the same native Save and both GLB files byte for byte.
+The first legacy replay wrapper used one basename for its executable and
+output directory. The corrected wrapper ran the byte-identical executable.
+
+The preview and portable exporter compile albedo, ORM and canonical
+normal from the same exact padded grid. The renderer keeps the existing
+GPU FLOAT emission packet. Two independently baked 1024-square fields
+pass cold Open, rebake, exact Undo/Redo, both GLB formats and exact native
+reopen. The test compares all material and normal bytes with the original
+compositor and all exact EXR channel bits with the dense sampler.
+
+Nested DomeD Wayland and synthetic OpenXR on software GL and Intel Arc
+match the native 1024+1024 Standard GLB. The 512+512, 1024+1024 and rebake
+Standard and Editable files pass Khronos validation with zero errors and
+warnings.
+A prepared retained-source 1024+1024 probe reaches the preview work cap
+and the two export work caps. Its 512+512 control passes. Large retained
+fields, typed MToon, alternate emission coordinates, HDR VRM, full
+integrated regression and physical headset verification remain open.
+[Baked texture-set validation](validation/native-texture-set-hdr-baked-production-20261127.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete

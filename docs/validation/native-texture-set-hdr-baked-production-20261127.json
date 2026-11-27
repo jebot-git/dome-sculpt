@@ -1,0 +1,230 @@
+{
+  "archive": {
+    "file": "native-texture-set-hdr-baked-production-20261127.tar.gz",
+    "members": 126,
+    "sha256": "9e57fecd33dac7dace3b04fd4debfd288c9b62d1931b5f28d4ca01d8e43c9d19"
+  },
+  "baked_fixture_paint_storage_bytes_per_member": {
+    "compact": 26632224,
+    "dense": 43278336
+  },
+  "baseline": "6d05f08f58eecc80c5416e7066f5c5226969f59c",
+  "controls": {
+    "dense_preview": {
+      "log_sha256": "fa56b22984afb72dd556b545d117aa8361c228e058d8802e68303aaa466e35ea",
+      "observation": "Timed out waiting for actual Document"
+    },
+    "dense_save": {
+      "log_sha256": "ba692390ebee85c723c8bd6f9b02449e65fc1a205e75bcffce65ec70b68da9e6",
+      "observation": "Texture-set archive exceeds its owning byte budget"
+    },
+    "retained_1024": {
+      "log_sha256": "33cb7465fa8c422ac25a4060ab2c27c2d64e5a695bc11be7de7cf4737595ad35",
+      "observation": "Texture-set field preview exceeds its charged work bound"
+    },
+    "retained_512": {
+      "log_sha256": "3073b5df39894b7ff156ff95d59ef0540b03183e45363d09b48e41f42f4281af",
+      "observation": "editable exported"
+    }
+  },
+  "frontends": {
+    "arc": {
+      "app_sha256": "a73ae0a550f20a1204e8c1393ee6c9ac7781fbb180ca7ed68e400974471a9926",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "6ce9944f0511c04422dbf1b4d9a1e1e49f8eae7557dd8c2e8d4e98a4d7df1a2a",
+      "invocation": "b730922e72ce49c793b8318a1a4a77d0",
+      "mode": "arc",
+      "native_sha256": "df422411aa3f1aa72b010493ccee1189b6bbbb18d600dc51900800a8310358db",
+      "phase": "complete",
+      "report_sha256": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7",
+      "run_script_sha256": "8acd1aa09712493478daf95679a97dca44d0f9370a38425907934263a129b8ce",
+      "runtime_sha256": "40fa5b55ac329cf6dd77a3bdf5a5eac6f5f840d4ef43efd77678c588538fd8e9",
+      "terminal": true
+    },
+    "software": {
+      "app_sha256": "1062a2494e026251cbef0e2ae77c5ca34edb8c7a2ef634aa0e83f0cdd79e527f",
+      "checks": 10,
+      "exit": 0,
+      "input_sha256": "6ce9944f0511c04422dbf1b4d9a1e1e49f8eae7557dd8c2e8d4e98a4d7df1a2a",
+      "invocation": "e15853840e6843058db65288b826eb09",
+      "mode": "software",
+      "native_sha256": "df422411aa3f1aa72b010493ccee1189b6bbbb18d600dc51900800a8310358db",
+      "phase": "complete",
+      "report_sha256": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7",
+      "run_script_sha256": "8acd1aa09712493478daf95679a97dca44d0f9370a38425907934263a129b8ce",
+      "runtime_sha256": "bbb5897e8616b8fafdbd9d22a4bba4f06290e278b37782134867d4b4477c1fac",
+      "terminal": true
+    },
+    "wayland": {
+      "app_sha256": "1062a2494e026251cbef0e2ae77c5ca34edb8c7a2ef634aa0e83f0cdd79e527f",
+      "checks": 7,
+      "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+      "compositor_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+      "exit": 0,
+      "input_sha256": "6ce9944f0511c04422dbf1b4d9a1e1e49f8eae7557dd8c2e8d4e98a4d7df1a2a",
+      "invocation": "5d51b087c8b34d6e8b7803761d48a4ac",
+      "mode": "wayland",
+      "native_sha256": "df422411aa3f1aa72b010493ccee1189b6bbbb18d600dc51900800a8310358db",
+      "phase": "complete",
+      "probe_sha256": "5bf11c670f66bbb68960073878933055b09582e5173ec1e3f472b413956c55aa",
+      "report_sha256": "1479f58dde45a6650ec4a86a27bfa78dbff2a7235cf3bac585efc465832f849d",
+      "run_script_sha256": "c25dc6ada0d181cee466312b60871fc9c1ceffb6a0f8420c3143ec668f2644c6",
+      "terminal": true
+    }
+  },
+  "khronos": {
+    "release-final/probe-1024-1024/editable.glb": {
+      "bytes": 53348756,
+      "errors": 0,
+      "filename": "release-final/probe-1024-1024/editable.glb",
+      "report_sha256": "7e3f69797a186062678fb036eabd9e863e318809d77828ba4b52d57ef213cd52",
+      "sha256": "e7eaa312add3ae2a1f1560df65521f90f5f4b0a8f700e7d9b86b928b0b724269",
+      "validator": "2.0.0-dev.3.10",
+      "warnings": 0
+    },
+    "release-final/probe-1024-1024/standard.glb": {
+      "bytes": 53716596,
+      "errors": 0,
+      "filename": "release-final/probe-1024-1024/standard.glb",
+      "report_sha256": "a82c86de969bb584e52f6c461b74d9a5e11da050e70fe612a6bbd3a24f9f702b",
+      "sha256": "df422411aa3f1aa72b010493ccee1189b6bbbb18d600dc51900800a8310358db",
+      "validator": "2.0.0-dev.3.10",
+      "warnings": 0
+    },
+    "release-final/probe-512-512/editable.glb": {
+      "bytes": 13640448,
+      "errors": 0,
+      "filename": "release-final/probe-512-512/editable.glb",
+      "report_sha256": "b090d6bced745c217d61057274dc3b47f65b2830efbb46076175d4b2e42bd2ba",
+      "sha256": "2d0316334df0c37d1501dfea7d1f94123de7610ac02f68f5176fa980f91a9c7c",
+      "validator": "2.0.0-dev.3.10",
+      "warnings": 0
+    },
+    "release-final/probe-512-512/standard.glb": {
+      "bytes": 13780732,
+      "errors": 0,
+      "filename": "release-final/probe-512-512/standard.glb",
+      "report_sha256": "49c89dfe241299789636495769675aa457de0c965740b0ddf390bfe7d6104344",
+      "sha256": "19127fdd76dd8e38f79bb8c656db85bf9ea6b335d467700d5157bee66a6295d3",
+      "validator": "2.0.0-dev.3.10",
+      "warnings": 0
+    },
+    "release-final/production-baked-editable.glb": {
+      "bytes": 52946496,
+      "errors": 0,
+      "filename": "release-final/production-baked-editable.glb",
+      "report_sha256": "0907470fbbd12311100a1692b47c39fb0e13661bd68090f7ce5873b24ad26f95",
+      "sha256": "fc0abfaa3116c29a6a88757a2d8a57a5e081c6355886a4a797d07f3c4a3ceb6b",
+      "validator": "2.0.0-dev.3.10",
+      "warnings": 0
+    },
+    "release-final/production-baked-standard.glb": {
+      "bytes": 53256284,
+      "errors": 0,
+      "filename": "release-final/production-baked-standard.glb",
+      "report_sha256": "9ef8e15cba77f191409f43299b5b79f4120b447bff3eb23f7009f57002b5bdce",
+      "sha256": "9efba79876b58a0d3e9e7baa3131f9510b5735446f20dc67a77d3293a4fc64c6",
+      "validator": "2.0.0-dev.3.10",
+      "warnings": 0
+    }
+  },
+  "limits": {
+    "baked_paint_storage": 134217728,
+    "texture_set_bytes": 268435456,
+    "texture_set_work": 64000000
+  },
+  "open": "Larger and prepared retained-source multisets, typed MToon, alternate emission coordinates, HDR VRM, full integrated regression and physical headset verification.",
+  "packages": {
+    "legacy-project/editable.glb": {
+      "bytes": 21963456,
+      "identical_to_original_dense_project": true,
+      "sha256": "a126ccbc5f3198d3af941aa27402c839f042df7b6ec9e9ef44d11b07bf15d812"
+    },
+    "legacy-project/source.dsculpt": {
+      "bytes": 21930536,
+      "identical_to_original_dense_project": true,
+      "sha256": "ee577e62351dc91d982f80db65709a5a0156e043a519b12bd000173b78e7c0ed"
+    },
+    "legacy-project/standard.glb": {
+      "bytes": 22103740,
+      "identical_to_original_dense_project": true,
+      "sha256": "e8bc7568604a8464c17c919659803b5f96792318a3a562d3cc60035ce29fdca6"
+    },
+    "probe-1024-1024/editable.glb": {
+      "bytes": 53348756,
+      "sha256": "e7eaa312add3ae2a1f1560df65521f90f5f4b0a8f700e7d9b86b928b0b724269"
+    },
+    "probe-1024-1024/source.dsculpt": {
+      "bytes": 53269298,
+      "sha256": "6ce9944f0511c04422dbf1b4d9a1e1e49f8eae7557dd8c2e8d4e98a4d7df1a2a"
+    },
+    "probe-1024-1024/standard.glb": {
+      "bytes": 53716596,
+      "sha256": "df422411aa3f1aa72b010493ccee1189b6bbbb18d600dc51900800a8310358db"
+    },
+    "probe-512-512/editable.glb": {
+      "bytes": 13640448,
+      "sha256": "2d0316334df0c37d1501dfea7d1f94123de7610ac02f68f5176fa980f91a9c7c"
+    },
+    "probe-512-512/source.dsculpt": {
+      "bytes": 13607528,
+      "sha256": "26765782f551b118a6c3b3c7a662ff897f0a066b470ff7668223e6ed468eebf4"
+    },
+    "probe-512-512/standard.glb": {
+      "bytes": 13780732,
+      "sha256": "19127fdd76dd8e38f79bb8c656db85bf9ea6b335d467700d5157bee66a6295d3"
+    },
+    "production-baked-editable.glb": {
+      "bytes": 52946496,
+      "sha256": "fc0abfaa3116c29a6a88757a2d8a57a5e081c6355886a4a797d07f3c4a3ceb6b"
+    },
+    "production-baked-standard.glb": {
+      "bytes": 53256284,
+      "sha256": "9efba79876b58a0d3e9e7baa3131f9510b5735446f20dc67a77d3293a4fc64c6"
+    },
+    "production-baked.dsculpt": {
+      "bytes": 52867484,
+      "sha256": "3e26b196a7b45bfa1d5025125d93d35c762f710a41945578ab3f128fb91fd187"
+    }
+  },
+  "product": "9dcf0355444c102631c6c518aa81e302a954b109",
+  "profiles": {
+    "asan": {
+      "application_sha256": "a73ae0a550f20a1204e8c1393ee6c9ac7781fbb180ca7ed68e400974471a9926",
+      "baked_emission_sha256": "621204a1fff8d63aa3b347f4ad719c95ca40642244c878fdb13b4ab2d03990a7",
+      "checks": {
+        "baked-emission-test": 1720,
+        "dome-sculpt-bake-test": 45,
+        "dome-sculpt-current-paint-preview-native-test": 8425,
+        "dome-sculpt-texture-set-export-test": 149,
+        "dome-sculpt-texture-set-native-test": 45,
+        "dome-sculpt-texture-set-source-export-test": 6074,
+        "dome-sculpt-texture-set-surfaces-test": 72,
+        "retained-editable": 44,
+        "retained-standard": 50
+      },
+      "core_sha256": "e05a8c73430d156c88276102fbd4148f425492347ad665c7c2c756f061f6eba0",
+      "legacy_replay_executable_sha256": "5ea538505a4af651c774e78682d826feda7970b71e5fefe8e234ee8a52c7ef57"
+    },
+    "release": {
+      "application_sha256": "1062a2494e026251cbef0e2ae77c5ca34edb8c7a2ef634aa0e83f0cdd79e527f",
+      "baked_emission_sha256": "71f7398191f0ff32f1e8b823dc2182448face29f731aaafd4a90314f2d9ca1c9",
+      "checks": {
+        "baked-emission-test": 1720,
+        "dome-sculpt-bake-test": 45,
+        "dome-sculpt-current-paint-preview-native-test": 8425,
+        "dome-sculpt-texture-set-export-test": 149,
+        "dome-sculpt-texture-set-native-test": 45,
+        "dome-sculpt-texture-set-source-export-test": 6074,
+        "dome-sculpt-texture-set-surfaces-test": 72,
+        "retained-editable": 44,
+        "retained-standard": 50
+      },
+      "core_sha256": "bfdbbc56df206d23dd2e616defb448d4395e838e472f4e1b672aec9c2209212f",
+      "legacy_replay_executable_sha256": "2eb591ff4ce5fcbdde2b0d18b4548b3d3ace71a483fbf187b45217d8d5d62765"
+    }
+  },
+  "scope": "Actual Document Bake and rebake, native preview, Save/Open, and Standard and Editable GLB of two separate native HDR PBR material members. Dense predecessor compatibility and independent exact material/EXR reference comparisons.",
+  "source_patch_sha256": "878bb71ba6617168b28bb5891ebd2371350f1f4fb07c454248f74c18c6e40345"
+}
