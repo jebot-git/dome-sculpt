@@ -86,6 +86,15 @@ remain transactional. The native Shapekey Restore confirmation defaults to
 Cancel in nested DomeD Wayland.
 [Retopology Restore evidence](validation/retopology-restore-20261127.json)
 
+First retopology Apply projects the existing material slots of an
+undeformed native reference. Paint layers, Bake and supported static
+MToon roles follow the patch on their own grids. Interior raster samples
+check that each destination triangle belongs to its chosen source material.
+The original source becomes the hidden guide, and subsequent Apply uses
+the patch's material ancestry. Prepared imported fields and actively
+deformed first-transfer sources remain open.
+[First material transfer evidence](validation/retopology-first-material-20261127.json)
+
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.
 Linked Shape Restore uses the current pose of the original imported rig.

@@ -108,6 +108,24 @@ default Shapekey Restore confirmation and matches the saved native worker
 output for Restore, Undo and Redo.
 [Retopology Restore validation](validation/retopology-restore-20261127.json)
 
+First Apply now transfers editable material sets from an undeformed native
+reference to the new retopology patch. Each slot keeps its own paint
+resolution, layer settings and Bake recipe. Transfers include baked maps
+and supported static MToon roles. The source becomes the hidden guide with
+its original materials intact. Faces that cross a sampled source material
+boundary require a split before Apply. The check also covers unpainted
+material slots. Later Apply uses the patch's own triangle ancestry.
+
+The 34 selected Release tests and six strict ASan/UBSan cases pass. Nine
+project and GLB outputs match across profiles. Nested DomeD Wayland builds
+the first two faces with pointer gestures and exports two material slots
+through the universal menu. Synthetic OpenXR renders both material sets in
+both eyes on Intel Arc A770 and llvmpipe. All four worker and Wayland exports
+pass Khronos validation with zero errors and warnings. Prepared imported
+fields and actively deformed references still need their own first-transfer
+adapters.
+[First material transfer validation](validation/retopology-first-material-20261127.json)
+
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and
 the material of each surviving single-material face. Each paint and Bake
