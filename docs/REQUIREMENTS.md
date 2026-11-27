@@ -240,10 +240,15 @@ mixed MToon and PBR fields. Editable GLB also emits the certified typed
 FLOAT preview. It retains the exact native Scene and can use a measured
 PBR preview when a material cannot meet the certificate or the export
 budget. Tests open the Editable file through Document and reproduce both
-portable formats byte for byte. Larger typed Bake previews, original
-authored and deforming frames, typed donor partitions, VRM integration,
-alternate UVs, resampling, live painted animation, other portable sampler
-modes and physical verification remain open.
+portable formats byte for byte. Standard VRM1 now carries native rigid
+texture-set accessories under an imported avatar's instance root. Both
+typed MToon and core PBR FLOAT partitions retain their exact per-material
+OpenEXR resources without acquiring source expression or joint identities.
+The selected nested accessory resolves the avatar from the desktop and XR
+export commands. Larger typed Bake previews, original authored and
+deforming frames, typed donor partitions, Editable VRM, source-bone
+attachment, VRM0 texture-set materials, alternate UVs, resampling, live
+painted animation, other sampler modes and physical verification remain open.
 [Native MToon texture-set evidence](validation/native-mtoon-texture-sets-20261127.json)
 [Portable MToon texture-set evidence](validation/portable-mtoon-texture-sets-20261127.json)
 [Painted MToon texture-set evidence](validation/painted-mtoon-texture-sets-20261127.json)
@@ -253,6 +258,7 @@ modes and physical verification remain open.
 [Portable MToon Bake evidence](validation/portable-mtoon-bake-20261127.json)
 [Typed FLOAT MToon Bake export evidence](validation/portable-mtoon-float-20261127.json)
 [Editable typed FLOAT preview evidence](validation/editable-mtoon-float-20261127.json)
+[Standard VRM1 native texture-set accessory evidence](validation/vrm1-native-texture-set-20261127.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge

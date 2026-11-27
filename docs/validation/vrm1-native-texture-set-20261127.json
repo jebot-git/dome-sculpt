@@ -1,0 +1,186 @@
+{
+  "archive": {
+    "filename": "vrm1-native-texture-set-20261127.tar.gz",
+    "files": {
+      "asan/app-link.log": "0df6a3bfd8b6a0becd715f3256f0696da67aafebd64fa62872af1197c2941003",
+      "asan/archive-product.log": "e119cfbde63fdc80e13a08c43c4226c293238394b28865a4897a23c585de1280",
+      "asan/archive-refresh.log": "5aacd26cbbe89d037b0aa9b3c61bad7a38b7a7123d71b6cc3bf06576be8c2ff1",
+      "asan/document.cpp-compile.log": "09bf6109dd642db346ae02ae421b83d36f794cd612356cce6905f085500593de",
+      "asan/emission-export.cpp-compile.log": "b63d843f1e3a175b8306b0bc42106ca0e95c543627404ec9b8deb825a4cf845a",
+      "asan/emission-vrm.cpp-compile.log": "74f05f8c75c4fdcb4277303c742b527722d34266953343877e3b233a5a413aa2",
+      "asan/emission-vrm.log": "bcbe2bc8db0af8a50eca876aa9b4f4d7516d80a600cd1349c71df5aeeffee48d",
+      "asan/native-worker.log": "791b991c6a47eb05cae1d62baa9c418c01f09b81f6389c98a7e489e0d07718b5",
+      "asan/portable.log": "b0ec2fc4d54ab6f8c7ba8154769a3407edcb1ce89d567c7051ee0759918ec1a5",
+      "asan/vrm-rest.log": "0927d4bd6768cc7c505472f0688e1e6421ac6a13036426391cd9114d373bdea9",
+      "asan/vrm-source-graph.cpp-compile.log": "d53bdf8354dad5077906e913fa9e4cc2459181833e642e10d77c3e9160f3b7ef",
+      "asan/vrm.cpp-compile.log": "f6fe74c602595383dd0e01e153a242a01a7c927d3f3c7dade2f94907125185db",
+      "asan/vrm1-export.cpp-compile.log": "bd2c1736d11cd4428ed3a3c0512518f2350d66114ba64c63c85acf5a489538a0",
+      "asan/vrm1-source.log": "bde95d76c3bf4c55dce6771a528d2aa262bb1ff43e13a0842960742d41b8d1aa",
+      "build.py": "be7abb8856e3d4f536a5dfb60cfe56beb8b06f69112a9c0b43e41358b13dbbf4",
+      "headless-glb-validator.json": "29b36bcd75a13a930f20113129574c05101f5401a571bd140a0e32c023cbe473",
+      "headless.log": "d0000bcad8a9a853e2842d33ddde91ec1db5dee350c466337c5847a4c171f3b0",
+      "khronos.cjs": "44cd8f99a331cc7bc2dc0faefb5f3b1ac3501a9734c346d656590d193e51281a",
+      "khronos.json": "b1e3f613136806cc03e7349d86d74760370ab9578ef7f819f783a0c15df6e289",
+      "prior-combined-run-at-recording.json": "1813c8216aaff1c9a1804d567d8e982a9f13d2e933f089da480c954fec6e4c0e",
+      "registered.log": "064911faad81e7e61128f0361a82ab77cda2353a73f533e032e2363e5046c699",
+      "registered.xml": "64b010b2e3e92eb5ba66f317f7b9e7d236b84970410c1e63c4f3cf48f0bfc039",
+      "release/app-link.log": "bf29a394c5b61b3cd15abe2b1ffc6ab79a52d849bdbd2797bc48bd5f41e21a37",
+      "release/archive-product.log": "b0b0bd540e4d6ff478c29a16babf6e9ab5220aaf10d281a5df6e3ec996a1d37f",
+      "release/archive-refresh.log": "3f23780c0384e7a4782788eea53136cbef9815471e1d3068acfb8530d9c20d9d",
+      "release/document.cpp-compile.log": "3483ddf68440a24eda663b1106a6232315aa0fc1cc9825fef5eaf5b6626008bf",
+      "release/emission-export.cpp-compile.log": "fbda5b927d6fe39c094211aaedfbdf24c3346fb0a21559636346e198b2b85445",
+      "release/emission-vrm.cpp-compile.log": "3511c7feaf3df59d1dd3799428898082375fde421c85e511adb689b2ab5964f9",
+      "release/native-worker.log": "6cae7e58b451b1fe863e4e8218a44e0fa748a2e0892b1a8221fd9b7042b27638",
+      "release/portable.log": "d923ab01d32c2f2eec050987ec4601dd094af0adc997f8b979333166628fab30",
+      "release/vrm-rest.log": "a2b50df0d30bf9bb5f97fb5309a8a76c40cc19e695a9d64414f0b20b17e5a6ab",
+      "release/vrm-source-graph.cpp-compile.log": "43aa0ffff7190cb4183244701f414c791b1dc5ef1d9f28d8f2d439edd2278e77",
+      "release/vrm.cpp-compile.log": "c0c19508a10f8d157d5fd7f4098f4ef873665589d4ed5335c094a9a0a625cb60",
+      "release/vrm1-authoring.log": "d930ce31671591fe0cd2c0aafaa89a2f600b4c4902fd59ab7093b0e33810db39",
+      "release/vrm1-export.cpp-compile.log": "0cacc7b8aa3c4e2d09e5fa0cf5739003ce217033ae1f556e55ef17c5cf10f33b",
+      "release/vrm1-source.log": "f426ea72bd9cc03702b2e9ef3a0176ea815a2f301a9615b9f88f3e86cf19f52e",
+      "schemas.json": "45e477359844394bc1d3835b46288707609942f0564afd54d343db22ac0b1a28",
+      "ui.py": "2477606cec798f521a5862d8040b06fadbc4af9bda210e3830a390ef007b2f40",
+      "wayland-accessory.py": "1f74bb403d9a08f2579371ef328a3cb04eacdb2d172a8b9f2039445e37b02ccb",
+      "wayland/log.txt": "ef33ed860a745aea44213bdc834f370f061fcfb5ad7d523e4d4074ad56522d26",
+      "wayland/report.json": "215e13e83112a76a1c8b60fdb602d7d427a5b0974e12c84f49210493121f017b",
+      "xr-accessory.py": "a417bc1f76499761abf0dde1f1bb1b3f2fc5461bedf71b34b947d9157ee85a56",
+      "xr-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "xr/arc/run.log": "de1a5fd9f9e6ab687b61a41f6132ba5bc1dc5c6b10ff4751569686242400dec3",
+      "xr/arc/runtime.json": "c3cb1a8ba55a35aa8115f8df7efadcb947f457d37627212c8358dcea58b5fae7",
+      "xr/software/run.log": "de1a5fd9f9e6ab687b61a41f6132ba5bc1dc5c6b10ff4751569686242400dec3",
+      "xr/software/runtime.json": "94852903659fd24219c2535288a31abea49174574843e2ffe47b439444e1f4d0",
+      "xr/standard-avatar-sector.diff": "e5f40b237e8431cedee3b912a1c2c7b03e4f9ac3fac67239cb2f7addb114f58f"
+    },
+    "sha256": "e8e3b8dc257fa460492e02263de338cc132f24bdd18896da926631f64536a6c2"
+  },
+  "build_outputs_sha256": {
+    "asan": {
+      "dome-sculpt": "5b1ac2c39af6ef196a5b17499955b89ab8f443987f8a01dcc214fc8493fb4931",
+      "dome-sculpt-emission-vrm-test": "ea4497ec26743caaa3bbd4546af3ed72bdc5ecfcc79ee944d2e46e09b6dc099a",
+      "libdome-sculpt-core.a": "d9cd7d4be9dee8ba55bf2e8dd1534aac4a49405798c8a20a61aed3a2d1520806"
+    },
+    "release": {
+      "dome-sculpt": "4961862b1e8ea2a5b5576b3ad5709dd44bfdb55eff32a532ec4f1bfae1d87c4b",
+      "dome-sculpt-emission-vrm-test": "ca7fc247c50757909e4595276329f3313a513d4d3cba04b577f98714c272044b",
+      "libdome-sculpt-core.a": "5218c831fe71b2e33280ebffcf1ff3fdc40fd93318faf9108adc390f33d9d8f1"
+    }
+  },
+  "byte_identical_outputs": {
+    "accessory-avatar-baseline.vrm": "dd308f80504de8b404e8d24a527b4dd3ae88292acc47e20742bd555fd6a4c846",
+    "accessory-source.vrm": "755ce4030b3783a35a4d6af6042da0acdaa7324878424e9e5565fd5a8bb9c5a6",
+    "native-accessory-second.vrm": "5c609c9435e9267d692a9b67239bbbb05779648e8c2bca1a3159d993ebcd13e9",
+    "native-accessory.dsculpt": "b9355f1038729e3a75195e437637ca401dbb401e3741e49978724dd4eb31bed3",
+    "native-accessory.vrm": "5c609c9435e9267d692a9b67239bbbb05779648e8c2bca1a3159d993ebcd13e9"
+  },
+  "headless_cold_vrm_to_glb_sha256": "df913ab66c979194a995a95faf50dcbd1e0270132e18769110d36186b3e9f2ee",
+  "headless_matches_accessory_pngs": true,
+  "independent_interop": {
+    "khronos_errors": 0,
+    "khronos_files": 4,
+    "khronos_version": "2.0.0-dev.3.10",
+    "khronos_warnings": 0,
+    "pinned_vrm_schema_checks": 13
+  },
+  "native_float_fields": [
+    {
+      "material": 0,
+      "node": 22,
+      "object": 1,
+      "sha256": "222692c2a4da1bd74bec7b9fb15512b2800390fa288742a51af9c02c382f7bfe",
+      "textureSet": {
+        "id": 0,
+        "texCoord": 0
+      },
+      "view": "authored-mtoon"
+    },
+    {
+      "material": 3,
+      "node": 22,
+      "object": 1,
+      "sha256": "061dbdf47095c5e5978f24c90456cd0c241443c2cd337567ca4d4e720a8f12c1",
+      "textureSet": {
+        "id": 1,
+        "texCoord": 0
+      },
+      "view": "pbr"
+    }
+  ],
+  "prior_combined_release_at_recording": {
+    "app_sha256": "757f265c99f4f811c34bf6d8ab9a0eb7d40ecf4a026350c418550fad2ef5625c",
+    "cache_sha256": "941246a34d52a93f55e2dc9444541cfe7ad057a397a1f773d0d5e28bcb52dc60",
+    "candidate": "662d889da2b3a56e36f2f58f5280a624ae798906",
+    "changed_paths": [
+      "CMakeLists.txt",
+      "docs/HANDOFF.md",
+      "docs/REQUIREMENTS.md",
+      "docs/validation/exact-overlay-gpu-budget-20261127.json",
+      "docs/validation/exact-overlay-gpu-budget-20261127.tar.gz",
+      "docs/validation/native-mtoon-bake-20261127.json",
+      "docs/validation/native-mtoon-bake-20261127.tar.gz",
+      "docs/validation/retopo-save-queue-20261127.json",
+      "docs/validation/retopo-save-queue-20261127.tar.gz",
+      "src/bake-authoring.cpp",
+      "src/bake.cpp",
+      "src/export.cpp",
+      "src/native-authoring-compiler.cpp",
+      "src/render-paint-overlay.hpp",
+      "src/source-bake-normal.hpp",
+      "src/texture-set-export.cpp",
+      "src/texture-set-export.hpp",
+      "src/texture-set-range.cpp",
+      "src/texture-set-surface.cpp",
+      "src/texture-set-worker.cpp",
+      "src/texture-sets.cpp",
+      "tests/bake-recipes-xr.py",
+      "tests/bake-recipes.cpp",
+      "tests/baked-emission-gpu.cpp",
+      "tests/mtoon-render.cpp",
+      "tests/paint-overlay-gpu.cpp"
+    ],
+    "elapsed_seconds": 1049.026,
+    "invocation": "5d6e0b870e0749f1a8e890898960df75",
+    "phase": "run every registered Release test",
+    "registered": 1366,
+    "seed_app_sha256": "e0e7ea525e5338c4080a2af9db1cca0c18d856b5d9ddf37c399214b0afdc2e38",
+    "seed_cache_sha256": "7a052e626ae14dbbeb06a4465ed0203f08e2cba506988b71f891d7d317c00ab0",
+    "seed_registration_error": "texture-set-export was renamed dome-sculpt-texture-set-export",
+    "seed_revision": "f70483e921ded0d80497f36802e9201b9aebc1c1",
+    "terminal": false
+  },
+  "product_revision": "f4dd2adf5d9ac1d2e169164250cf5988d84e67c4",
+  "profiles": {
+    "asan": {
+      "native_worker_checks": 20
+    },
+    "release": {
+      "native_worker_checks": 20
+    }
+  },
+  "registered_release_seconds": {
+    "dome-sculpt-texture-set-export": 11.6338,
+    "emission-vrm": 57.8049,
+    "vrm-rest-metadata": 0.00520848,
+    "vrm1-painted-authoring": 4.39721,
+    "vrm1-source-export": 0.635755
+  },
+  "ui_release": {
+    "wayland": {
+      "checks": 5,
+      "sha256": "5c609c9435e9267d692a9b67239bbbb05779648e8c2bca1a3159d993ebcd13e9"
+    },
+    "xr-arc": {
+      "checks": 5,
+      "physical_headset": false,
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "sha256": "5c609c9435e9267d692a9b67239bbbb05779648e8c2bca1a3159d993ebcd13e9",
+      "swapchain_releases": 92
+    },
+    "xr-software": {
+      "checks": 5,
+      "physical_headset": false,
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "sha256": "5c609c9435e9267d692a9b67239bbbb05779648e8c2bca1a3159d993ebcd13e9",
+      "swapchain_releases": 86
+    }
+  }
+}

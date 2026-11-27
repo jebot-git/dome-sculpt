@@ -2592,6 +2592,35 @@ The same build passes 16 native DomeD Wayland and 19 synthetic OpenXR
 Bake workflow checks.
 [Editable FLOAT Bake validation](validation/editable-mtoon-float-20261127.json)
 
+### Native texture-set accessories in Standard VRM1
+
+The Standard VRM1 export worker places native rigid texture-set accessories
+under the authenticated original avatar instance and retains their nested
+native groups. The independent source tree keeps its authored node and
+expression targets. The selected accessory resolves its enclosing VRM1
+avatar for desktop and XR export. A separate avatar group remains outside
+the selection and cannot be substituted as the accessory's source.
+
+The 512-square partial Bake preserves MToon radiance, its canonical tangent
+stream, the missed original normal, and the neighboring physical PBR
+partition. The two partitions retain independent FLOAT32 OpenEXR resources.
+The saved VRM restores the exact selected native scene and explicitly
+marks the hidden donor unavailable when it falls outside export scope.
+A second export reproduces the same file bytes. The Wayland universal menu
+and synthetic OpenXR Files command write the same VRM as the Document worker.
+Source-bone attachments, deforming or retained source texture-set partitions,
+VRM0 materials and Editable VRM remain open.
+
+The native worker passes 20 focused checks in both Release and ASan/UBSan.
+Five registered Release suites pass. Independent cgltf compares the original
+node frames, geometry and morph identities with the source-only export.
+Khronos reports zero errors or warnings across four VRMs, and 13 checks
+pass the pinned VRM and MToon schemas. The nested Wayland chooser and
+synthetic OpenXR on software GL and Intel Arc A770 each produce the exact
+verified VRM. The headless application reopens it and emits a Standard GLB
+with the identical accessory PNG payloads.
+[Native VRM1 texture-set validation](validation/vrm1-native-texture-set-20261127.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete
