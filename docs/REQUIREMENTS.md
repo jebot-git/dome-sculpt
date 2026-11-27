@@ -230,9 +230,16 @@ tangents and a bounded linear normal texture. Partially covered fields
 can retain uniform or aligned varying original normals. Complete filtered
 coverage can replace an unrelated original normal raster. The standalone
 files agree with native paint, normal and mask rendering through an
-independent import. Larger typed Bake previews, original authored and
-deforming frames, typed donor partitions, Standard GLB of FLOAT Bake,
-VRM integration, alternate UVs,
+independent import. Standard GLB also exports static FLOAT Bake as
+MToon 1.0 for certified canonical tangent frames and constant or aligned
+clamp-linear UV0 emission sources. Its standard texture uses an explicit
+radiance scale and bounds both byte quantization and filtering error.
+The exact FLOAT32 OpenEXR and native scene retain separate legacy,
+absolute and coverage channels for each physical partition, including
+mixed MToon and PBR fields. Editable GLB still restores the same native
+data through its measured core PBR fallback. Larger typed Bake previews,
+original authored and deforming frames, typed donor partitions,
+typed FLOAT preview in Editable GLB, VRM integration, alternate UVs,
 resampling, live painted animation, other portable sampler modes and
 physical verification remain open.
 [Native MToon texture-set evidence](validation/native-mtoon-texture-sets-20261127.json)
@@ -242,6 +249,7 @@ physical verification remain open.
 [Varying MToon source evidence](validation/varying-role-mtoon-20261127.json)
 [Native MToon Bake evidence](validation/native-mtoon-bake-20261127.json)
 [Portable MToon Bake evidence](validation/portable-mtoon-bake-20261127.json)
+[Typed FLOAT MToon Bake export evidence](validation/portable-mtoon-float-20261127.json)
 
 Strict Bake rays now recover source-edge contacts affected by float staging.
 An exact ray hit has priority. A missed ray can use an actual source edge

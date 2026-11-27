@@ -2534,6 +2534,38 @@ that build intact, reuses its unchanged objects in a private build,
 rebuilds the affected targets, and uses the actual test registration.
 [Portable MToon Bake validation](validation/portable-mtoon-bake-20261127.json)
 
+### Standard GLB with FLOAT MToon Bake
+
+The Standard GLB worker exports static typed MToon 1.0 Bake with its
+certified canonical normal and tangent frame. The emitted texture
+combines the original typed emission, the material-relative contribution
+scaled by the original strength, and the independent absolute Bake and
+paint values. It uses a per-channel factor and standard emissive strength.
+For aligned clamp-linear UV0 sources, the covariance bound accounts for
+multiplying the independently filtered original emission and uncovered
+fraction. The recorded bound also includes PNG quantization. Sources
+that cannot meet the bound leave the existing destination intact.
+
+Each physical partition retains its own exact streamed RGB, contribution
+and coverage channels in OpenEXR. Package replay verifies the model,
+material membership, coordinates and actual emitted PNG. The mixed
+scene preserves distinct typed MToon and PBR field records. Cold re-export
+canonicalizes the generated unit strength and reproduces the original
+GLB bytes. Editable GLB restores the full native state with its measured
+PBR fallback. Deforming frames, broader source sampling, VRM and physical
+XR remain open for this route.
+
+The five export fixtures pass 171 graphics checks in each Release and
+ASan/UBSan run on software GL and Intel Arc A770. The imported renders
+preserve masked visibility and differ by at most two RGB bytes in
+software and one on Arc. Ten GLBs pass Khronos validation without errors
+or warnings. The five Standard MToon materials pass the pinned schema.
+Both 512-square FLOAT outputs match the headless application's fresh
+exports. Six focused registered Release tests pass. The same application
+passes a 16-check native DomeD Wayland Bake workflow and a 19-check
+synthetic OpenXR replay with accepted, cancelled and interrupted edits.
+[Typed FLOAT Bake validation](validation/portable-mtoon-float-20261127.json)
+
 ## Source and integration boundary
 
 - Main now admits product1bc13125 and public fixturef1e193c7 after complete

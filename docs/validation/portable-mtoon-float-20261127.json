@@ -1,0 +1,254 @@
+{
+  "archive": {
+    "filename": "portable-mtoon-float-20261127.tar.gz",
+    "files": {
+      "arc.py": "3917a0f2ab46fdc4b3a5c54b65b8d3a597d712b46cc5ff7085920e1cf1713a23",
+      "asan-arc/graphics.log": "f71d65013f6566bee083c8a6788d515c55fb49a2ae2caa99302a585bea64c8ab",
+      "asan-software/graphics.log": "ce7847bdcda243362a1f744018ca9449dbd602c6208006b94829fff2cc06ce17",
+      "asan/app-link.log": "8944a4f371d8ad3417cc6ae5fd5b37a6830fc2aebdad2ecb6ccf53ff9ccffe8b",
+      "asan/archive-product.log": "ee3e0e83fda6830523aa5e9dda20954240dcb0d1ae4edafcf8d3d7edee1aa8f7",
+      "asan/archive-refresh.log": "7b9fd406f95235b29e42ba7a8bab192b3346f7be55ea95fac8631b917dbb78d0",
+      "asan/emission-export.cpp-compile.log": "1a805e7d56ee530e7d4decf2811964e586135bc0583d00044a4a3f95fac68003",
+      "asan/emission-package.cpp-compile.log": "34fc75fc05bbe629b4b322a76b65a8b5cdeac40d63b663f5162144d0bd779aaf",
+      "asan/export.cpp-compile.log": "e7c41ad49abe5ad5109bd66a3e8674882a8e690d31cdc8e88101f43340dc4cbd",
+      "asan/graphics-compile.log": "38a3a6507435da1e1711d4d43b5ead330abc3212d8b8a5e9ef8224b55ab2771c",
+      "asan/hdr.log": "aba115a8f51fab22a6ef537cbedf515ed186bed015fc07f219b34709f43fa5e9",
+      "asan/portable.log": "b4dc5ae0a6e75b969c16f5346d311a0cacc7fadd9788e4a32979be792a2761e7",
+      "asan/recipe.log": "e9a2c6a60bfb304c6842cdd85a6f25d376a04781af4f51cd3dcf942941f44cae",
+      "asan/texture-set-export.cpp-compile.log": "6f7bb7db28e0f6fadc07e88e73dbc21e7ef61aef2e7194008b282609890faa4d",
+      "build.py": "a6e573b43e105cfc07af4181c52c7c44f2aafd6ffe54d4f4fa59a20c29636a6b",
+      "headless.log": "db62a1e231c1fd1235d058cf07b85323bffadbcd2e5f7dcba85992b41672e366",
+      "khronos.cjs": "5551890064b3e7c03ec70370b7692be0c4877bcf809a11d3d75a87deba29697b",
+      "khronos.json": "ed8568820729e84dbb47cf406c5d595b69a4b104777f3d43305080de44d61ad5",
+      "openxr/report.json": "528845174a2be985afa5ed69f32fdfc7bb9b7e6cf022d1df99eb0ef9bd1c9c78",
+      "openxr/runner.log": "0e9496dcaa0d798ce3ba016c70ed6bbacbd07f687ea48c9ca1d18ba3596b6d80",
+      "previous-combined-run-at-recording.json": "1813c8216aaff1c9a1804d567d8e982a9f13d2e933f089da480c954fec6e4c0e",
+      "registered.log": "59a9fc8caa1d1f49c4dfbbe732f77f68cada56695f5671d1eeefb1407579c7c8",
+      "registered.xml": "1a23fa94a26d7dae4eb0c87c6846d697db61aa5ba950d511a7370c0e075c9c79",
+      "release-arc/graphics.log": "58b20961f3c6a5a83ffabed3e9b1088ab6da6938e80e26571481d0f0f5b74a7d",
+      "release-software/graphics.log": "669e3a10446068c38a33aa823dd5d2c5dadb35606a73b5a41940f8da2490c7ec",
+      "release/app-link.log": "51e2fd49b83590887616947e0c1ffdb422a22c4357b5c6208041e5edeca707b7",
+      "release/archive-product.log": "b1d2ebc0e9a8a7f766cae0e6bc4c6b866b614dc3669137fd7a2f2d36310af700",
+      "release/archive-refresh.log": "9edac65fc0f0964827af4519909f5717a88807879f353746469123f8a3429ee1",
+      "release/emission-export.cpp-compile.log": "23ea0315389d3bc5124ce4a25b0c7735fd947110a540e4ce2efa411f0ddc5e3a",
+      "release/emission-package.cpp-compile.log": "f256c0929411df2a029e6a8b69e34c9936f14afbfef79a2bb469894d96e54f80",
+      "release/export.cpp-compile.log": "75d8bece20dafc83308e22eb38aa4459558ac8a92bd889807a4cb3764031f8fe",
+      "release/graphics-compile.log": "618356e86aae5c74d868609e2ed7ca2cf781d9a6a377967eb1744ab6a483598d",
+      "release/hdr.log": "57e94dc7190dfe0e8a4eef665a6fe2894c6eca77ac5223cc41ad10d3acd59635",
+      "release/portable.log": "56db6b6c490b0b070c4cc8d8d5aabff63db72b031895ad29ca2894274e5c0b49",
+      "release/recipe.log": "d9960bc352d4ef69468c9e066b6740262026de926a8d531d1fbce7092a481a2f",
+      "release/texture-set-export.cpp-compile.log": "829f4c94037dd1c879f50411177648e8b39475ea5af8d5e406f37829baa5f05d",
+      "schemas.json": "df0856fb755e270a7afb5407738226022dfc04ebbc30bef07109cb49617fdc77",
+      "ui.py": "efdda0ba5168600b87ef8cc75c12e4ae819f55d3b1b8855635362d9ea3cff914",
+      "wayland-diagnostic/report.json": "8f51ae17c4e3d3aad1bed83a5512a964747e23f041fa4291a81b0b5638ceff5f",
+      "wayland-diagnostic/runner.log": "cb61f88a5ab5236be2416aa097a5763542d2adf74f8e359bcee03d991eb9dbc8"
+    },
+    "sha256": "c8418af0a027cf2cdce4792da8eecf30b17adc35770cb339c10594206346b367"
+  },
+  "byte_identical_headless_float_exports": 2,
+  "byte_identical_outputs": {
+    "full-ldr/baked.dsculpt": "19c7d87b323627eaf611b6598ba8cb4cfecddaf4564b3831bb58c8e81b276cf6",
+    "full-ldr/editable.glb": "88d371010df098b666dfa19059bf99680b099cb203c71e203b6985d51f399763",
+    "full-ldr/recall.dsculpt": "e4636cdfede95a612fd87c6c9a936542b8247b11ea04717ced0e86ea7f8ef1e7",
+    "full-ldr/standard.glb": "dbc5deff3879a02d9808790b768da359325a5d20dc569bb9fb01a818a18c3f14",
+    "gain/baked.dsculpt": "e09e37dea273ffca8abb95f9e282589023146f8e4f579b1eb87127e0e490701f",
+    "gain/editable.glb": "34f4bb563afaf0eaa5943fd32c8eaa29ef0862520a200b5d9694a55c7e46e404",
+    "gain/recall.dsculpt": "21083a25ad20d720ea7c189c7b8b6725458ca30aa39b29a2ee8ba4594fb2485d",
+    "gain/standard.glb": "319cff3ce4946ebb4a8e4f35d2753b428fae2d635db296bad2d37a8d8af940a3",
+    "hdr/baked.dsculpt": "0f3ca03638142f8fd308816ebc14c1b7d4d51700596dcfcc332d9daf399ad39a",
+    "hdr/editable.glb": "d8a8c5961a3f32abb211de0886a1a0edc5e6a2f2745d01357152ba3c4c74d9d7",
+    "hdr/recall.dsculpt": "0a3cb3df9276388770f7a8c7e855e8f423f037634292b3f8e92ffd692f4f3c2c",
+    "hdr/standard.glb": "f74532f27215abf8ef2d809cbb6377674fe6ba03e10e2320e73df1c9e1b2a361",
+    "ldr/baked.dsculpt": "a450f7381798881a9cfbc9e01858437d44d19b31fd01397b5a47df89f7c568ab",
+    "ldr/editable.glb": "ba95d0149f37e8e465c952e03280aa19069f8293d6dbcfec40d1acfc80831597",
+    "ldr/recall.dsculpt": "01f9134bbbb9fc89b2c279b01d3c6915d547bfe09ab9df53bfcc9e2bf9a23ae8",
+    "ldr/standard.glb": "6b86b297192892313665e02cccd10e99c8bc8d9bf6cb417ba566da6efe1e4d13",
+    "varying-ldr/baked.dsculpt": "40d53dcee213ab213993852f85df0fa75fd36710b0676b48c822d7c02e21a20b",
+    "varying-ldr/editable.glb": "639781c1797ea2dfe56c843f13602540662e0d7097f0ef7a94a3920ccf4fc379",
+    "varying-ldr/recall.dsculpt": "a10777976d4b4c1addc218811d520a3b9f41fa3b0447b44fee108ce0320b0fc1",
+    "varying-ldr/standard.glb": "ebbd63779b99334b8db8a4697c82c5fc28541f0082b2ab51d972f1ebc2a7fa60"
+  },
+  "canonical_domed_revision": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "float_member_resources": {
+    "gain": [
+      {
+        "exr_sha256": "34ddc9f1e1bc89aa7df4fb37e190ea75389a58017d3d36920761d786b254eb18",
+        "set": 1,
+        "strength": 1.0,
+        "view": "authored-mtoon"
+      }
+    ],
+    "hdr": [
+      {
+        "exr_sha256": "06b714def116dea830f5d288031c28d477a221cc0656e835325d47b39ee91308",
+        "set": 0,
+        "strength": 1.399999976158142,
+        "view": "authored-mtoon"
+      },
+      {
+        "exr_sha256": "9d38b3b34f6533cca577e15e5afbf51e7a980bd30c10845b1ac1fc4e2023feb1",
+        "set": 1,
+        "strength": 1.149999976158142,
+        "view": "pbr"
+      }
+    ]
+  },
+  "independent_interop": {
+    "khronos_errors": 0,
+    "khronos_files": 10,
+    "khronos_version": "2.0.0-dev.3.10",
+    "khronos_warnings": 0,
+    "pinned_mtoon_standard_files": 5,
+    "schema_resolver_controls": 2
+  },
+  "prior_combined_release_at_recording": {
+    "app_sha256": "757f265c99f4f811c34bf6d8ab9a0eb7d40ecf4a026350c418550fad2ef5625c",
+    "cache_sha256": "941246a34d52a93f55e2dc9444541cfe7ad057a397a1f773d0d5e28bcb52dc60",
+    "candidate": "662d889da2b3a56e36f2f58f5280a624ae798906",
+    "changed_paths": [
+      "CMakeLists.txt",
+      "docs/HANDOFF.md",
+      "docs/REQUIREMENTS.md",
+      "docs/validation/exact-overlay-gpu-budget-20261127.json",
+      "docs/validation/exact-overlay-gpu-budget-20261127.tar.gz",
+      "docs/validation/native-mtoon-bake-20261127.json",
+      "docs/validation/native-mtoon-bake-20261127.tar.gz",
+      "docs/validation/retopo-save-queue-20261127.json",
+      "docs/validation/retopo-save-queue-20261127.tar.gz",
+      "src/bake-authoring.cpp",
+      "src/bake.cpp",
+      "src/export.cpp",
+      "src/native-authoring-compiler.cpp",
+      "src/render-paint-overlay.hpp",
+      "src/source-bake-normal.hpp",
+      "src/texture-set-export.cpp",
+      "src/texture-set-export.hpp",
+      "src/texture-set-range.cpp",
+      "src/texture-set-surface.cpp",
+      "src/texture-set-worker.cpp",
+      "src/texture-sets.cpp",
+      "tests/bake-recipes-xr.py",
+      "tests/bake-recipes.cpp",
+      "tests/baked-emission-gpu.cpp",
+      "tests/mtoon-render.cpp",
+      "tests/paint-overlay-gpu.cpp"
+    ],
+    "elapsed_seconds": 1049.026,
+    "invocation": "5d6e0b870e0749f1a8e890898960df75",
+    "phase": "run every registered Release test",
+    "registered": 1366,
+    "seed_app_sha256": "e0e7ea525e5338c4080a2af9db1cca0c18d856b5d9ddf37c399214b0afdc2e38",
+    "seed_cache_sha256": "7a052e626ae14dbbeb06a4465ed0203f08e2cba506988b71f891d7d317c00ab0",
+    "seed_registration_error": "texture-set-export was renamed dome-sculpt-texture-set-export",
+    "seed_revision": "f70483e921ded0d80497f36802e9201b9aebc1c1",
+    "terminal": false
+  },
+  "product_revision": "8f655748804f47351c3a888d4bd72bab4ac18512",
+  "profiles": {
+    "asan-arc": {
+      "alpha_differences": 0,
+      "float_filter": [
+        {
+          "analytical_bound": 0.00138053,
+          "case": "gain",
+          "channel_comparisons": 39048,
+          "fractional_points": 2476,
+          "maximum_absolute_error": 0.00121173
+        },
+        {
+          "analytical_bound": 0.00629001,
+          "case": "hdr",
+          "channel_comparisons": 39402,
+          "fractional_points": 2476,
+          "maximum_absolute_error": 0.00467272
+        }
+      ],
+      "graphics_checks": 171,
+      "maximum_rgb_byte_difference": 1,
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+    },
+    "asan-software": {
+      "alpha_differences": 0,
+      "float_filter": [
+        {
+          "analytical_bound": 0.00138053,
+          "case": "gain",
+          "channel_comparisons": 39048,
+          "fractional_points": 2476,
+          "maximum_absolute_error": 0.00121173
+        },
+        {
+          "analytical_bound": 0.00629001,
+          "case": "hdr",
+          "channel_comparisons": 39402,
+          "fractional_points": 2476,
+          "maximum_absolute_error": 0.00467272
+        }
+      ],
+      "graphics_checks": 171,
+      "maximum_rgb_byte_difference": 2,
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)"
+    },
+    "release-arc": {
+      "alpha_differences": 0,
+      "float_filter": [
+        {
+          "analytical_bound": 0.00138053,
+          "case": "gain",
+          "channel_comparisons": 39048,
+          "fractional_points": 2476,
+          "maximum_absolute_error": 0.00121173
+        },
+        {
+          "analytical_bound": 0.00629001,
+          "case": "hdr",
+          "channel_comparisons": 39402,
+          "fractional_points": 2476,
+          "maximum_absolute_error": 0.00467272
+        }
+      ],
+      "graphics_checks": 171,
+      "maximum_rgb_byte_difference": 1,
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+    },
+    "release-software": {
+      "alpha_differences": 0,
+      "float_filter": [
+        {
+          "analytical_bound": 0.00138053,
+          "case": "gain",
+          "channel_comparisons": 39048,
+          "fractional_points": 2476,
+          "maximum_absolute_error": 0.00121173
+        },
+        {
+          "analytical_bound": 0.00629001,
+          "case": "hdr",
+          "channel_comparisons": 39402,
+          "fractional_points": 2476,
+          "maximum_absolute_error": 0.00467272
+        }
+      ],
+      "graphics_checks": 171,
+      "maximum_rgb_byte_difference": 2,
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)"
+    }
+  },
+  "registered_release_seconds": {
+    "dome-sculpt-texture-set-export": 12.0547,
+    "emission-export": 0.156027,
+    "mtoon-baked-texture-sets": 8.98605,
+    "mtoon-painted-texture-sets": 0.289107,
+    "mtoon-texture-sets": 0.26487,
+    "texture-set-bake-recipe": 0.0361786
+  },
+  "ui_release_smoke": {
+    "openxr": {
+      "checks": 19
+    },
+    "wayland-diagnostic": {
+      "checks": 16
+    }
+  },
+  "unchanged_ldr_outputs": 12
+}
