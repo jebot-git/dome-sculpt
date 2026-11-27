@@ -14,11 +14,10 @@ Update this current summary at milestones rather than prepending more history.
 
 Dome Sculpt is an integrated authoring candidate. The isolated software
 Release run for `662d889d` passed all 1,366 registered tests. The newer
-controller attachment revision `eea22499` has focused Release and sanitizer
-results, nested DomeD Wayland coverage, and synthetic OpenXR coverage on
-software GL and Intel Arc A770. Its own combined Release rerun started after
-these checks. The [validation receipt](validation/vrm1-xr-attachment-20261127.json)
-contains the earlier complete JUnit and the new focused evidence.
+controller attachment revision `eea22499` passed all 1,367 registered tests
+in its combined Release run. It also has focused sanitizer results,
+nested DomeD Wayland coverage, and synthetic OpenXR coverage on software GL
+and Intel Arc A770. [Controller attachment validation](validation/vrm1-xr-attachment-20261127.json)
 
 The current texture-set shapekey revision `17367cb0` adds mixed-material
 shapekey authoring and portable rigid VRM 1.0 accessory morphs. It restores
@@ -33,7 +32,9 @@ history. Standard and Editable GLB carry per-corner morph normals and
 tangents where the material requires them. Release and ASan/UBSan pass the
 focused worker suite. Eight OpenGL fixtures pass on llvmpipe and Intel Arc,
 nested DomeD Wayland covers Create and Undo/Redo, and synthetic OpenXR
-reopens and renders the saved pose in both eyes. [Retained texture-set shapekey validation](validation/retained-texture-set-shapekeys-20261127.json)
+reopens and renders the saved pose in both eyes. A fresh combined Release
+run for `9db1ed93` is running separately.
+[Retained texture-set shapekey validation](validation/retained-texture-set-shapekeys-20261127.json)
 
 Native texture-set accessories can now use Surface Heat, weight transfer, or
 legacy automatic binding against an original VRM 1.0 avatar. Surface Heat keeps

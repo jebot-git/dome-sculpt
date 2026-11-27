@@ -363,5 +363,18 @@
       "xr-export-arc/runtime.json": "62c049af78fe24ead0dd02df70440ed02816305951706cdcb175dfef7cbd706a",
       "xr-export.py": "e7882b576d1f8afaa8e7a2d2ff4d8d83c60d307af2203bf3301406eef37a6487"
     }
+  },
+  "combined_full_software_release": {
+    "revision": "eea224999d5e542c20f1a383be893b68ffdc3b37",
+    "totals": {
+      "pass": 1367,
+      "fail": 0,
+      "skip": 0
+    },
+    "app_sha256": "017807904294579dfeab2a4ea7e05c96a7c4bf1d2b4aa51a19f7fdcee63575ce",
+    "cache_sha256": "941246a34d52a93f55e2dc9444541cfe7ad057a397a1f773d0d5e28bcb52dc60",
+    "junit_path": "vrm1-xr-attachment-combined-release-20261127.xml.gz",
+    "junit_sha256": "ee1226cd91830f807a1acdf01e4f2afcfc9f06776bec5f59982b927ceb820344",
+    "compressed_junit_sha256": "a0b9be7e23f778fb905b3f637fa6e4a117a37e82f22bee55b773ecaa06616490"
   }
 }
