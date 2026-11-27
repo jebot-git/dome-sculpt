@@ -382,10 +382,31 @@ All 27 focused Release and 20 strict ASan/UBSan cases pass. Standard and
 Editable GLB carry each material's own faces, texture dimensions and explicit
 tangents. Both exports and the package-free copy pass Khronos validation with
 zero errors and warnings. The package-free reimport differs from the native
-view by at most one 8-bit RGB level in both eyes. Independently prepared and
-source-retained material grids, typed MToon sets, larger assets, accelerated
-resampling and physical device acceptance remain open.
+view by at most one 8-bit RGB level in both eyes.
 [Per-material Bake resize evidence](validation/texture-set-bake-resize-20261127.json)
+
+Native MToon material slots now resize their writable paint and canonical
+Bake while their independent base, shade, normal and emission roles keep
+their original image and sampler owners. The same applies to independent
+Core PBR images on native UV0. Enlargement preserves whole authored paint
+cells. Reduction checks the original hidden and visible layers, and the
+worker checks the composed paint and coverage in both native color views
+when the Bake or layers carry different PBR colors. The baked fixture grows
+from 128 to 256 and reduces back to the original Bake coefficients. The
+painted fixture grows from 64 to 128 while its varying shared shade, base and
+emission sources stay at 64.
+
+All 29 focused Release tests and three strict ASan/UBSan workflows pass.
+Wayland and synthetic OpenXR produce byte-identical baked project saves after
+Apply, Undo and Redo. The Standard and Editable GLB files pass Khronos and
+pinned MToon 1.0 schema checks. Standard GLB and package-free imports match
+the native rendered fixtures within one 8-bit component on Intel Arc A770
+and llvmpipe. The painted export keeps identical cutout pixels and 35 picking
+decisions on each renderer. Source-authority and independently prepared paint
+grids, larger assets, GPU resampling and physical device acceptance remain
+open. Standard export of other source-role combinations still needs its own
+portable representation.
+[Native MToon grid resize evidence](validation/texture-set-mtoon-resize-20261127.json)
 
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and

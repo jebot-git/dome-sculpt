@@ -1,0 +1,468 @@
+{
+  "archive_members_sha256": {
+    "asan/baked-mtoon.log": "ba0fd2ad7ee3d49d6980b54f2851faac6f299faf2a57601230b77aa101a5844e",
+    "asan/baked.log": "317516bf288fd1fa08b50b2c5fc287cccbabb6662a086e5a57efb38e2c70600a",
+    "asan/default.log": "5c9ddcf2f642a2c180879aff9b197bc1dd67909d99abc325e745a5647636d687",
+    "baked-v4/render-portable-arc.log": "02bd555e8c6fd8d5a51498af1a9f205c53df8361a377047e5aaff42e56f74449",
+    "baked-v4/render-portable-software.log": "e80035078d34ab33cafa1a45562ccdf7e4b523ffaea155c36a2d0c9d9692679f",
+    "baseline-new.log": "e01e4142ab5941057029001198c46159b75af86e338058f8aa2f59e81d5f1f68",
+    "baseline-old.log": "e10ea893b15bf1776b69919123d3f54c78b56833a9f0080494cfed4fbec81ab3",
+    "baseline-probe.cpp": "d433b5e731c98449b212945d1850de1d46745e5727eb8702c541df31e2d5e593",
+    "bind-wayland.log": "002da5047f5529ef704f2718c79ea2ffdd5ba20be3f7d3603bf9f43108801711",
+    "build-v4.sh": "3acc92f6cb23bd976c699ae895e78cd0b10f9c2db7603e7607e05a92cd9c410f",
+    "check-arc.sh": "4f992570f12af6544899d8404466a9f54dba17a82a0f272685282d10bbc59ff2",
+    "check-asan.py": "1a1b0ba81f1392b6357812841cfd8ef824b89e4d39edca6c0ebaf098df04a2a6",
+    "check-baseline.py": "7c21bf6586df4e0e4699837357fc1d185a6957938d8a29e2f17c58a41f5b3aeb",
+    "check-release.sh": "878e8fbe2d222114731591f01cb4b88051f060f3555831f68819dd9cb2816340",
+    "field-xr-paced-arc.log": "3f5669241733f1253b3f74a80c6b6c3260792abb8454d75fe886dc9a5f700d20",
+    "field-xr-paced-arc/report.json": "b06e74bafdca768e3b47da552721113bdd40bae99a59cd792d6371441723b12b",
+    "field-xr-paced-arc/runtime.json": "100b527b22dc1d931a2bdd157502521910e7397fe805009e368536999ba850e5",
+    "field-xr-paced-software.log": "3f5669241733f1253b3f74a80c6b6c3260792abb8454d75fe886dc9a5f700d20",
+    "field-xr-paced-software/report.json": "0f5ab221ad77bb6ca9a59a7562aa20cdc716ec074d11dc0214c51d2f029e84a0",
+    "field-xr-paced-software/runtime.json": "70f1348063b162c6e3e9261026d36701c2e9e4cc75077636fd15d6cc57271113",
+    "field-xr-paced.py": "9a34c4bd493c0c65a3e219d503a17acdaae1200cb2da61c459c1f93b5b963a90",
+    "first-wayland.json": "ffbb64bdd32d2819a9fefec8a21e45eba2647e5cf45f4cc740ead24491e2e8c6",
+    "first-wayland.log": "15d606d72661bd95c13720505d27c5e665d49103ce304f5ee1cc7eec5d506b0b",
+    "khronos.cjs": "8aa033667c14917bf1f1ce6f1e675e7413d7159aeb3a0ab2fbcbe3ab798e8eb5",
+    "khronos.json": "6b87cc1da90e952bfcefad517687ac691b38c7ca93467f3dc82931440321445b",
+    "khronos.log": "2c6a52819ee479bc8f58db760fc465b680a25980ecbdea1e321be21c24f4bff3",
+    "native-v4.log": "ba0fd2ad7ee3d49d6980b54f2851faac6f299faf2a57601230b77aa101a5844e",
+    "painted-v2-software.log": "79a808ae98b9f70630aeac77e01b64c134abfbd83cb0c27ccb0012aba928322e",
+    "painted-v4-arc.log": "05c7876c8d86759138167642a65dfb9627fe8836f4825cce254237d92fed86ae",
+    "painted-v4-software.log": "959781e2741e7d20396d0019c1387fa5c06de628627fd8d501991254d523f0f2",
+    "record.py": "6620f828cbb04b8aa95a2eaacf5463326c58ca55f044272cfa90530e360072a8",
+    "regression-build.log": "3bc990ac9c3205e3eebebffe1618df76ec12b0680115ef627976df8da6e97ef9",
+    "release-tests.log": "4261381fd33a26c8e1717e7c0a14e8625cc798b10211a1ff3bea6e11af60f498",
+    "release-v4-build.log": "9ad115639a22b1c83ee417b446f9aab96da4a5f359aa4fd8e896af3236eb8186",
+    "release/mtoon-resize.xml": "6845befba929cee90683c8d6f5ab9812109341c85226cfa0368f7beeec1e930f",
+    "render-portable.cpp": "348e96eec050ccfad7c9239c8de902a06d97fcbb43bd3a6e1c646b36d40abd8a",
+    "render-portable.py": "d96e06c1bd00de6ba4d88eb05e09fd5712058dcf0ffb2064a69c7d11abb171d2",
+    "run-field-xr-paced.py": "19ea519d4465347cc88ce3cf1659f7cf2db7dde61a71f5754d65fb46e49656e1",
+    "run-wayland.py": "72bc44bab3cab6b1f5d0621cc5fe85322b1da6beb8fd9f0de2b598a7e987dac2",
+    "schemas.json": "16c0c109abab4ea15e4056a09f1eba5643e0b868a58094e5d9fc3e70e89bfb38",
+    "schemas.log": "8c7126a4357a9d45426514e7ea50061485589b77deea1fec5063e1d14908869c",
+    "schemas.py": "f04602074fd0d77411c09ac61f0832187e6498eb130c9eb860f76472ea2c2fcf",
+    "source-v4.patch": "62429de99d3fe0e63e0fc70120255a55511dc09777865497b3f5eab4f2d36747",
+    "strip-editable-package.py": "478013101a02fef2d3429bab89210645262bfe15caf3fa9dcc0e616bdb6213b5",
+    "wayland-resize.py": "955528946f6ebc11ee840a878e637d92d6d8f98fd22b12eb00de28a739e857b7",
+    "wayland-resize/report.json": "cddbdc36c2b25ea24a188bd22de6a8b64b2f4d2b305aa947745f4ecc0acd6c99"
+  },
+  "archive_sha256": "c7643dadfc839dc7432f3af1252bb21aa3cc722924cf7de2799f3dbfe468f7dd",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "khronos": {
+    "results": [
+      {
+        "extension": {
+          "shadeMultiplyTexture": {
+            "index": 6
+          },
+          "specVersion": "1.0"
+        },
+        "issues": {
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "pointer": "/extensionsUsed/1",
+              "severity": 2
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/bufferViews/14",
+              "severity": 2
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/bufferViews/15",
+              "severity": 2
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/textures/6",
+              "severity": 2
+            }
+          ],
+          "numErrors": 0,
+          "numHints": 0,
+          "numInfos": 4,
+          "numWarnings": 0,
+          "truncated": false
+        },
+        "uri": "baked-v4/baked-member-standard.glb"
+      },
+      {
+        "extension": {
+          "shadeMultiplyTexture": {
+            "index": 6
+          },
+          "specVersion": "1.0"
+        },
+        "issues": {
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "pointer": "/extensionsUsed/1",
+              "severity": 2
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/bufferViews/14",
+              "severity": 2
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/textures/6",
+              "severity": 2
+            }
+          ],
+          "numErrors": 0,
+          "numHints": 0,
+          "numInfos": 3,
+          "numWarnings": 0,
+          "truncated": false
+        },
+        "uri": "baked-v4/baked-member-editable.glb"
+      },
+      {
+        "extension": {
+          "shadeMultiplyTexture": {
+            "index": 6
+          },
+          "specVersion": "1.0"
+        },
+        "issues": {
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "pointer": "/extensionsUsed/1",
+              "severity": 2
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/bufferViews/14",
+              "severity": 2
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/bufferViews/15",
+              "severity": 2
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/textures/6",
+              "severity": 2
+            }
+          ],
+          "numErrors": 0,
+          "numHints": 0,
+          "numInfos": 4,
+          "numWarnings": 0,
+          "truncated": false
+        },
+        "uri": "baked-v4/portable.glb"
+      },
+      {
+        "extension": {
+          "shadeColorFactor": [
+            1,
+            1,
+            1
+          ],
+          "shadeMultiplyTexture": {
+            "index": 4
+          },
+          "shadingShiftFactor": -0.800000011920929,
+          "specVersion": "1.0"
+        },
+        "issues": {
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "pointer": "/extensionsUsed/1",
+              "severity": 2
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/textures/4",
+              "severity": 2
+            }
+          ],
+          "numErrors": 0,
+          "numHints": 0,
+          "numInfos": 2,
+          "numWarnings": 0,
+          "truncated": false
+        },
+        "uri": "painted-v4/rendered-varying-mtoon.glb"
+      },
+      {
+        "extension": {
+          "shadeColorFactor": [
+            1,
+            1,
+            1
+          ],
+          "shadeMultiplyTexture": {
+            "index": 4
+          },
+          "shadingShiftFactor": -0.800000011920929,
+          "specVersion": "1.0"
+        },
+        "issues": {
+          "messages": [
+            {
+              "code": "UNSUPPORTED_EXTENSION",
+              "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+              "pointer": "/extensionsUsed/1",
+              "severity": 2
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/bufferViews/11",
+              "severity": 2
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "pointer": "/textures/4",
+              "severity": 2
+            }
+          ],
+          "numErrors": 0,
+          "numHints": 0,
+          "numInfos": 3,
+          "numWarnings": 0,
+          "truncated": false
+        },
+        "uri": "painted-v4/painted-resized-editable.glb"
+      }
+    ],
+    "validator": "2.0.0-dev.3.10"
+  },
+  "matching_native_and_glb_sha256": {
+    "baked-member-128.dsculpt": "344834d565525c8bb83c9088de64342105c7092d404c6132f0204ffcd47489c9",
+    "baked-member-256.dsculpt": "44f67153cd7a0adc2fad0693991bbda6a536d5a557ab88afe98e8c27086b707c",
+    "baked-member-editable.glb": "7bbd5cf88898ed47ec1cc523ac51138890597fd659b87514447ad0091875d833",
+    "baked-member-standard.glb": "52df48c4eb24a52f01263e10999c66db16e6499d46cc02cfe81cd6c897169b85",
+    "mtoon-core-images.dsculpt": "f6ff4f428e563bc488034fc1b1c7333a9b4cdaa36c7aa22ee252dfb9075cba20",
+    "painted-original.dsculpt": "40c0c4610aa78f969ec624910b7b2de4da858b1b6c252c2220358ecfd130d17b",
+    "painted-resized-editable.glb": "2add2a78868080ac3e2f23f303a574cc6fc5156643c12257b5f5920b5de73cd8",
+    "painted-resized.dsculpt": "0303ba45ba43c366367bf0d3890c4709dd06da12e40f436814a231e21c6d4930",
+    "rendered-varying-mtoon.glb": "707277cf0515842d7709efb3faaed5fd633c99b7ff0806a6ad377875a9a309fb"
+  },
+  "mtoon_schema": {
+    "cases": [
+      "baked-v4/baked-member-standard.glb",
+      "baked-v4/baked-member-editable.glb",
+      "baked-v4/portable.glb",
+      "painted-v4/rendered-varying-mtoon.glb",
+      "painted-v4/painted-resized-editable.glb"
+    ],
+    "malformed_shade_role_refused": true,
+    "pinned_schema_sha256": {
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/VRMC_materials_mtoon.schema.json": "39e69f102c7ae3bdaa35ff8f2bcbc022a5a4c052fe97009198566105c667e941",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/accessor.schema.json": "836d6678a985f3ffda0ab0c88ba6c0b83a8a5a484880c8da22d512525be3f418",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/accessor.sparse.indices.schema.json": "8ad0c36c2f36f4273f57fc14f9bdf81e2181004ba190d9f76f9a90aa2f2de000",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/accessor.sparse.schema.json": "41741576fb4b34d87f69166ed7e102ebe790ab96c5ae0cb6f8e891f2f59ac209",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/accessor.sparse.values.schema.json": "a796ba3bbf03d67fda7d4231cf26889ed56a94752ee55ab76e4db43261267ac3",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/animation.channel.schema.json": "7fb2fe35740e1dd8eb991712e2931e0a7d679d827066990d874ffb90d8c5fd62",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/animation.channel.target.schema.json": "ebbfe3c6d433b90f48c3d83c098082f72a78ed996b50a63be303587d2f8a32be",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/animation.sampler.schema.json": "3cdf57b0f146e76fa43eeba0336b296c89f5d09d707245f6982d173e5815fd45",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/animation.schema.json": "090c3906436d531c596044693b133e41d0bb28dccd5f065fc94635f43cb252ff",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/asset.schema.json": "99e271cd33fb36267db66b57f88317f3e6afd45f3ca12f10dffaaefd2051d0d2",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/buffer.schema.json": "407102821410d22b48bbc89dc8d76e02d6c26050e278664a84a260123fc94803",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/bufferView.schema.json": "9cd1b6af63de10e803f8dabf0bf6a903adef548998fa489eeb8b88978e020c8e",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/camera.orthographic.schema.json": "4739ae63fe8b16707526a64a4a33236fb212e8787fe2f2cd0dffc660a6ddef8e",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/camera.perspective.schema.json": "7b05b703d87be68ddf6c81904645442410c44f8b6b1960bd6cdd78ba0eb0b14e",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/camera.schema.json": "2de68eb1517b0df657c850840d6c485fc59bbb244a317f25ac13824fa619b03d",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/extensions.schema.json": "57c27d85fe1a7e4e13cc750ff1e35313cd5da83cc676d1526d626096e3b61d53",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/extras.schema.json": "97a8d6a5780c7c5d135933009261333c10bb7bfee0545c4e4b326d2d5c2d9fe5",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/glTF.schema.json": "659a1196f8b40b95f6524bbb85d4f0e580e4bd2d0525ddf4d6c70860fd6de7d3",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/glTFChildOfRootProperty.schema.json": "80952f5b6d0c2da226a2d009f67364f87a913b92adcf37be8e17445d40b4dfcd",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/glTFProperty.schema.json": "fe4a6164cdd8be0fd40324f1391a381564b93a82ba8730182cf3e7195a06ebfb",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/glTFid.schema.json": "83037eabbf44c5e07e28f3b8d3822c9c8359b9cd80710a32ddd482a7c4a6ede4",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/image.schema.json": "4d7e8d67858ee9cbc69c4edb67030e5dcb62116b27d5920a3f079b078b9bd60f",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/material.normalTextureInfo.schema.json": "6872e45b94f7b32f531b4f82ce794f7271329f72cd6050674f7222bc8838f89c",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/material.occlusionTextureInfo.schema.json": "089059e95f2341eb6692278b0cfb12401f2ce399c20ee2dae4179746d2846557",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/material.pbrMetallicRoughness.schema.json": "a88b6e5585bbe5a5365d18c34e0e1f4949e61588f03f3782f8802f55ffa4cbae",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/material.schema.json": "a9e9f7d7ef2be8e40ca309c26a9d4bdf6d6cdedc78ff5943dcd4b3221089d72c",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/mesh.primitive.schema.json": "7b0a44f930f17590fbe4abc2f0089a5537a87520fc9d8df44d94f75dffc483e9",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/mesh.schema.json": "d173e14adc7c02fabc92894a2afbc91f467cc6c37a1dcc84763161235f20472b",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/mtoon.shadingShiftTexture.schema.json": "248280f5bbb0d0677125237d6837d8157f88632a3a3c1aef1f7ee923e23c152c",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/node.schema.json": "1a88ac975a6eb05adf51484ce3104b687f260cd75157223826bfcf9fc05ce52c",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/sampler.schema.json": "2d3d291ef504c851e8ea84e10e28dd844095355da13f70b406cbee1ea7a68667",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/scene.schema.json": "33dbc49a173c2f600343b19e7667106ba8ace2787047c7598f9e4c98e03a6521",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/skin.schema.json": "1ecd6daca82bacbd280bc9abcf812fcd97108b6dce50c22dd52dbc6066756bc1",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/texture.schema.json": "15864aad7b07caddc57858d55af4dfcb92c8fecea7d376086e3c456d2f9b5cb5",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/textureInfo.schema.json": "d112fbf4c366bee9309dfb476f73cbf057a199425baf7cdcb66e2382b2346431"
+    }
+  },
+  "physical_headset": false,
+  "previous_main": "43fc158b6e5fc91a81a76ee46dc1afdab3d4f3ef",
+  "product": "2a6ad4fa4873e027050aad485d02d0db41eaae2f",
+  "release_application_sha256": "3f02f560f70e9eaf7a100f4986976d82e567140cb4fa55fdcc346fe1b86099db",
+  "release_tests": [
+    "dome-sculpt-texture-set-baked-mtoon-resolution",
+    "dome-sculpt-texture-set-baked-resolution",
+    "dome-sculpt-texture-set-resolution",
+    "mtoon-baked-texture-sets",
+    "mtoon-painted-texture-sets",
+    "mtoon-resized-texture-set",
+    "mtoon-texture-sets",
+    "native-authored-paint-resolution",
+    "native-baked-paint-resolution",
+    "native-empty-paint-resolution",
+    "native-mikk-export",
+    "native-mtoon-preview-contracts",
+    "retopology-first-material-affine",
+    "retopology-first-material-plain",
+    "retopology-first-material-posed-affine",
+    "retopology-first-material-posed-plain",
+    "retopology-imported-bake-resize",
+    "retopology-imported-mtoon-mixed-hdr",
+    "retopology-imported-mtoon-mixed-ldr",
+    "retopology-imported-mtoon-painted",
+    "retopology-imported-mtoon-resize",
+    "retopology-imported-mtoon-tinted",
+    "retopology-imported-mtoon-unprepared",
+    "retopology-imported-pbr",
+    "retopology-imported-prior-bake",
+    "retopology-mtoon-affine",
+    "retopology-mtoon-detached",
+    "retopology-mtoon-plain",
+    "retopology-mtoon-v0"
+  ],
+  "rendering": {
+    "arc": {
+      "baked_max_rgba8": 1,
+      "baked_pixels": 11628,
+      "baked_rms": 0.145303,
+      "painted_alpha_differences": 0,
+      "painted_max_rgb8": 1,
+      "painted_visibility_rays": 35
+    },
+    "software": {
+      "baked_max_rgba8": 1,
+      "baked_pixels": 11628,
+      "baked_rms": 0.154064,
+      "painted_alpha_differences": 0,
+      "painted_max_rgb8": 1,
+      "painted_visibility_rays": 35
+    }
+  },
+  "resize_backend": "CPU",
+  "sanitizer_checks": {
+    "baked": 52,
+    "baked-mtoon": 68,
+    "default": 2319
+  },
+  "source_patch_sha256": "62429de99d3fe0e63e0fc70120255a55511dc09777865497b3f5eab4f2d36747",
+  "synthetic_controller": {
+    "arc": {
+      "balanced_frames": 179,
+      "checks": [
+        "accepted rendered palette shows the expected history and closes after Save",
+        "accepted controller Save matches the complete native project byte for byte",
+        "undone rendered palette shows the expected history and closes after Save",
+        "undone controller Save matches the complete native project byte for byte",
+        "redone rendered palette shows the expected history and closes after Save",
+        "redone controller Save matches the complete native project byte for byte",
+        "OpenXR app drains and final close persists the exact resized patch",
+        "Real OpenXR loader balances frame, images and both swapchains",
+        "Both eyes render the patch and its actual resolution panel",
+        "Loader delivers actual panel navigation and slider rays",
+        "Requested OpenGL renderer drives the workflow",
+        "Process maps witness the ordinary application and synthetic runtime module"
+      ],
+      "complete": true,
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "runtime": "/home/blux/de-xr/dome-sculpt/artifacts/current-integrated-full-release-20261127/build/libdome-sculpt-texture-resolution-runtime.so"
+    },
+    "software": {
+      "balanced_frames": 154,
+      "checks": [
+        "accepted rendered palette shows the expected history and closes after Save",
+        "accepted controller Save matches the complete native project byte for byte",
+        "undone rendered palette shows the expected history and closes after Save",
+        "undone controller Save matches the complete native project byte for byte",
+        "redone rendered palette shows the expected history and closes after Save",
+        "redone controller Save matches the complete native project byte for byte",
+        "OpenXR app drains and final close persists the exact resized patch",
+        "Real OpenXR loader balances frame, images and both swapchains",
+        "Both eyes render the patch and its actual resolution panel",
+        "Loader delivers actual panel navigation and slider rays",
+        "Requested OpenGL renderer drives the workflow",
+        "Process maps witness the ordinary application and synthetic runtime module"
+      ],
+      "complete": true,
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "runtime": "/home/blux/de-xr/dome-sculpt/artifacts/current-integrated-full-release-20261127/build/libdome-sculpt-texture-resolution-runtime.so"
+    }
+  },
+  "wayland": {
+    "checks": [
+      {
+        "check": "Native Wayland paint client publishes the Dome Sculpt identity",
+        "passed": true
+      },
+      {
+        "check": "Native Wayland client exports the universal texture-set command",
+        "passed": true
+      },
+      {
+        "check": "The loaded baked texture set enables the universal texture-set command",
+        "passed": true
+      },
+      {
+        "check": "The FLTK dialog opens on the current 128-pixel grid under the same Wayland identity",
+        "passed": true
+      },
+      {
+        "check": "DomeD key events stage the 256-pixel choice",
+        "passed": true
+      },
+      {
+        "check": "Ctrl+W cancels the draft without writing the project",
+        "passed": true
+      },
+      {
+        "check": "Reopening after cancellation shows the original grid",
+        "passed": true
+      },
+      {
+        "check": "DomeD keyboard navigation reaches the native Apply button",
+        "passed": true
+      },
+      {
+        "check": "Ordered native Save matches the complete controller-authored 256-pixel project",
+        "passed": true
+      },
+      {
+        "check": "Universal Undo and Save restore the exact original project",
+        "passed": true
+      },
+      {
+        "check": "Universal Redo and Save reproduce the exact enlarged project",
+        "passed": true
+      },
+      {
+        "check": "Native Wayland client closes after the paint worker and history operations",
+        "passed": true
+      }
+    ],
+    "complete": true
+  }
+}

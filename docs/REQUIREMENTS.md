@@ -207,10 +207,17 @@ Bake source. The second slot's enlargement preserves every original baked and
 authored paint cell. The tested inverse reduction restores the original baked
 data. Save, cold Open and history are covered through the native worker, nested
 DomeD Wayland and synthetic OpenXR. Standard and Editable GLB preserve both
-materials and their explicit normal-map tangents. Independently prepared,
-source-retained and typed MToon material grids, larger assets, acceleration and
-physical device testing remain open.
+materials and their explicit normal-map tangents.
 [Per-material Bake resize evidence](validation/texture-set-bake-resize-20261127.json)
+
+Native MToon slots resize layered paint and canonical Bakes while preserving
+the original typed roles and independent UV0 images. The tested MToon 1.0
+fixtures cover varying shared shade, masked color, FLOAT emission, canonical
+normals, exact history, and Standard and Editable GLB. Real DomeD Wayland and
+synthetic OpenXR cover ordered publication. Prepared and source-authority
+grids, wider portable export, larger assets, acceleration and physical device
+verification remain open.
+[Native MToon grid resize evidence](validation/texture-set-mtoon-resize-20261127.json)
 
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.
