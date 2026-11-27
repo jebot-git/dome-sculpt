@@ -1,0 +1,319 @@
+{
+  "product": "06412ee9707abba83004aafb28bc4ad1230ce4b0",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "canonical_domed_compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+  "release_fltk": "/opt/fltk-vr/toolkit",
+  "release_app_sha256": "6726514718677fb8db5ddab09a6dc9808f266335390bc8f6932ca66735735f8d",
+  "release_tests": [
+    "native-paint32-fixture",
+    "retopology-affine-ui-fixture",
+    "layered-normal-native",
+    "layered-normal-uv-native",
+    "retopology-input-admission",
+    "retopology-affine-openxr",
+    "retopology-prepared-color-normal-affine",
+    "retopology-prepared-color-normal-plain",
+    "retopology-caller-admission",
+    "dome-sculpt-texture-set-export",
+    "retopology-reapply-plain",
+    "retopology-prepared-color-affine",
+    "retopology-reapply-affine",
+    "retopology-prepared-color-plain",
+    "retopology-prepared-affine",
+    "retopology-save-handoff",
+    "retopology-prepared-plain",
+    "retopology-held-admission",
+    "retopology-prepared-detached-affine",
+    "retopology-history-openxr-apply",
+    "retopology-prepared-detached",
+    "authoring-native-normal-union",
+    "retopology-restore-plain",
+    "texture-set-retained-skin",
+    "texture-set-retained-shapekeys",
+    "retopology-history-openxr-cancel",
+    "dome-sculpt-texture-set-source-export",
+    "retopology-restore-affine",
+    "retopology-mtoon-affine",
+    "retopology-mtoon-plain",
+    "retopology-mtoon-detached",
+    "retopology-linked-vrm1",
+    "retopology-surface-heat-plain",
+    "retopology-surface-heat-affine",
+    "texture-set-mtoon-independent-paint",
+    "retopology-affine",
+    "retopology-mtoon-v0",
+    "retopology-affine-wire",
+    "retopology-subdivide-seam-plain",
+    "retopology-material-seam-plain",
+    "vrm1-retained-skinned-accessory",
+    "retopology-subdivide-seam-affine",
+    "retopology-authoring",
+    "retopology-worker-faults",
+    "retopology-material-seam-affine",
+    "retopology-worker-accepted-publication",
+    "texture-set-mtoon-derivative-tangent",
+    "retopology-mixed-material",
+    "texture-set-mtoon-varying-alpha",
+    "retopology-authority-focus",
+    "retopology-worker-reporter-recovery",
+    "dome-sculpt-texture-set-surfaces",
+    "retopology-authority-grab",
+    "texture-set-active-bake",
+    "retopology-prepared-color-normal-first"
+  ],
+  "strict_asan_ubsan_workflows": [
+    "prepared-color-normal-plain",
+    "prepared-color-normal-affine",
+    "prepared-color-normal-first",
+    "prepared-color-affine",
+    "prepared-affine",
+    "reapply-affine"
+  ],
+  "native_color_checks": {
+    "prepared-color-normal-plain": {
+      "coverage_above_240": 191573,
+      "independent_bake_alpha": 191573,
+      "independent_hidden_layer_rgba": 8835,
+      "independent_normal_at_zero_color_coverage": 61067
+    },
+    "prepared-color-normal-affine": {
+      "coverage_above_240": 90058,
+      "independent_bake_alpha": 90058,
+      "independent_hidden_layer_rgba": 7567,
+      "independent_normal_at_zero_color_coverage": 144302
+    },
+    "prepared-color-normal-first": {
+      "coverage_above_240": 191573,
+      "independent_bake_alpha": 191573,
+      "independent_hidden_layer_rgba": 8835,
+      "independent_normal_at_zero_color_coverage": 61067
+    }
+  },
+  "byte_identical_release_and_sanitizer": {
+    "retopology-prepared-color-normal-plain/color-before.dsculpt": "e59b361c163e22ecc79ba2dab20f7739766219c24f9412afacb18aded8254086",
+    "retopology-prepared-color-normal-plain/color-after.dsculpt": "260843e16dea828cd43970ca9a7b3ba6d1843202b4541966a46893b256c423fc",
+    "retopology-prepared-color-normal-plain/color-common-control.dsculpt": "07b5bcad0e067f997d55c7d1642c52fefdae0c31dfcf612f4497fa73c3eb7f6d",
+    "retopology-prepared-color-normal-plain/color-standard.glb": "30b69520c931f4660091dfae57ce0dcc66098e1341535b713f44e240adfefa39",
+    "retopology-prepared-color-normal-plain/color-editable.glb": "2506932bf7484d068f2217bfe5939b7b24ca115a5afcf52ce6f42d3e9ec04f53",
+    "retopology-prepared-color-normal-plain/color-normal-cleared.dsculpt": "7ca00080ab282694914563567aa706d3936d25c6b7e56de975c1ed3520ed9c4b",
+    "retopology-prepared-color-normal-plain/color-normal-flat-control.dsculpt": "9dd7b56f0fcd8740291532103ab922c9a3d292b148833088bcafca565834b5f5",
+    "retopology-prepared-color-normal-plain/color-normal-unconverted.dsculpt": "ea1be499e73e18fdeebb8b3e6507521865e5524888a0e2e2b5882ec7576101ef",
+    "retopology-prepared-color-normal-plain/color-normal-converted.dsculpt": "7303ae466eaf0b64ed9206bfa8bec60c12d9698dc2b57d8134f5c0777af28cdb",
+    "retopology-prepared-color-normal-affine/color-before.dsculpt": "0b4a760a8166a51bb617cfc3761561e20e23e4f6d5447561e54e68a61535eaad",
+    "retopology-prepared-color-normal-affine/color-after.dsculpt": "1aada60cffbe7c2a957e6c70dd526e26d09a6879a0a048589def117940f54fc0",
+    "retopology-prepared-color-normal-affine/color-common-control.dsculpt": "f91b87a6b5e9aa31f27597ca1b8abacd78eea2dbfd85eb529bcbe0ce46a13e4d",
+    "retopology-prepared-color-normal-affine/color-standard.glb": "2b39a42f4d1a4ab340e7f14da41a97c8746a6dcb78f0d2346da19d3a2e35f01b",
+    "retopology-prepared-color-normal-affine/color-editable.glb": "92b40eac46631edd6e0edc4ff05917fffa03cb2e84544c018f6ffbaaace02e0d",
+    "retopology-prepared-color-normal-affine/color-normal-cleared.dsculpt": "c1a5625868428e319a98f0f2a17906ae5bdb40028f18f92e213eb76d67eb44e1",
+    "retopology-prepared-color-normal-affine/color-normal-flat-control.dsculpt": "c3af878c22b0d000b0d8ab832579122d42d067998b76ee4c8ee1b56c7eaa6e69",
+    "retopology-prepared-color-normal-affine/color-normal-unconverted.dsculpt": "5ae9228bb83d007d6584c8769549705c7ffa8ea081838486af56562b389a9e0a",
+    "retopology-prepared-color-normal-affine/color-normal-converted.dsculpt": "7e67bc5be7f8e8e9f55c3303f65d3a126ed0cdfed41ae5410127bce8442d9e92",
+    "retopology-prepared-color-normal-first/color-before.dsculpt": "c94f2e4d06116f9bd62525c6691192137a0a2495c2b5dd14e6115775aa60c0ae",
+    "retopology-prepared-color-normal-first/color-after.dsculpt": "e54735dc3ba9c8b40886ed529ffe4bc417540e8e98026c8f1e60ff822fdf1df0",
+    "retopology-prepared-color-normal-first/color-common-control.dsculpt": "2a9de5347295a24ac3bbeba4c34684cd6b406a3839cce21ba5c04893a1513bb7",
+    "retopology-prepared-color-normal-first/color-standard.glb": "30b69520c931f4660091dfae57ce0dcc66098e1341535b713f44e240adfefa39",
+    "retopology-prepared-color-normal-first/color-editable.glb": "3026a1b642f5ba216a241b858acfe9606983f23f72ad02069a2513f9256237c3",
+    "retopology-prepared-color-normal-first/color-normal-cleared.dsculpt": "abb395d73c4f64e4feb4ef3eaa22bee0f21cd9cae85670e5ba8ac9c5bf4b832b",
+    "retopology-prepared-color-normal-first/color-normal-flat-control.dsculpt": "4328eaf36ced54fb38d683d646d718e2e0050c0601c88a308396e6227b71fd72"
+  },
+  "wayland": {
+    "checks": [
+      {
+        "passed": true,
+        "check": "Native retopology editor publishes the canonical Dome Sculpt Wayland identity"
+      },
+      {
+        "passed": true,
+        "check": "The Wayland universal menu enables portable normal conversion for a prepared-color Bake"
+      },
+      {
+        "passed": true,
+        "check": "After conversion the same historical action is disabled"
+      },
+      {
+        "passed": true,
+        "check": "Conversion and universal Save match the native worker reference byte for byte"
+      },
+      {
+        "passed": true,
+        "check": "Native client releases the compositor and export worker on close"
+      }
+    ],
+    "complete": true
+  },
+  "synthetic_openxr": {
+    "software-plain": {
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "frame_counts": [
+        6,
+        6,
+        6
+      ],
+      "different_rgb_components": {
+        "color-common-control": [
+          65441,
+          65527
+        ],
+        "color-normal-flat-control": [
+          84705,
+          84669
+        ]
+      },
+      "horizontal_view_offset_metres": 0,
+      "exact_native_save": true
+    },
+    "software-affine": {
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "frame_counts": [
+        6,
+        6,
+        6
+      ],
+      "different_rgb_components": {
+        "color-common-control": [
+          40807,
+          41015
+        ],
+        "color-normal-flat-control": [
+          83171,
+          91265
+        ]
+      },
+      "horizontal_view_offset_metres": 0.52,
+      "exact_native_save": true
+    },
+    "arc-plain": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "frame_counts": [
+        6,
+        6,
+        6
+      ],
+      "different_rgb_components": {
+        "color-common-control": [
+          65450,
+          65536
+        ],
+        "color-normal-flat-control": [
+          84711,
+          84669
+        ]
+      },
+      "horizontal_view_offset_metres": 0,
+      "exact_native_save": true
+    },
+    "arc-affine": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "frame_counts": [
+        6,
+        6,
+        6
+      ],
+      "different_rgb_components": {
+        "color-common-control": [
+          40805,
+          41016
+        ],
+        "color-normal-flat-control": [
+          83172,
+          91266
+        ]
+      },
+      "horizontal_view_offset_metres": 0.52,
+      "exact_native_save": true
+    }
+  },
+  "khronos_version": "2.0.0-dev.3.10",
+  "khronos": {
+    "retopology-prepared-color-normal-plain/color-standard.glb": {
+      "errors": 0,
+      "warnings": 0,
+      "resolved_material_and_explicit_tangent": true,
+      "warning_codes": []
+    },
+    "retopology-prepared-color-normal-plain/color-editable.glb": {
+      "errors": 0,
+      "warnings": 0,
+      "resolved_material_and_explicit_tangent": true,
+      "warning_codes": []
+    },
+    "retopology-prepared-color-normal-affine/color-standard.glb": {
+      "errors": 0,
+      "warnings": 0,
+      "resolved_material_and_explicit_tangent": true,
+      "warning_codes": []
+    },
+    "retopology-prepared-color-normal-affine/color-editable.glb": {
+      "errors": 0,
+      "warnings": 0,
+      "resolved_material_and_explicit_tangent": true,
+      "warning_codes": []
+    },
+    "retopology-prepared-color-normal-first/color-standard.glb": {
+      "errors": 0,
+      "warnings": 0,
+      "resolved_material_and_explicit_tangent": true,
+      "warning_codes": []
+    },
+    "retopology-prepared-color-normal-first/color-editable.glb": {
+      "errors": 0,
+      "warnings": 0,
+      "resolved_material_and_explicit_tangent": true,
+      "warning_codes": []
+    }
+  },
+  "reframed_runtime_sha256": "a80c7c6b988e00360e4a5ea3d58d9e0165f8681062b42129a8f1cc09db78defc",
+  "combined_release_earlier_revisions": {
+    "retopology-subdivide-20261127": {
+      "candidate": "0432e1a3bb5d5922d125e19005a11b0eb19e4678",
+      "terminal": false,
+      "invocation": "5fbdca0a590b4f47a64c9c8f609539a0",
+      "phase": "run all Release tests",
+      "earlier_unit": "ds-mtoon-static-normal-uv-combined-release-20261127.service",
+      "elapsed_seconds": 2108.775,
+      "registered": 1394,
+      "app_sha256": "cd18cefa53c6ca1aa22c32b2605fb208df9da6318b2a97bdbf224b87b60889cd",
+      "cache_sha256": "052864d537338b8d77e15ec671a50be1630d9c7248183ed20bc3717dc0cbace1"
+    },
+    "retopology-prepared-color-20261127": {
+      "candidate": "489523918ac57e07ac2a6d2e7c5372eb76c4ed79",
+      "terminal": false,
+      "invocation": "1008d3cdb7864103a82c83c975423639",
+      "phase": "wait for earlier combined Release",
+      "earlier_unit": "ds-retopology-subdivide-combined-release-20261127.service",
+      "earlier_pid": 661779,
+      "elapsed_seconds": 1075.458
+    }
+  },
+  "physical_headset": false,
+  "archive_sha256": "659f5e6629d4c127bf36d4e514f6c016c21329251fec5fec487c71b6ca8667cb",
+  "archive_members_sha256": {
+    "release-final.log": "6fea8b4b340f278cd50964abc9a110ad8be84f1e27ed7c12a6c2269f90b0522f",
+    "release-final-build.log": "4603c8d54d9b0f19af21d22897bc22c08a08d1ad9c005bc2b3ffc593191b2a8e",
+    "asan-build.log": "ba606fb879a68a8d9e623d6f5dad2d8a9f8681b403381565e3a9e8deea14ed9f",
+    "asan-prepared-color-normal-plain.log": "e1ac636f0135a8c2636d673ad7d80c9b77fb0afe2eaecce67bad4b5bee639bad",
+    "asan-prepared-color-normal-affine.log": "3b4d398075eff8f2e035b11dbdee5efe86b520c5eb53ccc63b6a5b2f697c52b9",
+    "asan-prepared-color-normal-first.log": "4a34ec4ae51668d6e1e40d6a89822074ca69b8299f3d43ebde45d4bb28c4b563",
+    "asan-prepared-color-affine.log": "95c07a52e269f3fd381887f6c28caf5c1acb61607df1b0454ee897332a15b44e",
+    "asan-prepared-affine.log": "bf6ce3f15f1432cee5afbbcf8e1d3fdf5f7debf4f9def0e38ef26df41bd421ae",
+    "asan-reapply-affine.log": "a99670917a9a5fefe287ccd0f71ab4482a8d09cf70d7e6ccfa09748b3ec6b48c",
+    "khronos.json": "b064af1673945d2d27c84a3d44587f2bf8664a589e2099d85d7b8b087e1a1fab",
+    "khronos.cjs": "707b449e0d074dcdb7ce6a0e6979cc3ef5fab71116e7e42c7b388168ceed8fe8",
+    "check-profile.sh": "a1bb5d05b4d0fc5a73e3101d72135ea19224c50d9b6f3d49e2c20927b89b8c1a",
+    "strict.sh": "6ec05ab18f69a8524f98c31fdfed689e0e8e14772474627ab8b9b865dc141347",
+    "relink-sanitizer.py": "4ea224db0c3934e05144c9e76e50d27f975b4e9f90b106716adac5994f43fd37",
+    "run-render.py": "81b8c934a42d78116138381914e3571e41c550fc0f5c777b35eba666b24b716a",
+    "xr-prepare.py": "c361c088dba0b3bcf33959044d86011881b8ffbc791bce198184a5e1db462c1e",
+    "run-wayland.py": "012e8b779ae9a3314b7393357b1798733709dc5806b8865703309ac13532d5d2",
+    "wayland-convert.py": "46712477a93223784232cddba979ade56f6db7ad9d53293c10a681465e19cf66",
+    "bind-wayland.log": "118aca150005712b1d73d4e3cd8c7df3af005dafdacacd7f7c524adadb17ecfb",
+    "wayland-convert/report.json": "5726a1cfc9160743c4dee3d16e2eb076e7d167241d5e4e333afb415e8eb7a2cd",
+    "frame-runtime.py": "3ddc6fcd95c8571a736ba7508ebdb1c691c77c1c98cd16eb99955e1561c0d877",
+    "unframed-affine-arc.log": "79f9d4ed2039791147d7f6945170ba3b097749ff9f731cf889de28e75af0bc9b",
+    "unframed-affine-software.log": "79f9d4ed2039791147d7f6945170ba3b097749ff9f731cf889de28e75af0bc9b",
+    "xr-software-plain/compare.json": "442cca19af0a05a25ef4a55ff5f3ec06bd481d23e333e45f9606d173e1a3adf3",
+    "xr-software-affine/compare.json": "6ae8cd1e1177780b9fc0c3df5b4b0e3ae0ef9e2034fea7a9e692ee56ca469c5b",
+    "xr-arc-plain/compare.json": "4afe954dff63d20f7be2f6ffe6d030d4fff1f7c82dc5276f75b76ca91317d098",
+    "xr-arc-affine/compare.json": "66a427dde9bfc85e2ac2d6c64348e3759608c39eb2fcea5d175c1273c96e24ae"
+  }
+}

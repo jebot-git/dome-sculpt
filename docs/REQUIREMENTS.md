@@ -142,9 +142,16 @@ for single-material native patches with an identity vertex-colour field.
 The new field has its own certified atlas, while the hidden original keeps
 its previous preparation and Bake. Standard GLB carries the resolved
 texture and Editable GLB reopens the paint layers and their preparation.
-Imported prepared sets, simultaneous independently prepared normal and
-colour owners, and physical headset acceptance remain open.
+Imported prepared material sets and physical headset acceptance remain open.
 [Prepared colour evidence](validation/retopology-prepared-color-20261127.json)
+
+Changed retopology now carries separate prepared colour and normal fields
+together on native single-material patches. The ordinary portable-normal
+command preserves existing resolved colour, and the reverse preparation
+order also works. Apply, Clear Bake, Save/Open and Undo/Redo preserve the
+two owners. Standard and Editable GLB carry the resolved texture and
+portable normal frame. Combined retained UV grids and non-identity colour
+fields remain open. [Combined-field evidence](validation/retopology-color-normal-20261127.json)
 
 Changed retopology now reprojects static native MToon texture sets using the
 actual material slot of each triangle and independent role output grids.

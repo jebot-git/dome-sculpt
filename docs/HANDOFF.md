@@ -245,9 +245,31 @@ in both eyes on llvmpipe and Intel Arc A770. All 52 selected Release tests
 and five ASan/UBSan workflows pass. Ten native project and GLB files
 match byte for byte across both builds. A full Release sweep of `48952391`
 is queued behind the earlier edge-subdivision sweep. Prepared imported
-material sets and combined independent colour and prepared normal owners
-still need their transfer adapters.
+material sets still need their transfer adapter.
 [Prepared colour validation](validation/retopology-prepared-color-20261127.json)
+
+Native retopology can now retain independently prepared colour and portable
+baked normals together. **Convert to portable normals** is available when
+the patch has a native identity colour field and a canonical Bake. The
+conversion records the original canonical normals and their coverage and
+leaves the live PBR and common colour planes, editable layers and colour
+receipt intact. Preparing the normals first and then baking resolved colour
+also produces an editable pair of fields.
+
+Apply rebuilds both owners against the replacement geometry and samples
+the old PBR and toon normals independently of material coverage. A cleared
+Bake stays cleared, and its durable preparation owners reopen. Standard GLB
+contains the exact resolved base colour with explicit tangents and a normal
+map. Editable GLB restores the complete authoring state. All six GLBs pass
+Khronos validation with zero errors and warnings. Nested DomeD Wayland
+dispatches conversion through the universal menu and saves the same
+project as the native worker. Synthetic OpenXR compares colour and normal
+controls independently in both eyes on software GL and Intel Arc A770.
+The 55 selected Release tests and six ASan/UBSan workflows pass with 25
+native and GLB files matching across both builds. Combined preparation of
+retained UV grids, non-identity colour fields and imported material sets
+still needs transfer support.
+[Combined colour and normal validation](validation/retopology-color-normal-20261127.json)
 
 Changed native retopology now transfers static MToon 0 and 1 images per
 material slot. The worker samples each slot's previous rest surface with
