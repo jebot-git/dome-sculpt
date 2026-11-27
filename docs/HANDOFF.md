@@ -285,8 +285,14 @@ explicit-tangent GLBs have zero Khronos warnings. Synthetic OpenXR compares
 the native two-material project with its Standard GLB re-import on Arc A770
 and llvmpipe. All four stereo images are within two 8-bit RGB levels. A
 neutral-map control changes more than 112,000 RGB components in each eye.
-The full Release regression for frozen product `8ba3c55d` is running as
-`ds-mtoon-static-normal-uv-combined-release-20261127.service`.
+The full Release regression for frozen product `8ba3c55d` finished with
+1,387 passes and one host resolution-quality harness failure. The same
+binary passed three isolated retries. The fixture now tracks release and
+re-arm by generation, so arming the next request preserves a release the
+old worker has yet to observe. Ten current Release runs pass a control
+that forces this ordering and then exercises the real worker. The next
+frozen combined Release build has started.
+[Resolution quality gate evidence](validation/resolution-quality-gate-20261127.json)
 The focused checks include the later color and normal-map witness fixture.
 [Static normal transform validation](validation/mtoon-static-normal-uv-20261127.json)
 

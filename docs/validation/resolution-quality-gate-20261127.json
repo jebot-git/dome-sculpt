@@ -1,0 +1,38 @@
+{
+  "fixture_fix": "b15bbf9244568c453533b16baf94979d97317804",
+  "earlier_combined": {
+    "candidate": "8ba3c55d73d311b0836daccf69b5a6f1d596a19a",
+    "terminal": true,
+    "invocation": "378bfc74957941659465cd43d5356df0",
+    "phase": "complete",
+    "elapsed_seconds": 4672.138,
+    "registered": 1388,
+    "app_sha256": "5cad5679475a7a479530a7da49966724e49a95843160cde8ebd0ddcb3b8b7cc0",
+    "cache_sha256": "4b194aed6628c3141b19b6b66d7f1c8019c2aa73292407d122903fc3ac58c03b",
+    "exit": 8,
+    "totals": {
+      "pass": 1387,
+      "fail": 1,
+      "skip": 0
+    },
+    "failed": [
+      "resolution-quality-host-aggregate"
+    ],
+    "skipped": [],
+    "junit_sha256": "1327023f5711ac6bd29265ad7431e9ef47e4e1d89a9b2d5a246f5db04098643f"
+  },
+  "earlier_frozen_binary_isolated_retries_passed": 3,
+  "current_optimized_release_repetitions_passed": 10,
+  "forced_rearm_controls_passed": 10,
+  "test_mode": "host aggregate worker seam",
+  "archive_sha256": "095255daadd49bc2e56ee31f9c05b821b29594700d55461829b82d3b70deb7e1",
+  "archive_members_sha256": {
+    "earlier-full-excerpt.log": "efd1c32ad02ecd61a08922689f25f33a7c521f4158c255ac58ad17294371d783",
+    "earlier-full-status.json": "52e56e7560bad854cbef5a6de52e4f8f7251db89e9e0e4c266f8110abaa5f16c",
+    "older-exact-retry.log": "6546502f00f37618058e91544a9a70c531e435e5140ade2c135545b95ab7b681",
+    "current-release.log": "30b9f32224fb64dceadbf4da69ad846cc0159d586e949780df33431a1c4eae0e",
+    "current-release-build.log": "b75bbab826999fafa70663cf5b39cabf1a8a5ad83c1ce683c7b3cbdaa1328d47",
+    "retry-earlier.py": "e3f26f7dce0714c17de37b1c66a8a50fc8d17088ba34177058fbaba49be476ba",
+    "run-current.sh": "8d88f3e335066bbaf6ba8c3dd940091518d93050a44d0637175d703e9a93cec3"
+  }
+}
