@@ -281,16 +281,16 @@ paint_grid::Pixel grid_layer_pixel(const PaintLayer &layer,uint32_t r,uint32_t x
     if(plane) {
       const auto light=plane->texel(offset);
       for(unsigned c=0;c<3;++c) {
-        p.emission[c]=word(light.legacy[c]);
-        p.emission[3+c]=word(light.physical[c]);
+        p.emission[c]=std::bit_cast<uint32_t>(light.legacy[c]);
+        p.emission[3+c]=std::bit_cast<uint32_t>(light.physical[c]);
       }
-      p.emission[6]=word(light.coverage);
+      p.emission[6]=std::bit_cast<uint32_t>(light.coverage);
       p.present|=4;
     }else{
       const auto &table=grid_tables();
       for(unsigned c=0;c<3;++c)
-        p.emission[c]=word(float(number(table.srgb[p.values[6+c]])));
-      p.emission[6]=word(float(p.coverage[3])/255);
+        p.emission[c]=std::bit_cast<uint32_t>(float(number(table.srgb[p.values[6+c]])));
+      p.emission[6]=std::bit_cast<uint32_t>(float(p.coverage[3])/255);
     }
   }
   return p;
@@ -1092,10 +1092,10 @@ std::vector<PaintLayer> resample_texture_set_layers(
             PaintEmissionValue light;
             if(layout.floats!=paint_grid::FloatPlane::Absent) {
               for(size_t k=0;k<3;++k) {
-                light.legacy[k]=float(std::clamp(number(p.emission[k]),0.,1.));
-                light.physical[k]=float(std::clamp(number(p.emission[k+3]),0.,double(maximum_native_emission)));
+                light.legacy[k]=std::clamp(std::bit_cast<float>(p.emission[k]),0.f,1.f);
+                light.physical[k]=std::clamp(std::bit_cast<float>(p.emission[k+3]),0.f,maximum_native_emission);
               }
-              light.coverage=float(std::clamp(number(p.emission[6]),0.,1.));
+              light.coverage=std::clamp(std::bit_cast<float>(p.emission[6]),0.f,1.f);
               light.validate();
             }
             has_common|=bool(p.present&1);
@@ -1240,10 +1240,10 @@ std::shared_ptr<const BakedTextures> resample_native_bake_grid(
         if(emission) {
           const auto sample=emission->texel(src);
           for(unsigned c=0;c<3;++c) {
-            p.emission[c]=word(sample.legacy[c]);
-            p.emission[3+c]=word(sample.absolute[c]);
+            p.emission[c]=std::bit_cast<uint32_t>(sample.legacy[c]);
+            p.emission[3+c]=std::bit_cast<uint32_t>(sample.absolute[c]);
           }
-          p.emission[6]=word(sample.coverage);
+          p.emission[6]=std::bit_cast<uint32_t>(sample.coverage);
         }
         return p;
       },[&](uint32_t x,uint32_t y,const paint_grid::Pixel &p){
@@ -1254,10 +1254,10 @@ std::shared_ptr<const BakedTextures> resample_native_bake_grid(
         if(emission) {
           auto &sample=device_emission[dst];
           for(unsigned c=0;c<3;++c) {
-            sample.legacy[c]=float(number(p.emission[c]));
-            sample.absolute[c]=float(number(p.emission[3+c]));
+            sample.legacy[c]=std::bit_cast<float>(p.emission[c]);
+            sample.absolute[c]=std::bit_cast<float>(p.emission[3+c]);
           }
-          sample.coverage=float(number(p.emission[6]));
+          sample.coverage=std::bit_cast<float>(p.emission[6]);
         }
       });
   }else for(uint32_t y=0;y<to;++y){

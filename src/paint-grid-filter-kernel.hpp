@@ -17,11 +17,14 @@ inline constexpr unsigned channels = 20;
 inline constexpr unsigned float_channels = 7;
 
 struct Pixel {
-  uint64_t emission[float_channels]{};
+  // FLOAT paint and Bake store binary32 values. Carry their exact bits
+  // across the host/device boundary and do the filtering in binary64.
+  uint32_t emission[float_channels]{};
   uint8_t values[channels]{};
   uint8_t coverage[4]{};
   uint8_t mask = 255, present = 0;
 };
+static_assert(sizeof(Pixel)==56);
 struct Layout {
   uint32_t active = 0, srgb = 0;
   uint32_t pbr = 0;
@@ -80,6 +83,43 @@ DOME_GRID_FN uint64_t div(uint64_t a,uint64_t b) {
   return (uint64_t(exponent)<<52)+fraction+round_up;
 }
 DOME_GRID_FN uint64_t integer(int32_t a) { return softfloat64::i32_to_f64(a).v; }
+
+// These integer conversions preserve subnormals on devices without native
+// binary64 or with single-precision flush to zero enabled.
+DOME_GRID_FN uint64_t widen_float_bits(uint32_t bits) {
+  constexpr uint32_t fraction_mask=0x007fffffu;
+  const uint64_t sign=uint64_t(bits&0x80000000u)<<32;
+  const auto exponent=(bits>>23)&0xffu;
+  const auto fraction=bits&fraction_mask;
+  if(exponent) {
+    const uint64_t wide_exponent=exponent==0xffu?0x7ffu:exponent+(1023-127);
+    return sign|(wide_exponent<<52)|(uint64_t(fraction)<<29);
+  }
+  if(!fraction)return sign;
+  const auto shift=softfloat64::softfloat_countLeadingZeros32(fraction)-(32-24);
+  return sign|(uint64_t(1023-126-shift)<<52)|(uint64_t((fraction<<shift)&fraction_mask)<<29);
+}
+
+DOME_GRID_FN uint32_t narrow_float_bits(uint64_t bits) {
+  constexpr uint64_t hidden=uint64_t(1)<<52;
+  const uint32_t sign=uint32_t(bits>>32)&0x80000000u;
+  const int exponent=int((bits>>52)&0x7ffu)-1023;
+  const auto fraction=bits&(hidden-1);
+  if(exponent>127)
+    return sign|0x7f800000u|(exponent==1024&&fraction?0x00400000u:0);
+  if(exponent<-150)return sign;
+  const bool subnormal=exponent<-126;
+  const unsigned shift=unsigned(29+(subnormal?-126-exponent:0));
+  const auto significand=hidden|fraction;
+  const auto retained=significand>>shift;
+  const auto remainder=significand&((uint64_t(1)<<shift)-1);
+  const auto half=uint64_t(1)<<(shift-1);
+  const auto rounding=uint32_t(remainder>half||(remainder==half&&(retained&1)));
+  // The retained leading bit supplies the low bit of the biased exponent.
+  // A carry from rounding can enter the next exponent or the normal range.
+  const uint32_t exponent_base=subnormal?0:uint32_t(exponent+126)<<23;
+  return sign|(exponent_base+uint32_t(retained)+rounding);
+}
 
 struct Axis {
   uint32_t first, count;
@@ -146,14 +186,13 @@ DOME_GRID_FN Pixel filter(size_t index,const Batch &batch,const Layout &layout,
         mask=add(mask,reduce?mul(weight,tables.unit[p.mask]):
                  div(mul(weight,integer(p.mask)),integer(255)));
       if (layout.floats!=FloatPlane::Absent) {
-        for (unsigned c=0;c<float_channels;++c)
-          if (!(layout.fixed_emission&(1u<<c)))
-            emission_raw[c]=add(emission_raw[c],mul(weight,p.emission[c]));
-        if (layout.floats==FloatPlane::UnassociatedPaint) {
-          const auto a=mul(weight,p.emission[6]);
-          for (unsigned c=0;c<6;++c)
-            if (!(layout.fixed_emission&(1u<<c)))
-              emission_weighted[c]=add(emission_weighted[c],mul(a,p.emission[c]));
+        const auto a=mul(weight,widen_float_bits(p.emission[6]));
+        emission_raw[6]=add(emission_raw[6],a);
+        for (unsigned c=0;c<float_channels-1;++c) if (!(layout.fixed_emission&(1u<<c))) {
+          const auto value=widen_float_bits(p.emission[c]);
+          emission_raw[c]=add(emission_raw[c],mul(weight,value));
+          if(layout.floats==FloatPlane::UnassociatedPaint)
+            emission_weighted[c]=add(emission_weighted[c],mul(a,value));
         }
       }
     }
@@ -170,10 +209,12 @@ DOME_GRID_FN Pixel filter(size_t index,const Batch &batch,const Layout &layout,
   if (layout.mask) out.mask=quantize(mask,tables.unit_threshold);
   if (layout.floats!=FloatPlane::Absent) {
     const auto a=emission_raw[6];
-    out.emission[6]=a;
-    for (unsigned c=0;c<6;++c)
-      out.emission[c]=layout.fixed_emission&(1u<<c)?layout.emission_constants[c]:
+    out.emission[6]=narrow_float_bits(a);
+    for (unsigned c=0;c<float_channels-1;++c) {
+      const auto value=layout.fixed_emission&(1u<<c)?layout.emission_constants[c]:
           (a&&layout.floats==FloatPlane::UnassociatedPaint)?div(emission_weighted[c],a):emission_raw[c];
+      out.emission[c]=narrow_float_bits(value);
+    }
   }
   return out;
 }

@@ -316,8 +316,8 @@ void filter_binary64_rounding(){
   std::array<Pixel,4> input{};
   std::array<Pixel,1> output{};
   for(size_t i=0;i<input.size();++i) {
-    input[i].emission[1]=std::bit_cast<uint64_t>(double(std::bit_cast<float>(legacy[i])));
-    input[i].emission[6]=std::bit_cast<uint64_t>(double(std::bit_cast<float>(coverage[i])));
+    input[i].emission[1]=legacy[i];
+    input[i].emission[6]=coverage[i];
     input[i].mask=masks[i];
   }
   Tables tables{};
@@ -334,8 +334,32 @@ void filter_binary64_rounding(){
   layout.floats=FloatPlane::UnassociatedPaint;
   Filter backend(tables);
   backend.run({128,64,{0,0,2,2},{0,0,1,1}},layout,input,output,{});
-  check(output[0].emission[1]==0x3f962d9d2f9f3b9eull,
-        "The selected kernel keeps the exact binary64 quotient before FLOAT storage");
+  check(output[0].emission[1]==0x3cb16ce9u,
+        "The selected kernel rounds the binary64 quotient directly to the expected FLOAT word");
+
+  bool exact_conversion=true;
+  for(uint32_t bits:{0u,0x80000000u,1u,0x80000001u,0x007fffffu,0x00800000u,0x3f800000u,0x7f7fffffu}) {
+    const auto wide=std::bit_cast<uint64_t>(double(std::bit_cast<float>(bits)));
+    exact_conversion &= widen_float_bits(bits)==wide&&narrow_float_bits(wide)==bits;
+  }
+  bool correct_device_rounding=true;
+  layout.floats=FloatPlane::BakedCoefficients;
+  for(uint32_t lower:{0u,1u,0x007fffffu,0x3f7fffffu,0x3f800000u,0x461c3fffu}) {
+    const double lo=std::bit_cast<float>(lower);
+    const double hi=std::bit_cast<float>(lower+1);
+    const double halfway=(lo+hi)*.5;
+    for(double value:{std::nextafter(halfway,lo),halfway,std::nextafter(halfway,hi)})
+      exact_conversion &= narrow_float_bits(std::bit_cast<uint64_t>(value))==
+                          std::bit_cast<uint32_t>(float(value));
+    for(size_t i=0;i<input.size();++i) {
+      input[i].emission[3]=lower+uint32_t(i%2);
+      input[i].emission[6]=0x3f800000u;
+    }
+    backend.run({128,64,{0,0,2,2},{0,0,1,1}},layout,input,output,{});
+    correct_device_rounding &= output[0].emission[3]==lower+(lower&1u);
+  }
+  check(exact_conversion,"Integer FLOAT transport matches host conversions, including signed zero and subnormals");
+  check(correct_device_rounding,"The selected filter kernel rounds exact FLOAT ties to even at normal and subnormal boundaries");
   layout.floats=FloatPlane::Absent;
   layout.mask=true;
   backend.run({64,128,{10,1,2,2},{22,4,1,1}},layout,input,output,{});
@@ -364,9 +388,9 @@ void filter_binary64_rounding(){
     std::copy(common.begin(),common.end(),large[i].values);
     for(size_t c=0;c<3;++c)large[i].coverage[c]=uint8_t(i*(c+1)%256);
     for(size_t c=0;c<coefficients.size();++c)
-      large[i].emission[c]=std::bit_cast<uint64_t>(double(coefficients[c]));
+      large[i].emission[c]=std::bit_cast<uint32_t>(coefficients[c]);
     const float coverage=std::ldexp(float(i%9)/8.f,-int(i%150));
-    large[i].emission[6]=std::bit_cast<uint64_t>(double(coverage));
+    large[i].emission[6]=std::bit_cast<uint32_t>(coverage);
   }
   layout={};
   layout.srgb=7;
@@ -389,15 +413,15 @@ void filter_binary64_rounding(){
     layout.fixed_common=0x3f;
     std::copy(common.begin(),common.end(),layout.common_constants);
     layout.fixed_emission=0x3f;
-    std::copy_n(large.front().emission,6,layout.emission_constants);
+    std::transform(large.front().emission,large.front().emission+6,
+                   layout.emission_constants,widen_float_bits);
     backend.run(area,layout,large,output,{});
     check(std::equal(common.begin(),common.end(),baseline.values) &&
               std::equal(common.begin(),common.end(),output[0].values) &&
               std::equal(std::begin(baseline.coverage),std::end(baseline.coverage),output[0].coverage),
           "Fixed sRGB, alpha and material bytes agree with actual area filtering at any coverage");
     for(size_t c=0;c<7;++c)
-      check(std::bit_cast<uint32_t>(float(std::bit_cast<double>(output[0].emission[c])))==
-                std::bit_cast<uint32_t>(float(std::bit_cast<double>(baseline.emission[c]))),
+      check(output[0].emission[c]==baseline.emission[c],
             "The largest area footprint preserves fixed FLOAT results at storage precision");
   }
 }
