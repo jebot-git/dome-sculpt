@@ -34,7 +34,20 @@ namespace {
 size_t checks=0;
 void check(bool v,const char*s){if(!v)throw std::runtime_error(s);++checks;}
 template<class F>void refuses(F&&f,const char*s){bool rejected=false;try{f();}catch(const std::exception&e){rejected=true;std::cout<<"EXPECTED "<<e.what()<<'\n';}check(rejected,s);}
-void ready(Document&d){check(d.wait_asset(std::chrono::seconds(120))&&d.wait_mesh(std::chrono::seconds(120)),"Actual native workers settle");if(!d.frame().state->error.empty())throw std::runtime_error(d.frame().state->error);}
+void ready(Document &document){
+ const auto timeout=std::chrono::seconds(120);
+ const bool asset_ready=document.wait_asset(timeout);
+ const auto deadline=std::chrono::steady_clock::now()+timeout;
+ bool mesh_ready=false;
+ do{
+  const auto state=document.frame().state;
+  if(!state->error.empty())throw std::runtime_error(state->error);
+  mesh_ready=asset_ready&&document.wait_mesh(std::chrono::milliseconds(100));
+ }while(asset_ready&&!mesh_ready&&std::chrono::steady_clock::now()<deadline);
+ const auto state=document.frame().state;
+ if(!state->error.empty())throw std::runtime_error(state->error);
+ check(asset_ready&&mesh_ready,"Actual native workers settle");
+}
 void polygon(Document&d){check(d.wait_polygon(std::chrono::seconds(120)),"Actual native polygon queue settles");if(!d.frame().state->error.empty())throw std::runtime_error(d.frame().state->error);}
 Image solid(std::array<uint8_t,4>rgba,uint32_t resolution=64){Image out{resolution,resolution,{}};out.rgba.resize(size_t(resolution)*resolution*4);for(size_t i=0;i<out.rgba.size();i+=4)std::copy(rgba.begin(),rgba.end(),out.rgba.begin()+i);return out;}
 void native_owner_controls(const Scene&scene){
@@ -717,10 +730,30 @@ void retained_bake_xr_fixture(const std::filesystem::path &input,const std::file
  plain.save(reference);
 }
 }
-void bake_retained_recipient(TextureSetId id,bool physical){
- auto scene=source(true,physical,false,false,false,physical);
+void bake_retained_recipient(TextureSetId id,bool physical,uint32_t resolution=64){
+ auto scene=source(true,physical,false,false,false,physical,resolution);
  const auto target=scene.active().id;
  if(!physical)scene.active().affine_edit.reset();
+ if(resolution>64)for(TextureSetId set:{0u,1u}){
+  const auto member=texture_set_view(scene.active(),set);
+  const auto triangle=member.domain->triangles().front();
+  const auto &mesh=member.painted->mesh();
+  Vec3 center{};
+  for(size_t k=0;k<3;++k)center+=mesh.positions.at(mesh.indices.at(size_t(triangle)*3+k))*(1.f/3);
+  check(edit_texture_set(scene,target,set,[&](PaintedMesh &paint,Material &material){
+   material.emissive=set?std::array<float,3>{.2f,.4f,.6f}:std::array<float,3>{.7f,.1f,.3f};
+   paint.add_layer("Distinct LDR layers");
+   Brush brush;brush.from=brush.to=center;brush.normal={0,0,1};brush.radius=.046f;brush.strength=.8f;
+   PaintSettings emissive;emissive.front_only=false;emissive.channel=PaintChannel::Emission;
+   emissive.emission_units=PaintEmissionUnits::MaterialRelative;emissive.emission={.4f,.15f,.8f};
+   paint.begin_stroke();paint.stamp(brush,emissive);
+   const bool emission=paint.end_stroke();
+   emissive.channel=PaintChannel::Color;emissive.color={.55f,.13f,.6f,.72f};
+   brush.from.x+=.021f;brush.to=brush.from;
+   paint.begin_stroke();paint.stamp(brush,emissive);
+   return paint.end_stroke()&&emission&&!paint.has_physical_emission();
+  }),"Both large retained fields contain genuine LDR color and emission paint");
+ }
  select_texture_set(scene,target,id);
  const auto old=texture_set_view(scene.active(),id);
  const auto neighbor=texture_set_view(scene.active(),id==0?1:0);
@@ -755,6 +788,28 @@ void bake_retained_recipient(TextureSetId id,bool physical){
  const auto baseline=scene.encode();
  ObjectBakeSettings settings;settings.allow_backfaces=true;settings.padding=0;settings.ao_samples=2;
  Document document;document.replace(scene);ready(document);
+ if(resolution>64){
+  const auto rendered=document.frame().surface;
+  size_t fields=0;
+  for(const auto &range:rendered->ranges){
+   if(range.object!=target)continue;
+   const auto member=texture_set_view(scene.active(),range.texture_set);
+   const auto read=member.source->read_view(member);
+   const auto expected=detail::PolygonSurfacePaintCodec::preview(
+       *read,member.material_bindings,member.material,{},member.source->source_preview());
+   const auto equal=[](const Image &a,const Image &b){
+    return a.width==b.width&&a.height==b.height&&a.rgba==b.rgba;
+   };
+   const auto &actual=*range.textures;
+   check(equal(actual.color,expected->color)&&equal(actual.metal_rough,expected->metal_rough)&&
+         equal(actual.emission,expected->emission)&&equal(actual.color_coverage,expected->color_coverage)&&
+         equal(actual.emission_coverage,expected->emission_coverage)&&equal(actual.normal,expected->normal)&&
+         equal(actual.mtoon_normal,expected->mtoon_normal)&&actual.transparent==expected->transparent,
+         "Large retained preview matches all legacy material, coverage and normal bytes");
+   ++fields;
+  }
+  check(fields==2,"Large native preview publishes both complete retained ranges");
+ }
  check(document.can_select_texture_sets(),"Actual retained set selection is available");
  document.texture_set_action(SpatialCommand::TextureNext);ready(document);
  check(document.frame().state->active_texture_set==(id==0?1:0),"The actual next-set command selects the other retained field");
@@ -1032,10 +1087,13 @@ int main(int argc,char **argv)try {
   std::cout<<"PASS "<<checks<<" retained "<<(standard?"Standard":"Editable")<<" HDR controls\n";
   return 0;
  }
- if(argc==3&&mode=="--retained-bake-target"){
+ if((argc==3||argc==4)&&mode=="--retained-bake-target"){
   std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);
-  bake_retained_recipient(1,false);
-  bake_retained_recipient(0,true);
+  if(argc==4)bake_retained_recipient(1,false,uint32_t(std::stoul(argv[3])));
+  else{
+   bake_retained_recipient(1,false);
+   bake_retained_recipient(0,true);
+  }
   std::cout<<"PASS "<<checks<<" retained target Bake controls\n";
   return 0;
  }

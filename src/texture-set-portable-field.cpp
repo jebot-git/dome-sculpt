@@ -287,7 +287,7 @@ PortableTextureSetField portable_texture_set_field(const TextureSetView &field,
   }
  }
  std::shared_ptr<TextureMaps> portable;
- if(retained_hdr_grid(field))portable=PolygonSurfacePaintCodec::preview_retained_hdr(field,work,limits);
+ if(retained_material_grid(field))portable=PolygonSurfacePaintCodec::preview_retained_material(field,work,limits);
  else{
   const auto read=field.source->read_view(field,limits);
   const auto maps=PolygonSurfacePaintCodec::preview(*read,field.material_bindings,field.material,limits.cancelled,preview);

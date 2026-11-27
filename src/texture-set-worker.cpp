@@ -20,7 +20,8 @@ void charge_preview_work(size_t &work,size_t count,size_t cost,const TextureSetL
   throw std::length_error("Texture-set field preview exceeds its charged work bound");
  work+=count*cost;
 }
-void charge_grid_capture(size_t&bytes,size_t&work,const TextureSetView&field,const TextureSetLimits&limits,bool classify_alpha){
+void charge_grid_capture(size_t&bytes,size_t&work,const TextureSetView&field,const TextureSetLimits&limits,
+    bool classify_alpha,bool shared_raster=false){
  const auto&paint=*field.painted;
  const size_t tile_area=PaintTile::size*PaintTile::size;
  const size_t pixels=size_t(paint.resolution())*paint.resolution(),tiles=pixels/tile_area;
@@ -33,7 +34,9 @@ void charge_grid_capture(size_t&bytes,size_t&work,const TextureSetView&field,con
   storage_entries+=layer.tiles.size()+layer.pbr_tiles.size()+layer.emission_tiles.size();
  // Charge the retained raster, sparse storage, copied directories and the
  // temporary ordered owner sets used by capture. Include cold-cache work.
- charge(bytes,1,TextureSetPaintAccess::working_bytes(paint,paint.resolution()),limits);
+ const auto capture_bytes=shared_raster?TextureSetPaintAccess::snapshot_bytes(paint):
+     TextureSetPaintAccess::working_bytes(paint,paint.resolution());
+ charge(bytes,1,capture_bytes,limits);
  charge(bytes,tiles,visible_layers*3*sizeof(std::shared_ptr<const PaintTile>)+8,limits);
  charge_preview_work(work,storage_entries,8,limits);
  charge_preview_work(work,tiles,2+2*visible_layers,limits);
@@ -109,19 +112,24 @@ void append_texture_set_surface(MeshSnapshot&snapshot,const ObjectSurface&o,
    charge_grid_capture(bytes,preview_work,field,limits,true);
   }else if(view.render_only&&!field.source&&field.painted->baked()&&field.painted->baked()->emission_field&&native_hdr_grid(*field.painted)){
    charge_grid_capture(bytes,preview_work,field,limits,false);
-   charge(bytes,1,native_hdr_grid_bytes(*field.painted),limits);
-   charge_native_hdr_grid_work(*field.painted,preview_work,limits);
-  }else if(view.render_only&&retained_hdr_grid(field)){
+   charge(bytes,1,native_material_grid_bytes(*field.painted,TextureSetGridMode::NativeHdr),limits);
+   charge_native_material_grid_work(*field.painted,preview_work,limits,TextureSetGridMode::NativeHdr);
+  }else if(view.render_only&&retained_material_grid(field)){
    const auto read=field.source->read_view(field,limits);
    const auto normals=retained_hdr_normal_bytes(field);
-   charge_grid_capture(bytes,preview_work,field,limits,false);
-   const auto original=TextureSetPaintAccess::raster_owner(*read);
-   if(retained_rasters.insert(original).second)
-    charge(bytes,1,PaintOverlayFactory::raster_storage_bytes(*read),limits);
-   charge(bytes,1,native_hdr_grid_bytes(*read,true),limits);
+   charge_grid_capture(bytes,preview_work,field,limits,false,true);
+   // The plan retains each member raster and the packet aliases its read
+   // raster. Neither capture allocates a replacement raster.
+   for(const auto *paint:{field.painted.get(),read.get()}){
+    const auto owner=TextureSetPaintAccess::raster_owner(*paint);
+    if(retained_rasters.insert(owner).second)
+     charge(bytes,1,PaintOverlayFactory::raster_storage_bytes(*paint),limits);
+   }
+   const auto mode=retained_grid_mode(field);
+   charge(bytes,1,native_material_grid_bytes(*read,mode),limits);
    charge(bytes,1,normals,limits);
    charge_preview_work(preview_work,normals/2,1,limits);
-   charge_native_hdr_grid_work(*read,preview_work,limits,true);
+   charge_native_material_grid_work(*read,preview_work,limits,mode);
   }else{
    charge(bytes,pixels,128,limits);
    charge_preview_work(preview_work,pixels,(layers+1)*32,limits);

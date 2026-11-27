@@ -1733,12 +1733,12 @@ std::shared_ptr<const TextureMaps> detail::PolygonSurfacePaintCodec::preview(con
   finish_polygon_maps(*maps,paint,binding,std::move(packet),cached,cancelled);
   return maps;
 }
-std::shared_ptr<TextureMaps> detail::PolygonSurfacePaintCodec::preview_retained_hdr(
+std::shared_ptr<TextureMaps> detail::PolygonSurfacePaintCodec::preview_retained_material(
     const TextureSetView&field,size_t &work,const TextureSetLimits&limits) {
   limits.validate();
   paint_compute::checkpoint(limits.cancelled);
-  if(!retained_hdr_grid(field))
-    throw std::invalid_argument("Retained HDR preview requires its actual PBR material member");
+  if(!retained_material_grid(field))
+    throw std::invalid_argument("Retained preview requires its actual PBR material member");
   field.source->authenticate_owner(field.source);
   const auto paint=field.source->read_view(field,limits);
   const auto &binding=field.material_bindings;
@@ -1746,14 +1746,15 @@ std::shared_ptr<TextureMaps> detail::PolygonSurfacePaintCodec::preview_retained_
   binding->validate();
   binding->polygon_surface_transfer->validate_current(*paint);
   field.material.validate();
+  const auto mode=retained_grid_mode(field);
   const auto normal_bytes=retained_hdr_normal_bytes(field);
-  const auto map_bytes=native_hdr_grid_bytes(*paint,true);
+  const auto map_bytes=native_material_grid_bytes(*paint,mode);
   if(map_bytes>limits.maximum_bytes||normal_bytes>limits.maximum_bytes-map_bytes)
-    throw std::length_error("Retained HDR preview exceeds its material and normal byte limit");
+    throw std::length_error("Retained preview exceeds its material and normal byte limit");
   if(work>limits.maximum_work||normal_bytes/2>limits.maximum_work-work)
-    throw std::length_error("Retained HDR normal carriage exceeds its work limit");
+    throw std::length_error("Retained normal carriage exceeds its work limit");
   work+=normal_bytes/2; // Copy and validate both normal images at texel granularity.
-  auto maps=compile_native_hdr_grid(*paint,field.material,work,limits,true);
+  auto maps=compile_native_material_grid(*paint,field.material,work,limits,mode);
   auto packet=PaintOverlayFactory::capture_native_emission(*paint,limits.cancelled);
   finish_polygon_maps(*maps,*paint,binding,std::move(packet),cached,limits.cancelled);
   return maps;
@@ -1842,7 +1843,8 @@ std::shared_ptr<const TextureMaps> detail::EmissionExportAccess::preview_texture
         if(NativeEmissionOwner{paint.mesh_owner(),{}}.matches(*held))return held;
   }
   TextureSetLimits limits;limits.cancelled=cancelled;size_t work=0;
-  auto maps=detail::compile_native_hdr_grid(paint,material,work,limits);
+  auto maps=detail::compile_native_material_grid(paint,material,work,limits,
+      detail::TextureSetGridMode::NativeHdr);
   maps->baked_base=paint.baked_;
   maps->overlay=PaintOverlayFactory::capture_native_emission(paint,cancelled);
   paint_compute::checkpoint(cancelled);
