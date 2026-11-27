@@ -48,8 +48,10 @@ The application's default FLTK backend follows its environment.
   the matching GPU driver/runtime.
 
 Desktop and OpenXR authoring require a working device for the selected
-compute backend and a hardware-accelerated OpenGL context. CPU numerical
-references can be built separately with `-DDOME_CPU_REFERENCE_TESTS=ON
+compute backend and a hardware-accelerated OpenGL context. Command-line
+export also requires the selected compute device. CPU numerical and
+sanitizer references are headless test builds. Configure them with
+`-DDOME_CPU_REFERENCE_TESTS=ON
 -DDOME_COMPUTE_BACKEND=CPU -DDOME_BUILD_UI=OFF -DDOME_BUILD_XR=OFF
 -DBUILD_TESTING=ON` in a fresh build directory.
 

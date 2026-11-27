@@ -1,3 +1,6 @@
+> Current authoring builds require oneAPI, ROCm or CUDA and hardware OpenGL.
+> CPU builds are headless test references. See the current [GPU requirements](REQUIREMENTS.md#required-gpu-acceleration--2026-11-27).
+>
 > Current source admission adds affine/ordered retopology, held-admission
 > rollback and visible compact markers. Read RETOPO-INTEGRATION.md for its
 > exact matched native/FLTK/software-loader/Arc scope; full goal remains open.

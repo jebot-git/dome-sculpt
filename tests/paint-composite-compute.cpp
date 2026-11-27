@@ -113,7 +113,8 @@ void attach_prepared_tiles(Input &input){
 struct SourceFixture {
  std::array<PaintSourceTexture,SourceRoleCount> textures;
  std::array<std::optional<detail::SourceTextureGrid>,SourceRoleCount> grids;
- explicit SourceFixture(Input &in){
+ std::array<detail::SourceTextureProducts,SourceRoleCount> products;
+ explicit SourceFixture(Input &in,unsigned coupled_roles=0){
   const auto r=in.parameters.resolution;
   std::mt19937 rng(0x56e0c);
   for(size_t role=0;role<textures.size();++role){
@@ -125,8 +126,31 @@ struct SourceFixture {
    texture.wrap_s=role==0?33648:role==1?33071:10497;
    texture.wrap_t=role==0?33071:role==2?33648:10497;
    texture.mag_filter=role==1?9728:9729;
+   if(coupled_roles&(1u<<role)){
+    constexpr std::array<std::array<float,6>,SourceRoleCount> transforms{{
+     {{9999.5f,-9999.5f,.53f,-1.17f,-2.f,.21f}},
+     {{-.73f,1.27f,2.f,-2.f,-.41f,-1.f}},
+     {{-2.f,2.f,4.125f,-3.37f,-1.f,-2.f}},
+     {{1.f,-1.f,-1.53f,-.35f,-0x1p-90f,.003f}},
+    }};
+    texture.uv_transform=transforms[role];
+   }
    const auto &grid=grids[role].emplace(texture,r,r,role==SourceColor||role==SourceEmission);
-   in.sources[role]={image->rgba,grid.columns(),grid.rows(),width,height,texture.mag_filter==9728};
+   auto &input=in.sources[role];
+   input.rgba=image->rgba;
+   input.width=width;
+   input.height=height;
+   input.nearest=texture.mag_filter==9728;
+   if(coupled_roles&(1u<<role)){
+    auto &terms=products[role];
+    terms=detail::source_texture_products(texture,r,r);
+    input.column_terms=terms.columns;
+    input.row_terms=terms.rows;
+    input.transform=terms.transform;
+   }else{
+    input.columns=grid.columns();
+    input.rows=grid.rows();
+   }
   }
   in.occlusion_strength=.47f;
  }
@@ -145,7 +169,7 @@ int main(int argc,char**argv)try{
   check(refuses([&]{paint_compute::composite(in);}),"Missing selected device silently returned CPU baked paint composite");
   in.projected_color=baked.color;in.baked_pbr_color=baked.orm;attach_prepared_tiles(in);
   check(refuses([&]{paint_compute::composite(in);}),"Missing device silently returned CPU prepared color composite");
-  const SourceFixture source(in);
+  const SourceFixture source(in,0b0101);
   check(refuses([&]{paint_compute::composite(in);}),"Missing device silently returned CPU textured paint composite");
   std::cout<<"PASS selected-backend missing-device refusal for plain, baked, prepared and textured paint\n";return 0;
  }
@@ -183,10 +207,10 @@ int main(int argc,char**argv)try{
         !std::memcmp(without.pixels.data(),out.pixels.data(),out.pixels.size()*sizeof(Output)),
         "The optional Bake normal does not affect material channels");
  }
- for(bool baked_input:{false,true}){
+ for(unsigned coupled_roles:{0u,0b0101u,0b1111u})for(bool baked_input:{false,true}){
   in=fixture(288,baked_input?5:0,24);
   const BakeFixture baked(in.padding.size());
-  const SourceFixture source(in);
+  const SourceFixture source(in,coupled_roles);
   in.projected_color=baked.color;
   if(baked_input){in.bake=baked.images();in.baked_pbr_color=baked.orm;attach_prepared_tiles(in);}
   const auto result=paint_compute::composite(in);
@@ -200,11 +224,21 @@ int main(int argc,char**argv)try{
   }
   auto bad=in;bad.projected_color=bad.projected_color.subspan(1);
   check(refuses([&]{paint_compute::composite(bad);}),"Malformed projection was submitted to the GPU");
-  bad=in;bad.sources[0].rows=bad.sources[0].rows.subspan(1);
-  check(refuses([&]{paint_compute::composite(bad);}),"Incomplete texture coordinates were submitted to the GPU");
-  bad=in;auto wrong=std::vector<detail::SourceTextureAxis>(in.sources[0].columns.begin(),in.sources[0].columns.end());
-  wrong[1].second=-1;bad.sources[0].columns=wrong;
-  check(refuses([&]{paint_compute::composite(bad);}),"Invalid source texture tap was submitted to the GPU");
+  if(in.sources[0].coupled()){
+   bad=in;bad.sources[0].row_terms=bad.sources[0].row_terms.subspan(1);
+   check(refuses([&]{paint_compute::composite(bad);}),"Incomplete coupled coordinates were submitted to the GPU");
+   bad=in;bad.sources[0].transform.wrap_s=3;
+   check(refuses([&]{paint_compute::composite(bad);}),"Invalid coupled wrap mode was submitted to the GPU");
+   bad=in;auto wrong=source.products[0].columns;
+   wrong[1].u=std::bit_cast<uint64_t>(10001.);bad.sources[0].column_terms=wrong;
+   check(refuses([&]{paint_compute::composite(bad);}),"Invalid source coordinate term was submitted to the GPU");
+  }else{
+   bad=in;bad.sources[0].rows=bad.sources[0].rows.subspan(1);
+   check(refuses([&]{paint_compute::composite(bad);}),"Incomplete texture coordinates were submitted to the GPU");
+   bad=in;auto wrong=std::vector<detail::SourceTextureAxis>(in.sources[0].columns.begin(),in.sources[0].columns.end());
+   wrong[1].second=-1;bad.sources[0].columns=wrong;
+   check(refuses([&]{paint_compute::composite(bad);}),"Invalid source texture tap was submitted to the GPU");
+  }
   bad=in;bad.sources[0].rgba=bad.sources[0].rgba.subspan(4);
   check(refuses([&]{paint_compute::composite(bad);}),"Truncated source image was submitted to the GPU");
   if(baked_input){

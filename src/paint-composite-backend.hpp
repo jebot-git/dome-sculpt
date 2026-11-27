@@ -28,6 +28,12 @@ struct TextureInput {
   std::span<const detail::SourceTextureAxis> columns,rows;
   uint32_t width=0,height=0;
   bool nearest=false;
+  std::span<const SourceTerms> column_terms,row_terms;
+  SourceTransform transform;
+  bool coupled() const noexcept { return !column_terms.empty(); }
+  SourceCoordinateJob coordinate_job(const SourceTerms *a,const SourceTerms *b,SourcePixelTaps *output) const noexcept {
+    return {a,b,output,transform,width,height,nearest};
+  }
 };
 struct Input {
   Parameters parameters;
@@ -55,6 +61,16 @@ struct Input {
     for(const auto &source:sources)count+=source.columns.size()+source.rows.size();
     return count;
   }
+  size_t term_count() const noexcept {
+    size_t count=0;
+    for(const auto &source:sources)count+=source.column_terms.size()+source.row_terms.size();
+    return count;
+  }
+  size_t coupled_source_count() const noexcept {
+    size_t count=0;
+    for(const auto &source:sources)count+=source.coupled();
+    return count;
+  }
   template<class Copy>
   void visit_images(Copy copy) const {
     for(const auto plane:{bake.coverage,bake.color,bake.orm,bake.emission,bake.normal,projected_color,baked_pbr_color})
@@ -63,9 +79,16 @@ struct Input {
   }
   template<class Copy>
   void visit_axes(Copy copy) const {
-    for(const auto &source:sources)if(!source.rgba.empty()){
+    for(const auto &source:sources)if(!source.columns.empty()){
       copy(source.columns);
       copy(source.rows);
+    }
+  }
+  template<class Copy>
+  void visit_terms(Copy copy) const {
+    for(const auto &source:sources)if(source.coupled()){
+      copy(source.column_terms);
+      copy(source.row_terms);
     }
   }
   SourceMaterial source_views() const noexcept {
@@ -84,11 +107,29 @@ struct Input {
     for(size_t role=0;role<sources.size();++role){
       const auto &source=sources[role];
       if(source.rgba.empty())continue;
-      result.textures[role]={images+offset,axes,axes+source.columns.size(),source.width,source.nearest};
+      auto &texture=result.textures[role];
+      texture={images+offset,nullptr,nullptr,source.width,source.nearest};
+      if(!source.columns.empty()){
+        texture.columns=axes;
+        texture.rows=axes+source.columns.size();
+        axes+=source.columns.size()+source.rows.size();
+      }
       offset+=source.rgba.size();
-      axes+=source.columns.size()+source.rows.size();
     }
     return result;
+  }
+  SourceCoordinateBatch device_coordinate_jobs(const SourceTerms *terms,SourcePixelTaps *output,size_t stride,
+                                               SourceMaterial &material) const noexcept {
+    SourceCoordinateBatch batch;
+    for(size_t role=0;role<sources.size();++role){
+      const auto &source=sources[role];
+      if(!source.coupled())continue;
+      auto *job_output=output+batch.size*stride;
+      batch.jobs[batch.size++]=source.coordinate_job(terms,terms+source.column_terms.size(),job_output);
+      material.textures[role].mapped=job_output;
+      terms+=source.column_terms.size()+source.row_terms.size();
+    }
+    return batch;
   }
   PreparedColor device_colors(const uint8_t *images,const uint32_t *ids,const ColorPixel *colors) const noexcept {
     if(projected_color.empty())return {};

@@ -8,6 +8,8 @@ namespace {
 struct UsmDeleter {sycl::queue *queue;template<class T>void operator()(T*p)const noexcept{if(p)try{sycl::free(p,*queue);}catch(...){}}};
 }
 namespace paint_compute {
+void launch_source_coordinates(sycl::queue &,SourceCoordinateBatch,uint32_t,uint32_t,size_t);
+
 Result composite(const Input &in,const std::function<bool()> &cancelled){
  validate(in,cancelled);const auto &table=quantization();
  sycl::queue queue{sycl::gpu_selector_v,[](sycl::exception_list errors){for(auto error:errors)std::rethrow_exception(error);},sycl::property_list{sycl::property::queue::in_order{}}};
@@ -18,6 +20,10 @@ Result composite(const Input &in,const std::function<bool()> &cancelled){
  if(const auto bytes=in.image_bytes())baked=allocate.template operator()<uint8_t>(bytes);
  std::unique_ptr<detail::SourceTextureAxis,UsmDeleter> axes{nullptr,{&queue}};
  if(const auto count=in.axis_count())axes=allocate.template operator()<detail::SourceTextureAxis>(count);
+ std::unique_ptr<SourceTerms,UsmDeleter> terms{nullptr,{&queue}};
+ std::unique_ptr<SourcePixelTaps,UsmDeleter> mapped{nullptr,{&queue}};
+ if(const auto count=in.term_count())terms=allocate.template operator()<SourceTerms>(count);
+ if(const auto count=in.coupled_source_count())mapped=allocate.template operator()<SourcePixelTaps>(count*chunk_pixels);
  auto quant=allocate.template operator()<Quantization>(1);auto output=allocate.template operator()<Output>(chunk_pixels);
  std::unique_ptr<uint32_t,UsmDeleter> color_tiles{nullptr,{&queue}};
  std::unique_ptr<ColorPixel,UsmDeleter> color_pixels{nullptr,{&queue}};
@@ -44,7 +50,8 @@ Result composite(const Input &in,const std::function<bool()> &cancelled){
   queue.memcpy(padding.get(),in.padding.data(),in.padding.size()*sizeof(int32_t));queue.memcpy(quant.get(),&table,sizeof(table));
   const auto bake=in.bake.device_view(baked.get());
   const auto prepared=in.device_colors(baked.get(),color_tiles.get(),color_pixels.get());
-  const auto source=in.device_sources(baked.get(),axes.get());
+  auto source=in.device_sources(baked.get(),axes.get());
+  const auto coordinates=in.device_coordinate_jobs(terms.get(),mapped.get(),chunk_pixels,source);
   auto *image_target=baked.get();
   in.visit_images([&](const auto plane){
    queue.memcpy(image_target,plane.data(),plane.size_bytes());
@@ -55,12 +62,19 @@ Result composite(const Input &in,const std::function<bool()> &cancelled){
    queue.memcpy(axis_target,taps.data(),taps.size_bytes());
    axis_target+=taps.size();
   });
+  auto *term_target=terms.get();
+  in.visit_terms([&](const auto values){
+   queue.memcpy(term_target,values.data(),values.size_bytes());
+   term_target+=values.size();
+  });
   const auto p=in.parameters;const auto l=layers.get();const auto t=tiles.get();const auto px=pixels.get();const auto pad=padding.get();const auto q=quant.get();const auto out=output.get();
   auto *normal=normal_output.get();
   auto *pbr=pbr_output.get();
   for(size_t first=0;first<result.pixels.size();){
    checkpoint(cancelled);
    const auto count=std::min(chunk_pixels,result.pixels.size()-first);
+   source.first=uint32_t(first);
+   if(coordinates.size)launch_source_coordinates(queue,coordinates,p.resolution,source.first,count);
    queue.parallel_for(sycl::range<1>{count},[=](sycl::id<1> id){
     const auto at=uint32_t(first+id[0]);
     out[id]=compose(at,p,l,t,px,pad,bake,prepared,source,*q,pbr?pbr+4*id[0]:nullptr);

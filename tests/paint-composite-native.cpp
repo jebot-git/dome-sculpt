@@ -142,11 +142,15 @@ int main()try{
   if(textured){
    auto source_maps=std::make_shared<PaintSourceMaps>(*object.painted->source_maps());
    source_maps->color.uv_transform[1]=.125f;
+   source_maps->color.uv_transform[2]=-.37f;
    auto rotated=PaintedMesh::from_maps(object.painted->mesh(),source_maps,512);
-   const auto before=calls.load();
+   reference_mode=true;
+   const auto expected_rotated=PaintedMesh::from_maps(rotated->mesh(),source_maps,512)->composite(a);
+   reference_mode=false;
+   const auto before=textured_calls.load();
    const auto mapped=rotated->composite(a);
-   check(calls==before&&mapped->source_maps==rotated->source_maps()&&!mapped->color.rgba.empty(),
-         "An affine source with coupled UV axes keeps its established compositor and exact image owner");
+   check(textured_calls==before+1&&mapped->source_maps==rotated->source_maps()&&equal(*mapped,*expected_rotated),
+         "An affine source with coupled UV axes uses the selected backend and preserves exact output and image ownership");
   }
  }
  Document d;d.replace(scene);ready(d);const auto original=d.copy_scene().encode();auto held=d.frame().surface->ranges.front().textures;auto held_pixels=held->color.rgba;auto rest=d.copy_scene().active().painted->mesh();const auto rig=d.copy_scene().active().deformation->encode(rest);

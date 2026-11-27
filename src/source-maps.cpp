@@ -81,6 +81,29 @@ float texel_center(uint32_t at,uint32_t extent) {
 }
 }
 
+detail::SourceTextureProducts detail::source_texture_products(const PaintSourceTexture &source,
+    uint32_t width,uint32_t height){
+  source.validate();
+  if(!source.image||!width||!height||width>2048||height>2048)
+    throw std::invalid_argument("Invalid coupled source texture grid");
+  const auto &m=source.uv_transform;
+  const auto bits=[](double value){return std::bit_cast<uint64_t>(value);};
+  SourceTextureProducts result;
+  result.transform={bits(m[4]),bits(m[5]),source.wrap_s,source.wrap_t};
+  result.columns.reserve(width);
+  result.rows.reserve(height);
+  // Products of two binary32 operands fit exactly in binary64.
+  for(uint32_t x=0;x<width;++x){
+    const double u=texel_center(x,width);
+    result.columns.push_back({bits(double(m[0])*u),bits(double(m[2])*u)});
+  }
+  for(uint32_t y=0;y<height;++y){
+    const double v=texel_center(y,height);
+    result.rows.push_back({bits(double(m[1])*v),bits(double(m[3])*v)});
+  }
+  return result;
+}
+
 detail::SourceTextureGrid::SourceTextureGrid(const PaintSourceTexture &source,
     uint32_t width,uint32_t height,bool srgb)
     :source_(source),width_(width),height_(height),srgb_(srgb) {

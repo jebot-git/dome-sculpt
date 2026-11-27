@@ -38,21 +38,35 @@ void validate(const Input &in,const std::function<bool()> &cancelled){
   throw std::invalid_argument("Invalid source texture occlusion strength");
  for(const auto &source:in.sources){
   if(source.rgba.empty()){
-   if(source.width||source.height||!source.columns.empty()||!source.rows.empty())
+   if(source.width||source.height||!source.columns.empty()||!source.rows.empty()||
+      !source.column_terms.empty()||!source.row_terms.empty())
     throw std::invalid_argument("Source texture coordinates have no image owner");
    continue;
   }
   if(!source.width||!source.height||source.width>p.resolution||source.height>p.resolution||
-     source.rgba.size()!=4*size_t(source.width)*source.height||
-     source.columns.size()!=p.resolution||source.rows.size()!=p.resolution)
+     source.rgba.size()!=4*size_t(source.width)*source.height)
    throw std::invalid_argument("Source texture inputs do not fit the compositor grid");
+  checkpoint(cancelled);
+  if(source.coupled()){
+   const auto valid_mode=[](int mode){return mode==33071||mode==33648||mode==10497;};
+   const auto valid_term=[](uint64_t v){return (v&0x7fffffffffffffffull)<=std::bit_cast<uint64_t>(10000.);};
+   if(!source.columns.empty()||!source.rows.empty()||source.column_terms.size()!=p.resolution||
+      source.row_terms.size()!=p.resolution||!valid_mode(source.transform.wrap_s)||!valid_mode(source.transform.wrap_t)||
+      !valid_term(source.transform.offset_u)||!valid_term(source.transform.offset_v))
+    throw std::invalid_argument("Invalid coupled source texture transform");
+   for(const auto terms:{source.column_terms,source.row_terms})
+    for(const auto &term:terms)if(!valid_term(term.u)||!valid_term(term.v))
+     throw std::invalid_argument("Coupled source texture term exceeds the transform bounds");
+   continue;
+  }
+  if(source.columns.size()!=p.resolution||source.rows.size()!=p.resolution||!source.row_terms.empty())
+   throw std::invalid_argument("Source texture coordinates do not fit the compositor grid");
   const auto check_axis=[&](std::span<const detail::SourceTextureAxis> taps,uint32_t extent){
    for(const auto &tap:taps){
     if(uint32_t(tap.first)>=extent||uint32_t(tap.second)>=extent||!std::isfinite(tap.fraction)||tap.fraction<0||tap.fraction>1)
      throw std::out_of_range("Source texture tap is outside the declared image");
    }
   };
-  checkpoint(cancelled);
   check_axis(source.columns,source.width);
   check_axis(source.rows,source.height);
  }

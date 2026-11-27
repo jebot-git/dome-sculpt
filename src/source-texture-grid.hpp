@@ -2,9 +2,15 @@
 #pragma once
 #include "dome/source-maps.hpp"
 #include "source-texture-axis.hpp"
+#include "paint-source-coordinate.hpp"
 #include <span>
 
 namespace dome::detail {
+struct SourceTextureProducts {
+  std::vector<paint_compute::SourceTerms> columns,rows;
+  paint_compute::SourceTransform transform;
+};
+SourceTextureProducts source_texture_products(const PaintSourceTexture &,uint32_t width,uint32_t height);
 // Validated immutable source sampled at output texel centers. Axis-aligned
 // transforms reuse the same wrapped taps down each column and across each row.
 class SourceTextureGrid {

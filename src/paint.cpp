@@ -4795,8 +4795,7 @@ auto composite_source_textures(const PaintSourceMaps &maps){
 }
 bool gpu_source_textures_eligible(const PaintSourceMaps &maps,uint32_t resolution){
  return std::ranges::all_of(composite_source_textures(maps),[&](const auto *source){
-  return !source->image||(source->image->width<=resolution&&source->image->height<=resolution&&
-      source->uv_transform[1]==0&&source->uv_transform[2]==0);
+  return !source->image||(source->image->width<=resolution&&source->image->height<=resolution);
  });
 }
 bool gpu_plain_composite_eligible(uint32_t r,const std::vector<PaintLayer> &layers,bool material_input,bool projected){
@@ -4819,13 +4818,28 @@ std::shared_ptr<TextureMaps> gpu_plain_composite(uint32_t r,const std::vector<Pa
   if(!source.normal.image||source.normal_scale<=0)in.bake.normal=bake->maps.normal.rgba;
  }
  std::array<std::optional<detail::SourceTextureGrid>,SourceRoleCount> source_grids;
+ std::array<detail::SourceTextureProducts,SourceRoleCount> source_products;
  const auto textures=composite_source_textures(source);
  for(size_t role=0;role<textures.size();++role){
   const auto &texture=*textures[role];
   if(!texture.image)continue;
   checkpoint(cancelled);
-  const auto &grid=source_grids[role].emplace(texture,r,r,false);
-  in.sources[role]={texture.image->rgba,grid.columns(),grid.rows(),texture.image->width,texture.image->height,texture.mag_filter==9728};
+  auto &input=in.sources[role];
+  input.rgba=texture.image->rgba;
+  input.width=texture.image->width;
+  input.height=texture.image->height;
+  input.nearest=texture.mag_filter==9728;
+  if(texture.uv_transform[1]!=0||texture.uv_transform[2]!=0){
+   auto &products=source_products[role];
+   products=detail::source_texture_products(texture,r,r);
+   input.column_terms=products.columns;
+   input.row_terms=products.rows;
+   input.transform=products.transform;
+  }else{
+   const auto &grid=source_grids[role].emplace(texture,r,r,false);
+   input.columns=grid.columns();
+   input.rows=grid.rows();
+  }
  }
  in.occlusion_strength=source.occlusion_strength;
  if(projection){

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
-#include "source-texture-axis.hpp"
+#include "paint-source-coordinate.hpp"
 #include <cstdint>
 #include <cstddef>
 #include <bit>
@@ -34,11 +34,14 @@ struct SourceTexture {
  const detail::SourceTextureAxis *columns=nullptr,*rows=nullptr;
  uint32_t width=0;
  bool nearest=false;
+ const SourcePixelTaps *mapped=nullptr;
 };
 struct SourceMaterial {
  SourceTexture textures[SourceRoleCount];
  float occlusion_strength=1;
+ uint32_t first=0;
 };
+static_assert(SourceRoleCount==source_coordinate_roles);
 struct Quantization {float unit[256]{},srgb[256]{};uint32_t threshold[255]{};uint32_t reserved=0;};
 inline constexpr uint32_t absent=UINT32_MAX;
 // Volatile float expression boundaries prohibit contraction without changing
@@ -65,13 +68,14 @@ DOME_PC_FN uint8_t srgb_byte(float v,const Quantization &q){
  return uint8_t(lo);
 }
 DOME_PC_FN float blend(float base,float paint,float a){return add(mul(base,sub(1,a)),mul(paint,a));}
-DOME_PC_FN void sample_source(SourceTexture texture,uint32_t x,uint32_t y,bool srgb,
+DOME_PC_FN void sample_source(SourceTexture texture,uint32_t x,uint32_t y,uint32_t index,bool srgb,
                               const Quantization &q,float (&result)[4]){
  if(!texture.rgba){
   for(auto &channel:result)channel=1;
   return;
  }
- const auto column=texture.columns[x],row=texture.rows[y];
+ const auto taps=texture.mapped?texture.mapped[index]:SourcePixelTaps{texture.columns[x],texture.rows[y]};
+ const auto column=taps.column,row=taps.row;
  const auto decode=[&](const uint8_t *rgba,unsigned c){return srgb&&c<3?q.srgb[rgba[c]]:q.unit[rgba[c]];};
  if(texture.nearest){
   const auto *rgba=texture.rgba+(size_t(row.first)*texture.width+column.first)*4;
@@ -131,11 +135,12 @@ DOME_PC_FN Output compose(uint32_t at,const Parameters &p,const Layer *layers,co
                          const Pixel *pixels,const int32_t *padding,Bake bake,PreparedColor prepared,
                          const SourceMaterial &source,const Quantization &q,uint8_t *prepared_out){
  const uint32_t column=at%p.resolution,row=at/p.resolution;
+ const uint32_t index=at-source.first;
  float color[4],orm[4],sampled_emission[4],occlusion[4];
- sample_source(source.textures[SourceColor],column,row,true,q,color);
- sample_source(source.textures[SourceOrm],column,row,false,q,orm);
- sample_source(source.textures[SourceEmission],column,row,true,q,sampled_emission);
- sample_source(source.textures[SourceOcclusion],column,row,false,q,occlusion);
+ sample_source(source.textures[SourceColor],column,row,index,true,q,color);
+ sample_source(source.textures[SourceOrm],column,row,index,false,q,orm);
+ sample_source(source.textures[SourceEmission],column,row,index,true,q,sampled_emission);
+ sample_source(source.textures[SourceOcclusion],column,row,index,false,q,occlusion);
  for(unsigned c=0;c<4;++c)color[c]=mul(color[c],p.color[c]);
  float pbr[4]{};
  if(prepared_out){

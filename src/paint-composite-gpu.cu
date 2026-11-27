@@ -27,8 +27,18 @@
 #endif
 #include "paint-composite-backend.hpp"
 #include "paint-grid-filter.hpp"
+#include "paint-source-coordinate-kernel.hpp"
 namespace dome {namespace {
 template<class E>void checked(E value){if(value!=DS_SUCCESS)throw std::runtime_error(DS_ERROR_TEXT(value));}
+__global__ void map_source_coordinates(paint_compute::SourceCoordinateBatch batch,uint32_t resolution,
+                                       uint32_t first,size_t count){
+ const size_t i=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+ if(i>=count*batch.size)return;
+ const size_t index=i%count;
+ const uint32_t at=first+uint32_t(index);
+ const auto &job=batch.jobs[i/count];
+ job.output[index]=paint_compute::source_coordinates(job,at%resolution,at/resolution);
+}
 __global__ void paint_pixels(paint_compute::Parameters p,const paint_compute::Layer *layers,const uint32_t *tiles,
     const paint_compute::Pixel *pixels,const int32_t *padding,paint_compute::Bake bake,
     paint_compute::PreparedColor prepared,paint_compute::SourceMaterial source,const paint_compute::Quantization *q,
@@ -58,6 +68,8 @@ Result composite(const Input &in,const std::function<bool()> &cancelled){
  Buffer<Pixel> pixels(std::max(size_t(1),in.pixels.size()));Buffer<int32_t> padding(in.padding.size());Buffer<Quantization> quant(1);Buffer<Output> output(chunk_pixels);
  Buffer<uint8_t> baked(in.image_bytes());
  Buffer<detail::SourceTextureAxis> axes(in.axis_count());
+ Buffer<SourceTerms> terms(in.term_count());
+ Buffer<SourcePixelTaps> mapped(in.coupled_source_count()*chunk_pixels);
  Buffer<uint32_t> color_tiles(in.color_tiles.size());
  Buffer<ColorPixel> color_pixels(in.color_pixels.size());
  Buffer<uint8_t> normal(in.bake.normal.empty()?0:4*chunk_pixels);
@@ -76,7 +88,8 @@ Result composite(const Input &in,const std::function<bool()> &cancelled){
   checked(DS_COPY(padding.data,in.padding.data(),in.padding.size()*sizeof(int32_t),DS_TO_DEVICE));checked(DS_COPY(quant.data,&q,sizeof(q),DS_TO_DEVICE));
   const auto bake=in.bake.device_view(baked.data);
   const auto prepared=in.device_colors(baked.data,color_tiles.data,color_pixels.data);
-  const auto source=in.device_sources(baked.data,axes.data);
+  auto source=in.device_sources(baked.data,axes.data);
+  const auto coordinates=in.device_coordinate_jobs(terms.data,mapped.data,chunk_pixels,source);
   auto *image_target=baked.data;
   in.visit_images([&](const auto plane){
    checked(DS_COPY(image_target,plane.data(),plane.size_bytes(),DS_TO_DEVICE));
@@ -87,9 +100,19 @@ Result composite(const Input &in,const std::function<bool()> &cancelled){
    checked(DS_COPY(axis_target,taps.data(),taps.size_bytes(),DS_TO_DEVICE));
    axis_target+=taps.size();
   });
+  auto *term_target=terms.data;
+  in.visit_terms([&](const auto values){
+   checked(DS_COPY(term_target,values.data(),values.size_bytes(),DS_TO_DEVICE));
+   term_target+=values.size();
+  });
   for(size_t first=0;first<result.pixels.size();){
    checkpoint(cancelled);
    const auto count=std::min(chunk_pixels,result.pixels.size()-first);
+   source.first=uint32_t(first);
+   if(coordinates.size){
+    map_source_coordinates<<<(count*coordinates.size+255)/256,256>>>(coordinates,in.parameters.resolution,source.first,count);
+    checked(DS_LAST_ERROR());
+   }
    paint_pixels<<<(count+255)/256,256>>>(in.parameters,layers.data,tiles.data,pixels.data,padding.data,
        bake,prepared,source,quant.data,output.data,normal.data,pbr.data,first,count);
    checked(DS_LAST_ERROR());checked(DS_SYNC());
