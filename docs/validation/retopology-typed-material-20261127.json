@@ -1,0 +1,189 @@
+{
+  "revision": "b355208dd43799a630118fa176593a70a8857cd7",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "release_fltk": "/opt/fltk-vr/toolkit",
+  "release_tests": [
+    "retopology-mtoon-affine",
+    "retopology-mtoon-plain",
+    "retopology-authority-grab",
+    "retopology-authority-focus",
+    "retopology-held-admission",
+    "layered-normal-native",
+    "retopology-history-openxr-cancel",
+    "native-paint32-fixture",
+    "retopology-affine-ui-fixture",
+    "retopology-history-openxr-apply",
+    "layered-normal-uv-native",
+    "retopology-caller-admission",
+    "retopology-input-admission",
+    "retopology-affine-openxr",
+    "retopology-save-handoff",
+    "retopology-reapply-affine",
+    "retopology-reapply-plain",
+    "retopology-restore-plain",
+    "retopology-prepared-plain",
+    "retopology-prepared-affine",
+    "retopology-linked-vrm1",
+    "retopology-restore-affine",
+    "authoring-native-normal-union",
+    "retopology-surface-heat-affine",
+    "retopology-affine",
+    "retopology-surface-heat-plain",
+    "retopology-affine-wire",
+    "retopology-authoring",
+    "retopology-worker-faults",
+    "retopology-mtoon-v0",
+    "retopology-worker-accepted-publication",
+    "retopology-worker-reporter-recovery",
+    "texture-set-active-bake",
+    "retopology-mixed-material",
+    "dome-sculpt-texture-set-surfaces",
+    "dome-sculpt-texture-set-export"
+  ],
+  "asan_ubsan_workflows": [
+    "mtoon-plain",
+    "mtoon-affine",
+    "mtoon-v0",
+    "prepared-affine",
+    "restore-affine"
+  ],
+  "asan_ubsan_method": "Recompiled paint, retopo-authoring, texture-sets and final worker fixture using the generated sanitizer CMake commands. Relinked against the matching ASan/UBSan archive.",
+  "same_slot_measurements": {
+    "plain": {
+      "texel_role_comparisons": 4312,
+      "max_linear_channel_error": 0.00351506,
+      "max_normal_direction_vector_error": 0.00343126
+    },
+    "affine": {
+      "texel_role_comparisons": 4263,
+      "max_linear_channel_error": 0.00346583,
+      "max_normal_direction_vector_error": 0.0035171
+    },
+    "v0": {
+      "texel_role_comparisons": 4350,
+      "max_linear_channel_error": 0.00358576,
+      "max_normal_direction_vector_error": 0.00343126
+    }
+  },
+  "release_asan_exact_sha256": {
+    "retopology-mtoon-plain/mtoon-before.dsculpt": "cd6429d8b66989161edb0d8e0ec78eaadbdda3709639ac1741f9d6b042a78d1e",
+    "retopology-mtoon-plain/mtoon-retopo.dsculpt": "53d4ed5d5d4493686442592adbe2542dfb89ddfb81dd345c50d3b463cf12f35b",
+    "retopology-mtoon-plain/mtoon-retopo.glb": "5ef7c24d9434123101bd1892298a73f7136edd3b206f90599539f1c864dd3233",
+    "retopology-mtoon-plain/mtoon-portable.glb": "e78fb842a454e6469458254892d467e880c52a70dadf620c11022c2a0769d855",
+    "retopology-mtoon-affine/mtoon-before.dsculpt": "68e972f0de5956e9ed7b86986449a1a69eab864459d1aad44e018ee4bb49e951",
+    "retopology-mtoon-affine/mtoon-retopo.dsculpt": "a2cb19c42cd9a2d4f7a224ca5961973957800377d0ebeaa9a724319be21c84b8",
+    "retopology-mtoon-affine/mtoon-retopo.glb": "75e895d391df39f0df4412de225385be80b90223dc2e9c7a1a90e1715dece6cb",
+    "retopology-mtoon-affine/mtoon-portable.glb": "52cc694355d264c8d8932f159acf7b0d09ee41600c604cb4f77b67f2fef4d659",
+    "retopology-mtoon-v0/mtoon-before.dsculpt": "0b981bf5a10893c82321205738bb6a7fbb462a9ed23b111d88e9acde26f0d839",
+    "retopology-mtoon-v0/mtoon-retopo.dsculpt": "84b0e35e3382100392a3b10e305be1ec30175fdc4bf42e297e106ac0f9dfac5b"
+  },
+  "khronos": {
+    "plain-retopo": {
+      "errors": 0,
+      "warning": "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE",
+      "typed_role_widths": [
+        512
+      ]
+    },
+    "plain-portable": {
+      "errors": 0,
+      "warning": "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE",
+      "typed_role_widths": [
+        128,
+        512
+      ]
+    },
+    "affine-retopo": {
+      "errors": 0,
+      "warning": "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE",
+      "typed_role_widths": [
+        512
+      ]
+    },
+    "affine-portable": {
+      "errors": 0,
+      "warning": "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE",
+      "typed_role_widths": [
+        128,
+        512
+      ]
+    }
+  },
+  "official_mtoon_1_schema_errors": 0,
+  "nested_native_wayland": {
+    "checks": [
+      {
+        "passed": true,
+        "check": "Native retopology editor publishes the canonical Dome Sculpt Wayland identity"
+      },
+      {
+        "passed": true,
+        "check": "The actual Wayland universal menu enables Start patch on the saved replacement"
+      },
+      {
+        "passed": true,
+        "check": "An unchanged reopened patch keeps Apply disabled"
+      },
+      {
+        "passed": true,
+        "check": "The canonical Move radio can be selected on the reopened patch"
+      },
+      {
+        "passed": true,
+        "check": "Cancel followed by universal Save preserves every replacement and retained source byte"
+      },
+      {
+        "passed": true,
+        "check": "Native client releases the compositor and export worker on close"
+      }
+    ],
+    "complete": true
+  },
+  "synthetic_stereo_openxr": {
+    "arc": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_submissions": [
+        6,
+        6
+      ],
+      "differing_rgb_components_per_eye": [
+        16397,
+        16121
+      ],
+      "exact_native_before_and_after_reopen": true
+    },
+    "software": {
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "stereo_submissions": [
+        6,
+        6
+      ],
+      "differing_rgb_components_per_eye": [
+        16836,
+        16742
+      ],
+      "exact_native_before_and_after_reopen": true
+    }
+  },
+  "physical_headset": false,
+  "archive_sha256": "631adcdddf0ed138b4751bcfca5807e4a2c602a82051c1d60b14414e4be7c1df",
+  "archive_members_sha256": {
+    "release-verified.log": "b060873e3011f4c93fb173fc0f1186a21478a2d92c646558f7f066f10c949afe",
+    "release-verified-build.log": "8f56a641fbde4cc3c60742349b462eac496177c09ea39b48564b5df3eaeb8f1d",
+    "release/Testing/Temporary/LastTest.log": "f15a6116160bd277f3ea6efc2a624e1449afcd9f4896ae5da0c0dca38f254189",
+    "asan-build.log": "7d3ea037fd5d80b1d94c45361aca3325fffc95e8a8067c0be487f0a59699736c",
+    "khronos.json": "33ac0c5c0eae3b8fa92880ba527069739990f26bb1a3834b6193693421767011",
+    "schemas.json": "053130552e96cada4a5e7457dd5d91e9a0b2f2d6d113a20f021d29caa2c3e401",
+    "khronos.cjs": "f91fccc291bb23e52bf27d357944ca7e9e86c5dfbdf5cd8e2e587bc849ff1e99",
+    "xr-toon.py": "4b47550f0e23af5994958af5cb263218c780774ee73ec14f9c51c84a3c3e8a02",
+    "run-render.py": "25c9f902f469bc46a912fb157a40d33fc7edee9d931df93f7e7595c358616470",
+    "xr-arc/compare.json": "66b2515c5245b7bb0d9b2ac16df0fc696df814687f29480b4e8c52cc7d25c3ca",
+    "xr-software/compare.json": "a801ef490106da9154df77ce42db76c814a6d889c06d8b107e016a741eed9309",
+    "wayland-reapply/report.json": "57c49923fada5f513ba5122e811210418db445f4b4e4ab03d1073e00b960d56e",
+    "asan-mtoon-plain.log": "b6c3723dc7d0aaa0a531898776f88fde914c1c526734289b6aa575e081b8f141",
+    "asan-mtoon-affine.log": "fd6004124f3573e08c0078604d40a1ae338b263462cb42737e2963a9621181a7",
+    "asan-mtoon-v0.log": "83df5e42645aa9d5bceb3d8d98e844123f007a55d8d89e64c2a496acf675e8eb",
+    "asan-prepared-affine.log": "bf6ce3f15f1432cee5afbbcf8e1d3fdf5f7debf4f9def0e38ef26df41bd421ae",
+    "asan-restore-affine.log": "91ea01bfff12e655238ea03ce21998c5eefb55f9f90bac25a4c716927a95bf9f"
+  }
+}

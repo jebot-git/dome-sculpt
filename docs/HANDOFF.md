@@ -149,7 +149,7 @@ The normal transfer uses its own coverage. Colour, roughness, emission and
 editable paint layers follow the writable grid. The old patch holds its
 original authoring state and the replacement has a replayable prepared bake
 on its new atlas. An already cleared Bake stays cleared after Apply.
-Prepared imported material sets and typed MToon reprojection remain open.
+Prepared imported material sets still need their own transfer adapter.
 All 19 selected Release tests and four ASan/UBSan workflows pass. The six
 native project and Editable GLB files match across both builds. The two
 fixtures compare 5,651 placed
@@ -158,6 +158,28 @@ direction-vector error is 0.00672. Both Editable GLBs pass Khronos validation
 with zero errors and warnings. Synthetic OpenXR reopens and renders the
 changed prepared patch on llvmpipe and Intel Arc A770.
 [Prepared geometry validation](validation/retopology-prepared-reproject-20261127.json)
+
+Changed native retopology now transfers static MToon 0 and 1 images per
+material slot. The worker samples each slot's previous rest surface with
+the authored texture transform, wrapping and color encoding. The replacement
+keeps editable paint and independently rasterized typed roles, with MatCap
+preserving its original image and view coordinates. Typed normal detail
+uses the placed source and replacement derivative frames. A material whose
+front and back directions cannot share the same target map fails before
+publication, as do animated roles that need a live sampling adapter.
+Ordered Save, cold Open and Undo/Redo round-trip the native material fields.
+Editable GLB retains the independent ink overlay. Standard GLB carries both
+typed materials in the export control without that overlay, and an unsupported
+painted Standard export preserves the existing output. All 36 selected
+Release tests and five ASan/UBSan workflows pass. The ten new native and
+GLB verification files match byte for byte across both builds. Official
+MToon 1 schemas and Khronos report zero errors on all four GLBs. Khronos
+reports generated tangent space on the normal-mapped primitive. Nested
+DomeD Wayland covers reopening, Move,
+Cancel and exact Save. Synthetic OpenXR reopens and renders the before and
+after projects on Intel Arc A770 and llvmpipe. Imported prepared texture sets,
+live UV animation transfer, and broader portable painted MToon remain open.
+[Typed MToon retopology validation](validation/retopology-typed-material-20261127.json)
 
 Surface Heat also binds meshes after independent frame and shapekey
 authoring. Retention accounts for the actual POSITION correspondences,

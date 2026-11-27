@@ -109,9 +109,20 @@ normal maps under reflected and sheared placements and after independent
 retained UV editing. The two normal roles keep their own sampling and
 coverage. Ordinary material Bake and sparse editable layers remain separate.
 Save, Undo/Redo and Editable GLB retain the prepared role owners. Prepared
-per-material sets, authored source textures, typed MToon and physical XR
+per-material sets, imported source textures and physical XR
 production workflows remain required.
 [Prepared geometry evidence](validation/retopology-prepared-reproject-20261127.json)
+
+Changed retopology now reprojects static native MToon texture sets using the
+actual material slot of each triangle and independent role output grids.
+Native MToon 0 shared transforms and MToon 1 per-role transforms both follow
+the source surface. MatCap keeps its original view-space sampling. Typed
+normals are reoriented in placed derivative frames and checked after
+quantization. Native Save and Editable GLB retain independent paint and role
+textures. MToon 1 Standard GLB passes for the qualified static texture export
+control. Animated UV transport, incompatible two-sided normal frames,
+imported prepared sets and broader painted portable export remain open.
+[Typed MToon retopology evidence](validation/retopology-typed-material-20261127.json)
 
 The current combined atlas and HDR cache source passes all 153 checks
 in both software Release and Intel Arc ASan/UBSan OpenXR replays. Its
