@@ -75,8 +75,7 @@ worker projects mesh attributes onto the previous rest surface, preserving
 the native rig, pose and shapekey POSITION data under affine placement.
 Native geometric key frames follow the replacement atlas. Save, cancellation
 and one Undo/Redo retain both patch generations. Wire-only edits keep the
-existing raster and deformation owners. Retained material grids and imported
-linked rigs remain open.
+existing raster and deformation owners.
 [Retopology reapply evidence](validation/retopology-reapply-20261127.json)
 
 Rig and Shapekey Restore keep changed native retopology and the current
@@ -86,6 +85,16 @@ cross-references survive cold Open, and Apply, Restore and their Undo/Redo
 remain transactional. The native Shapekey Restore confirmation defaults to
 Cancel in nested DomeD Wayland.
 [Retopology Restore evidence](validation/retopology-restore-20261127.json)
+
+Native multi-material retopology preserves independently painted and baked
+grids and original VRM 1.0 joint links when Apply changes the patch.
+Linked Shape Restore uses the current pose of the original imported rig.
+Standard and Editable VRM reference the original humanoid joints. The
+Editable package includes genuine hidden retopology guides required by
+the exported parts and their history. Source-authored and prepared
+material grids, mixed-material face subdivision and physical-device
+workflow acceptance remain open.
+[Linked retopology evidence](validation/retopology-linked-skin-20261127.json)
 
 The current combined atlas and HDR cache source passes all 153 checks
 in both software Release and Intel Arc ASan/UBSan OpenXR replays. Its

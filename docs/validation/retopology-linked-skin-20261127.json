@@ -1,0 +1,173 @@
+{
+  "revision": "71e3e6df7cca135c451a030fdd7f00c202df3dc5",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "release_fltk": "/opt/fltk-vr/toolkit",
+  "sanitizer_fltk": "artifacts/sdk-20261126/toolkit-sanitize",
+  "release_tests": [
+    "authoring-native-normal-union",
+    "layered-normal-native",
+    "layered-normal-uv-native",
+    "native-paint32-fixture",
+    "retopology-affine",
+    "retopology-authoring",
+    "retopology-linked-vrm1",
+    "retopology-reapply-affine",
+    "retopology-reapply-plain",
+    "retopology-restore-affine",
+    "retopology-restore-plain",
+    "retopology-save-handoff",
+    "retopology-surface-heat-affine",
+    "retopology-surface-heat-plain",
+    "vrm1-retained-skinned-accessory",
+    "vrm1-source-export"
+  ],
+  "release_interchange_tests": [
+    "bake-recipes",
+    "native-authoring",
+    "native-authoring-real",
+    "native-scene-append-real",
+    "retopology-worker-faults"
+  ],
+  "release_app_sha256": "bffb290c262c6c16e5da884a871b871cb230939f9956c71a5161bf7092e1f091",
+  "release_linked_fixture_sha256": "c9a9d53bb8982fda7b031db148affd68ce2a51e71ca9423330b49e9f9c481049",
+  "asan_ubsan_tests": [
+    "retopology-linked-vrm1",
+    "vrm1-retained-skinned-accessory",
+    "vrm1-source-export"
+  ],
+  "asan_ubsan_method": "Recompiled the final editable-export translation unit with the generated CMake sanitizer flags, replaced its core archive member, and relinked the focused fixture with the generated sanitizer command",
+  "asan_ubsan_linked_fixture_sha256": "ac0fd14c9b67df8cb579d06eb0df4064b40d5d98dc9ecdc14c57101f4c5663c0",
+  "worker_assertions": 22,
+  "release_files_sha256": {
+    "linked-before.dsculpt": "0ad806a2a9351295e8e274cbbf435fc0b5d55fdaacdae04306a2a6c8ff282f4e",
+    "linked-reapplied.dsculpt": "eff8d9d700b5612bb419f1911da426171cbab1c6523c90a31dd35991c20b4382",
+    "linked-posed.dsculpt": "506861479a01be71d17c644696a0ab9e048b667d809fca85fe9a562ab16e094c",
+    "linked-shape-restored.dsculpt": "f33d46273f0824d996d552f75e5289781bef0232bf13700b0a239f8541abdd62",
+    "linked-standard.vrm": "a293c90143caa5809506f6e246b6b39ea2d8550e1f515ca23351ec364d0f22f8",
+    "linked-editable.vrm": "ac795428835c4f8226da5a9a26b606844a86e9cb85cecad237493efb8c60e108"
+  },
+  "asan_ubsan_files_sha256": {
+    "linked-before.dsculpt": "0ad806a2a9351295e8e274cbbf435fc0b5d55fdaacdae04306a2a6c8ff282f4e",
+    "linked-reapplied.dsculpt": "eff8d9d700b5612bb419f1911da426171cbab1c6523c90a31dd35991c20b4382",
+    "linked-posed.dsculpt": "506861479a01be71d17c644696a0ab9e048b667d809fca85fe9a562ab16e094c",
+    "linked-shape-restored.dsculpt": "f33d46273f0824d996d552f75e5289781bef0232bf13700b0a239f8541abdd62",
+    "linked-standard.vrm": "a293c90143caa5809506f6e246b6b39ea2d8550e1f515ca23351ec364d0f22f8",
+    "linked-editable.vrm": "ac795428835c4f8226da5a9a26b606844a86e9cb85cecad237493efb8c60e108"
+  },
+  "exact_release_asan_ubsan_files": [
+    "linked-before.dsculpt",
+    "linked-reapplied.dsculpt",
+    "linked-posed.dsculpt",
+    "linked-shape-restored.dsculpt",
+    "linked-standard.vrm",
+    "linked-editable.vrm"
+  ],
+  "nested_domed_wayland_checks": [
+    {
+      "passed": true,
+      "check": "Native retopology editor publishes the canonical Dome Sculpt Wayland identity"
+    },
+    {
+      "passed": true,
+      "check": "The actual Wayland universal menu enables Shape Restore on the saved replacement"
+    },
+    {
+      "passed": true,
+      "check": "Return defaults to Cancel on the native Restore confirmation"
+    },
+    {
+      "passed": true,
+      "check": "Native Cancel leaves both reprojected checkpoints exact"
+    },
+    {
+      "passed": true,
+      "check": "Native Shape Restore and universal Save match the independent worker's history result"
+    },
+    {
+      "passed": true,
+      "check": "Universal Undo restores the complete reapply project and both checkpoints"
+    },
+    {
+      "passed": true,
+      "check": "Universal Redo selects the same projected historical endpoint"
+    },
+    {
+      "passed": true,
+      "check": "Native client releases the compositor and export worker on close"
+    }
+  ],
+  "synthetic_openxr": {
+    "arc": {
+      "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_submissions_per_state": [
+        6,
+        6
+      ],
+      "image_releases_per_state": [
+        12,
+        12
+      ],
+      "differing_rgb_components_per_eye": [
+        24533,
+        25203
+      ],
+      "exact_close": true
+    },
+    "software": {
+      "gl_renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "stereo_submissions_per_state": [
+        6,
+        6
+      ],
+      "image_releases_per_state": [
+        12,
+        12
+      ],
+      "differing_rgb_components_per_eye": [
+        24501,
+        25220
+      ],
+      "exact_close": true
+    }
+  },
+  "validation": {
+    "linked-standard.vrm": {
+      "glTF_errors": 0,
+      "glTF_warning_codes": [
+        "MULTIPLE_EXTENSIONS",
+        "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ],
+      "glTF_warnings": 8,
+      "vrm_schema_checks": 4,
+      "vrm_schema_errors": 0
+    },
+    "linked-editable.vrm": {
+      "glTF_errors": 0,
+      "glTF_warning_codes": [
+        "MULTIPLE_EXTENSIONS",
+        "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+        "NODE_SKINNED_MESH_NON_ROOT"
+      ],
+      "glTF_warnings": 8,
+      "vrm_schema_checks": 4,
+      "vrm_schema_errors": 0
+    }
+  },
+  "physical_headset": false,
+  "archive_sha256": "059d36d75d53f5347e54e9c385e42d9dd0d8982511b0194bf929add37dc695b4",
+  "archive_members_sha256": {
+    "release.log": "524bbd45566ec85be8d1e48b7b4824facdbeeb3345621fa7c38328bc509b232d",
+    "release-interchange.log": "66f6e827fccca2a6c6eaa91a46787d87af4cd8f56c614851155d686adb94a086",
+    "release-worker.log": "92d96c7f7e6e63810349ae40290aaab4d53e1e9ef7a0aa53ee475bdcbc3c7d38",
+    "asan.log": "ca5c33df3e4f2f7b8789fd4be5d5aa15fb83aa5d404bc314591e739c3c7b24d6",
+    "asan-final-build.log": "f52fdde516e3d7dae7ea5d69f59c441246efe25b6ea83e9ea33b1cf05256c61f",
+    "wayland.json": "7f10cb2bae0458a6edad274b1335bc1be6e0e4f1aa4e3c379b968b4599c3d431",
+    "wayland.log": "1e08fc8df727e0d9c7195e2c6a61caffd2fef268501fb7ec3d812a3f75e8dae3",
+    "software-xr.json": "41700a9c80f8f1a2c7a2e107bd33d173067fa0330ec09d146a7268993561cedc",
+    "arc-xr.json": "6921c18d51ea237601e06592b37a95d2b2ae37837ac6b1ccee62e32c50a7c6e8",
+    "khronos.json": "93427b87b96924576e6e2a625016cc62d2f15b15b81eee834fa1b1caaffeed16",
+    "official-schemas.json": "900e89a06d8af580ffd531431d7c74481dadefaccb5a8a9026acd1a0dee9f2df",
+    "frozen-resolution-retry.log": "331ff68fd0a9245ce3bde67f58890b0ae3b98fd289a744cbd6b7bfb6c0b6226b"
+  }
+}

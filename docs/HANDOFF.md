@@ -91,7 +91,6 @@ late cancellation, Undo/Redo, native frame replay and GLB skin/morph export.
 All 15 selected Release and seven ASan/UBSan tests passed. Nested DomeD
 Wayland covers reopen, Move, Cancel and exact Save. Synthetic OpenXR
 renders the replacement in both eyes on software GL and Intel Arc A770.
-Prepared and retained material grids and imported joint links remain open.
 [Retopology reapply validation](validation/retopology-reapply-20261127.json)
 
 Rig Restore and Shapekey Restore now preserve the replacement topology after
@@ -104,6 +103,26 @@ ordered Save and Undo/Redo. Nested DomeD Wayland verifies Cancel as the
 default Shapekey Restore confirmation and matches the saved native worker
 output for Restore, Undo and Redo.
 [Retopology Restore validation](validation/retopology-restore-20261127.json)
+
+Retopology reapply now works on native multi-material accessories attached
+to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and
+the material of each surviving single-material face. Each paint and Bake
+field samples its own material slot. Rig and Shape Restore preserve the
+replacement patch, and a restored linked shape follows the avatar's live
+pose. Both VRM output modes emit the original humanoid joints. Editable VRM
+also keeps the hidden guide needed to reopen the retopology workspace.
+Prepared and retained-source material grids still need a transfer adapter.
+The 21 selected Release tests cover the linked workflow and related
+authoring, Bake recipe, and worker regressions. Three focused ASan/UBSan
+tests pass, and both profiles produce the same six project and export files
+byte for byte. Nested DomeD Wayland matches the linked Shape Restore and
+Undo/Redo results exactly, and synthetic OpenXR renders the linked pose on
+llvmpipe and Intel Arc A770. Both exports pass the official VRM schemas and
+Khronos validation with zero errors. Khronos reports eight warnings per
+export for combined material extensions and transformed skinned nodes.
+The full Release qualification of `71e3e6df` is running as
+`ds-retopology-linked-skin-combined-release-20261127.service`.
+[Linked retopology validation](validation/retopology-linked-skin-20261127.json)
 
 Surface Heat also binds meshes after independent frame and shapekey
 authoring. Retention accounts for the actual POSITION correspondences,
