@@ -7,6 +7,7 @@
 #include "dome/color-paint-sampling.hpp"
 #include "dome/normal-sampling.hpp"
 #include "dome/polygon-color.hpp"
+#include "dome/retopo-authoring.hpp"
 #include "dome/texture-sets.hpp"
 #include "native-paint-frame-source.hpp"
 #include "native-paint-sampling.hpp"
@@ -386,6 +387,23 @@ void Counter::polygon(const std::shared_ptr<const PolygonAuthority> &value) {
   polygon_colors(value->colors);
   origin(value->origin);
   leave(value);
+}
+
+void Counter::retopology(const std::shared_ptr<const RetopoPatch> &patch) {
+  if (!enter(patch)) return;
+  add(sizeof(*patch));
+  const auto charge_nodes = [this](const auto &tree) {
+    using Value = typename std::remove_cvref_t<decltype(tree)>::value_type;
+    // RetopoMesh stores one tree node per stable ID. Allow for links,
+    // alignment and allocator overhead in addition to the stored value.
+    add(tree.size(), sizeof(Value) + 3 * sizeof(void *) + 64);
+  };
+  const auto &topology = patch->topology;
+  charge_nodes(topology.vertices());
+  charge_nodes(topology.edges());
+  charge_nodes(topology.faces());
+  for (const auto &[id, face] : topology.faces()) vector(face.vertices);
+  leave(patch);
 }
 
 void Counter::polygon_owner(const std::shared_ptr<const PolygonSurfaceOwner> &value) {

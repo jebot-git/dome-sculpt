@@ -158,7 +158,7 @@ struct Counter {
   void placement(const std::shared_ptr<const SourcePlacementCapsule>&p){if(enter(p)){add(sizeof(*p));vector(p->groups);for(auto&g:p->groups)group(g);if(enter(p->object_edit)){add(sizeof(*p->object_edit));leave(p->object_edit);}leave(p);}}
   void bake_recipe(const std::shared_ptr<const ObjectBakeRecipe>&p){if(enter(p)){add(sizeof(*p));text(p->source.name);if(p->cage)text(p->cage->name);leave(p);}}
   void origin(const std::shared_ptr<const PolygonOrigin>&p){if(enter(p)){
-    unsupported(p->retopology,"Native anatomical total budget has not yet admitted retained retopology");
+    retopology(p->retopology);
     polygon(p->polygon);
     add(sizeof(*p));text(p->name);text(p->material.name);volume(p->volume);paint(p->paint);texture_sets(p->texture_sets);deformation(p->deformation);appearance(p->appearance);material(p->material_bindings);placement(p->placement);origin(p->shape_source);origin(p->rig_source);bake_recipe(p->bake_recipe);leave(p);
   }}
@@ -183,6 +183,7 @@ struct Counter {
   void polygon_colors(const std::shared_ptr<const PolygonColorField>&);
   void polygon_color_surface(const std::shared_ptr<const PolygonColorSurface>&);
   void polygon(const std::shared_ptr<const PolygonAuthority>&);
+  void retopology(const std::shared_ptr<const RetopoPatch>&);
   void polygon_mesh(const PolygonMesh&);
   void polygon_owner(const std::shared_ptr<const PolygonSurfaceOwner>&);
   void polygon_preview(const std::shared_ptr<const PolygonSurfacePreview>&);
@@ -195,7 +196,7 @@ inline NativeWeightRetention native_weight_retention(const Scene&scene,size_t ma
   Counter c(maximum,maximum_work);c.add(sizeof(Scene));c.add(scene.objects().capacity(),sizeof(SculptObject));c.add(scene.groups().capacity(),sizeof(SceneGroup));
   for(auto&g:scene.groups())c.group(g);
   for(auto&o:scene.objects()){
-    c.unsupported(o.retopology,"Native anatomical total budget has not yet admitted retopology");
+    c.retopology(o.retopology);
     c.polygon(o.polygon);
     c.text(o.name);c.text(o.material.name);c.volume(o.volume,true);c.paint(o.painted,true);c.texture_sets(o.texture_sets);c.deformation(o.deformation);c.appearance(o.appearance);c.material(o.material_bindings);c.origin(o.shape_source);c.origin(o.rig_source);c.bake_recipe(o.bake_recipe);if(c.enter(o.affine_edit)){c.add(sizeof(*o.affine_edit));c.leave(o.affine_edit);}
   }
