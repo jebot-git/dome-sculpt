@@ -1,0 +1,348 @@
+{
+  "product": "8d7356eaab69d600fec8bbae3c6f26cc7bd3cb73",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+  "release_app_sha256": "0cb590868228c0484d110806009f36f031b48a59bdf488dc7be73c238be5f263",
+  "strict_asan_ubsan_fixture_sha256": "65b27376d923ef87cc948926f7aa10004c3fddd65b05e8df630ca85d6eba71ad",
+  "native_tests": {
+    "release": [
+      "retopology-prepared-color-normal-first",
+      "retopology-prepared-color-normal-plain",
+      "dome-sculpt-texture-set-export",
+      "retopology-prepared-color-normal-affine",
+      "retopology-reapply-plain",
+      "retopology-reapply-affine",
+      "retopology-save-handoff",
+      "retopology-history-openxr-apply",
+      "retopology-held-admission",
+      "retopology-history-openxr-cancel",
+      "retopology-restore-plain",
+      "dome-sculpt-texture-set-source-export",
+      "retopology-restore-affine",
+      "retopology-mtoon-detached",
+      "texture-set-retained-bake-source",
+      "retopology-mtoon-affine",
+      "retopology-mtoon-plain",
+      "retopology-linked-vrm1",
+      "retopology-surface-heat-plain",
+      "retopology-surface-heat-affine",
+      "texture-set-retained-native-target",
+      "retopology-affine",
+      "retopology-subdivide-seam-plain",
+      "retopology-mtoon-v0",
+      "retopology-prepared-color-normal-uv-affine",
+      "texture-set-retained-bake-target",
+      "retopology-subdivide-seam-affine",
+      "retopology-material-seam-plain",
+      "retopology-material-seam-affine",
+      "texture-set-retained-retopology-affine",
+      "texture-set-retained-retopology-plain",
+      "retopology-authoring",
+      "texture-set-retained-hdr-standard",
+      "texture-set-retained-hdr-editable",
+      "retopology-first-material-affine",
+      "retopology-first-material-posed-plain",
+      "retopology-first-material-posed-affine",
+      "retopology-mixed-material",
+      "retopology-authority-focus",
+      "retopology-first-material-plain",
+      "dome-sculpt-texture-set-surfaces",
+      "retopology-authority-grab",
+      "retopology-prepared-color-normal-uv-plain",
+      "canonical-paint-color-hdr"
+    ],
+    "asan": [
+      "texture-set-retained-bake-target",
+      "retopology-material-seam-plain",
+      "retopology-material-seam-affine",
+      "retopology-first-material-posed-affine",
+      "texture-set-retained-native-target",
+      "retopology-first-material-affine",
+      "retopology-first-material-posed-plain",
+      "retopology-first-material-plain",
+      "retopology-mixed-material",
+      "texture-set-retained-retopology-plain",
+      "texture-set-retained-retopology-affine"
+    ]
+  },
+  "measurements": {
+    "release": {
+      "plain": {
+        "checks": 124,
+        "normal_samples": 70,
+        "minimum_normal_dot_rounded": 0.999996
+      },
+      "affine": {
+        "checks": 132,
+        "normal_samples": 78,
+        "minimum_normal_dot_rounded": 0.999972
+      }
+    },
+    "asan": {
+      "plain": {
+        "checks": 124,
+        "normal_samples": 70,
+        "minimum_normal_dot_rounded": 0.999996
+      },
+      "affine": {
+        "checks": 132,
+        "normal_samples": 78,
+        "minimum_normal_dot_rounded": 0.999972
+      }
+    }
+  },
+  "matching_release_and_sanitizer_outputs_sha256": {
+    "texture-set-retained-retopology-plain/imported-pbr-donor.glb": "8fb28c98987ed78ddd3a1f23ade290a61940fb37a55605a36bb0172c8fcdb908",
+    "texture-set-retained-retopology-plain/prepared-editable.glb": "a0b78b3e9eab4a9fd38feac5b8076f41de8d1b844ae4fa24947528ee93eed7b1",
+    "texture-set-retained-retopology-plain/prepared-guide.dsculpt": "6b48b94eedddf97f7800be78a3b61891456362fabf9757d57f87f4b450bd40b5",
+    "texture-set-retained-retopology-plain/prepared-retopo.dsculpt": "98eb315d12372b3174923e71aee4ad8a5c0e1dfdca59c282b311db7e2044307b",
+    "texture-set-retained-retopology-plain/prepared-standard.glb": "f177331daa96bab73480437e690d1f0c83984784d25ca370ba09a04e2bfc9dc0",
+    "texture-set-retained-retopology-affine/prepared-editable.glb": "22ff996829e3ae8cda76e7310bc206fbe3eccb1f514cad2f29b5cba5c07ccadb",
+    "texture-set-retained-retopology-affine/prepared-guide.dsculpt": "c19e0c7c9ba8f027be63f6c8bdf40617ae35b85dd7a32860e777cad57c8a1270",
+    "texture-set-retained-retopology-affine/prepared-retopo.dsculpt": "2bc9b7b65e71e940e6a15f7b074b0c4f4b95d9478259ba66f26634c552743374",
+    "texture-set-retained-retopology-affine/prepared-standard.glb": "ecca2b7d56bf57faa906692f00bd121e54b9429fec630f5e2d7f29dddd6ea848"
+  },
+  "wayland": {
+    "checks": [
+      {
+        "passed": true,
+        "check": "Native retopology editor publishes the canonical Dome Sculpt Wayland identity"
+      },
+      {
+        "passed": true,
+        "check": "The actual Wayland universal menu enables Start patch on the original prepared two-material source"
+      },
+      {
+        "passed": true,
+        "check": "An empty patch keeps Apply disabled"
+      },
+      {
+        "passed": true,
+        "check": "Canvas gestures create one editable face inside each original material"
+      },
+      {
+        "passed": true,
+        "check": "Universal Apply and Save publish a separate two-face patch and hide the original guide"
+      },
+      {
+        "passed": true,
+        "check": "An independent reader finds paint and normal textures in both exported material slots"
+      },
+      {
+        "passed": true,
+        "check": "Native client releases the compositor and export worker on close"
+      }
+    ],
+    "complete": true
+  },
+  "synthetic_openxr": {
+    "arc-plain": {
+      "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_submissions_per_project": 6,
+      "differing_rgb_components_per_eye": [
+        58199,
+        59715
+      ],
+      "authoring_pixels_per_eye": {
+        "prepared-guide": {
+          "0": 93760,
+          "1": 93760
+        },
+        "prepared-retopo": {
+          "0": 77129,
+          "1": 76941
+        }
+      },
+      "exact_ordered_close": true
+    },
+    "arc-affine": {
+      "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_submissions_per_project": 6,
+      "differing_rgb_components_per_eye": [
+        66299,
+        64370
+      ],
+      "authoring_pixels_per_eye": {
+        "prepared-guide": {
+          "0": 84491,
+          "1": 84109
+        },
+        "prepared-retopo": {
+          "0": 66394,
+          "1": 66408
+        }
+      },
+      "exact_ordered_close": true
+    },
+    "software-plain": {
+      "gl_renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "stereo_submissions_per_project": 6,
+      "differing_rgb_components_per_eye": [
+        58292,
+        59959
+      ],
+      "authoring_pixels_per_eye": {
+        "prepared-guide": {
+          "0": 93760,
+          "1": 93760
+        },
+        "prepared-retopo": {
+          "0": 77130,
+          "1": 76941
+        }
+      },
+      "exact_ordered_close": true
+    },
+    "software-affine": {
+      "gl_renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "stereo_submissions_per_project": 6,
+      "differing_rgb_components_per_eye": [
+        67843,
+        65945
+      ],
+      "authoring_pixels_per_eye": {
+        "prepared-guide": {
+          "0": 84491,
+          "1": 84112
+        },
+        "prepared-retopo": {
+          "0": 66394,
+          "1": 66409
+        }
+      },
+      "exact_ordered_close": true
+    }
+  },
+  "physical_headset": false,
+  "khronos": {
+    "validator": "2.0.0-dev.3.10",
+    "results": [
+      {
+        "file": "release/texture-set-retained-retopology-plain/prepared-standard.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 0,
+          "numHints": 0,
+          "messages": [],
+          "truncated": false
+        },
+        "sha256": "f177331daa96bab73480437e690d1f0c83984784d25ca370ba09a04e2bfc9dc0"
+      },
+      {
+        "file": "release/texture-set-retained-retopology-plain/prepared-editable.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 1,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/13"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "a0b78b3e9eab4a9fd38feac5b8076f41de8d1b844ae4fa24947528ee93eed7b1"
+      },
+      {
+        "file": "release/texture-set-retained-retopology-affine/prepared-standard.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 3,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/13"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/14"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/15"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "ecca2b7d56bf57faa906692f00bd121e54b9429fec630f5e2d7f29dddd6ea848"
+      },
+      {
+        "file": "release/texture-set-retained-retopology-affine/prepared-editable.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 1,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/13"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "22ff996829e3ae8cda76e7310bc206fbe3eccb1f514cad2f29b5cba5c07ccadb"
+      },
+      {
+        "file": "wayland-first-material/wayland-patch.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 0,
+          "numHints": 0,
+          "messages": [],
+          "truncated": false
+        },
+        "sha256": "bab249777735c4497212fb4af6e91667bf0ced496a929d2245c8baad1d5d7d2c"
+      }
+    ]
+  },
+  "archive_sha256": "b780ea2f7789a3aca17f20ce31f01743913412f5a632ad704eef353d7db79cdd",
+  "archive_members_sha256": {
+    "record.py": "455c9251799aa74d9dbe33ef432827d45734b543453c29746b8254f443a77c45",
+    "check-profile.sh": "c700dcf44c270ba8b1f07a72746cea4b71a9b54032f367e66fb3b59833f1871f",
+    "run-wayland.py": "c7c964bfba9c8a93ea096586497d237751b488bfa9fd89c6c2c3ff3848ee14e0",
+    "wayland-first-material.py": "4ee1591b0c314e03d3cf5f950f2de3f613d6697c12a09b34f9407644f91a7a69",
+    "bind-wayland-initial.log": "5b4ac31fc1e4a34cbb4e4b5b9fe0fd3dfe88b563109935ca173574559eea640f",
+    "bind-wayland.log": "079234bd85d804e32a363ddb9481ab5297e64fd4511c6d4586adf8a94392bed3",
+    "wayland-first-material/report.json": "c89e0c491811f751d113cc3c07bfb3c6ae236ddd4b516c7466958cad54e56a18",
+    "wayland-first-material/viewport.json": "6603ea8aa67faab9c62ade089a671c83de8f83f8b59269d33fd75af389cd473c",
+    "wayland-first-material/corners.json": "d6df97adcdc08a9d06862d17da9d353e27ba872fc04693cbfb790ea8519c210b",
+    "wayland-first-material/source-viewport.png": "f189f5d70c40517b0d508198b8f69a18aa38fb7e441447ddad157feee2d379e8",
+    "run-render.py": "af29903acbd4ea5c62bc0c8613729e993242853ae2f9db2c31aa24d5e9370987",
+    "xr-first-material.py": "af1639fef2764e021e9eb142f760328e24f17c589eb12ddad05b5dda17edfe36",
+    "khronos.cjs": "2d7782d5ab8272c1409ecbe31d8d2493018917c95e64c4d7fc1e7953bd270394",
+    "khronos.json": "a9d24bf3e203ef49df6b0cff30a4df5b684caf3d083e910537255c23eb1fff35",
+    "release-qualified.log": "1dc94ca6f2e2a5254b51c87d3c410e99078266f00f844fa6b23c570fcba25c27",
+    "release-qualified-build.log": "8c35b1682f73592d30612d7b0fabdb384fcfff35cb5a076cb48b85b1368aa794",
+    "release-plain-controls.log": "5d1bbbccb278b6359d2976a17108d9a054b3039947f2476b855b8ed1185779a6",
+    "release-affine-controls.log": "4e1e43c1396523e76e42003e53fdbbb9891a094fd623cf480baff2093a4ff3b5",
+    "asan-qualified.log": "ab7e2c3ed41a6e26be512a891c3bd058bbfdffae98a18868f03a8d8ee89ca0fb",
+    "asan-qualified-build.log": "79f0859df55d4c305a03d6a56fc868836bdbc9a38c698ff03384a84acc640eae",
+    "asan-plain-controls.log": "a7d8bef414239b9c509ea186086c889e15238127c21cc30515fefc0149a9874d",
+    "asan-affine-controls.log": "7cec87b5f2a80690874fb9fa431369947586ed4959d6f8e5aed0e5703697a11e",
+    "xr-arc-plain/compare.json": "d7e86434df88463eb447082f7a120d5c9727b14334811a8026d2fb05890bca0e",
+    "verified-plain-arc.log": "6afed4964d0b91d9bc63ad3151bbea9ebc789084f5167162b20305e693ca4ad9",
+    "xr-arc-affine/compare.json": "f868e70aee17ab1ffa623bd84e7c9b77a697c4f778ab07129b1d915761bbf392",
+    "verified-affine-arc.log": "f7df37c8ed586d3a906d60d8c3629b7b4b14a6bc53127654e0291869a8caeee4",
+    "xr-software-plain/compare.json": "d0417a8008c355049e5923ee41fcfa47e1c51a1723cd383837303f567db66cd4",
+    "verified-plain-software.log": "e54454d7ae28b3e53567195b69e3fa6201cfd6d95c020f6a2e2a3a5246fe334a",
+    "xr-software-affine/compare.json": "fb2ce88ef3d16b4d8f324b73cddf614414b6229494859792d6220820ce6f85be",
+    "verified-affine-software.log": "cfb92e6504610fb19b0ca695b9c9a1ba8d7bc2a76beeea7fbebebbaaeccee26b"
+  }
+}

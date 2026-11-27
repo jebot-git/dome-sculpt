@@ -100,8 +100,17 @@ original triangle and UV order stays authoritative for paint. Canonical
 Bake normals use the placed posed tangent frame and the quantized output
 is checked against the patch frame. Supported static MToon texture roles
 also use the posed surface. The original rig and morphs stay editable on
-the hidden guide. Prepared imported fields remain open.
+the hidden guide.
 [Posed material transfer evidence](validation/retopology-first-material-pose-20261127.json)
+
+First retopology Apply also converts prepared PBR material sets to editable
+patch rasters, including a Bake from an imported GLB and a reflected, sheared
+case with partial material Bake coverage and FLOAT emission. Paint and normal
+coordinates come from the original per-slot owners. The hidden guide retains
+its original data. Release, ASan/UBSan, nested DomeD Wayland, synthetic stereo
+and Khronos GLB checks cover this path. Direct raw imported fields, prepared
+MToon, and physical headset qualification remain open.
+[Prepared PBR transfer evidence](validation/retopology-first-retained-20261127.json)
 
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.

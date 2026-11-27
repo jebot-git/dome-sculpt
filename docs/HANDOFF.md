@@ -139,8 +139,26 @@ cases pass. Nine native files and GLBs match across build profiles. Nested
 DomeD Wayland traces, applies, saves and exports the morph-only patch.
 Synthetic OpenXR renders both material slots in both eyes on Arc A770 and
 llvmpipe. Four GLBs pass Khronos validation with zero errors and warnings.
-Prepared imported fields still need their first-transfer adapter.
 [Posed material transfer validation](validation/retopology-first-material-pose-20261127.json)
+
+First Apply also transfers prepared PBR material sets from authenticated
+polygon guides. It reads editable paint and prepared normal data on their
+original grids, projects each slot onto the new patch, and keeps the original
+material and Bake history on the hidden guide. The fixtures cover a real GLB
+donor used for Bake, and a reflected, sheared guide with partial material Bake
+coverage and FLOAT emission. The conversion checks the quantized destination
+normal and refuses atomically if its material coverage cannot reproduce the
+prepared direction within 0.02 radians.
+
+All 44 selected Release and 11 strict ASan/UBSan tests pass. The two fixtures
+compare 148 resolved normals and yield nine byte-identical native and GLB
+files across build profiles. Nested DomeD Wayland traces both materials, applies
+and saves the patch, and exports both paint and normal maps. Five GLBs pass
+Khronos validation with zero errors and warnings. Synthetic OpenXR reopens
+and renders the guide and patch in both eyes on Intel Arc A770 and llvmpipe.
+Direct sampling of raw imported material fields, prepared MToon transfer, and
+physical headset acceptance remain open.
+[Prepared PBR transfer validation](validation/retopology-first-retained-20261127.json)
 
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and
@@ -149,7 +167,7 @@ field samples its own material slot. Rig and Shape Restore preserve the
 replacement patch, and a restored linked shape follows the avatar's live
 pose. Both VRM output modes emit the original humanoid joints. Editable VRM
 also keeps the hidden guide needed to reopen the retopology workspace.
-Prepared texture sets and imported material grids still need a transfer adapter.
+Reapply with imported material grids and retained source adapters remains open.
 The 21 selected Release tests cover the linked workflow and related
 authoring, Bake recipe, and worker regressions. Three focused ASan/UBSan
 tests pass, and both profiles produce the same six project and export files
