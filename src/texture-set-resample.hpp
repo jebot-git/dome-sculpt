@@ -19,6 +19,10 @@ FilteredPaintTexel filter_paint_layer(const PaintLayer &,uint32_t resolution,
 
 bool can_resize_native_texture_grid(const SculptObject &) noexcept;
 TextureSetLimits native_texture_grid_limits();
+inline bool resizable_canonical_bake(const BakedTextures *bake) noexcept {
+  return !bake || (!bake->normal_authority && !bake->normal_field &&
+                    bake->normal_interpretation == BakedNormalInterpretation::CanonicalMikk);
+}
 
 // No geometry interpretation: filters every authored texel, including hidden,
 // masked and currently uncovered values, on independently preserved planes.

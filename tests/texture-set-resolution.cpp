@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/texture-set-resolution.hpp"
+#include "dome/bake-recipe.hpp"
 #include "dome/document.hpp"
 #include "paint-color-access.hpp"
 #include "texture-set-controls.hpp"
@@ -44,10 +45,16 @@ void stamp(PaintedMesh &p, PaintSettings settings, float strength = 1) {
   p.stamp(b, settings);
   check(p.end_stroke(), "Actual native stamp authors the requested plane");
 }
-Scene fixture() {
+Scene fixture(bool separate_materials = false) {
   Mesh m;
   m.positions = {{-1, -1, 0},   {1, -1, 0},   {1, 1, 0},   {-1, 1, 0},
                  {-1, -1, .5f}, {1, -1, .5f}, {1, 1, .5f}, {-1, 1, .5f}};
+  if (separate_materials) {
+    for (size_t i = 0; i < m.positions.size(); ++i) {
+      m.positions[i].x = .44f * m.positions[i].x + (i < 4 ? -.49f : .49f);
+      m.positions[i].y *= .8f;
+    }
+  }
   m.normals.assign(8, {0, 0, 1});
   m.uv = {{{0, 0}}, {{1, 0}}, {{1, 1}}, {{0, 1}},
           {{0, 0}}, {{1, 0}}, {{1, 1}}, {{0, 1}}};
@@ -683,14 +690,142 @@ void native() {
         "Actual XR focus loss cancels staged resizing without a worker "
         "publication");
 }
+
+void baked_member() {
+  auto scene=fixture(true);
+  const auto target=scene.active().id;
+  const auto solid=[](uint32_t resolution,std::array<uint8_t,4> pixel){
+    Image image{resolution,resolution,std::vector<uint8_t>(size_t(resolution)*resolution*4)};
+    for(size_t at=0;at<image.rgba.size();at+=4)
+      std::copy(pixel.begin(),pixel.end(),image.rgba.begin()+at);
+    return image;
+  };
+  edit_texture_set(scene,target,0,[&](PaintedMesh &paint,Material &){
+    BakedTextures bake;
+    bake.maps.color=solid(64,{82,221,129,255});
+    bake.maps.metal_rough=solid(64,{213,115,84,255});
+    bake.maps.normal=solid(64,{126,151,246,255});
+    bake.maps.emission=solid(64,{81,115,47,255});
+    bake.coverage.assign(64*64,190);
+    paint.install_bake(std::move(bake));
+    return true;
+  });
+  Mesh mesh;
+  mesh.positions={{.05f,-.8f,.53f},{.93f,-.8f,.53f},{.93f,.8f,.53f},{.05f,.8f,.53f}};
+  mesh.normals.assign(4,{0,0,1});
+  mesh.uv={{{0,0}},{{1,0}},{{1,1}},{{0,1}}};
+  mesh.indices={0,1,2,0,2,3};
+  const auto source=scene.add("Hidden bake source",Volume{});
+  auto &donor=scene.object(source);
+  donor.mesh_active=true;donor.visible=false;
+  donor.material.emissive={3.8f,.46f,.25f};
+  donor.painted=std::make_shared<PaintedMesh>(std::move(mesh),64);
+  BakedTextures source_maps;
+  source_maps.maps.color=solid(64,{176,58,202,225});
+  source_maps.maps.metal_rough=solid(64,{200,130,52,255});
+  source_maps.maps.normal=solid(64,{157,137,248,255});
+  source_maps.coverage.assign(64*64,182);
+  source_maps.emission_field=BakedEmissionField::generate_compact(64,[](size_t at){
+    const float a=.0012f+float(at%64)*.00001f;
+    return BakedEmissionSample{{a*.25f,a*.1f,0},{a*6800,a*50,a*3},a};
+  });
+  donor.painted->install_bake(std::move(source_maps));
+  scene.select(target);
+  Document doc;
+  doc.replace(scene);
+  settle(doc);
+  ObjectBakeSettings settings;
+  settings.front_mm=settings.back_mm=50;
+  settings.ao_samples=0;
+  settings.padding=0;
+  doc.bake_from_object(source,settings);
+  doc.save_async("baked-member-128.dsculpt").get();
+  settle(doc);
+  const auto baked=doc.copy_scene();
+  const auto field=active_texture_set(baked.active());
+  const auto sibling=texture_set_view(baked.active(),0);
+  check(bool(field.painted->baked()),"The selected material has a Bake after projection");
+  const auto &old=*field.painted->baked();
+  check(field.id==1&&field.painted->resolution()==128&&old.emission_field&&
+        !old.maps.normal.rgba.empty()&&field.bake_recipe&&field.bake_recipe->source.object==source,
+        "The real Bake worker publishes a canonical FLOAT Bake and recipe on the additional member");
+  const auto before=baked.encode();
+  if(compute_backend()!="CPU"){
+    auto refused=baked;
+    refuses([&]{resample_texture_set(refused,target,1,{256});},"Missing accelerated canonical Bake resizing refuses");
+    check(refused.encode()==before,"An unavailable backend preserves every material and its Bake");
+    return;
+  }
+  auto denied=baked;
+  TextureSetLimits limits;
+  limits.maximum_bytes=1;
+  refuses([&]{resample_texture_set(denied,target,1,{256},limits);},"Insufficient bytes refuse before publishing a baked member");
+  check(denied.encode()==before,"Refusal retains the original collection and its complete baked field");
+  ResizeController hand(doc);
+  hand.open();hand.sector(6);hand.ray(.4f);hand.ray(.4f,true,false);
+  check(doc.copy_scene().encode()==before,"Controller Cancel leaves all baked members unchanged");
+  hand.sector(6);hand.ray(.4f);hand.ray(.4f,true,true);
+  doc.save_async("baked-member-256.dsculpt").get();
+  settle(doc);
+  const auto resized=doc.copy_scene();
+  const auto current=active_texture_set(resized.active());
+  check(bool(current.painted->baked()),"The resized native material retains a Bake");
+  const auto &grown=*current.painted->baked();
+  check(current.painted->resolution()==256&&current.domain==field.domain&&current.bake_recipe==field.bake_recipe&&
+        current.painted->mesh_owner()==field.painted->mesh_owner(),
+        "Resize retains the selected face domain, Bake recipe and mesh owner");
+  const auto retained_sibling=texture_set_view(resized.active(),0);
+  check(retained_sibling.domain==sibling.domain&&
+        detail::TextureSetPaintAccess::same_current(*retained_sibling.painted,*sibling.painted)&&
+        detail::TextureSetPaintAccess::same_current(*resized.object(source).painted,*baked.object(source).painted),
+        "The sibling and hidden donor keep their complete current paint and Bake state");
+  bool equal=true;
+  for(uint32_t y=0;y<256&&equal;++y)for(uint32_t x=0;x<256&&equal;++x){
+    const size_t src=size_t(y/2)*128+x/2,dst=size_t(y)*256+x;
+    equal=grown.coverage[dst]==old.coverage[src];
+    for(auto [a,b]:{std::pair{&old.maps.color,&grown.maps.color},
+        {&old.maps.normal,&grown.maps.normal},{&old.maps.metal_rough,&grown.maps.metal_rough}})
+      equal&=std::equal(a->rgba.data()+4*src,a->rgba.data()+4*src+4,b->rgba.data()+4*dst);
+    const auto a=old.emission_field->texel(src),b=grown.emission_field->texel(dst);
+    equal&=a.coverage==b.coverage&&a.absolute==b.absolute&&a.legacy==b.legacy;
+    for(const auto &layer:field.painted->layers())
+      equal&=current.painted->pixel(layer.id,x,y)==field.painted->pixel(layer.id,x/2,y/2)&&
+        current.painted->emission_pixel(layer.id,x,y)==field.painted->emission_pixel(layer.id,x/2,y/2);
+  }
+  check(equal,"Every common, normal, independent FLOAT and authored layer cell survives member enlargement");
+  const auto exact=resized.encode();
+  check(Scene::load("baked-member-256.dsculpt").encode()==exact&&doc.undo()&&doc.copy_scene().encode()==before&&
+        doc.redo()&&doc.copy_scene().encode()==exact,"Ordered Save and one Undo/Redo preserve complete baked member history");
+  settle(doc);
+  doc.export_asset("baked-member-standard.glb",AssetExportFormat::Glb).get();
+  doc.export_asset("baked-member-editable.glb",AssetExportFormat::EditableGlb256).get();
+  check(Scene::load("baked-member-editable.glb").encode()==exact,"Editable GLB restores the selected grid and both material sets exactly");
+
+  auto reduced=resized;
+  const auto report=resample_texture_set(reduced,target,1,{128});
+  const auto reduced_field=active_texture_set(reduced.active());
+  check(bool(reduced_field.painted->baked()),"The reduced native material retains a Bake");
+  const auto &restored=*reduced_field.painted->baked();
+  equal=report.changed&&restored.coverage==old.coverage&&restored.maps.color.rgba==old.maps.color.rgba&&
+        restored.maps.metal_rough.rgba==old.maps.metal_rough.rgba&&restored.maps.normal.rgba==old.maps.normal.rgba;
+  for(size_t i=0;i<old.emission_field->sample_count()&&equal;++i){
+    const auto a=old.emission_field->texel(i),b=restored.emission_field->texel(i);
+    equal=a.coverage==b.coverage&&a.legacy==b.legacy&&a.absolute==b.absolute;
+  }
+  check(equal&&reduced_field.bake_recipe==field.bake_recipe,"Reducing the exact enlargement recovers every baked texel and emission coefficient");
+  auto primary=resized;
+  check(resample_texture_set(primary,target,0,{128}).changed&&primary.active().painted->resolution()==128&&
+        primary.active().painted->baked()->maps.emission.width==128&&texture_set_view(primary.active(),1).painted==current.painted,
+        "The primary RGB8 Bake resizes without replacing the additional FLOAT member");
+}
 } // namespace
 int main(int argc, char **argv) try {
   if (argc > 1) {
     std::filesystem::create_directories(argv[1]);
     std::filesystem::current_path(argv[1]);
   }
-  numeric();
-  native();
+  if(argc==3&&std::string_view(argv[2])=="baked")baked_member();
+  else {numeric();native();}
   std::cout << "PASS " << checks << " measured texture resolution checks\n";
   return 0;
 } catch (const std::exception &e) {

@@ -2053,11 +2053,8 @@ std::shared_ptr<PaintedMesh>detail::TextureSetPaintAccess::bind_raster(const Pai
   if(snapshot_bytes(before)>limits.maximum_bytes)throw std::length_error("Source member raster metadata exceeds its quota");auto result=before.snapshot();result->surface_=prototype.surface_;result->texture_set_domain_=domain;result->sampling_attachment_=prototype.sampling_attachment_;result->composite_cache_=std::make_shared<PaintedMesh::CompositeCache>();result->composite_token_=next_composite_token();return result;
 }
 bool detail::TextureSetPaintAccess::can_resize_raw(const PaintedMesh &paint)noexcept{
-  const auto &bake=paint.baked_;
-  const bool native_bake=!bake||(!bake->normal_authority&&!bake->normal_field&&
-      bake->normal_interpretation==BakedNormalInterpretation::CanonicalMikk);
   return valid_raster(paint)&&!paint.in_stroke()&&!paint.texture_set_domain_&&
-    !paint.sampling_attachment_&&!paint.color_projection_&&!paint.normal_projection_&&native_bake&&
+    !paint.sampling_attachment_&&!paint.color_projection_&&!paint.normal_projection_&&resizable_canonical_bake(paint.baked_.get())&&
     !paint.surface_->paint_domain&&!paint.surface_->original_sampling&&!paint.surface_->source_capture_only&&
     paint.surface_->options.policy!=PaintUvPolicy::PolygonAuthored;
 }
@@ -2169,7 +2166,7 @@ std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::resample_plain(const
  if(domain)domain->authenticate_owner(domain);
  if((!domain&&!can_resize_raw(before))||(domain&&(!valid_raster(before)||before.in_stroke()||!domain->matches(before.mesh_owner())||
     before.paint_sampling_domain()||before.source_maps_||before.source_sampling_prepared()||
-    before.sampling_attachment_||before.color_projection_||before.normal_projection_||before.baked_||
+    before.sampling_attachment_||before.color_projection_||before.normal_projection_||!resizable_canonical_bake(before.baked_.get())||
     before.surface_->original_sampling||before.surface_->source_capture_only)))
   throw std::invalid_argument("Resampling requires actual plain member geometry/grid owners");
  if(options.resolution==before.resolution())return before.snapshot();
@@ -2208,7 +2205,9 @@ std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::resample_plain(const
   if(candidate_bytes>limits.maximum_bytes||candidates>(limits.maximum_bytes-candidate_bytes)/stride)throw std::length_error("Texture-set candidate storage exceeds its prospective byte bound");candidate_bytes+=candidates*stride;
  }
  if(candidate_bytes>=filter_limits.maximum_bytes)throw std::length_error("Texture-set candidates exhaust its peak budget");filter_limits.maximum_bytes-=candidate_bytes;
- auto layers=detail::resample_texture_set_layers(before,options,filter_limits,report,!domain);report.peak_bytes+=candidate_bytes;
+ // Refinement of a baked grid keeps its paint cells aligned with the exact
+ // replicated Bake footprint. Keep legacy interpolation for unbaked sets.
+ auto layers=detail::resample_texture_set_layers(before,options,filter_limits,report,!domain||before.baked_);report.peak_bytes+=candidate_bytes;
  auto raster_options=before.surface_->options;raster_options.cancelled=limits.cancelled;
  raster_options.max_raster_samples=std::min({raster_options.max_raster_samples,std::max(size_t(1),samples),limits.maximum_work-report.work});
  raster_options.max_candidate_checks=std::min(raster_options.max_candidate_checks,std::max(size_t(1),max_checks));

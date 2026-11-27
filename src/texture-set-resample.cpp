@@ -739,8 +739,7 @@ std::shared_ptr<const BakedTextures> resample_native_bake_grid(
     const TextureSetLimits &limits,TextureSetResolutionReport &report) {
   stop(limits);
   before.validate(from);
-  if(before.normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||
-     before.normal_authority||before.normal_field)
+  if(!resizable_canonical_bake(&before))
     throw std::invalid_argument("Paint resolution requires an ordinary canonical Bake grid");
   const auto to=options.resolution;
   const size_t source_pixels=size_t(from)*from,target_pixels=size_t(to)*to;
@@ -925,8 +924,8 @@ resample_texture_set(Scene &scene, uint64_t object, TextureSetId set,
       field.painted->source_maps() ||
       field.painted->source_sampling_prepared() ||
       field.painted->color_projection() || field.painted->normal_projection() ||
-      field.painted->baked())
-    throw std::invalid_argument("Source/baked/prepared field resolution needs "
+      !detail::resizable_canonical_bake(field.painted->baked().get()))
+    throw std::invalid_argument("Source or independently prepared field resolution needs "
                                 "its authenticated writable-grid transition");
   TextureSetResolutionReport report;
   report.original_resolution = field.painted->resolution();
