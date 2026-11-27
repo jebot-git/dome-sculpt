@@ -176,9 +176,9 @@ reproduces the missing Bake. The 45 selected Release and 12 strict sanitizer
 tests pass, and five native and GLB files match across profiles. Nested DomeD
 Wayland traces, applies, saves and exports the quad. Synthetic OpenXR renders
 the original and the patch on Intel Arc A770 and llvmpipe. Khronos reports no
-errors and advises that each patch export relies on runtime tangent generation.
-Existing authored Bake data on an imported guide, imported MToon, and physical
-headset acceptance remain open for this route.
+errors and advises that each patch export relies on runtime tangent generation
+at this checkpoint. The following milestones cover explicit tangents and
+prior Bake data.
 [Imported PBR retopology validation](validation/retopology-first-imported-20261127.json)
 
 Native single-material PBR exports with canonical Bake now write the actual
@@ -206,6 +206,25 @@ The two skinned GLBs retain the existing skin-node advisory.
 Nonlinear shading between morph endpoints and full physical headset
 acceptance remain open.
 [Native Bake tangent validation](validation/native-bake-tangents-20261127.json)
+
+First Apply now also accepts an imported PBR guide with an authenticated
+Source8 Bake in the canonical Mikk and vertex-component representation.
+The worker evaluates the original normal map in its placed derivative frame
+and the Bake in the guide's current posed tangent frame. It resolves common
+material coverage and independent FLOAT emission coverage into a new patch
+Bake beneath the reprojected editable layers. The hidden guide keeps its
+original GLB, pose, Paint8 payload and Bake recipe. The public Bake worker
+can reuse that guide as a donor while retaining its material and normal owners.
+
+The reflected and sheared active-morph control checks 86 interior samples,
+84 with partial Bake coverage. The 60 selected Release and 12 strict
+ASan/UBSan tests pass and generate five byte-identical native and GLB files.
+Nested DomeD Wayland exercises tracing, Apply, Save and export from the
+universal menu. Synthetic OpenXR reopens both projects and renders stereo
+on Intel Arc A770 and llvmpipe. Five GLBs pass Khronos validation with zero
+errors and warnings. Imported MToon, other independently prepared imported
+normal or colour variants, and physical headset qualification remain open.
+[Prior imported Bake validation](validation/retopology-imported-prior-bake-20261127.json)
 
 Retopology reapply now works on native multi-material accessories attached
 to original VRM 1.0 joints. The replacement keeps its avatar hierarchy and

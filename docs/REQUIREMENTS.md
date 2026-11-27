@@ -117,8 +117,7 @@ vertex RGBA, normal frames and physical emission across both source triangles
 in a reflected, sheared morph fixture. The published quad keeps separate
 editable layers. Native persistence and Editable GLB retain the original
 GLB and its pose. Focused Release and ASan/UBSan, nested DomeD Wayland,
-synthetic OpenXR and GLB validation cover the tested case. Original guides
-with prior Bake data and imported MToon material transfer remain required.
+synthetic OpenXR and GLB validation cover the original pre-Bake case.
 [Imported PBR retopology evidence](validation/retopology-first-imported-20261127.json)
 
 Single-material native Mikk Bake now emits explicit tangents in Standard and
@@ -129,6 +128,17 @@ test fixtures cover the imported PBR patch and native mirrored charts with
 two morph endpoints. Nonlinear intermediate poses and physical headset
 qualification remain required.
 [Native Bake tangent evidence](validation/native-bake-tangents-20261127.json)
+
+Imported PBR guides with a prior authenticated Source8 Bake can now donate
+their evaluated material to a first retopology patch. The two normal frames,
+fractional common coverage and independent FLOAT emission resolve into a new
+native Bake. Editable layers transfer separately. Ordered Save and cold Open
+preserve the original guide's Paint8 bytes and donor recipe. Release,
+ASan/UBSan, nested DomeD Wayland, synthetic OpenXR on Intel Arc and llvmpipe,
+and Khronos GLB validation cover this canonical Mikk and vertex-component
+case. Imported MToon, other independently prepared imported fields and
+physical headset acceptance remain required.
+[Prior imported Bake evidence](validation/retopology-imported-prior-bake-20261127.json)
 
 Native multi-material retopology preserves independently painted and baked
 grids and original VRM 1.0 joint links when Apply changes the patch.

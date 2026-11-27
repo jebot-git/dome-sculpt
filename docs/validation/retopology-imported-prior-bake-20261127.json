@@ -1,0 +1,416 @@
+{
+  "product": "d0a7cb98ffbc876ff9cebc1823485186992dcb03",
+  "previous_product": "c5caba2f33f12d598c8f3ca588c59c616d4a5aa7",
+  "previous_main": "49443e7431a4df7efb8a5ed568756c89dc627e90",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "canonical_compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+  "release_app_sha256": "474f7ba9916866fa0d35ca9283e0da264d02abf81119191c542da9b0ba5c99c8",
+  "strict_asan_ubsan_test_sha256": "0a15b871e2cd8a514e23a6885a615c0dca584239b314c635976247334b5f786d",
+  "test_results": {
+    "release": [
+      "retopology-prepared-color-normal-first",
+      "retopology-prepared-color-normal-plain",
+      "dome-sculpt-texture-set-export",
+      "retopology-prepared-color-normal-affine",
+      "retopology-reapply-plain",
+      "retopology-save-handoff",
+      "retopology-reapply-affine",
+      "retopology-history-openxr-apply",
+      "retopology-held-admission",
+      "retopology-restore-plain",
+      "native-paint32-export",
+      "retopology-history-openxr-cancel",
+      "gltf-interoperability",
+      "retopology-restore-affine",
+      "dome-sculpt-texture-set-source-export",
+      "texture-set-retained-bake-source",
+      "retopology-mtoon-detached",
+      "retopology-mtoon-plain",
+      "retopology-mtoon-affine",
+      "retopology-linked-vrm1",
+      "retopology-surface-heat-plain",
+      "retopology-prepared-color-normal-uv-affine",
+      "retopology-surface-heat-affine",
+      "texture-set-retained-native-target",
+      "retopology-affine",
+      "retopology-subdivide-seam-plain",
+      "retopology-mtoon-v0",
+      "retopology-prepared-color-normal-uv-plain",
+      "texture-set-retained-bake-target",
+      "native-paint32-skin-export",
+      "retopology-subdivide-seam-affine",
+      "baked-emission-uv1-worker",
+      "retopology-material-seam-plain",
+      "retopology-material-seam-affine",
+      "texture-set-retained-hdr-standard",
+      "texture-set-retained-retopology-plain",
+      "texture-set-retained-retopology-affine",
+      "retopology-authoring",
+      "retopology-first-material-posed-affine",
+      "texture-set-retained-hdr-editable",
+      "baked-emission-workflow",
+      "retopology-first-material-posed-plain",
+      "retopology-first-material-affine",
+      "retopology-first-material-plain",
+      "retopology-mixed-material",
+      "retopology-imported-pbr",
+      "retopology-authority-focus",
+      "baked-emission-native",
+      "retopology-authority-grab",
+      "bake-polygon-cage",
+      "native-paint-key-frames",
+      "bake-recipes",
+      "native-mikk-export",
+      "dome-sculpt-texture-set-surfaces",
+      "normal-frame-export",
+      "baked-emission-source",
+      "bake-custom-cage",
+      "retopology-imported-prior-bake",
+      "canonical-paint-color-hdr",
+      "source8-preview"
+    ],
+    "asan": [
+      "retopology-surface-heat-affine",
+      "retopology-surface-heat-plain",
+      "retopology-first-material-posed-affine",
+      "texture-set-retained-retopology-affine",
+      "retopology-first-material-posed-plain",
+      "retopology-first-material-affine",
+      "retopology-imported-pbr",
+      "retopology-first-material-plain",
+      "native-mikk-export",
+      "retopology-mixed-material",
+      "retopology-imported-prior-bake",
+      "texture-set-retained-retopology-plain"
+    ]
+  },
+  "native_measurements": {
+    "release": {
+      "checks": 865,
+      "interior_samples": 86,
+      "partial_coverage_samples": 84,
+      "minimum_normal_dot_rounded": 0.999983,
+      "peak_red_radiance_rounded": 3.09321
+    },
+    "asan": {
+      "checks": 865,
+      "interior_samples": 86,
+      "partial_coverage_samples": 84,
+      "minimum_normal_dot_rounded": 0.999983,
+      "peak_red_radiance_rounded": 3.09321
+    }
+  },
+  "identical_native_and_glb_outputs_sha256": {
+    "original-import.glb": "4349b237343b4acc62caa1057e6a4463e9e8f7d8ba094bfbc4ded60016e73cac",
+    "raw-guide.dsculpt": "d16d46a5b419ff593df1d7a9e47cd3b653ca6ecc20ce13633005b0642a21118b",
+    "raw-patch.dsculpt": "ea26f996a766aa3159c7b69bbe27d9ed3bcfdd2f3f204eed27985d12b6a22f9d",
+    "raw-standard.glb": "f68883845367bf9b3ce2ae603c064f43844087611f262aa3ce4d0a1ad7fee8ba",
+    "raw-editable.glb": "bcfdc1fc0408589d3aa0eaaa40e0b82326a3eccd5047d023cb195cf4396115e5"
+  },
+  "public_worker": {
+    "checks": [
+      "PASS public Bake and first Retopology Apply on the posed imported guide preserve its donor recipe and exact Paint8 payload",
+      "PASS the previously baked imported guide also donates a normal and FLOAT emission Bake through the public worker"
+    ],
+    "outputs_sha256": {
+      "actual-authored-bake.dsculpt": "bc536436b302b465e620198c6bf82ac2d4a41729e3bd3e0b4678a007c3d838be",
+      "actual-authored-bake.glb": "acba4a163e1f26d06f6822b7c340afc81f64036ec95427356ad443aa95e9d509"
+    }
+  },
+  "wayland": {
+    "checks": [
+      {
+        "passed": true,
+        "check": "Native retopology editor publishes the canonical Dome Sculpt Wayland identity"
+      },
+      {
+        "passed": true,
+        "check": "The actual Wayland universal menu enables Start patch on the original imported PBR source"
+      },
+      {
+        "passed": true,
+        "check": "An empty patch keeps Apply disabled"
+      },
+      {
+        "passed": true,
+        "check": "Canvas gestures trace a new quad across the source triangulation"
+      },
+      {
+        "passed": true,
+        "check": "Universal Apply and Save publish a separate quad patch and hide the original guide"
+      },
+      {
+        "passed": true,
+        "check": "An independent reader finds explicit tangents and base colour, normal and emissive textures in the exported material"
+      },
+      {
+        "passed": true,
+        "check": "Native client releases the compositor and export worker on close"
+      }
+    ],
+    "complete": true
+  },
+  "synthetic_stereo": {
+    "arc": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_submissions_per_project": 6,
+      "differing_rgb_components_per_eye": [
+        20792,
+        21495
+      ],
+      "authoring_pixels_per_eye": {
+        "raw-guide": {
+          "0": 102400,
+          "1": 102400
+        },
+        "raw-patch": {
+          "0": 100508,
+          "1": 100083
+        }
+      },
+      "exact_ordered_close": true
+    },
+    "software": {
+      "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+      "stereo_submissions_per_project": 6,
+      "differing_rgb_components_per_eye": [
+        18383,
+        19693
+      ],
+      "authoring_pixels_per_eye": {
+        "raw-guide": {
+          "0": 102400,
+          "1": 102400
+        },
+        "raw-patch": {
+          "0": 100508,
+          "1": 100083
+        }
+      },
+      "exact_ordered_close": true
+    }
+  },
+  "physical_headset": false,
+  "khronos": {
+    "validator": "2.0.0-dev.3.10",
+    "results": [
+      {
+        "file": "release/retopology-imported-prior-bake/original-import.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 0,
+          "numHints": 9,
+          "messages": [
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/COLOR_0"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/indices"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+            },
+            {
+              "code": "BUFFER_VIEW_TARGET_MISSING",
+              "message": "bufferView.target should be set for vertex or index data.",
+              "severity": 3,
+              "pointer": "/meshes/0/primitives/0/targets/0/TANGENT"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "4349b237343b4acc62caa1057e6a4463e9e8f7d8ba094bfbc4ded60016e73cac"
+      },
+      {
+        "file": "release/retopology-imported-prior-bake/raw-standard.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 3,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/10"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/11"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/3"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "f68883845367bf9b3ce2ae603c064f43844087611f262aa3ce4d0a1ad7fee8ba"
+      },
+      {
+        "file": "release/retopology-imported-prior-bake/raw-editable.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/10"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/3"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "bcfdc1fc0408589d3aa0eaaa40e0b82326a3eccd5047d023cb195cf4396115e5"
+      },
+      {
+        "file": "wayland-first-material/wayland-patch.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 3,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/10"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/11"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/3"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "96c85beac032a57733c2b35111f1c7ef32167ea8df89cf3d086605ee9a32766b"
+      },
+      {
+        "file": "actual-authoring/actual-authored-bake.glb",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 3,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/10"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/11"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/3"
+            }
+          ],
+          "truncated": false
+        },
+        "sha256": "acba4a163e1f26d06f6822b7c340afc81f64036ec95427356ad443aa95e9d509"
+      }
+    ]
+  },
+  "archive_sha256": "8a6ab1e7b2cdac8907862655c792b8365fc7d73381c2637122e41995955ae789",
+  "archive_members_sha256": {
+    "record.py": "d709516b08e87bef45425114cc763f2cebd03517f04ba1a09c64ba7b389b3236",
+    "check-profile.sh": "c700dcf44c270ba8b1f07a72746cea4b71a9b54032f367e66fb3b59833f1871f",
+    "check-extended.sh": "3c0a6699eaf744f9d25f12e7a84d84c12c14a53b9d0deab879d8aeb0a951c4c9",
+    "baseline-fixture.log": "60669dfabfed8b6bbb40eed9db1d4723346f9ce3dae94b0182090c063c16ff20",
+    "author-and-apply.cpp": "416e01b3cd0b9404dd44396bd5f2c1eb3792f24b15a3a2854bff8f2a15d708ae",
+    "author-and-apply.py": "7260b9970bbec396ab132b6c78f230f1cb98b0c37226df6c9912e4f8ac82b955",
+    "plain-guide-for-worker.glb": "cbb3dc58f98dc83cc019d145acd97df2c5d47db906a8b853ecee88dbd516089f",
+    "author-and-apply.log": "a8b3c364b4b7e851217c1b9ef8b08c337f1fb0a960c3bfff6e213f561335caf7",
+    "run-wayland.py": "0a2a8cc130512a732d928d02429dfa8f8c4b92f865e77286eb54e64db2231aa6",
+    "wayland-first-material.py": "9da20c46a8e788d02df57754b32cc21d8129b66e2f2702a9823a690f26186b54",
+    "bind-wayland.log": "dd7095b4039469ed578d2ca1476b1af127bb61b06769226d4c5062c2304f02ee",
+    "wayland-first-material/report.json": "b125a6174d826d126afdc0f121cd335aba5020d0dfb8606eb87e7b4f7a6f19b5",
+    "wayland-first-material/corners.json": "be5dd396b9b7bd64f77942b4ec67c5d26136c5fde70fc9c6cab4fdf41e1d3f78",
+    "wayland-first-material/source-viewport.png": "2693615e331ff1ddb4e2f112b66bdb2bb328d1e450f767ac42e6e003e40ee9d4",
+    "run-render.py": "af29903acbd4ea5c62bc0c8613729e993242853ae2f9db2c31aa24d5e9370987",
+    "xr-first-material.py": "2916ea99675578ce6a8e9de3b9dc481d63e82203fa56fd2e59e983ba1deb80b8",
+    "khronos.cjs": "904de842e19385aec924099d1e57fc0ed821e293342c67fac6ab6c1c53724919",
+    "khronos.json": "bfd43a3fac691a56385d2ed9cc91ce0cbec5cd828d62ac506640c321d22f65ef",
+    "khronos.log": "817b3eefc86807d943c8ff929e2e41338863b61d2034ab2ed2cc869fe55e0332",
+    "release-final.log": "9f5befaa88a49b750e0c95dbecb503464644e1c5938a202d83d51315365b2d69",
+    "release-final-build.log": "2d4abab0551bb6652c915cc7cbd2b7427f024d9fe06537edf61e695d0af57ac2",
+    "release-native-controls.log": "ceab2bf3cb6e28ef42c593c8e257458dd17f2cebeab8e5b130f93fba8b80e4f2",
+    "asan-qualified.log": "787cc2a3cf444e317721d1a22dcd9102822456db7c019934f95903ce568bffc8",
+    "asan-qualified-build.log": "0cbd29ef5eeb6176c7179c1419325721ddaa0b29128b67625f70cfa837fa06d0",
+    "asan-native-controls.log": "cb3e23f61d90452268dcdb4f3e0e7843298cb047a3d2a2e20ce3e1a2343a462a",
+    "xr-arc-affine/compare.json": "323bcaf0622a2234982daaf72848c8157a5e2730ed7fca29280e314eb4a3bdfd",
+    "verified-affine-arc.log": "dbc668aa81706795ec59af59edd6732139f04432798919cf22b712c4a7bce7ec",
+    "xr-software-affine/compare.json": "8d6cb27f1eeaa7fb1e7997874c20175995f16ec5b6ff79ebbd97b792dd4b4912",
+    "verified-affine-software.log": "6e30af878d01ecadf48a1296fdf5cec4fb7b1c23375b1ad20781df57d01b485a"
+  }
+}
