@@ -74,6 +74,19 @@ int main(int argc,char **argv)try{
  paint->add_layer("Absolute physical");setting.emission_units=PaintEmissionUnits::Physical;setting.emission={10000,.005f,12};stroke(*paint,setting);paint->layer_properties("Absolute physical",true,.61f);
  auto packet=detail::PaintOverlayFactory::capture(*paint);auto same_padding=detail::PaintOverlayFactory::capture(*paint);check(packet->padding()==same_padding->padding()&&!packet->padding().owner_before(same_padding->padding())&&!same_padding->padding().owner_before(packet->padding()),"Packets alias the real immutable padding owner without dense copying");
  const auto original=paint->encode();glEnable(GL_BLEND);glEnable(GL_SCISSOR_TEST);glViewport(2,3,17,19);compiler.prepare({{packet,false},{packet,false}});GLint viewport[4]{};glGetIntegerv(GL_VIEWPORT,viewport);check(glIsEnabled(GL_BLEND)&&glIsEnabled(GL_SCISSOR_TEST)&&viewport[0]==2&&viewport[1]==3&&viewport[2]==17&&viewport[3]==19,"GPU compiler restores caller viewport and render switches");glDisable(GL_BLEND);glDisable(GL_SCISSOR_TEST);check(compiler.size()==1,"Repeated immutable inputs reuse one five-plane owner");compare(*paint,compiler.at(packet,false),false);
+ const auto unbaked=detail::PaintOverlayCompiler::demand(packet,false);
+ const auto actual_bytes=compiler.bytes(),actual_images=compiler.image_count();
+ std::cout<<"OVERLAY_GPU_BYTES forecast="<<unbaked.bytes<<" actual="<<actual_bytes<<'\n';
+ check(unbaked.bytes==actual_bytes&&unbaked.images==actual_images,
+       "Unbaked overlay forecast equals every live and pending upload store, including its R8 placeholder");
+ {
+  detail::PaintOverlayCompiler exact;
+  check(refuses([&]{exact.prepare({{packet,false}},actual_bytes-1,actual_images);})&&
+        exact.size()==0&&exact.bytes()==0,"One byte below the actual overlay staging cost refuses before allocation");
+  exact.prepare({{packet,false}},actual_bytes,actual_images);
+  check(exact.bytes()==actual_bytes&&exact.image_count()==actual_images,
+        "Unbaked overlay admits the exact measured byte and image limits");
+ }
  auto pixels=read(compiler.at(packet,false));const size_t center=(32*64+32)*4;check(pixels[4][center+1]>0&&pixels[4][center]>100,"Tiny and HDR physical radiance both survive float GPU composition");
  check(refuses([&]{compiler.prepare({{packet,false}},8);})&&compiler.size()==1,"Budget refusal precedes cache mutation and GPU allocation");check(paint->encode()==original,"GPU compilation leaves all native paint/source bytes exact");check(packet->storage_bytes()>=packet->padding()->size()*sizeof(int32_t),"Retained sparse packet charges its real aliased SurfaceMap and tile owners");
  detail::PaintOverlayCompiler cpu_limited;check(refuses([&]{cpu_limited.prepare({{packet,false}},1024ull*1024*1024,1024,1);})&&cpu_limited.size()==0,"Pointer planning obeys an explicit CPU working budget before packing");
@@ -81,7 +94,15 @@ int main(int argc,char **argv)try{
  try{prospective.prepare({{packet,false}},compiler.at(packet,false).bytes);}catch(const std::length_error&){forecast_refusal=true;}catch(const std::bad_alloc&){}overlay_deny_large=0;
  check(forecast_refusal&&!overlay_large_attempt&&prospective.size()==0,"Upload budget refusal precedes large sparse CPU allocations and GPU mutation");
  paint->begin_stroke();setting.erase=true;paint->stamp(Brush{{0,0,0},{0,0,0},{0,0,1},2,.3f},setting);paint->cancel_stroke();check(paint->encode()==original,"Cancel restores exact physical/legacy owners before reusing a GPU packet");
- auto based=paint->snapshot();based->install_bake(baked(64));auto bp=detail::PaintOverlayFactory::capture(*based);compiler.prepare({{bp,false}});compare(*based,compiler.at(bp,false),false);
+ auto based=paint->snapshot();based->install_bake(baked(64));auto bp=detail::PaintOverlayFactory::capture(*based);
+ {
+  detail::PaintOverlayCompiler exact;
+  const auto demand=detail::PaintOverlayCompiler::demand(bp,false);
+  exact.prepare({{bp,false}},demand.bytes,demand.images);
+  check(exact.bytes()==demand.bytes&&exact.image_count()==demand.images,
+        "LDR Bake plane forecast equals actual RGBA8 and R8 upload stores");
+  compare(*based,exact.at(bp,false),false);
+ }
  auto scene=source_color_fixture::model(true);auto &o=scene.active();PaintSettings white;white.color={1,1,1,1};stroke(*o.painted,white,.99f);auto prepared=prepare_source_colors({o.painted,o.appearance,o.material_bindings,o.deformation,o.material});auto pp=detail::PaintOverlayFactory::capture(*prepared.paint);check(pp->source_maps()==prepared.paint->source_maps(),"Packet retains the exact optional original source-map identity");compiler.prepare({{pp,false},{pp,true}});compare(*prepared.paint,compiler.at(pp,false),false);compare(*prepared.paint,compiler.at(pp,true),true);auto a=read(compiler.at(pp,false)),b=read(compiler.at(pp,true));double colour_delta=0;for(size_t i=0;i<a[0].size();++i)colour_delta=std::max(colour_delta,std::abs(double(a[0][i])-b[0][i]));check(colour_delta>.1,"Real prepared zero-colour source distinguishes PBR and authored overlay planes");
  {
   detail::PaintOverlayCompiler emitter;emitter.prepare({{packet,false}});const auto &resource=emitter.at(packet,false);const auto direct=read(resource);

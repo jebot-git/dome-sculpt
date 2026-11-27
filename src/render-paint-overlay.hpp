@@ -86,6 +86,20 @@ void main(){
  static size_t field_upload_bytes(const BakedEmissionField::StorageView &field){
   return field.dense.size_bytes()+field.varying.size_bytes()+field.binary_coverage.size_bytes();
  }
+ struct BakedUpload {
+  uint32_t side;
+  bool from_bake, scalar;
+  size_t bytes() const noexcept { return size_t(side)*side*(scalar?1:4); }
+ };
+ static BakedUpload baked_upload(const BakedTextures *bake,size_t plane,uint32_t resolution) noexcept {
+  const bool from_bake=bake&&(plane!=2||!bake->emission_field);
+  return {from_bake?resolution:1u,from_bake,plane==3};
+ }
+ static size_t baked_upload_bytes(const BakedTextures *bake,uint32_t resolution) noexcept {
+  size_t total=0;
+  for(size_t plane=0;plane<4;++plane)total+=baked_upload(bake,plane,resolution).bytes();
+  return total;
+ }
  Resource build(std::shared_ptr<const PaintOverlayPacket> packet,bool pbr,size_t budget,size_t working_budget){
   Resource result;result.owner=std::move(packet);result.pbr=pbr;result.resolution=result.owner->resolution();const auto &input=*result.owner;
   if(input.empty())return result;
@@ -110,7 +124,7 @@ void main(){
   const auto field=input.baked()?input.baked()->emission_field:nullptr;
   const auto storage=field?field->storage():BakedEmissionField::StorageView{};
   const size_t field_bytes=field_upload_bytes(storage);
-  const size_t baked_bytes=field?pixels*9+4:(input.baked()?pixels*13:16);
+  const size_t baked_bytes=baked_upload_bytes(input.baked().get(),input.resolution());
   size_t upload=0;for(auto size:{common_pixels*16,physical_values*4+field_bytes,offset_count*8,pixels*4,baked_bytes})add(upload,size,budget-result.bytes,"GPU overlay byte budget exceeded");
   size_t working=key_bytes;for(auto size:{common_pixels*16,physical_values*4,offset_count*8})add(working,size,working_budget,"GPU overlay sparse packing exceeds CPU working budget");
   // A known byte refusal stays entirely in owned CPU code. Query the driver
@@ -142,10 +156,23 @@ void main(){
     upload_words(storage.dense);upload_words(storage.varying);upload_words(storage.binary_coverage);
    }else buffer(1,GL_R32UI,physical.size()*4,physical.data());
    buffer(2,GL_RG32I,offsets.size()*8,offsets.data());buffer(3,GL_R32I,pixels*4,input.padding()->data());
-   std::array<uint8_t,4> zero{};for(size_t n=0;n<4;++n){glActiveTexture(GL_TEXTURE4+n);const auto baked=input.baked();const Image *im=nullptr;if(baked&&n<3)im=n==0?(pbr&&baked->color_interpretation==BakedColorInterpretation::ResolvedPbr?&baked->maps.pbr_color:&baked->maps.color):n==1?&baked->maps.metal_rough:&baked->maps.emission;
-    const bool active=baked&&!(field&&n==2);
-    temp.baked_stores[n]=ledger_->create(Ledger::Kind::Texture,active?pixels*(n==3?1:4):(n==3?1:4),Ledger::Domain::Material,group_);temp.baked[n]=temp.baked_stores[n].name();
-    image(temp.baked[n],active?input.resolution():1,active?input.resolution():1,n==3?GL_R8:GL_RGBA8,n==3?GL_RED:GL_RGBA,active?(n==3?static_cast<const void*>(baked->coverage.data()):static_cast<const void*>(im->rgba.data())):zero.data());}
+   const auto *baked=input.baked().get();
+   std::array<uint8_t,4> zero{};
+   for(size_t n=0;n<temp.baked.size();++n){
+    glActiveTexture(GL_TEXTURE4+n);
+    const auto upload=baked_upload(baked,n,input.resolution());
+    const auto *pixels=zero.data();
+    if(upload.from_bake){
+     if(upload.scalar)pixels=baked->coverage.data();
+     else if(n==0)pixels=(pbr&&baked->color_interpretation==BakedColorInterpretation::ResolvedPbr?
+                          baked->maps.pbr_color:baked->maps.color).rgba.data();
+     else pixels=(n==1?baked->maps.metal_rough:baked->maps.emission).rgba.data();
+    }
+    temp.baked_stores[n]=ledger_->create(Ledger::Kind::Texture,upload.bytes(),Ledger::Domain::Material,group_);
+    temp.baked[n]=temp.baked_stores[n].name();
+    image(temp.baked[n],upload.side,upload.side,upload.scalar?GL_R8:GL_RGBA8,
+          upload.scalar?GL_RED:GL_RGBA,pixels);
+   }
    glBindFramebuffer(GL_DRAW_FRAMEBUFFER,temp.fbo);std::array<GLenum,5> attachments{};for(size_t n=0;n<5;++n){result.stores[n]=ledger_->create(Ledger::Kind::Texture,result.bytes/5,Ledger::Domain::Material,group_);result.planes[n]=result.stores[n].name();glBindTexture(GL_TEXTURE_2D,result.planes[n]);glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA32F,GLsizei(input.resolution()),GLsizei(input.resolution()),0,GL_RGBA,GL_FLOAT,nullptr);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);attachments[n]=GL_COLOR_ATTACHMENT0+n;glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,attachments[n],GL_TEXTURE_2D,result.planes[n],0);}glDrawBuffers(5,attachments.data());
    if(glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER)!=GL_FRAMEBUFFER_COMPLETE)throw std::runtime_error("GPU overlay framebuffer incomplete");
    for(size_t n=0;n<4;++n){glActiveTexture(GL_TEXTURE4+n);glBindTexture(GL_TEXTURE_2D,temp.baked[n]);}
@@ -185,7 +212,9 @@ public:
   auto order=[](const auto&a,const auto&b){auto less=std::less<const void*>{};return less(a.first,b.first)||(a.first==b.first&&less(a.second,b.second));};std::sort(common.begin(),common.end(),order);common.erase(std::unique(common.begin(),common.end()),common.end());std::sort(physical.begin(),physical.end(),std::less<const void*>{});physical.erase(std::unique(physical.begin(),physical.end()),physical.end());
   const auto r=owner->resolution();const size_t pixels=size_t(r)*r,offsets=std::max(size_t(1),owner->layers().size()*size_t(r/32)*(r/32));
   const auto field=owner->baked()?owner->baked()->emission_field:nullptr;
-  return {texture_bytes(owner)+std::max(size_t(1),common.size()*1024)*16+std::max(size_t(1),physical.size()*1024*7)*4+offsets*8+pixels*4+(field?pixels*9+4+field_upload_bytes(field->storage()):(owner->baked()?pixels*13:16)),13};
+  return {texture_bytes(owner)+std::max(size_t(1),common.size()*1024)*16+
+          std::max(size_t(1),physical.size()*1024*7)*4+offsets*8+pixels*4+
+          baked_upload_bytes(owner->baked().get(),r)+(field?field_upload_bytes(field->storage()):0),13};
  }
  Demand additional(const std::vector<Input>&inputs,size_t working=256ull*1024*1024)const{Selection seen;Demand total;for(const auto&i:inputs){auto owner=contribution(i.owner);Key key{owner.get(),i.pbr};if(cache_.contains(key)||!seen.insert(key).second)continue;const auto d=demand(owner,i.pbr,working);if(d.bytes>SIZE_MAX-total.bytes||d.images>SIZE_MAX-total.images)throw std::length_error("Overlay store forecast overflow");total.bytes+=d.bytes;total.images+=d.images;}return total;}
  Ledger::Group group()const noexcept{return group_;}

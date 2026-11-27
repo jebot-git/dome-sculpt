@@ -38,6 +38,8 @@ int main()try{
     bool refused=false;try{compiler.prepare({{packet,false}},demand.bytes-1,13);}catch(const std::length_error&){refused=true;}
     check(refused&&compiler.size()==0,"FLOAT input bytes refuse exact forecast-minus-one before publication");
     compiler.prepare({{packet,false}},demand.bytes,13);
+    check(compiler.bytes()==demand.bytes&&compiler.image_count()==demand.images,
+          "FLOAT Bake forecast matches the real coefficient buffer and exact texture stores");
     const auto pixels=read(compiler.at(packet,false));
     for(size_t i=0;i<4096;++i){const auto owner=packet->padding()->at(i);check(owner>=0,"real atlas owns projected test texel");const size_t index=size_t(owner);const auto &base=values[index];const double common=paint->baked()->coverage[index]/255.;
       std::array<std::array<double,4>,5> expected{};
