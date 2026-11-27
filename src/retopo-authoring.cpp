@@ -769,6 +769,12 @@ public:
       return reproject_canonical(old_paint,material,old_deformation,*old_material,deformation,projection);
     if (old_material && old_material->color_preparation && !old_sets)
       return reproject_color(old_paint,material,*old_material,deformation,projection);
+    if (!old_sets && old_material && detail::native_texture_set_mtoon(&old_paint,nullptr,old_material.get())) {
+      auto paint = grid_for(old_paint.resolution())->snapshot();
+      detail::TextureSetPaintAccess::reproject_retopology(old_paint,*paint,projection,false,nullptr,nullptr,true);
+      auto binding = detail::TextureSetPaintAccess::reproject_retopology_mtoon(old_paint,*paint,material,old_material,projection);
+      return {std::move(paint),std::move(deformation),std::move(binding),{}};
+    }
     // Every field of a texture set shares the replacement REST geometry. Its
     // own raster bounds and same-slot source filter preserve material seams.
     const bool owned_set_material = old_sets && (old_sets->primary_source() || (old_material && old_material->has_mtoon));
@@ -952,10 +958,10 @@ private:
             detail::TextureSetPaintAccess::reproject_retopology(source, *output, projection, false, &field);
             return detail::RetopoTextureField{std::move(output),{},binding->physical_emission};
           }
-          detail::TextureSetPaintAccess::reproject_retopology(source, *output, projection);
+          detail::TextureSetPaintAccess::reproject_retopology(source,*output,projection,false,nullptr,nullptr,bool(binding));
           if (!binding) return detail::RetopoTextureField{std::move(output),{}, {}};
           return detail::RetopoTextureField{output,detail::TextureSetPaintAccess::reproject_retopology_mtoon(
-              source,*output,binding,projection), {}};
+              source,*output,field.material,binding,projection), {}};
         });
     projected_sets_.push_back({primary.get(), &sets, primary_binding.get(), result});
     return result;
@@ -1145,20 +1151,23 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
         (sets->primary_source() || std::ranges::any_of(sets->additional(),[](const auto &field) { return bool(field.source); }));
     const bool project_materials = previous.id == source && sets && !previous.appearance &&
         (retained || (!sets->topology()->polygon_ids() && detail::texture_set_editable_fields(previous)));
-    const bool imported_pbr = previous.id == source && !sets && previous.mesh_active && previous.painted &&
-        previous.appearance && previous.painted->source_maps() && !previous.material.toon &&
-        previous.material_bindings && !previous.material_bindings->has_mtoon;
-    const auto resolution = project_materials || imported_pbr ? previous.painted->resolution() : 512;
+    const bool imported = previous.id == source && !sets && previous.mesh_active && previous.painted &&
+        previous.appearance && previous.painted->source_maps() && previous.material_bindings &&
+        (!previous.material.toon || previous.material_bindings->has_mtoon);
+    const auto resolution = project_materials || imported ? previous.painted->resolution() : 512;
     unwrap(triangles.mesh, resolution, 4, cancelled);
     PaintSurfaceOptions options;
     options.cancelled = cancelled;
     painted = PaintedMesh::from_mesh(std::move(triangles.mesh), resolution, options);
-    if (imported_pbr) {
+    if (imported) {
       detail::RetopoTransferBudget budget(cancelled);
       budget.reserve(1,detail::TextureSetPaintAccess::working_bytes(*painted,resolution));
       detail::RetopoTransfer projection(previous.painted->mesh(),scene.world_matrix(source),staged.world_matrix(id),
           budget,{},true,previous.deformation.get());
-      detail::TextureSetPaintAccess::reproject_retopology(*previous.painted,*painted,projection,false,nullptr,&previous);
+      const auto &binding=previous.material_bindings;
+      if (binding->has_mtoon)
+        material=detail::TextureSetPaintAccess::reproject_retopology_mtoon(*previous.painted,*painted,previous.material,binding,projection,&previous);
+      detail::TextureSetPaintAccess::reproject_retopology(*previous.painted,*painted,projection,false,nullptr,&previous,binding->has_mtoon);
     } else if (project_materials) {
       RetopoReplacement replacement(painted, previous.painted->mesh(), scene.world_matrix(source), staged.world_matrix(id),
           {}, triangles.source_faces, {}, cancelled,previous.deformation.get());

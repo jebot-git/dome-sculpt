@@ -9,6 +9,7 @@ struct SourceBakeNormalOptions {
  size_t max_working_bytes=256*1024*1024;
  std::function<bool()> cancelled;
  const AffineInteractionFrame *placement=nullptr;
+ std::shared_ptr<const std::vector<std::array<float,2>>> authored_mtoon_uv1{};
 };
 // Actual artist-frame roles after morph, skin and placement evaluation.
 // Only the capture function can pair a resolver with prepared material data.
@@ -16,15 +17,15 @@ class SourceBakeNormalResolver {
 public:
  SourceBakeNormalResolver()=default;
  explicit operator bool() const noexcept { return bool(sample_); }
- std::array<Vec3,2> operator()(uint32_t triangle,std::array<float,3> bary) const {
-   return sample_(triangle,bary);
+ std::array<Vec3,2> operator()(uint32_t triangle,std::array<float,3> bary,bool mtoon_back=false) const {
+   return sample_(triangle,bary,mtoon_back);
  }
  bool matches_prepared_source(const TextureMaps &) const noexcept;
  bool requires_source_pairing() const noexcept {return bool(projection_)||bool(paired_maps_);}
  const auto &paired_maps() const noexcept {return paired_maps_;}
  const auto &paint_domain() const noexcept {return paint_domain_;}
 private:
- using Sample=std::function<std::array<Vec3,2>(uint32_t,std::array<float,3>)>;
+ using Sample=std::function<std::array<Vec3,2>(uint32_t,std::array<float,3>,bool)>;
  SourceBakeNormalResolver(Sample sample,std::shared_ptr<const PaintNormalProjection> projection,
      std::shared_ptr<const PaintOverlayPacket> packet,std::shared_ptr<const TextureMaps> paired_maps={},
      std::shared_ptr<const PaintSamplingDomain> paint_domain={})

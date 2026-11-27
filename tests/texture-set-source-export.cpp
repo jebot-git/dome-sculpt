@@ -1807,7 +1807,7 @@ void export_mirrored_mikk() {
  std::cout<<"MIKK_EXPORT native_vertices=5 portable_vertices=6 endpoints=2\n";
 }
 
-void retopology_imported_pbr(bool prior_bake=false) {
+detail::GltfDocument imported_retopo_input(bool transformed_normal) {
  const auto bytes=source_color_fixture::bytes();
  const size_t json_size=word(bytes,12);
  detail::GltfDocument input;
@@ -1836,7 +1836,7 @@ void retopology_imported_pbr(bool prior_bake=false) {
  pbr["metallicFactor"]=.6f;
  pbr["metallicRoughnessTexture"]={{"index",0}};
  material["occlusionTexture"]={{"index",0},{"texCoord",1},{"strength",.37f}};
- if(prior_bake) {
+ if(transformed_normal) {
   material["normalTexture"]["texCoord"]=1;
   material["normalTexture"]["extensions"]["KHR_texture_transform"]={{"rotation",.31f},{"scale",{.72f,1.13f}}};
  }
@@ -1848,7 +1848,11 @@ void retopology_imported_pbr(bool prior_bake=false) {
  input.json["meshes"][0]["weights"]={.8f};
  input.json["nodes"][0]["matrix"]={-1.05,0,0,0,0,.86,0,0,0,0,1.07,0,.03,.06,.09,1};
  input.json["buffers"][0]["byteLength"]=input.binary.size();
- detail::write_glb(std::move(input),"original-import.glb");
+ return input;
+}
+
+void retopology_imported_pbr(bool prior_bake=false) {
+ detail::write_glb(imported_retopo_input(prior_bake),"original-import.glb");
  ImportAuthoringOptions options;options.paint_resolution=64;options.prepare_texture_atlas=true;
  auto imported=prepare_authoring_import(Scene{},"original-import.glb",options);
  check(imported.objects.size()==1,"The real GLB authoring entry point imports one posed PBR object");
@@ -2071,6 +2075,258 @@ void retopology_imported_pbr(bool prior_bake=false) {
  check(Scene::load("raw-editable.glb").encode()==accepted,"Editable GLB restores the complete imported-source project");
 }
 
+void retopology_imported_mtoon(bool tinted,bool unprepared) {
+ auto input=imported_retopo_input(true);
+ if(!tinted)input.json["meshes"][0]["primitives"][0]["attributes"].erase("COLOR_0");
+ auto &material=input.json["materials"][0];
+ material["doubleSided"]=false;
+ material["extensions"]["VRMC_materials_mtoon"]={{"specVersion","1.0"},
+     {"shadeColorFactor",{.36f,.58f,.8f}},
+     {"shadeMultiplyTexture",material["pbrMetallicRoughness"]["baseColorTexture"]},
+     {"rimMultiplyTexture",{{"index",0}}},{"parametricRimColorFactor",{.2f,.3f,.1f}},
+     {"matcapTexture",{{"index",0}}},{"matcapFactor",{.2f,.1f,.15f}},
+     {"shadingShiftTexture",{{"index",0},{"texCoord",1},{"scale",.4f}}}};
+ if(unprepared){
+  material["pbrMetallicRoughness"]["baseColorTexture"]["texCoord"]=0;
+  for(const auto *slot:{"normalTexture","occlusionTexture","emissiveTexture"})material[slot]["texCoord"]=0;
+ }
+ input.json["extensionsUsed"].push_back("VRMC_materials_mtoon");
+ detail::write_glb(std::move(input),"original-import.glb");
+ ImportAuthoringOptions options;
+ options.paint_resolution=64;
+ options.prepare_texture_atlas=!unprepared;
+ auto imported=prepare_authoring_import(Scene{},"original-import.glb",options);
+ const auto id=imported.objects.at(0);
+ auto scene=std::move(imported.scene);
+ for(const auto &object:scene.objects())if(object.id!=id)scene.object(object.id).visible=false;
+ scene.select(id);
+ auto &guide=scene.active();
+ auto shear=AffineTransform{}.matrix();
+ shear[1]=.12;shear[4]=.17;shear[9]=.1;
+ guide.affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(shear));
+ if(!tinted){
+  guide.painted->add_layer("Original hidden ink");
+  PaintSettings ink;ink.front_only=false;ink.color={.8f,.3f,.16f,.7f};
+  Brush brush;brush.from=brush.to={0,0,0};brush.radius=2;brush.normal={0,0,1};brush.strength=.71f;
+  guide.painted->begin_stroke();guide.painted->stamp(brush,ink);
+  check(guide.painted->end_stroke(),"The imported MToon model owns actual editable paint");
+  guide.painted->layer_properties("Original hidden ink",false,.37f);
+ }
+ const auto &binding=*guide.material_bindings;
+ const auto &rest=guide.painted->mesh();
+ const auto &maps=*guide.painted->source_maps();
+ const auto geometry=guide.deformation->preview(rest);
+ const auto world=scene.world_matrix(id);
+ const bool reflected=world.orientation()==AffineOrientation::Reversing;
+ std::array<std::vector<std::array<float,2>>,2> source_uv;
+ if(unprepared){
+  const auto &primitive=guide.appearance->asset->primitives.front();
+  source_uv[0]=rest.uv;
+  for(auto v:guide.appearance->source_vertices)source_uv[1].push_back(primitive.uv1.at(v));
+  check(!maps.uv1&&!guide.painted->source_sampling_prepared(),"Only the original typed roles reference the alternate source UV");
+ }else{
+  const auto coords=detail::PaintOverlayFactory::source_coordinates(*guide.painted);
+  source_uv={*coords[0],*coords[1]};
+ }
+ check(binding.has_mtoon&&binding.material.version()==MToonVersion::V1&&!source_uv[1].empty()&&
+       reflected&&guide.deformation->morph_weights.at(0)>.7f,
+       "The actual importer retains the alternate UV and active pose under reflected shear");
+ scene.save("raw-guide.dsculpt");
+ const auto original=scene.encode();
+ const auto position=[](const AffineTransform &frame,Vec3 p){
+  const auto q=frame.point({p.x,p.y,p.z});return Vec3{float(q[0]),float(q[1]),float(q[2])};
+ };
+ Document doc;doc.replace(scene);ready(doc);
+ const auto draft=[&] {
+  check(doc.wait_retopology(),"Imported MToon retopology edit settles");
+  const auto view=doc.frame().state->retopology;
+  if(view&&!view->error.empty())throw std::runtime_error(view->error);
+ };
+ doc.begin_retopology();draft();
+ for(auto corner:geometry.positions){
+  check(doc.begin_desktop(),"The native editor admits an imported MToon point gesture");
+  Brush pick;pick.from=pick.to=position(world,corner*.84f);pick.radius=.01f;
+  doc.stamp_desktop(pick);doc.end_desktop();draft();
+ }
+ doc.edit_retopology(RetopoAction::Face);draft();
+ doc.end_retopology(true);
+ doc.save_async("raw-patch.dsculpt").get();ready(doc);
+ const auto result=doc.copy_scene();
+ const auto &patch=result.active();
+ const auto &hidden=result.object(id);
+ check(patch.retopology&&patch.retopology->source==id&&patch.painted->source_maps()&&
+       patch.material_bindings&&patch.material_bindings->has_mtoon&&!patch.appearance&&!hidden.visible&&
+       hidden.appearance==guide.appearance&&hidden.material_bindings==guide.material_bindings,
+       "Apply publishes a separate native MToon field while retaining the exact imported guide");
+ const auto &output=*patch.material_bindings;
+ const auto &target=patch.painted->mesh();
+ const auto &core=*patch.painted->source_maps();
+ const auto &out_image=*output.roles[size_t(MToonSlot::Base)].image;
+ check((output.roles[0].image==output.roles[1].image)!=unprepared&&
+       output.roles[size_t(MToonSlot::Matcap)].image==binding.roles[size_t(MToonSlot::Matcap)].image&&
+       output.material.gpu_parameters()==binding.material.gpu_parameters()&&core.color.image&&core.normal.image&&
+       core.occlusion.image&&core.metal_rough.image&&core.emission.image,
+       "The patch retains shared shade, view-space MatCap and separate Core PBR textures");
+ if(!tinted){
+  const auto &layer=patch.painted->layers().back();
+  check(layer.name=="Original hidden ink"&&!layer.visible&&layer.opacity==.37f&&
+        std::ranges::any_of(layer.tiles,[](const auto &tile){return tile&&std::ranges::any_of(tile->pixels,
+            [](const auto &pixel){return pixel.data[9]>110;});}),
+        "Transferred hidden ink keeps its independent editable layer");
+ }
+
+ const auto target_world=result.world_matrix(patch.id);
+ const SurfaceQuery query(geometry);
+ detail::NormalFrameLayout layout;layout.vertices=rest.indices;
+ for(uint32_t c=0;c<rest.indices.size();++c)layout.corners.push_back(c);
+ const auto posed=detail::normal_frame_preview(*binding.normal_frames,layout,guide.deformation.get(),{},3);
+ const auto colors=detail::source_vertex_colors(guide.appearance.get(),rest.positions.size());
+ size_t samples=0;
+ float worst_channel=0,worst_core=0,min_normal=1,min_core_normal=1;
+ std::array<bool,2> source_faces{};
+ const auto resolution=out_image.width;
+ for (size_t i=0;i<target.indices.size();i+=3) {
+  const auto a=target.indices[i],b=target.indices[i+1],c=target.indices[i+2];
+  const auto uv=target.uv[a];
+  const auto du=target.uv[b][0]-uv[0],dv=target.uv[b][1]-uv[1];
+  const auto eu=target.uv[c][0]-uv[0],ev=target.uv[c][1]-uv[1];
+  const auto determinant=du*ev-eu*dv;
+  const auto x=position(target_world,target.positions[b])-position(target_world,target.positions[a]);
+  const auto y=position(target_world,target.positions[c])-position(target_world,target.positions[a]);
+  for (uint32_t row=3;row<resolution;row+=5)for(uint32_t col=4;col<resolution;col+=5){
+   const std::array q{(col+.5f)/resolution,(row+.5f)/resolution};
+   const auto sx=q[0]-uv[0],sy=q[1]-uv[1];
+   const auto v=(sx*ev-sy*eu)/determinant,w=(du*sy-dv*sx)/determinant;
+   const std::array bary{1-v-w,v,w};
+   if(std::ranges::min(bary)<.08f)continue;
+   const auto p=position(target_world,target.positions[a]*bary[0]+target.positions[b]*v+target.positions[c]*w);
+   const auto hit=query.nearest_result(p,world,SurfaceQueryOptions{.closest_maximum=.02f});
+   check(bool(hit),"Interior MToon patch texel finds its actual posed guide");
+   const auto &surface=hit->surface;
+   source_faces.at(surface.triangle)=true;
+   Vec3 N{};
+   for(size_t k=0;k<3;++k){
+    const auto n=target.normals[std::array{a,b,c}[k]];
+    N+=unit(target_world.normal({n.x,n.y,n.z}))*bary[k];
+   }
+   N=normalized(N);
+   auto T=(x*ev-y*dv)/determinant;
+   T=normalized(T-N*dot(N,T));
+   auto B=cross(N,T);
+   if(dot(B,(y*du-x*eu)/determinant)<0)B=B*-1;
+   const auto target_normal=[&](const PaintSourceTexture &view,float scale){
+    const auto pixel=sample_source_texture(view,q[0],q[1],false);
+    return normalized((T*(pixel[0]*2-1)+B*(pixel[1]*2-1))*scale+N*(pixel[2]*2-1));
+   };
+   for (size_t role=0;role<binding.roles.size();++role) {
+    if(!binding.roles[role].image||role==size_t(MToonSlot::Matcap))continue;
+    const auto &coordinates=source_uv[mtoon_coordinate(binding.material.textures[role])];
+    std::array<float,2> at{};
+    for(size_t k=0;k<3;++k)for(size_t axis=0;axis<2;++axis)
+      at[axis]+=coordinates.at(rest.indices[surface.triangle*3+k])[axis]*surface.barycentric[k];
+    at=mtoon_uv(binding.material,MToonSlot(role),at,0);
+    const bool srgb=binding.material.textures[role].encoding==MToonEncoding::Srgb;
+    const auto wanted=sample_source_texture(binding.roles[role],at[0],at[1],srgb);
+    if(role==size_t(MToonSlot::Normal)){
+     Vec3 n{},t{};float hand=0;
+     for(size_t k=0;k<3;++k){
+      const auto index=surface.triangle*3+k;
+      const auto vn=posed.normals[1][index];const auto vt=posed.tangents[1][index];
+      n+=unit(world.normal({vn.x,vn.y,vn.z}))*surface.barycentric[k];
+      t+=unit(world.direction({vt[0],vt[1],vt[2]}))*surface.barycentric[k];
+      hand=reflected?-vt[3]:vt[3];
+     }
+     n=normalized(n);t=normalized(t);
+     const auto detail=mtoon_normal_map({wanted[0],wanted[1],wanted[2]},binding.material.parameters.normal_scale);
+     const auto expected=normalized(n*detail.z+t*detail.x+normalized(cross(n,t))*(hand*detail.y));
+     min_normal=std::min(min_normal,dot(expected,target_normal(output.roles[role],output.material.parameters.normal_scale)));
+    } else {
+     const auto actual=sample_source_texture(output.roles[role],q[0],q[1],srgb);
+     for(size_t k=0;k<4;++k)worst_channel=std::max(worst_channel,std::abs(actual[k]-wanted[k]));
+    }
+   }
+   for(auto [source_view,target_view,srgb]:{
+       std::tuple{&maps.color,&core.color,true},std::tuple{&maps.metal_rough,&core.metal_rough,false},
+       std::tuple{&maps.emission,&core.emission,true},std::tuple{&maps.occlusion,&core.occlusion,false}}){
+    auto expected=sample_surface_texture(rest,maps,*source_view,surface.triangle,surface.barycentric,srgb);
+    if(source_view==&maps.color&&tinted)for(size_t k=0;k<4;++k){
+     float color=0;
+     for(size_t j=0;j<3;++j)color+=colors.at(rest.indices[surface.triangle*3+j])[k]*surface.barycentric[j];
+     expected[k]*=color;
+    }
+    const auto actual=sample_source_texture(*target_view,q[0],q[1],srgb);
+    for(size_t k=0;k<4;++k)worst_core=std::max(worst_core,std::abs(expected[k]-actual[k]));
+   }
+   const auto core_sample=sample_surface_texture(rest,maps,maps.normal,surface.triangle,surface.barycentric,false);
+   Vec3 core_n{},core_t{},core_b{};
+   for(size_t k=0;k<3;++k){
+    const auto index=surface.triangle*3+k;
+    const auto vn=posed.normals[0][index];const auto vt=posed.tangents[0][index];
+    const auto n=unit(world.normal({vn.x,vn.y,vn.z}));const auto t=unit(world.direction({vt[0],vt[1],vt[2]}));
+    core_n+=n*surface.barycentric[k];core_t+=t*surface.barycentric[k];
+    core_b+=cross(n,t)*(-vt[3]*surface.barycentric[k]);
+   }
+   const auto expected=normalized(normalized(core_n)*(core_sample[2]*2-1)+
+       (normalized(core_t)*(core_sample[0]*2-1)+normalized(core_b)*(core_sample[1]*2-1))*maps.normal_scale);
+   min_core_normal=std::min(min_core_normal,dot(expected,target_normal(core.normal,core.normal_scale)));
+   ++samples;
+  }
+ }
+ check(samples>40&&source_faces[0]&&source_faces[1]&&worst_channel<.006f&&worst_core<.006f&&
+       min_normal>.9997f&&min_core_normal>.9997f,
+       "Independent world sampling confirms both source triangles, typed roles and separate Core PBR frames");
+ std::cout<<"IMPORTED_MTOON samples="<<samples<<" max_role="<<worst_channel<<" max_core="<<worst_core
+          <<" min_typed_dot="<<min_normal<<" min_core_dot="<<min_core_normal<<'\n';
+ const auto accepted=result.encode();
+ check(Scene::load("raw-patch.dsculpt").encode()==accepted&&doc.undo()&&doc.copy_scene().encode()==original&&
+       doc.redo()&&doc.copy_scene().encode()==accepted,"Imported MToon Apply, Save, Undo and Redo preserve the guide and patch");
+ ready(doc);
+ doc.export_asset("raw-editable.glb",AssetExportFormat::EditableGlb256).get();
+ check(Scene::load("raw-editable.glb").encode()==accepted,"Editable GLB retains both material interpretations and editable ink");
+ if(!tinted&&!unprepared){
+  doc.begin_retopology();draft();
+  doc.edit_retopology(RetopoAction::MoveMode);draft();
+  const auto start=doc.frame().state->retopology;
+  const auto [corner,vertex]=*start->topology->vertices().begin();
+  const auto p=position(affine_similarity(start->transform),vertex.position);
+  check(doc.begin_desktop(),"The native MToon patch accepts a subsequent geometry edit");
+  Brush drag;drag.from=drag.to=p;
+  doc.stamp_desktop(drag);draft();
+  drag.to=p+Vec3{.032f,.023f,0};
+  doc.stamp_desktop(drag);doc.end_desktop();draft();
+  const auto current=doc.frame().state->retopology;
+  check(length(current->topology->vertices().at(corner).position-vertex.position)>.02f,"The second Apply changes an actual patch vertex");
+  doc.end_retopology(true);
+  doc.save_async("raw-reapplied.dsculpt").get();ready(doc);
+  const auto newest=doc.copy_scene();
+  const auto &reapplied=newest.active();
+  check(reapplied.id!=patch.id&&reapplied.material_bindings&&reapplied.material_bindings->has_mtoon&&
+        reapplied.painted->source_maps()->normal.image!=core.normal.image&&
+        reapplied.material_bindings->roles[0].image==reapplied.material_bindings->roles[1].image&&
+        reapplied.painted->layers().back().name=="Original hidden ink"&&
+        Scene::load("raw-reapplied.dsculpt").encode()==newest.encode()&&
+        doc.undo()&&doc.copy_scene().encode()==accepted,
+        "Changed Apply keeps both material authorities and the exact prior native history");
+
+  for(bool animated:{false,true}){
+   auto control=scene.snapshot();
+   auto modified=std::make_shared<SourceMaterialBindings>(binding);
+   if(animated)modified->material.parameters.scroll[0]=.2f;
+   else control.active().material.double_sided=true;
+   control.active().material_bindings=std::move(modified);
+   const auto before=control.encode();
+   bool rejected=false;
+   try { publish_retopology(control,patch.retopology->topology,id,{}); }
+   catch(const std::invalid_argument &e) {
+    rejected=std::string_view(e.what()).find(animated?"original static sampling":"angular bound")!=std::string_view::npos;
+   }
+   check(rejected&&control.encode()==before,animated?
+         "Animated material transfer refuses before source or history changes":
+         "A single normal image that cannot preserve both sides refuses atomically");
+  }
+ }
+}
+
 void retopology_retained_materials(bool reflected) {
  auto scene=source(true,reflected,false,false,true,true,64,reflected?200:255);
  const auto guide=scene.active().id;
@@ -2256,6 +2512,14 @@ int main(int argc,char **argv)try {
   std::filesystem::current_path(argv[2]);
   retopology_imported_pbr(mode=="--imported-prior-bake");
   std::cout<<"PASS "<<checks<<" imported material retopology checks\n";
+  return 0;
+ }
+ if(argc==4&&mode=="--imported-mtoon") {
+  std::filesystem::create_directories(argv[2]);
+  std::filesystem::current_path(argv[2]);
+  const std::string_view variant=argv[3];
+  retopology_imported_mtoon(variant=="tinted",variant=="unprepared");
+  std::cout<<"PASS "<<checks<<" imported MToon retopology checks\n";
   return 0;
  }
  if(argc==4&&mode=="--retained-retopology"){

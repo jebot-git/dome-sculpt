@@ -5222,6 +5222,11 @@ if(BUILD_TESTING)
   add_test(NAME retopology-imported-prior-bake COMMAND dome-sculpt-texture-set-source-export-test
     --imported-prior-bake ${CMAKE_CURRENT_BINARY_DIR}/retopology-imported-prior-bake)
   set_tests_properties(retopology-imported-prior-bake PROPERTIES TIMEOUT 400)
+  foreach(case painted tinted unprepared)
+    add_test(NAME retopology-imported-mtoon-${case} COMMAND dome-sculpt-texture-set-source-export-test
+      --imported-mtoon ${CMAKE_CURRENT_BINARY_DIR}/retopology-imported-mtoon-${case} ${case})
+    set_tests_properties(retopology-imported-mtoon-${case} PROPERTIES TIMEOUT 400)
+  endforeach()
   add_test(NAME native-mikk-export COMMAND dome-sculpt-texture-set-source-export-test
     --native-mikk-export ${CMAKE_CURRENT_BINARY_DIR}/native-mikk-export)
   set_tests_properties(native-mikk-export PROPERTIES TIMEOUT 400)

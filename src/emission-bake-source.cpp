@@ -61,6 +61,7 @@ struct Source {
   std::shared_ptr<const Mesh> mesh;
   std::shared_ptr<const PaintOverlayPacket> packet;
   std::shared_ptr<const PaintSourceMaps> maps;
+  std::shared_ptr<const std::vector<std::array<float,2>>> authored_mtoon_uv1;
   std::shared_ptr<const PaintSamplingDomain> paint_domain;
   PaintSourceTexture role;
   std::optional<MToonMaterial> toon;
@@ -77,6 +78,7 @@ struct Source {
       if(original&&independent_source&&(!packet||!packet->original_uv1()))
         throw std::invalid_argument("Typed emission UV1 lacks genuine original source coordinates");
       if(original&&packet&&packet->original_uv1())values=packet->original_uv1().get();
+      else if(original&&authored_mtoon_uv1)values=authored_mtoon_uv1.get();
       else if(maps&&maps->uv1)values=maps->uv1.get();
     }else if(maps){const auto i=maps->extra_uv_sets.find(set);if(i!=maps->extra_uv_sets.end())values=i->second.get();}
     if(!values||values->size()!=mesh->positions.size())throw std::invalid_argument("Emission Bake lacks the actual original role coordinates");
@@ -415,7 +417,7 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
     }
     auto sample=[normals=std::shared_ptr<const std::vector<Vec3>>(std::move(normals)),
         tangents=std::move(tangents),normal_image=std::move(normal_image),domain,
-        geometry=object.painted->mesh_owner(),cancelled=options.cancelled](uint32_t triangle,std::array<float,3> bary){
+        geometry=object.painted->mesh_owner(),cancelled=options.cancelled](uint32_t triangle,std::array<float,3> bary,bool){
       if(cancelled&&cancelled())throw std::runtime_error("Native paint Bake sampling cancelled");
       TangentFrame frame;
       for(size_t k=0;k<3;++k){
@@ -516,6 +518,7 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
   }
   Source coordinates;coordinates.mesh=object.painted->mesh_owner();coordinates.maps=object.painted->source_maps();
   coordinates.packet=paired_maps?paired_maps->overlay:PaintOverlayFactory::capture(*object.painted,options.cancelled);
+  coordinates.authored_mtoon_uv1=options.authored_mtoon_uv1;
   coordinates.cancelled=options.cancelled;
   if(!coordinates.maps)coordinates.maps=std::make_shared<const PaintSourceMaps>();
   coordinates.maps->validate_surface(mesh);
@@ -572,7 +575,7 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
   const auto packet=coordinates.packet;
   auto sample=[immutable,coordinates=std::move(coordinates),typed,typed_role,has_tangent,prepared,
       current_normals,retained,field,canonical_uv,native_normal=std::move(native_normal),domain,
-      source8=std::move(source8)](uint32_t triangle,std::array<float,3> bary){
+      source8=std::move(source8)](uint32_t triangle,std::array<float,3> bary,bool mtoon_back){
     coordinates.stop();const std::array<double,3> weights{bary[0],bary[1],bary[2]};std::array<Vec3,2> result;
     if(source8){const auto n=source8->at(coordinates,immutable->at(0),triangle,bary);return std::array{n,n};}
     if(field){
@@ -604,9 +607,12 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
     }
     for(size_t role=0;role<(typed?2u:1u);++role){
       std::array<NormalBakeVertex,3> corners;for(size_t k=0;k<3;++k)corners[k]=immutable->at(role).at(size_t(triangle)*3+k);
-      if(!has_tangent[role]){Vec3 N;for(size_t k=0;k<3;++k)N+=corners[k].n*bary[k];result[role]=normalized(N);continue;}
+      const bool back=mtoon_back&&role==1&&typed->version()==MToonVersion::V1;
+      if(!has_tangent[role]){Vec3 N;for(size_t k=0;k<3;++k)N+=corners[k].n*bary[k];result[role]=normalized(N)*(back?-1.f:1.f);continue;}
       const auto mode=role==0?NormalFragmentBasis::UnitColumns:typed->version()==MToonVersion::V0?NormalFragmentBasis::RawColumns:NormalFragmentBasis::UnitCross;
-      auto basis=normal_bake_basis(corners,weights,mode);result[role]=normalized(basis.n);
+      auto basis=normal_bake_basis(corners,weights,mode);
+      if(back){basis.n=basis.n*-1;basis.b=basis.b*-1;}
+      result[role]=normalized(basis.n);
       auto view=role==0?coordinates.maps->normal:typed_role;const bool enabled=role==0||typed->parameters.normal_enabled;
       if(prepared){
         view={};view.wrap_s=view.wrap_t=33071;view.min_filter=view.mag_filter=9729;
