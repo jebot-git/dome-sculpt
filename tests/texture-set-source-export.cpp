@@ -1697,6 +1697,115 @@ void recipe_reference_remap(bool prepared) {
  refuses([&]{Scene::decode(forged);},"Shared polygon sampling rejects a different geometric recipe");
 
 }
+size_t check_native_mikk_glb(const char *path, const Mesh &rest, const DeformationState *deformation=nullptr) {
+ cgltf_options options{};
+ cgltf_data *raw=nullptr;
+ check(cgltf_parse_file(&options,path,&raw)==cgltf_result_success,"An independent consumer opens the native Bake GLB");
+ std::unique_ptr<cgltf_data,decltype(&cgltf_free)> data(raw,cgltf_free);
+ check(cgltf_load_buffers(&options,raw,path)==cgltf_result_success&&cgltf_validate(raw)==cgltf_result_success&&
+       raw->meshes_count==1&&raw->meshes[0].primitives_count==1,"The emitted single primitive passes independent structural validation");
+ const auto &primitive=raw->meshes[0].primitives[0];
+ const auto position=cgltf_find_accessor(&primitive,cgltf_attribute_type_position,0);
+ const auto normal=cgltf_find_accessor(&primitive,cgltf_attribute_type_normal,0);
+ const auto tangent=cgltf_find_accessor(&primitive,cgltf_attribute_type_tangent,0);
+ const auto uv=cgltf_find_accessor(&primitive,cgltf_attribute_type_texcoord,0);
+ const auto weights=cgltf_find_accessor(&primitive,cgltf_attribute_type_weights,0);
+ const auto joints=cgltf_find_accessor(&primitive,cgltf_attribute_type_joints,0);
+ check(primitive.material&&primitive.material->normal_texture.texture&&position&&normal&&tangent&&uv&&
+       primitive.indices->count==rest.indices.size()&&tangent->count==position->count,
+       "GLB carries its Bake normal map and an explicit tangent for every emitted vertex");
+ const auto tangents=tangent_corners(rest);
+ const auto read=[&](const cgltf_accessor *accessor,size_t vertex,auto &values) {
+  check(accessor&&cgltf_accessor_read_float(accessor,vertex,values.data(),values.size()),"A portable vertex attribute has its expected width");
+ };
+ const auto current=deformation&&deformation->morphs?&*deformation->morphs:nullptr;
+ check(primitive.targets_count==(current?current->targets.size():0),"The portable mesh has every native morph endpoint");
+ std::vector<Mesh> shaped;
+ std::vector<std::vector<Tangent>> shaped_tangents;
+ for(size_t key=0;key<primitive.targets_count;++key){
+  shaped.push_back(current->target_surface(rest,key));
+  shaped_tangents.push_back(tangent_corners(shaped.back()));
+ }
+ for(size_t c=0;c<rest.indices.size();++c){
+  const auto source=rest.indices[c];
+  const auto emitted=cgltf_accessor_read_index(primitive.indices,c);
+  std::array<float,3> p,n;
+  std::array<float,4> t;
+  std::array<float,2> q;
+  read(position,emitted,p);read(normal,emitted,n);read(tangent,emitted,t);read(uv,emitted,q);
+  const auto &a=rest.positions[source], &b=rest.normals[source];
+  check(p==std::array{a.x,a.y,a.z}&&n==std::array{b.x,b.y,b.z}&&t==tangents[c]&&q==rest.uv[source],
+        "Every ordered GLB corner preserves the native rest POSITION, NORMAL, TANGENT and UV");
+  if(deformation&&deformation->skin){
+   std::array<float,4> w,j;
+   read(weights,emitted,w);read(joints,emitted,j);
+   const auto &influences=deformation->skin->vertices[source];
+   for(size_t k=0;k<influences.size();++k)
+    check(w[k]==influences[k].weight&&j[k]==influences[k].joint,"Shared corners duplicate their true skin influences");
+  }
+  for(size_t key=0;key<primitive.targets_count;++key){
+   cgltf_primitive attribute_view{};
+   attribute_view.attributes=primitive.targets[key].attributes;
+   attribute_view.attributes_count=primitive.targets[key].attributes_count;
+   std::array<float,3> dp,dn,dt;
+   read(cgltf_find_accessor(&attribute_view,cgltf_attribute_type_position,0),emitted,dp);
+   read(cgltf_find_accessor(&attribute_view,cgltf_attribute_type_normal,0),emitted,dn);
+   read(cgltf_find_accessor(&attribute_view,cgltf_attribute_type_tangent,0),emitted,dt);
+   const auto &mp=shaped[key].positions[source],&mn=shaped[key].normals[source];
+   const auto &mt=shaped_tangents[key][c];
+   check(length(Vec3{p[0]+dp[0],p[1]+dp[1],p[2]+dp[2]}-mp)<2e-7f&&
+         length(Vec3{n[0]+dn[0],n[1]+dn[1],n[2]+dn[2]}-mn)<2e-7f&&
+         length(Vec3{t[0]+dt[0]-mt[0],t[1]+dt[1]-mt[1],t[2]+dt[2]-mt[2]})<2e-7f&&t[3]==mt[3],
+         "Portable POSITION, NORMAL and TANGENT deltas reconstruct the actual native endpoint and hand");
+  }
+ }
+ return position->count;
+}
+
+void export_mirrored_mikk() {
+ Mesh mesh;
+ mesh.positions={{0,0,0},{1,0,0},{0,1,0},{-1,0,0},{0,-1,0}};
+ mesh.normals.assign(5,{0,0,1});
+ mesh.uv={{.5f,.5f},{.9f,.5f},{.5f,.9f},{.5f,.1f},{.1f,.5f}};
+ mesh.indices={0,1,2,0,3,4};
+ const auto mikk=tangent_corners(mesh);
+ check(mikk[0][3]!=mikk[3][3],"The same rest vertex really touches two charts with opposite tangent hands");
+ Scene scene;
+ auto &object=scene.active();
+ object.mesh_active=true;
+ object.painted=std::make_shared<PaintedMesh>(mesh,64);
+ BakedTextures bake;
+ bake.maps.color=solid({77,124,89,255});
+ bake.maps.normal=solid({167,71,218,255});
+ bake.maps.metal_rough=solid({212,111,44,255});
+ bake.maps.emission=solid({0,0,0,255});
+ bake.coverage.assign(64*64,255);
+ object.painted->install_bake(std::move(bake));
+ export_glb(scene.export_surfaces(),"mirrored-static.glb");
+ check(check_native_mikk_glb("mirrored-static.glb",mesh)==6,
+       "Static export keeps both channel hands without changing the native mesh");
+ DeformationState deformation(mesh);
+ deformation.skeleton=Skeleton{{{"Root",-1,{},.4f},{"Tip",0,{},.4f}}};
+ deformation.skin=SkinWeights{};
+ deformation.skin->vertices={{{0,.6f},{1,.4f}},{{1,1}},{{0,1}},{{0,1}},{{1,1}}};
+ deformation.morphs=MorphSet(mesh);
+ auto shape=mesh.positions;shape[1].z=.13f;shape[3].z=-.07f;
+ deformation.morphs->set_target(mesh,"Twist left",shape);
+ shape=mesh.positions;shape[2].z=.23f;shape[4].y-=.11f;
+ deformation.morphs->set_target(mesh,"Lift edge",shape);
+ deformation.morph_weights={0,1};
+ scene.set_deformation(object.id,deformation);
+ const auto original=scene.encode();
+ Document document;document.replace(scene);ready(document);
+ document.export_asset("mirrored-standard.glb",AssetExportFormat::Glb).get();
+ document.export_asset("mirrored-editable.glb",AssetExportFormat::EditableGlb256).get();
+ for(const auto *name:{"mirrored-standard.glb","mirrored-editable.glb"})
+  check(check_native_mikk_glb(name,mesh,&deformation)==6,"Only the genuinely opposite-handed shared corner splits into two vertices");
+ check(document.copy_scene().encode()==original&&Scene::load("mirrored-editable.glb").encode()==original,
+       "Portable splits leave the live and reloaded Editable geometry and paint untouched");
+ std::cout<<"MIKK_EXPORT native_vertices=5 portable_vertices=6 endpoints=2\n";
+}
+
 void retopology_imported_pbr() {
  const auto bytes=source_color_fixture::bytes();
  const size_t json_size=word(bytes,12);
@@ -1868,6 +1977,8 @@ void retopology_imported_pbr() {
  ready(document);
  document.export_asset("raw-standard.glb",AssetExportFormat::Glb).get();
  document.export_asset("raw-editable.glb",AssetExportFormat::EditableGlb256).get();
+ check_native_mikk_glb("raw-standard.glb",target);
+ check_native_mikk_glb("raw-editable.glb",target);
  check(Scene::load("raw-editable.glb").encode()==accepted,"Editable GLB restores the complete imported-source project");
 }
 
@@ -2044,6 +2155,13 @@ void retopology_retained_materials(bool reflected) {
 
 int main(int argc,char **argv)try {
  const std::string_view mode=argc>1?argv[1]:"";
+ if(argc==3&&mode=="--native-mikk-export") {
+  std::filesystem::create_directories(argv[2]);
+  std::filesystem::current_path(argv[2]);
+  export_mirrored_mikk();
+  std::cout<<"PASS "<<checks<<" native Mikk export checks\n";
+  return 0;
+ }
  if(argc==3&&mode=="--imported-retopology") {
   std::filesystem::create_directories(argv[2]);
   std::filesystem::current_path(argv[2]);

@@ -239,6 +239,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     std::optional<NormalFrameExport> prepared;
     if(input.material_bindings && input.material_bindings->normal_frames)prepared=normal_owner?normal_frame_export_vrm1(*normal_owner,input,cancelled):normal_frame_export(input,source_space,cancelled,source_space==SourceMorphSpace::Native);
     else if(input.material_bindings&&input.material_bindings->native_paint_sampling)prepared=native_paint_export(input,source_space,cancelled);
+    else if(!bundles[object_index]&&native_mikk_texture(input))prepared=native_mikk_export(input,cancelled);
     const auto &o=prepared?prepared->surface:input;auto *frame=prepared?&*prepared:nullptr;
     GltfObjectIdentity emission;
     if(frame){emission.canonical_normal=frame->canonical_normal;emission.prepared_normal=frame->prepared_normal;}

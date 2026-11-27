@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "normal-frame-runtime.hpp"
+#include "normal-bake-frames.hpp"
 #include "vrm1-normal-authority.hpp"
 #include "export-corner-coordinates.hpp"
 #include "native-paint-sampling.hpp"
@@ -13,6 +14,7 @@
 #include "dome/humanoid-creator.hpp"
 #include "normal-preparation-state.hpp"
 #include <algorithm>
+#include <map>
 #include <numeric>
 namespace dome::detail {
 struct NormalFrameExport {
@@ -30,6 +32,131 @@ struct NormalFrameExport {
   const ImportedPrimitive *source=nullptr;
   PaintSourceTexture canonical_normal,prepared_normal;
 };
+
+inline bool native_mikk_texture(const ObjectSurface &surface) {
+  const auto &maps=surface.textures;
+  if (!maps || surface.appearance || surface.material_bindings || surface.material.toon ||
+      maps->source_maps || maps->normal_projection || maps->color_projection || maps->normal.rgba.empty())
+    return false;
+  const auto &bake=maps->baked_base;
+  return bake && bake->normal_interpretation==BakedNormalInterpretation::CanonicalMikk &&
+      !bake->normal_field && !bake->normal_authority && !bake->maps.normal.rgba.empty();
+}
+
+// Static bakes can use the full native corner domain. Keep one representative
+// per original vertex and allocate entries only for genuinely different hands
+// or tangent directions. The exact rest vertex is part of the split identity.
+inline NormalFrameLayout native_mikk_static_layout(const Mesh &rest,std::span<const Tangent> tangents,
+    const std::function<bool()> &cancelled) {
+  NormalFrameLayout layout;
+  layout.indices.resize(rest.indices.size());
+  layout.vertices.reserve(rest.positions.size());layout.corners.reserve(rest.positions.size());
+  std::vector<uint32_t> by_vertex(rest.positions.size(),UINT32_MAX);
+  const auto stop=[&](size_t i) {
+    if ((i&1023)==0 && cancelled && cancelled()) throw std::runtime_error("Native Bake frame export cancelled");
+  };
+  // The first pass identifies the used rest vertices without allocating a
+  // map entry for every corner of a large mesh.
+  for (size_t c=rest.indices.size(); c-->0;) {
+    stop(c);
+    by_vertex[rest.indices[c]]=uint32_t(c);
+  }
+  for (size_t v=0; v<by_vertex.size(); ++v) {
+    stop(v);
+    auto &index=by_vertex[v];
+    if (index==UINT32_MAX) continue;
+    layout.corners.push_back(index);
+    index=uint32_t(layout.vertices.size());
+    layout.vertices.push_back(uint32_t(v));
+  }
+  std::map<std::pair<uint32_t,Tangent>,uint32_t> split;
+  for (size_t c=0; c<rest.indices.size(); ++c) {
+    stop(c);
+    const auto vertex=rest.indices[c];
+    const auto original=by_vertex[vertex];
+    auto &index=layout.indices[c];
+    index=original;
+    if (tangents[layout.corners[original]]==tangents[c]) continue;
+    auto [entry,added]=split.try_emplace({vertex,tangents[c]},uint32_t(layout.vertices.size()));
+    if (added) {
+      if (layout.vertices.size()==2'000'000)
+        throw std::length_error("Split Bake tangents exceed the native geometry limit");
+      layout.vertices.push_back(vertex);
+      layout.corners.push_back(uint32_t(c));
+    }
+    index=entry->second;
+  }
+  return layout;
+}
+
+inline NormalFrameExport native_mikk_export(const ObjectSurface &input,
+    const std::function<bool()> &cancelled) {
+  const auto stop=[&](size_t i) {
+    if ((i&1023)==0 && cancelled && cancelled()) throw std::runtime_error("Native Bake frame export cancelled");
+  };
+  const auto &rest=input.mesh;
+  // Evaluate the native UV0 Mikk frame at rest and at every morph endpoint
+  // before splitting. A shared rest vertex can have distinct corner tangents
+  // even when its POSITION, NORMAL and UV0 are identical.
+  const auto *morphs=input.deformation&&input.deformation->morphs?&*input.deformation->morphs:nullptr;
+  const auto frames=morphs&&!morphs->targets.empty()?normal_bake_frame_candidate(rest,input.deformation.get(),nullptr,
+      {128*1024*1024,128*1024*1024,cancelled}).frames:nullptr;
+  const auto generated=frames?std::vector<Tangent>{}:tangent_corners(rest,cancelled);
+  const auto &tangents=frames?frames->pbr->tangents:generated;
+  const std::span<const NormalFrameTarget> targets=frames?std::span(frames->pbr->targets):std::span<const NormalFrameTarget>{};
+  auto layout=frames?normal_frame_layout(rest,*frames,cancelled):native_mikk_static_layout(rest,tangents,cancelled);
+  if (frames && layout.vertices.size()==rest.positions.size()) {
+    // Keep original indexing whenever there is no split or unused vertex.
+    std::vector<uint32_t> order(rest.positions.size(),UINT32_MAX);
+    bool one_to_one=true;
+    for (size_t i=0; i<layout.vertices.size(); ++i) {
+      stop(i);
+      auto &corner=order[layout.vertices[i]];
+      one_to_one&=corner==UINT32_MAX;
+      corner=layout.corners[i];
+    }
+    if (one_to_one) {
+      std::iota(layout.vertices.begin(),layout.vertices.end(),uint32_t(0));
+      layout.corners=std::move(order);
+      layout.indices=rest.indices;
+    }
+  }
+  NormalFrameExport out;
+  out.surface={input.id,input.name,input.transform,input.material,{},input.textures,{},input.groups};
+  out.surface.affine_edit=input.affine_edit;
+  out.surface.rig_source=input.rig_source;
+  out.input_polygon_colors=input.polygon_colors;
+  auto &mesh=out.surface.mesh;
+  mesh.indices=std::move(layout.indices);
+  mesh.uv_seams=rest.uv_seams;
+  mesh.positions.reserve(layout.vertices.size());mesh.normals.reserve(layout.vertices.size());
+  mesh.uv.reserve(layout.vertices.size());out.tangents.reserve(layout.vertices.size());
+  if (!rest.uv_pins.empty()) mesh.uv_pins.reserve(layout.vertices.size());
+  out.normal_targets.resize(targets.size());out.tangent_targets.resize(targets.size());
+  for (size_t key=0; key<targets.size(); ++key) {
+    out.normal_targets[key].reserve(layout.vertices.size());
+    out.tangent_targets[key].reserve(layout.vertices.size());
+  }
+  for (size_t i=0; i<layout.vertices.size(); ++i) {
+    stop(i);
+    const auto vertex=layout.vertices[i],corner=layout.corners[i];
+    mesh.positions.push_back(rest.positions[vertex]);
+    mesh.normals.push_back(rest.normals[vertex]);
+    mesh.uv.push_back(rest.uv[vertex]);
+    if (!rest.uv_pins.empty()) mesh.uv_pins.push_back(rest.uv_pins[vertex]);
+    out.tangents.push_back(tangents[corner]);
+    for (size_t key=0; key<targets.size(); ++key) {
+      out.normal_targets[key].push_back(targets[key].normals[corner]);
+      out.tangent_targets[key].push_back(targets[key].tangents[corner]);
+    }
+  }
+  out.rest_vertices=std::move(layout.vertices);
+  out.surface.deformation=normal_frame_remap_deformation(input.deformation,rest,mesh,out.rest_vertices,cancelled);
+  mesh.validate();
+  stop(0);
+  return out;
+}
+
 // Plain native paint owns real geometry and a writable coordinate domain; it
 // does not acquire imported/artist normal frames merely to emit that domain.
 inline NormalFrameExport native_paint_export(const ObjectSurface &input,SourceMorphSpace space,

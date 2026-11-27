@@ -5219,6 +5219,9 @@ if(BUILD_TESTING)
   add_test(NAME retopology-imported-pbr COMMAND dome-sculpt-texture-set-source-export-test
     --imported-retopology ${CMAKE_CURRENT_BINARY_DIR}/retopology-imported-pbr)
   set_tests_properties(retopology-imported-pbr PROPERTIES TIMEOUT 400)
+  add_test(NAME native-mikk-export COMMAND dome-sculpt-texture-set-source-export-test
+    --native-mikk-export ${CMAKE_CURRENT_BINARY_DIR}/native-mikk-export)
+  set_tests_properties(native-mikk-export PROPERTIES TIMEOUT 400)
   foreach(placement plain affine)
     add_test(NAME texture-set-retained-retopology-${placement} COMMAND dome-sculpt-texture-set-source-export-test
       --retained-retopology ${CMAKE_CURRENT_BINARY_DIR}/texture-set-retained-retopology-${placement} ${placement})
