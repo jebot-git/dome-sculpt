@@ -85,13 +85,13 @@ inline PaintOverlayTexel sample_overlay_texel_owner(const PaintOverlayPacket &pa
    value[3][c]=value[3][c]*(1-coverage)+coverage;
   }
   const auto *emission=layer.emission_tiles.empty()?nullptr:layer.emission_tiles.at(tile).get();
-  const auto *light=emission?&emission->pixels[within]:nullptr;
-  const float coverage=light?mask*light->coverage:q[12]/255.f*mask;
+  const auto light=emission?emission->texel(within):PaintEmissionValue{};
+  const float coverage=emission?mask*light.coverage:q[12]/255.f*mask;
   if(coverage!=0){
    sample.work+=14;
    for(size_t c=0;c<3;++c){
-    blend(value[2][c],light?light->legacy[c]:overlay_linear_byte(q[6+c]),coverage);
-    blend(value[4][c],light?light->physical[c]:0,coverage);
+    blend(value[2][c],emission?light.legacy[c]:overlay_linear_byte(q[6+c]),coverage);
+    blend(value[4][c],light.physical[c],coverage);
    }
    value[3][3]=value[3][3]*(1-coverage)+coverage;
   }

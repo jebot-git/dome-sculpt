@@ -1117,7 +1117,10 @@ Scene Scene::decode_owning(const nlohmann::json &j,
           const auto &tiles=layer.at("physical_emission_tiles");
           if(version<27||!(source_physical.value_or(false)||detail::physical_paint_authority(record,source_paint_context))||!tiles.is_array()||tiles.empty()||tiles.size()>4096)
             throw std::invalid_argument("Physical paint requires actual Scene27/Paint3 capability");
-          storage+=tiles.size()*sizeof(PaintEmissionTile);
+          for (const auto &tile : tiles) {
+            detail::NativeReadScope::check();
+            storage+=PaintEmissionTile::encoded_storage_bytes(tile.at("data").get_binary());
+          }
         }
       }
       const bool shared=detail::shared_bake_for(record,paint,uint32_t(r),baked_emission)!=nullptr;

@@ -94,7 +94,9 @@ struct PolygonSceneBudget {
         const auto &tiles=l.at("physical_emission_tiles");
         if(!owning_physical_emission||version<27||!(source_physical.value_or(false)||physical_paint_authority(input,SourcePaintDecodeContext{independent_source_paint,owning_physical_emission&&version>=27,baked_emission}))||!tiles.is_array()||tiles.empty()||tiles.size()>4096)
           throw std::invalid_argument("Physical paint requires actual Scene27/Paint3 capability");
-        add(paint_bytes,tiles.size()*sizeof(PaintEmissionTile),256*1024*1024,"Scene retained physical paint storage exceeded");
+        for (const auto &tile : tiles)
+          add(paint_bytes,PaintEmissionTile::encoded_storage_bytes(tile.at("data").get_binary()),
+              256*1024*1024,"Scene retained physical paint storage exceeded");
       }
     }
     if(shared_set_geometry){

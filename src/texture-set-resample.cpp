@@ -183,14 +183,17 @@ struct Sample {
 struct StoredPixel {
   const PaintPixel *common = nullptr;
   const std::array<uint8_t, 4> *pbr = nullptr;
-  const PaintEmissionValue *emission = nullptr;
+  const PaintEmissionTile *emission = nullptr;
+  size_t emission_index = 0;
   bool empty() const { return !common && !pbr && !emission; }
   bool operator==(const StoredPixel &other) const {
     const auto equal = [](const auto *a, const auto *b) {
       return a == b || (a && b && *a == *b);
     };
     return equal(common, other.common) && equal(pbr, other.pbr) &&
-           equal(emission, other.emission);
+           ((emission == other.emission && (!emission || emission_index == other.emission_index)) ||
+            (emission && other.emission &&
+             emission->texel(emission_index) == other.emission->texel(other.emission_index)));
   }
 };
 StoredPixel stored_pixel(const PaintLayer &layer, uint32_t r, uint32_t x,
@@ -205,9 +208,10 @@ StoredPixel stored_pixel(const PaintLayer &layer, uint32_t r, uint32_t x,
   if (!layer.pbr_tiles.empty())
     if (const auto &pbr = layer.pbr_tiles.at(tile))
       stored.pbr = &pbr->pixels[offset];
-  if (!layer.emission_tiles.empty())
-    if (const auto &emission = layer.emission_tiles.at(tile))
-      stored.emission = &emission->pixels[offset];
+  if (!layer.emission_tiles.empty()) {
+    stored.emission = layer.emission_tiles.at(tile).get();
+    stored.emission_index = offset;
+  }
   return stored;
 }
 Sample pixel(const StoredPixel &stored,bool read_pbr=true,bool read_emission=true) {
@@ -227,7 +231,7 @@ Sample pixel(const StoredPixel &stored,bool read_pbr=true,bool read_emission=tru
   if (!read_emission)
     return s;
   if (stored.emission) {
-    s.emission = *stored.emission;
+    s.emission = stored.emission->texel(stored.emission_index);
   } else {
     s.emission.coverage = float(v[12]) / 255;
     for (size_t k = 0; k < 3; ++k)
@@ -255,7 +259,7 @@ paint_grid::Pixel grid_layer_pixel(const PaintLayer &layer,uint32_t r,uint32_t x
   if(!layer.emission_tiles.empty()) {
     const auto &plane=layer.emission_tiles[tile];
     if(plane) {
-      const auto &light=plane->pixels[offset];
+      const auto light=plane->texel(offset);
       for(unsigned c=0;c<3;++c) {
         p.emission[c]=word(light.legacy[c]);
         p.emission[3+c]=word(light.physical[c]);
@@ -468,9 +472,9 @@ void quality(const PaintLayer &before, const PaintLayer &after, uint32_t from,
   double peak = 1;
   for (const auto &t : before.emission_tiles)
     if (t)
-      for (const auto &p : t->pixels) {
+      for (size_t i=0;i<PaintEmissionTile::sample_count;++i) {
         work(report, 1, limits);
-        for (float v : p.physical)
+        for (float v : t->texel(i).physical)
           peak = std::max(peak, double(v));
       }
   double squares = 0;
@@ -744,9 +748,9 @@ void native_overlay_quality(const PaintedMesh &before, const PaintedMesh &after,
     for (const auto &tile : layer.emission_tiles)
       if (tile) {
         stop(limits);
-        work(report, tile->pixels.size(), limits);
-        for (const auto &pixel : tile->pixels)
-          for (float value : pixel.physical)
+        work(report, PaintEmissionTile::sample_count, limits);
+        for (size_t i=0;i<PaintEmissionTile::sample_count;++i)
+          for (float value : tile->texel(i).physical)
             emission_peak = std::max(emission_peak, double(value));
       }
   auto visible_tiles = [&](const PaintOverlayPacket &packet) {
@@ -872,7 +876,7 @@ std::vector<PaintLayer> resample_texture_set_layers(
     throw std::length_error("Texture-set resolution filtering/quality work "
                             "exceeds its prospective bound");
   charge(bytes, 1,
-         sizeof(PaintTile) + sizeof(PaintColorTile) + sizeof(PaintEmissionTile),
+         sizeof(PaintTile) + sizeof(PaintColorTile) + sizeof(PaintEmissionTile::Pixels),
          limits);
   for (const auto &layer : before.layers()) {
     const bool pbr = !layer.pbr_tiles.empty(),
@@ -889,7 +893,7 @@ std::vector<PaintLayer> resample_texture_set_layers(
     }
     charge(bytes, affected,
            sizeof(PaintTile) + (pbr ? sizeof(PaintColorTile) : 0) +
-               (emission ? sizeof(PaintEmissionTile) : 0),
+               (emission ? PaintEmissionTile::maximum_storage_bytes() : 0),
            limits);
     charge(bytes, tiles,
            (1 + size_t(pbr) + size_t(emission)) *
@@ -945,7 +949,7 @@ std::vector<PaintLayer> resample_texture_set_layers(
         }
         PaintTile common;
         PaintColorTile pbr;
-        PaintEmissionTile emission;
+        PaintEmissionTile::Pixels emission;
         bool has_common = false, has_pbr = false, has_emission = false;
         const auto store=[&](size_t i,PaintPixel c,PaintEmissionValue light) {
           // Any tile owning FLOAT also needs its matching legacy fallback.
@@ -955,7 +959,7 @@ std::vector<PaintLayer> resample_texture_set_layers(
               c.data[6+k]=fallback_byte(linear_to_srgb(light.legacy[k]));
           }
           common.pixels[i]=c;
-          emission.pixels[i]=light;
+          emission[i]=light;
         };
         if(layer_filter) {
           const auto taps=from>to?size_t(from/to)*(from/to):4;
@@ -998,7 +1002,7 @@ std::vector<PaintLayer> resample_texture_set_layers(
               if (exact_pbr)
                 pbr.pixels[i] = exact_pbr->pixels[source_pixel];
               if (exact_emission)
-                emission.pixels[i] = exact_emission->pixels[source_pixel];
+                emission[i] = exact_emission->texel(source_pixel);
               continue;
             }
             auto s = filtered(layer, from, to, grid_x, grid_y, report, limits,
@@ -1020,7 +1024,7 @@ std::vector<PaintLayer> resample_texture_set_layers(
               std::make_shared<const PaintColorTile>(std::move(pbr));
         if (exact_emission || has_emission)
           out.emission_tiles[t] =
-              std::make_shared<const PaintEmissionTile>(std::move(emission));
+              PaintEmissionTile::pack(emission);
       }
     TextureSetResolutionLayerQuality q;
     q.layer = layer.id;

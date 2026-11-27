@@ -139,7 +139,7 @@ struct Counter {
     for(auto&l:v.layers()){text(l.name);vector(l.tiles);vector(l.pbr_tiles);vector(l.emission_tiles);
       for(auto&t:l.tiles)if(enter(t)){add(sizeof(*t));leave(t);}
       for(auto&t:l.pbr_tiles)if(enter(t)){add(sizeof(*t));leave(t);}
-      for(auto&t:l.emission_tiles)if(enter(t)){add(sizeof(*t));leave(t);}}
+      for(auto&t:l.emission_tiles)if(enter(t)){add(t->storage_bytes());leave(t);}}
     maps(v.source_maps());leave(p);
   }
   void baked(const std::shared_ptr<const BakedTextures>&);

@@ -13,6 +13,7 @@
 #include <bit>
 #include <cmath>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
 
@@ -693,6 +694,84 @@ void reduce_dense_native_grid(const std::filesystem::path &root) {
   verify(two_visible,true,"dense-visible");
 }
 
+void fullsize_physical_paint(const std::filesystem::path &root) {
+  PaintEmissionTile::Pixels values;
+  for (size_t i = 0; i < values.size(); ++i) {
+    const float v = float(i)/values.size();
+    values[i] = {{0.f,v,.5f},{9500.f,v,14.f},v};
+  }
+  values.back().legacy[0] = -0.f;
+  const auto packed = PaintEmissionTile::pack(values);
+  const auto expanded = packed->expand();
+  using FloatWords = std::array<uint32_t,7>;
+  for (size_t i=0;i<values.size();++i)
+    if (std::bit_cast<FloatWords>(expanded[i]) != std::bit_cast<FloatWords>(values[i]))
+      throw std::runtime_error("Packed FLOAT paint changed an IEEE-754 word");
+  check(packed->storage_bytes()<PaintEmissionTile::maximum_storage_bytes(),
+        "Mixed constant and varying FLOAT channels retain every bit, including signed zero");
+
+  Scene scene;
+  Mesh mesh;
+  mesh.positions={{0,0,0},{1,0,0},{1,1,0},{0,1,0}};
+  mesh.normals.assign(4,{0,0,1});
+  mesh.indices={0,1,2,0,2,3};
+  mesh.uv={{0,0},{1,0},{1,1},{0,1}};
+  auto paint=std::make_shared<PaintedMesh>(std::move(mesh),2048);
+  scene.active().mesh_active=true;
+  scene.active().painted=paint;
+  const auto layer=paint->active_layer();
+  Brush brush;
+  brush.from=brush.to={.5f,.5f,0};
+  brush.normal={0,0,1};
+  brush.radius=1.35f;
+  brush.strength=.5f;
+  PaintSettings ink;
+  ink.channel=PaintChannel::Emission;
+  ink.emission_units=PaintEmissionUnits::Physical;
+  ink.emission={9500.f,.0002f,14.f};
+  ink.flow=.002f;
+  ink.front_only=false;
+  paint->begin_stroke();
+  paint->stamp(brush,ink);
+  check(paint->end_stroke(),"The native brush authors FLOAT emission over the full 2048 grid");
+  const auto &tiles=paint->layers().front().emission_tiles;
+  const auto center=paint->emission_pixel(layer,1024,1024);
+  const auto corner=paint->emission_pixel(layer,0,0);
+  check(tiles.size()==4096 && std::ranges::all_of(tiles,[](const auto &tile){return bool(tile);}) &&
+            tiles.size()*(PaintEmissionTile::wire_bytes+sizeof(PaintTile))>128*1024*1024 &&
+            paint->storage_bytes()<80*1024*1024 &&
+            center.physical==ink.emission && corner.physical==ink.emission &&
+            center.coverage>corner.coverage && center.coverage<1.f/255,
+        "All 4096 tiles retain varying sub-byte coverage and exact radiance within the storage limit");
+  const auto center_owner=tiles.at(32*64+32);
+  check(paint->undo() && !paint->has_physical_emission() &&
+            paint->redo() && paint->layers().front().emission_tiles.at(32*64+32)==center_owner,
+        "Undo and Redo restore the exact compact tile owner");
+
+  const auto first=root/"authored-2048.dsculpt";
+  const auto second=root/"reopened-2048.dsculpt";
+  {
+    Document document;
+    document.replace(scene.snapshot());ready(document);
+    document.save_async(first).get();
+  }
+  {
+    Document document;
+    document.open_async(first).get();ready(document);
+    const auto loaded=document.copy_scene().active().painted;
+    check(loaded->storage_bytes()==paint->storage_bytes() &&
+              loaded->emission_pixel(layer,1024,1024)==center &&
+              loaded->emission_pixel(layer,0,0)==corner,
+          "Cold Open restores compressed storage and original FLOAT samples");
+    document.save_async(second).get();
+  }
+  std::ifstream original(first,std::ios::binary),restored(second,std::ios::binary);
+  check(original && restored && std::equal(std::istreambuf_iterator<char>(original),{},
+                                          std::istreambuf_iterator<char>(restored),{}),
+        "Cold Open and resave preserve the original native wire bytes");
+  std::cout<<"Full-size retained paint bytes "<<paint->storage_bytes()<<'\n';
+}
+
 } // namespace
 
 int main(int argc,char **argv) try {
@@ -711,6 +790,8 @@ int main(int argc,char **argv) try {
   resize_baked_native_grid(root,true);
  } else if(std::string_view(argv[1])=="retained") {
   resize_retained_native_grid(root);
+ } else if(std::string_view(argv[1])=="fullsize") {
+  fullsize_physical_paint(root);
  } else {
   throw std::invalid_argument("Unknown paint resolution fixture");
  }

@@ -5349,7 +5349,10 @@ if(BUILD_TESTING)
   endif()
   add_test(NAME native-retained-paint-resolution COMMAND dome-sculpt-native-paint-resolution-test retained
     ${CMAKE_CURRENT_BINARY_DIR}/native-retained-paint-resolution)
+  add_test(NAME native-fullsize-physical-paint COMMAND dome-sculpt-native-paint-resolution-test fullsize
+    ${CMAKE_CURRENT_BINARY_DIR}/native-fullsize-physical-paint)
   set_tests_properties(native-empty-paint-resolution native-authored-paint-resolution PROPERTIES TIMEOUT 420)
+  set_tests_properties(native-fullsize-physical-paint PROPERTIES TIMEOUT 420)
 endif()
 
 include(tests/texture-set-resolution-workflows.cmake)

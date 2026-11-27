@@ -71,6 +71,84 @@
 #include <list>
 namespace dome {
 namespace {
+std::array<float,7> emission_channels(const PaintEmissionValue &value) {
+  return {value.legacy[0], value.legacy[1], value.legacy[2],
+          value.physical[0], value.physical[1], value.physical[2], value.coverage};
+}
+
+unsigned varying_emission_channels(const auto &read) {
+  const auto first = read(0);
+  unsigned mask = 0;
+  for (size_t i = 1; i < PaintEmissionTile::sample_count && mask != 0x7f; ++i) {
+    const auto values = read(i);
+    for (unsigned c = 0; c < first.size(); ++c)
+      if (std::bit_cast<uint32_t>(first[c]) != std::bit_cast<uint32_t>(values[c]))
+        mask |= 1u << c;
+  }
+  return mask;
+}
+} // namespace
+
+std::shared_ptr<const PaintEmissionTile> PaintEmissionTile::pack(const Pixels &pixels) {
+  const auto read = [&](size_t i) { return emission_channels(pixels[i]); };
+  auto tile = std::shared_ptr<PaintEmissionTile>(new PaintEmissionTile);
+  tile->constants_ = read(0);
+  const auto mask = varying_emission_channels(read);
+  tile->varying_mask_ = uint8_t(mask);
+  tile->varying_count_ = uint8_t(std::popcount(mask));
+  if (mask) {
+    tile->values_ = std::make_unique_for_overwrite<float[]>(sample_count * tile->varying_count_);
+    size_t offset = 0;
+    for (const auto &pixel : pixels) {
+      const auto values = emission_channels(pixel);
+      for (unsigned lanes = mask; lanes; lanes &= lanes - 1)
+        tile->values_[offset++] = values[std::countr_zero(lanes)];
+    }
+  }
+  return tile;
+}
+
+size_t PaintEmissionTile::encoded_storage_bytes(std::span<const uint8_t> bytes) {
+  if (bytes.size() != wire_bytes)
+    throw std::invalid_argument("Invalid physical emission tile byte count");
+  const auto read = [&](size_t index) {
+    std::array<float,7> values;
+    for (size_t c = 0; c < values.size(); ++c) {
+      const size_t at = (index * values.size() + c) * 4;
+      const uint32_t word = uint32_t(bytes[at]) | (uint32_t(bytes[at+1]) << 8) |
+                            (uint32_t(bytes[at+2]) << 16) | (uint32_t(bytes[at+3]) << 24);
+      values[c] = std::bit_cast<float>(word);
+    }
+    return values;
+  };
+  return sizeof(PaintEmissionTile) + sample_count * sizeof(float) *
+         std::popcount(varying_emission_channels(read));
+}
+
+size_t PaintEmissionTile::maximum_storage_bytes() noexcept {
+  return sizeof(PaintEmissionTile) + wire_bytes;
+}
+
+size_t PaintEmissionTile::storage_bytes() const noexcept {
+  return sizeof(PaintEmissionTile) + sample_count * sizeof(float) * varying_count_;
+}
+
+PaintEmissionValue PaintEmissionTile::texel(size_t index) const noexcept {
+  auto values = constants_;
+  size_t offset = index * varying_count_;
+  for (unsigned lanes = varying_mask_; lanes; lanes &= lanes - 1)
+    values[std::countr_zero(lanes)] = values_[offset++];
+  return {{values[0], values[1], values[2]}, {values[3], values[4], values[5]}, values[6]};
+}
+
+PaintEmissionTile::Pixels PaintEmissionTile::expand() const noexcept {
+  Pixels pixels;
+  for (size_t i = 0; i < pixels.size(); ++i)
+    pixels[i] = texel(i);
+  return pixels;
+}
+
+namespace {
 uint8_t byte(float v) {
   return uint8_t(std::lround(std::clamp(v, 0.f, 1.f) * 255));
 }
@@ -92,6 +170,13 @@ size_t color_tile_count(const PaintLayer &layer) {
 }
 size_t emission_tile_count(const PaintLayer &layer) {
   return std::count_if(layer.emission_tiles.begin(),layer.emission_tiles.end(),[](const auto &tile){return bool(tile);});
+}
+size_t emission_storage_bytes(const PaintLayer &layer) {
+  size_t bytes = 0;
+  for (const auto &tile : layer.emission_tiles)
+    if (tile)
+      bytes += tile->storage_bytes();
+  return bytes;
 }
 uint64_t next_composite_token() {
   static std::atomic<uint64_t> sequence{1};auto value=sequence.load(std::memory_order_relaxed);
@@ -782,7 +867,7 @@ struct SourcePaintAccess {
   static Footprint footprint(const PaintedMesh &p) {
     return {geometry_bytes(p.mesh()),coordinate_bytes(maps(p)),
       uint64_t(p.resolution())*p.resolution(),uint64_t(p.allocated_tiles_)*sizeof(PaintTile)+
-      uint64_t(p.allocated_color_tiles_)*sizeof(PaintColorTile)+[&]{uint64_t n=p.baked_?p.baked_->storage_bytes():0;for(const auto &l:p.layers_)n+=emission_tile_count(l)*sizeof(PaintEmissionTile);return n;}(),!p.surface_->source_capture_only};
+      uint64_t(p.allocated_color_tiles_)*sizeof(PaintColorTile)+[&]{uint64_t n=p.baked_?p.baked_->storage_bytes():0;for(const auto &l:p.layers_)n+=emission_storage_bytes(l);return n;}(),!p.surface_->source_capture_only};
   }
   // One canonical forecast for preparation, save, decode and prospective
   // strokes. Reserve the full sixteen layer-slot arrays, so metadata-only
@@ -872,7 +957,8 @@ struct SourcePaintAccess {
           const auto &emission=layer.at("physical_emission_tiles");
           if(original||!physical||!emission.is_array()||emission.empty()||emission.size()>size*size/1024)
             throw std::invalid_argument("Physical source paint requires its own nonempty capability");
-          result.tiles+=emission.size()*sizeof(PaintEmissionTile);
+          for (const auto &record : emission)
+            result.tiles += PaintEmissionTile::encoded_storage_bytes(record.at("data").get_binary());
         }
         const auto &tiles=layer.at("tiles");
         if(!tiles.is_array()||tiles.size()>size*size/1024||(original&&!tiles.empty()))throw std::invalid_argument("Invalid or nonpristine source paint tiles");
@@ -1214,7 +1300,7 @@ std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::c
       packet->storage_bytes_+=(layer.tiles.size()+layer.pbr_tiles.size()+layer.emission_tiles.size())*sizeof(std::shared_ptr<const PaintTile>);
       for(const auto &tile:layer.tiles)if(tile){packet->empty_=false;if(common_owners.insert(tile.get()).second)packet->storage_bytes_+=sizeof(PaintTile);}
       for(const auto &tile:layer.pbr_tiles)if(tile&&color_owners.insert(tile.get()).second)packet->storage_bytes_+=sizeof(PaintColorTile);
-      for(const auto &tile:layer.emission_tiles)if(tile&&emission_owners.insert(tile.get()).second)packet->storage_bytes_+=sizeof(PaintEmissionTile);
+      for(const auto &tile:layer.emission_tiles)if(tile&&emission_owners.insert(tile.get()).second)packet->storage_bytes_+=tile->storage_bytes();
     }
   }
   paint_compute::checkpoint(cancelled);return packet;
@@ -1388,7 +1474,7 @@ std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::p
 PaintEmissionValue PaintedMesh::emission_pixel(uint64_t id,uint32_t x,uint32_t y) const {
   const auto &p=pixel(id,x,y);const auto &l=layer(id);
   if(!l.emission_tiles.empty())if(const auto &tile=l.emission_tiles.at(size_t(y/32)*surface_->columns+x/32))
-    return tile->pixels[size_t(y%32)*32+x%32];
+    return tile->texel(size_t(y%32)*32+x%32);
   PaintEmissionValue result;
   for(size_t k=0;k<3;++k)result.legacy[k]=srgb_to_linear(unit(p.data[6+k]));
   result.coverage=unit(p.data[12]);
@@ -1444,7 +1530,7 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
   auto prior = l.tiles;
   auto prior_colors = l.pbr_tiles;
   auto prior_emission = l.emission_tiles;
-  size_t emission_bytes=0;for(const auto &layer:layers_)emission_bytes+=emission_tile_count(layer)*sizeof(PaintEmissionTile);
+  size_t emission_bytes=0;for(const auto &layer:layers_)emission_bytes+=emission_storage_bytes(layer);
   const size_t original_emission_bytes=emission_bytes;
   size_t allocated = allocated_tiles_;
   size_t allocated_colors = allocated_color_tiles_;
@@ -1463,7 +1549,7 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
       auto copy = l.tiles[tile] ? std::make_shared<PaintTile>(*l.tiles[tile])
                                 : std::make_shared<PaintTile>();
       std::shared_ptr<PaintColorTile> color_copy;
-      std::shared_ptr<PaintEmissionTile> emission_copy;
+      std::unique_ptr<PaintEmissionTile::Pixels> emission_copy;
       bool color_changed=false;
       bool emission_changed=false;
       bool tile_changed = false;
@@ -1517,15 +1603,18 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
                 // Absolute zero and fractional coverage both require their
                 // genuine owning plane, even if fallback bytes do not change.
                 emission_changed|=l.emission_tiles.empty()||!l.emission_tiles[tile];
-                emission_copy=std::make_shared<PaintEmissionTile>();
-                if(!l.emission_tiles.empty()&&l.emission_tiles[tile])*emission_copy=*l.emission_tiles[tile];
-                else if(l.tiles[tile])for(size_t i=0;i<emission_copy->pixels.size();++i){
-                  auto &value=emission_copy->pixels[i];const auto &q=l.tiles[tile]->pixels[i];
-                  for(size_t k=0;k<3;++k)value.legacy[k]=srgb_to_linear(unit(q.data[6+k]));
-                  value.coverage=unit(q.data[12]);
+                if(!l.emission_tiles.empty()&&l.emission_tiles[tile])
+                  emission_copy=std::make_unique<PaintEmissionTile::Pixels>(l.emission_tiles[tile]->expand());
+                else {
+                  emission_copy=std::make_unique<PaintEmissionTile::Pixels>();
+                  if(l.tiles[tile])for(size_t i=0;i<emission_copy->size();++i){
+                    auto &value=(*emission_copy)[i];const auto &q=l.tiles[tile]->pixels[i];
+                    for(size_t k=0;k<3;++k)value.legacy[k]=srgb_to_linear(unit(q.data[6+k]));
+                    value.coverage=unit(q.data[12]);
+                  }
                 }
               }
-              linear=&emission_copy->pixels[y*32+x];old_linear=*linear;
+              linear=&(*emission_copy)[y*32+x];old_linear=*linear;
             }
             float previous = linear?linear->coverage:unit(p.data[coverage]);
             if (selected.erase)
@@ -1586,15 +1675,22 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
       if (tile_changed || color_changed || emission_changed) {
         if(!l.tiles[tile])++allocated;
         if(color_changed && !l.pbr_tiles[tile])++allocated_colors;
-        if(emission_changed&&(l.emission_tiles.empty()||!l.emission_tiles[tile]))emission_bytes+=sizeof(PaintEmissionTile);
+        std::shared_ptr<const PaintEmissionTile> sealed_emission;
+        if (emission_changed) {
+          sealed_emission=PaintEmissionTile::pack(*emission_copy);
+          if(!l.emission_tiles.empty()&&l.emission_tiles[tile])
+            emission_bytes-=l.emission_tiles[tile]->storage_bytes();
+          emission_bytes+=sealed_emission->storage_bytes();
+        }
         const uint64_t added=uint64_t(allocated-allocated_tiles_)*sizeof(PaintTile)+
-          uint64_t(allocated_colors-allocated_color_tiles_)*sizeof(PaintColorTile)+emission_bytes-original_emission_bytes;
+          uint64_t(allocated_colors-allocated_color_tiles_)*sizeof(PaintColorTile)+
+          (emission_bytes>original_emission_bytes?emission_bytes-original_emission_bytes:0);
         if(retained_storage+allocated*sizeof(PaintTile)+allocated_colors*sizeof(PaintColorTile)+emission_bytes>128*1024*1024||
            (source_sampling_prepared()&&source_working+added>SourcePaintOptions::maximum_working_bytes))
           throw std::length_error("Paint storage budget exceeded");
         l.tiles[tile] = std::move(copy);
         if(color_changed)l.pbr_tiles[tile]=std::move(color_copy);
-        if(emission_changed){if(l.emission_tiles.empty())l.emission_tiles.resize(l.tiles.size());l.emission_tiles[tile]=std::move(emission_copy);}
+        if(sealed_emission){if(l.emission_tiles.empty())l.emission_tiles.resize(l.tiles.size());l.emission_tiles[tile]=std::move(sealed_emission);}
         changed = true;
       }
     }
@@ -1630,8 +1726,11 @@ bool PaintedMesh::end_stroke() {
     if (before_[i] != tiles[i])
       bytes += sizeof(PaintTile) * 2;
   for(size_t i=0;i<colors.size();++i)if(before_colors_[i]!=colors[i])bytes+=sizeof(PaintColorTile)*2;
-  for(size_t i=0;i<std::max(before_emission_.size(),emission.size());++i)
-    if((i<before_emission_.size()?before_emission_[i]:nullptr)!=(i<emission.size()?emission[i]:nullptr))bytes+=sizeof(PaintEmissionTile)*2;
+  for(size_t i=0;i<std::max(before_emission_.size(),emission.size());++i) {
+    const auto old=i<before_emission_.size()?before_emission_[i].get():nullptr;
+    const auto now=i<emission.size()?emission[i].get():nullptr;
+    if(old!=now)bytes+=(old?old->storage_bytes():0)+(now?now->storage_bytes():0);
+  }
   for (auto &s : redo_)
     history_bytes_ -= s.bytes;
   redo_.clear();
@@ -3240,7 +3339,7 @@ size_t PaintedMesh::storage_bytes() const {
       m.positions.size()*sizeof(Vec3)+m.normals.size()*sizeof(Vec3)+m.uv.size()*sizeof(std::array<float,2>)+
       m.indices.size()*sizeof(uint32_t)+m.uv_pins.size()+m.uv_seams.size();
   }
-  for(const auto &layer:layers_)result+=emission_tile_count(layer)*sizeof(PaintEmissionTile);
+  for(const auto &layer:layers_)result+=emission_storage_bytes(layer);
   return result;
 }
 void PaintedMesh::install_bake(BakedTextures incoming) {
@@ -3458,7 +3557,7 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &sour
   struct WritableLayer {
     size_t slot;
     std::vector<std::shared_ptr<PaintTile>> common;
-    std::vector<std::shared_ptr<PaintEmissionTile>> emission;
+    std::vector<std::shared_ptr<PaintEmissionTile::Pixels>> emission;
     std::vector<std::shared_ptr<PaintColorTile>> pbr;
   };
   std::vector<WritableLayer> writable;
@@ -3564,6 +3663,7 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &sour
     tile = std::make_shared<Tile>();
   };
   size_t hits = 0;
+  bool emission_sealing_reserved = false;
   for (size_t at = 0; at < texels; ++at) {
     if ((at & 1023) == 0) paint_compute::checkpoint(transfer.cancelled());
     const auto &texel = surface.texels[at];
@@ -3706,9 +3806,15 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &sour
       common->pixels[pixel] = sample.common;
       if (emission) {
         if (layer.emission.empty()) { layer.emission.resize(tile_slots); dest.emission_tiles.resize(tile_slots); }
+        if (!layer.emission[tile]) {
+          if (!emission_sealing_reserved) {
+            transfer.reserve(1,sizeof(PaintEmissionTile::Pixels));
+            emission_sealing_reserved=true;
+          }
+          transfer.reserve(1,sizeof(PaintEmissionTile));
+        }
         allocate_tile(layer.emission[tile]);
-        layer.emission[tile]->pixels[pixel] = sample.emission;
-        dest.emission_tiles[tile] = layer.emission[tile];
+        (*layer.emission[tile])[pixel] = sample.emission;
       }
       if (resolved_color) {
         // A tile is authoritative for all its pixels, including neighbors
@@ -3719,6 +3825,14 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &sour
         dest.pbr_tiles[tile] = pbr;
         pbr->pixels[pixel] = sample.pbr;
       }
+    }
+  }
+  for (auto &layer : writable) {
+    auto &destination=replacement.layers_[layer.slot].emission_tiles;
+    for(size_t i=0;i<layer.emission.size();++i)if(layer.emission[i]) {
+      paint_compute::checkpoint(transfer.cancelled());
+      destination[i]=PaintEmissionTile::pack(*layer.emission[i]);
+      layer.emission[i].reset();
     }
   }
   if (!hits && (!old_domain || (!old_domain->triangles().empty() && !new_domain->triangles().empty())))
@@ -4404,7 +4518,7 @@ std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material
         if(contributing)break;
       }
       if(source_sampling_prepared()&&!contributing)for(const auto &l:layers_)if(l.visible&&l.opacity>0)
-        for(const auto &tile:l.emission_tiles)if(tile)for(const auto &p:tile->pixels)if(p.coverage>0){contributing=true;break;}
+        for(const auto &tile:l.emission_tiles)if(tile)for(size_t i=0;i<PaintEmissionTile::sample_count;++i)if(tile->texel(i).coverage>0){contributing=true;break;}
       if(source_sampling_prepared())composite_cache_->source_preview.reset();
       composite_cache_->source_eligible=!contributing;composite_cache_->preview_token=composite_token_;
     }
@@ -5273,10 +5387,10 @@ nlohmann::json PaintedMesh::encode_impl(PaintImageArchive *archive,NormalSamplin
       auto emission=nlohmann::json::array();
       for(size_t i=0;i<l.emission_tiles.size();++i)if(l.emission_tiles[i]) {
         if(!l.tiles[i])throw std::logic_error("Physical emission tile has no common coverage owner");
-        std::vector<uint8_t> bytes;bytes.reserve(sizeof(PaintEmissionTile));
-        size_t pixel_index=0;
-        for(const auto &pixel:l.emission_tiles[i]->pixels){pixel.validate();
-          if(!emission_fallback_matches(pixel,l.tiles[i]->pixels[pixel_index++]))throw std::logic_error("Physical emission fallback bytes differ from their owning linear plane");
+        std::vector<uint8_t> bytes;bytes.reserve(PaintEmissionTile::wire_bytes);
+        for(size_t pixel_index=0;pixel_index<PaintEmissionTile::sample_count;++pixel_index){
+          const auto pixel=l.emission_tiles[i]->texel(pixel_index);pixel.validate();
+          if(!emission_fallback_matches(pixel,l.tiles[i]->pixels[pixel_index]))throw std::logic_error("Physical emission fallback bytes differ from their owning linear plane");
           for(float v:pixel.legacy)word(bytes,std::bit_cast<uint32_t>(v));
           for(float v:pixel.physical)word(bytes,std::bit_cast<uint32_t>(v));
           word(bytes,std::bit_cast<uint32_t>(pixel.coverage));}
@@ -5650,19 +5764,19 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode_impl(const nlohmann::json &inpu
         const auto &index=record.at("index"),&data=record.at("data");
         if((!index.is_number_unsigned()&&(!index.is_number_integer()||index.get<int64_t>()<0))||index.get<uint64_t>()>=l.tiles.size())throw std::invalid_argument("Invalid physical emission tile identity");
         const auto i=size_t(index.get<uint64_t>());
-        if(!l.tiles[i]||l.emission_tiles[i]||!data.is_binary()||data.get_binary().size()!=32*32*7*4)throw std::invalid_argument("Invalid physical emission tile data");
-        allocated+=sizeof(PaintEmissionTile);
+        if(!l.tiles[i]||l.emission_tiles[i]||!data.is_binary()||data.get_binary().size()!=PaintEmissionTile::wire_bytes)throw std::invalid_argument("Invalid physical emission tile data");
+        allocated+=PaintEmissionTile::encoded_storage_bytes(data.get_binary());
         if(allocated>128*1024*1024)throw std::length_error("Physical paint storage budget exceeded");
-        auto tile=std::make_shared<PaintEmissionTile>();size_t offset=0;
+        PaintEmissionTile::Pixels pixels;size_t offset=0;
         size_t pixel_index=0;
-        for(auto &pixel:tile->pixels){
+        for(auto &pixel:pixels){
           for(auto &value:pixel.legacy){value=std::bit_cast<float>(word(data.get_binary(),offset));offset+=4;}
           for(auto &value:pixel.physical){value=std::bit_cast<float>(word(data.get_binary(),offset));offset+=4;}
           pixel.coverage=std::bit_cast<float>(word(data.get_binary(),offset));offset+=4;
           pixel.validate();
           if(!emission_fallback_matches(pixel,l.tiles[i]->pixels[pixel_index++]))throw std::invalid_argument("Physical emission fallback bytes differ from their linear plane");
         }
-        l.emission_tiles[i]=std::move(tile);
+        l.emission_tiles[i]=PaintEmissionTile::pack(pixels);
       }
     }
     result->layers_.push_back(std::move(l));

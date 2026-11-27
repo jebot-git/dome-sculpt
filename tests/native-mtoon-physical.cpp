@@ -17,8 +17,8 @@ Coefficients independent_field(const PaintedMesh &paint,float u,float v) {
   auto texel=[&](int x,int y){Coefficients out;x=std::clamp(x,0,r-1);y=std::clamp(y,0,r-1);const size_t tile=size_t(y/32)*(r/32)+size_t(x/32),pixel=size_t(y%32)*32+size_t(x%32);
     for(const auto &layer:paint.layers())if(layer.visible&&layer.opacity>0)if(const auto &owner=layer.tiles.at(tile)){
       const auto &q=owner->pixels[pixel].data;const auto emission=layer.emission_tiles.empty()?nullptr:layer.emission_tiles.at(tile);
-      const double opacity=double(q[13])/255*layer.opacity,coverage=opacity*(emission?emission->pixels[pixel].coverage:double(q[12])/255);
-      for(size_t c=0;c<3;++c){const double legacy=emission?emission->pixels[pixel].legacy[c]:mtoon_srgb_to_linear(q[6+c]/255.f),physical=emission?emission->pixels[pixel].physical[c]:0;
+      const double opacity=double(q[13])/255*layer.opacity,coverage=opacity*(emission?emission->texel(pixel).coverage:double(q[12])/255);
+      for(size_t c=0;c<3;++c){const double legacy=emission?emission->texel(pixel).legacy[c]:mtoon_srgb_to_linear(q[6+c]/255.f),physical=emission?emission->texel(pixel).physical[c]:0;
         out.legacy[c]=out.legacy[c]*(1-coverage)+legacy*coverage;out.physical[c]=out.physical[c]*(1-coverage)+physical*coverage;}
       out.coverage=out.coverage*(1-coverage)+coverage;
     }return out;};

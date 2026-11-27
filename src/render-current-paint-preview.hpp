@@ -193,7 +193,7 @@ void main(){
   const auto&d=entry.resource.owner;const auto&field=*d->layers();const auto r=field.resolution();const size_t grid=size_t(r/32)*(r/32);
   const size_t count=std::max(size_t(1),grid*field.layers().size());std::vector<std::array<int32_t,2>> offsets(count,{-1,-1});
   auto common_pack=[](const PaintTile&t){std::array<std::array<uint32_t,4>,1024> out{};for(size_t i=0;i<1024;++i)for(size_t k=0;k<14;++k)out[i][k/4]|=uint32_t(t.pixels[i].data[k])<<((k%4)*8);return out;};
-  auto emission_pack=[](const PaintEmissionTile&t){std::array<float,7168> out{};for(size_t i=0;i<1024;++i){const auto&v=t.pixels[i];v.validate();for(size_t k=0;k<3;++k){out[i*7+k]=v.legacy[k];out[i*7+3+k]=v.physical[k];}out[i*7+6]=v.coverage;}return out;};
+  auto emission_pack=[](const PaintEmissionTile&t){std::array<float,7168> out{};for(size_t i=0;i<1024;++i){const auto v=t.texel(i);v.validate();for(size_t k=0;k<3;++k){out[i*7+k]=v.legacy[k];out[i*7+3+k]=v.physical[k];}out[i*7+6]=v.coverage;}return out;};
   for(size_t li=0;li<field.layers().size();++li){const auto&l=field.layers()[li];for(size_t t=0;t<grid;++t)if(l.tiles[t]){auto&o=offsets[li*grid+t];o[0]=int32_t(slot(common_,l.tiles[t],p.common,3072,16384,common_pack));if(!l.emission_tiles.empty()&&l.emission_tiles[t])o[1]=int32_t(slot(emission_,l.emission_tiles[t],p.emission,0,28672,emission_pack));}}
   entry.directory=buffer(offsets.size()*8);glBindBuffer(GL_COPY_WRITE_BUFFER,entry.directory.name);glBufferSubData(GL_COPY_WRITE_BUFFER,0,GLsizeiptr(offsets.size()*8),offsets.data());check();stats_.directory_bytes+=offsets.size()*8;entry.view=view(entry.directory,GL_RG32I);
   auto pad=padding_.find(field.padding());if(pad==padding_.end())throw std::logic_error("Current-grid padding forecast lost its owner");

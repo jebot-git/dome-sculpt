@@ -136,9 +136,26 @@ struct PaintColorTile {
   // not grow; coverage/masks/other channels remain in the common paint tile.
   std::array<std::array<uint8_t,4>, PaintTile::size * PaintTile::size> pixels{};
 };
-struct PaintEmissionTile {
-  // Optional Scene27 physical emission; common tile coverage/mask is shared.
-  std::array<PaintEmissionValue, PaintTile::size * PaintTile::size> pixels{};
+class PaintEmissionTile {
+public:
+  static constexpr size_t sample_count = PaintTile::size * PaintTile::size;
+  static constexpr size_t wire_bytes = sample_count * 7 * sizeof(uint32_t);
+  using Pixels = std::array<PaintEmissionValue, sample_count>;
+
+  static std::shared_ptr<const PaintEmissionTile> pack(const Pixels &);
+  // Legacy projects still carry the original seven FLOAT words per sample.
+  static size_t encoded_storage_bytes(std::span<const uint8_t>);
+  static size_t maximum_storage_bytes() noexcept;
+  size_t storage_bytes() const noexcept;
+  PaintEmissionValue texel(size_t index) const noexcept;
+  Pixels expand() const noexcept;
+
+private:
+  PaintEmissionTile() = default;
+  std::array<float,7> constants_{};
+  std::unique_ptr<float[]> values_;
+  uint8_t varying_mask_ = 0;
+  uint8_t varying_count_ = 0;
 };
 struct PaintLayer {
   uint64_t id = 0;

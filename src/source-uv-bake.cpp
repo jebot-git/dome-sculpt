@@ -412,7 +412,7 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
    for(const auto &layer:result.layers){
     for(const auto &tile:layer.tiles)if(tile)result.layer_bytes+=sizeof(PaintTile);
     for(const auto &tile:layer.pbr_tiles)if(tile)result.layer_bytes+=sizeof(PaintColorTile);
-    for(const auto &tile:layer.emission_tiles)if(tile)result.layer_bytes+=sizeof(PaintEmissionTile);
+    for(const auto &tile:layer.emission_tiles)if(tile)result.layer_bytes+=tile->storage_bytes();
    }
    if(result.layer_bytes>o.max_layer_bytes)throw std::length_error("Source UV paint tile budget exceeded");
    budget.cancel();result.diagnostics.push_back("Original image roles explicitly resampled into the current atlas; editable paint layers retain exact sparse owners and bytes");

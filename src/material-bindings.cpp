@@ -772,7 +772,8 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
         const auto &tiles=layer.at("physical_emission_tiles");
         if(!physical||!detail::physical_paint_authority(record,context)||!tiles.is_array()||tiles.empty()||tiles.size()>4096)
           throw std::invalid_argument("Physical paint requires actual material11/Paint3 capability");
-        tile_bytes+=tiles.size()*sizeof(PaintEmissionTile);
+        for (const auto &tile : tiles)
+          tile_bytes+=PaintEmissionTile::encoded_storage_bytes(tile.at("data").get_binary());
       }
     }
     if(!detail::shared_bake_for(record,paint,uint32_t(r),context.baked_emission)){

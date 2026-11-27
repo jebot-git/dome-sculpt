@@ -290,9 +290,9 @@ void resize_retained_grid(bool split){
   for(size_t pixel=0;source&&pixel<source->pixels.size();++pixel)
    if(source->pixels[pixel].data!=dest->pixels[pixel].data)
     throw std::runtime_error("Hidden byte paint changed across exact round-trip");
-  for(size_t pixel=0;source_light&&pixel<source_light->pixels.size();++pixel){
-   const auto &a=source_light->pixels[pixel];
-   const auto &b=dest_light->pixels[pixel];
+  for(size_t pixel=0;source_light&&pixel<PaintEmissionTile::sample_count;++pixel){
+   const auto a=source_light->texel(pixel);
+   const auto b=dest_light->texel(pixel);
    if(a.physical!=b.physical||a.legacy!=b.legacy||a.coverage!=b.coverage)
     throw std::runtime_error("Hidden physical coefficients changed across exact round-trip");
   }

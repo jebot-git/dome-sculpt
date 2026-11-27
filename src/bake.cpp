@@ -218,9 +218,11 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o,
         // The source-owned paint packet, when present, is independent of images.
         if(!m.maps->source_maps)throw std::invalid_argument("Raw bake source needs its explicit original texture role bundle");
         if(m.maps->overlay&&!m.resolved_emission)for(const auto &layer:m.maps->overlay->layers())
-          for(const auto &tile:layer.emission_tiles)if(tile)for(const auto &pixel:tile->pixels)
+          for(const auto &tile:layer.emission_tiles)if(tile)for(size_t i=0;i<PaintEmissionTile::sample_count;++i) {
+            const auto pixel=tile->texel(i);
             if(pixel.coverage>0&&std::any_of(pixel.physical.begin(),pixel.physical.end(),[](float v){return v!=0;}))
               throw std::invalid_argument("Physical source emission requires its explicit radiance-preserving bake adapter");
+          }
         if(m.maps->color.width||m.maps->metal_rough.width||m.maps->emission.width||m.maps->normal.width)throw std::invalid_argument("Raw bake source cannot also contain derived maps");
       }else{m.maps->color.validate(); m.maps->metal_rough.validate(); m.maps->emission.validate();}
       if(m.maps->pbr_color.width||m.maps->pbr_color.height||!m.maps->pbr_color.rgba.empty()) {

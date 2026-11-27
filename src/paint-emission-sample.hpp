@@ -73,11 +73,11 @@ private:
       const auto &q=common->pixels[within].data;
       const float mask=q[13]/255.f*layer.opacity;
       const auto *emission=layer.emission_tiles.empty()?nullptr:layer.emission_tiles[tile].get();
-      const auto *physical=emission?&emission->pixels[within]:nullptr;
-      const float coverage=physical?mask*physical->coverage:q[12]/255.f*mask;
+      const auto physical=emission?emission->texel(within):PaintEmissionValue{};
+      const float coverage=emission?mask*physical.coverage:q[12]/255.f*mask;
       for(size_t k=0;k<3;++k){
-        const float relative=physical?physical->legacy[k]:linear(q[6+k]/255.f);
-        const float absolute=physical?physical->physical[k]:0.f;
+        const float relative=emission?physical.legacy[k]:linear(q[6+k]/255.f);
+        const float absolute=physical.physical[k];
         value.legacy[k]=value.legacy[k]*(1-coverage)+relative*coverage;
         value.absolute[k]=value.absolute[k]*(1-coverage)+absolute*coverage;
       }
