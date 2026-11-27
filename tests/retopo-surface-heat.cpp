@@ -79,6 +79,29 @@ std::shared_ptr<const RetopoView> move_patch(Document &document, bool affine) {
   return draft;
 }
 
+std::shared_ptr<const RetopoView> relocate_patch(Document &document,const Scene &before,
+                                                Vec3 displacement,bool subdivide) {
+  const auto &old=before.active();
+  auto topology=old.retopology->topology;
+  topology.transform(before.world_matrix(old.id));
+  CanvasTransform move;
+  move.position={displacement.x,displacement.y,displacement.z};
+  topology.transform(affine_similarity(move));
+  if(subdivide){
+    const auto seam=std::ranges::find_if(topology.edges(),[](const auto &entry){return entry.second.seam;});
+    const auto midpoint=topology.subdivide_edge(seam->first);
+    check(topology.faces().size()==3&&topology.vertices().at(midpoint).split_edge[0],
+          "A detached replacement has an actual subdivided edge and a complete prior corner lineage");
+  }
+  auto draft=std::make_shared<RetopoView>();
+  draft->topology=std::make_shared<const RetopoMesh>(std::move(topology));
+  const auto guide=old.retopology->source;
+  document.edit_scene("Apply detached retopology",[=](Scene &scene,const auto &cancelled){
+    publish_retopology(scene,*draft->topology,guide,draft->transform,cancelled);
+  });
+  return draft;
+}
+
 Scene reference(bool affine) {
   Mesh mesh;
   mesh.positions = {{-.55f,-.55f,0},{.55f,-.55f,0},{.55f,.55f,0},{-.55f,.55f,0}};
@@ -551,10 +574,26 @@ void affine_wire_edit(const std::filesystem::path &out) {
         "Ordered Save, cold Open and Undo/Redo preserve the prepared affine wire edit");
 }
 
-void prepared_geometry_edit(bool affine,const std::filesystem::path &out) {
+void prepared_geometry_edit(bool affine,const std::filesystem::path &out,bool detached=false) {
   auto source = author_patch(affine,out);
   const auto previous = source.active().id;
   const auto guide = source.active().retopology->source;
+  if (detached) {
+    const auto &mesh=source.active().painted->mesh();
+    DeformationState authored(mesh);
+    authored.skeleton=Skeleton{{Bone{"Root"},Bone{"Tip",0}}};
+    authored.skin.emplace();
+    for (auto p : mesh.positions) {
+      const float tip=.5f+.3f*p.x;
+      authored.skin->vertices.push_back({{0,1-tip},{1,tip}});
+    }
+    authored.morphs.emplace(mesh);
+    auto target=mesh.positions;
+    for (auto &p : target) p.z+=.05f+.02f*p.x;
+    authored.morphs->set_target(mesh,"Incline",target);
+    authored.morph_weights={0};
+    source.set_deformation(previous,std::move(authored));
+  }
   Document document;
   document.replace(source);
   settled(document);
@@ -617,8 +656,13 @@ void prepared_geometry_edit(bool affine,const std::filesystem::path &out) {
   check(original->pbr()!=original->mtoon() && original->replacements()==1,
         "Original patch has two distinct prepared normal roles above an independent material coverage field");
   document.save_async(out/"prepared-before.dsculpt").get();
-  const auto draft=move_patch(document,affine);
-  document.end_retopology(true);
+  const Vec3 displacement{0,0,-.72f};
+  std::shared_ptr<const RetopoView> draft;
+  if (detached) draft=relocate_patch(document,before,displacement,true);
+  else {
+    draft=move_patch(document,affine);
+    document.end_retopology(true);
+  }
   const auto file=out/"prepared-reapplied.dsculpt";
   document.save_async(file).get();
   settled(document);
@@ -659,7 +703,9 @@ void prepared_geometry_edit(bool affine,const std::filesystem::path &out) {
       const std::array w{1.f-b1-b2,b1,b2};
       if (std::ranges::min(w)<.08f) continue;
       const auto location=point(new_world,mesh.positions[a]*w[0]+mesh.positions[b]*w[1]+mesh.positions[c]*w[2]);
-      const auto expected=query.nearest_result(location,old_world,nearest);
+      if (detached && query.nearest_result(location,old_world,nearest))
+        throw std::runtime_error("Detached fixture must miss every spatial projection at the actual location");
+      const auto expected=query.nearest_result(detached?location-displacement:location,old_world,nearest);
       if (!expected) continue;
       const auto old_normal=old_sample(expected->surface.triangle,expected->surface.barycentric);
       const auto new_normal=new_sample(tri,w);
@@ -673,6 +719,25 @@ void prepared_geometry_edit(bool affine,const std::filesystem::path &out) {
   std::cout<<"PREPARED_TRANSFER samples="<<samples<<" normal_only="<<normal_only<<" error="<<error<<'\n';
   check(samples>64 && normal_only>16 && error<.025f,
         "Independent placed sampling verifies both normal maps at texel centres, including zero material coverage");
+  if(detached){
+    const auto &deformation=*patch.deformation;
+    const auto inverse=old_world.inverse();
+    float weight_error=0,shape_error=0;
+    for (size_t vertex=0;vertex<mesh.positions.size();++vertex){
+      const auto local=point(inverse,point(new_world,mesh.positions[vertex])-displacement);
+      const auto &row=deformation.skin->vertices[vertex];
+      const auto tip=std::ranges::find(row,1u,&Influence::joint);
+      if(tip==row.end())throw std::runtime_error("Detached patch lost a source joint");
+      weight_error=std::max(weight_error,std::abs(tip->weight-(.5f+.3f*local.x)));
+      const auto former=old_world.direction({0,0,.05+.02*local.x});
+      const auto delta=deformation.morphs->targets.front().delta[vertex];
+      const auto rendered=new_world.direction({delta.x,delta.y,delta.z});
+      for(size_t axis=0;axis<3;++axis)shape_error=std::max(shape_error,float(std::abs(former[axis]-rendered[axis])));
+    }
+    std::cout<<"DETACHED_SKIN weight_error="<<weight_error<<" shape_error="<<shape_error<<'\n';
+    check(weight_error<2e-6f&&shape_error<2e-6f,
+          "Independent rest-space weights and shapekey vectors survive the detached patch and its new midpoint");
+  }
   check(document.undo() && document.copy_scene().encode()==before.encode() &&
         document.redo() && document.copy_scene().encode()==after.encode(),
         "Undo and Redo retain both complete prepared authoring generations");
@@ -1071,7 +1136,7 @@ Vec3 retopo_toon_test_normal(const TextureSetView &field,const AffineTransform &
   return mtoon_material_normal(binding.material,n,{t.x,t.y,t.z,sign},{sample[0],sample[1],sample[2]},n,true);
 }
 
-void retopo_toon_materials(bool affine,bool legacy,const std::filesystem::path &out) {
+void retopo_toon_materials(bool affine,bool legacy,const std::filesystem::path &out,bool detached=false) {
   auto scene=reference(false);
   const auto guide=scene.active().id;
   RetopoMesh patch;
@@ -1108,8 +1173,9 @@ void retopo_toon_materials(bool affine,bool legacy,const std::filesystem::path &
   settled(document);
   const auto before=document.copy_scene();
   document.save_async(out/"mtoon-before.dsculpt").get();
-  const auto draft=move_patch(document,affine);
-  document.end_retopology(true);
+  const Vec3 displacement{0,0,-.72f};
+  const auto draft=detached?relocate_patch(document,before,displacement,false):move_patch(document,affine);
+  if(!detached)document.end_retopology(true);
   const auto path=out/"mtoon-retopo.dsculpt";
   document.save_async(path).get();
   settled(document);
@@ -1154,7 +1220,9 @@ void retopo_toon_materials(bool affine,bool legacy,const std::filesystem::path &
         const std::array w{1-p-q,p,q};
         if (std::ranges::min(w)<.08f) continue;
         const auto position=point(new_world,mesh.positions[ia]*w[0]+mesh.positions[ib]*w[1]+mesh.positions[ic]*w[2]);
-        const auto hit=query.nearest_result(position,old_world,nearest);
+        if(detached&&query.nearest_result(position,old_world,nearest))
+          throw std::runtime_error("Detached typed material must miss the spatial projection");
+        const auto hit=query.nearest_result(detached?position-displacement:position,old_world,nearest);
         if (!hit) continue;
         const auto from=hit->surface;
         const auto source_uv=retopo_toon_test_uv(old.painted->mesh(),from.triangle,from.barycentric);
@@ -1224,7 +1292,7 @@ void retopo_toon_materials(bool affine,bool legacy,const std::filesystem::path &
   try {publish_retopology(live,*draft->topology,guide,draft->transform);}
   catch(const std::invalid_argument &error) {refused=std::string_view(error.what()).find("animated")!=std::string_view::npos;}
   check(refused && live.encode()==exact,"Live animated roles refuse geometry Apply without changing the source project");
-  if (!legacy) {
+  if (!legacy && !detached) {
     auto two_sided=before.snapshot();
     auto editable=*two_sided.active().material_bindings;
     editable.material.parameters.cull=MToonCull::Off;
@@ -1402,8 +1470,9 @@ int main(int argc,char **argv) try {
   if (argc!=3) return 2;
   const std::string_view mode = argv[2];
   if (mode!="plain" && mode!="affine" && mode!="affine-wire" && mode!="mixed-material" &&
-      mode!="mtoon-plain" && mode!="mtoon-affine" && mode!="mtoon-v0" &&
+      mode!="mtoon-plain" && mode!="mtoon-affine" && mode!="mtoon-v0" && mode!="mtoon-detached" &&
       mode!="reapply-plain" && mode!="reapply-affine" && mode!="prepared-plain" && mode!="prepared-affine" &&
+      mode!="prepared-detached" && mode!="prepared-detached-affine" &&
       mode!="restore-plain" && mode!="restore-affine" && mode!="material-seam-plain" &&
       mode!="material-seam-affine" && mode!="subdivide-seam-plain" && mode!="subdivide-seam-affine") return 2;
   const std::filesystem::path out = argv[1];
@@ -1415,8 +1484,8 @@ int main(int argc,char **argv) try {
   else if (mode=="mixed-material") mixed_material_quad(out);
   else if (mode.starts_with("material-seam-")) split_material_seam(mode.ends_with("affine"),out);
   else if (mode.starts_with("subdivide-seam-")) split_material_seam(mode.ends_with("affine"),out,true);
-  else if (mode.starts_with("mtoon-")) retopo_toon_materials(mode.ends_with("affine"),mode.ends_with("v0"),out);
-  else if (mode.starts_with("prepared-")) prepared_geometry_edit(mode.ends_with("affine"),out);
+  else if (mode.starts_with("mtoon-")) retopo_toon_materials(mode.ends_with("affine"),mode.ends_with("v0"),out,mode=="mtoon-detached");
+  else if (mode.starts_with("prepared-")) prepared_geometry_edit(mode.ends_with("affine"),out,mode.starts_with("prepared-detached"));
   else if (mode.starts_with("reapply-")) reapply_patch(mode.ends_with("affine"),out);
   else bind_patch(mode=="affine",out);
   std::cout << "PASS " << checks << " retopology Surface Heat controls\n";

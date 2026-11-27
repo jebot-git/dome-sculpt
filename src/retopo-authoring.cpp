@@ -76,8 +76,8 @@ Vec3 normal_direction(const AffineTransform &frame, Vec3 normal) {
 
 detail::RetopoTransfer::RetopoTransfer(const Mesh &previous_mesh,
     const AffineTransform &previous, const AffineTransform &replacement,
-    RetopoTransferBudget &budget)
-    : budget_(budget), placement_change_(replacement.inverse() * previous) {
+    RetopoTransferBudget &budget, std::span<const RetopoCorrespondence> retained)
+    : budget_(budget), retained_(retained), placement_change_(replacement.inverse() * previous) {
   // Subtract a common translation before narrowing the query point. Meshes
   // far from the world origin still use the authored affine metric.
   auto old = previous.matrix();
@@ -132,6 +132,40 @@ std::optional<SurfaceHit> detail::RetopoTransfer::match(Vec3 position, Vec3 norm
     return old_surface_->nearest(point, options_);
   const auto result = old_surface_->nearest_result(point, previous_metric_, options_);
   return result ? std::optional(result->surface) : std::nullopt;
+}
+
+bool detail::RetopoTransfer::has_retained(uint32_t face) const noexcept {
+  return face < retained_.size() && retained_[face].witnessed && retained_[face].triangle < world_normals_.size();
+}
+
+std::optional<SurfaceHit> detail::RetopoTransfer::match_retained(Vec3 position, Vec3 normal,
+    uint32_t face, std::array<float,3> weights, const TextureSetFaceDomain *source_domain) {
+  work();
+  if (!has_retained(face)) return {};
+  const auto &reference = retained_[face];
+  if ((source_domain && !source_domain->contains(reference.triangle)) ||
+      dot(world_normals_[reference.triangle],normal_direction(replacement_metric_,normal)) <= 0)
+    return {};
+  auto hit = SurfaceHit{.triangle=reference.triangle};
+  for (size_t i=0;i<3;++i) for (size_t k=0;k<3;++k)
+    hit.barycentric[k] += std::max(0.f,weights[i])*reference.corners[i][k];
+  const auto total = hit.barycentric[0]+hit.barycentric[1]+hit.barycentric[2];
+  if (!(total>0)) return {};
+  const auto &mesh = old_surface_->mesh();
+  for (size_t k=0;k<3;++k) {
+    hit.barycentric[k] /= total;
+    const auto vertex = mesh.indices[size_t(reference.triangle)*3+k];
+    hit.position += mesh.positions[vertex]*hit.barycentric[k];
+  }
+  hit.normal = world_normals_[reference.triangle];
+  hit.distance = length(skin_affine_point(previous_metric_,hit.position)-skin_affine_point(replacement_metric_,position));
+  return hit;
+}
+
+std::optional<SurfaceHit> detail::RetopoTransfer::match_patch(Vec3 position, Vec3 normal,
+    uint32_t face, std::array<float,3> weights, const TextureSetFaceDomain *source_domain) {
+  if (auto spatial = match(position,normal,source_domain)) return spatial;
+  return match_retained(position,normal,face,weights,source_domain);
 }
 RetopoWorkspace::RetopoWorkspace(const Scene &scene, const std::function<bool()> &cancelled) {
   const auto &active = scene.active();
@@ -411,40 +445,57 @@ bool same_patch_surface(const RetopoSurface &a, const RetopoSurface &b) {
          std::ranges::equal(a.mesh.positions, b.mesh.positions, same_position);
 }
 
-using StableTriangle = std::array<TopologyID,3>;
+bool same_rest_corners(const Mesh &a,const Mesh &b,const std::function<bool()> &cancelled) {
+  if (a.indices.size()!=b.indices.size()) return false;
+  for (size_t c=0;c<a.indices.size();++c) {
+    if ((c&1023)==0) stop(cancelled);
+    if (!same_position(a.positions[a.indices[c]],b.positions[b.indices[c]])) return false;
+  }
+  return true;
+}
 
-StableTriangle combine_corner_support(std::initializer_list<StableTriangle> corners) {
-  StableTriangle result{};
+using StableTriangle = std::array<TopologyID,3>;
+struct CornerParent { TopologyID vertex = 0; float weight = 0; };
+using CornerParents = std::array<CornerParent,3>;
+
+CornerParents combine_corner_support(std::initializer_list<CornerParents> corners) {
+  CornerParents result{};
   size_t used = 0;
   for (const auto &corner : corners) {
-    if (!corner[0]) return {};
-    for (auto id : corner) {
-      if (!id || std::ranges::find(result,id) != result.end()) continue;
-      if (used == result.size()) return {};
-      result[used++] = id;
+    if (!corner[0].vertex) return {};
+    for (const auto &parent : corner) {
+      if (!parent.vertex) continue;
+      const auto existing = std::ranges::find(result,parent.vertex,&CornerParent::vertex);
+      const auto weight = parent.weight / float(corners.size());
+      if (existing != result.end()) existing->weight += weight;
+      else {
+        if (used == result.size()) return {};
+        result[used++] = {parent.vertex,weight};
+      }
     }
   }
-  std::ranges::sort(std::span(result).first(used));
+  std::ranges::sort(std::span(result).first(used),{},&CornerParent::vertex);
   return result;
 }
 
-std::vector<uint32_t> match_patch_triangles(const RetopoSurface &before, const RetopoSurface &after,
-                                           const RetopoMesh &previous, const RetopoMesh &replacement,
-                                           const std::function<bool()> &cancelled) {
-  auto corners = [](const RetopoSurface &surface, size_t face) {
+std::vector<detail::RetopoCorrespondence> match_patch_triangles(const RetopoSurface &before,
+    const RetopoSurface &after, const RetopoMesh &previous, const RetopoMesh &replacement,
+    bool witnessed_order,
+    const std::function<bool()> &cancelled) {
+  const auto corners = [](const RetopoSurface &surface, size_t face) {
     StableTriangle ids;
     for (size_t k = 0; k < ids.size(); ++k)
       ids[k] = surface.source_vertices[surface.mesh.indices[face * 3 + k]];
-    std::ranges::sort(ids);
     return ids;
   };
+  const auto sorted = [](StableTriangle ids) { std::ranges::sort(ids); return ids; };
   // Stop at vertices in the preceding topology, even if they were created
   // by an earlier subdivision. Material correspondence is to that generation.
-  std::map<TopologyID,StableTriangle> midpoint_support;
-  const auto support = [&](TopologyID id) -> StableTriangle {
-    if (previous.vertices().contains(id)) return {id,0,0};
+  std::map<TopologyID,CornerParents> midpoint_support;
+  const auto support = [&](TopologyID id) -> CornerParents {
+    if (previous.vertices().contains(id)) return {{{id,1},{},{}}};
     const auto found = midpoint_support.find(id);
-    return found == midpoint_support.end() ? StableTriangle{} : found->second;
+    return found == midpoint_support.end() ? CornerParents{} : found->second;
   };
   for (const auto &[id,vertex] : replacement.vertices()) {
     stop(cancelled);
@@ -453,38 +504,52 @@ std::vector<uint32_t> match_patch_triangles(const RetopoSurface &before, const R
       midpoint_support.emplace(id,combine_corner_support({support(a),support(b)}));
   }
   std::map<StableTriangle,uint32_t> source_triangles;
-  std::vector<uint32_t> result(after.source_faces.size(), UINT32_MAX);
+  std::vector<detail::RetopoCorrespondence> result(after.source_faces.size());
   for (size_t i = 0; i < result.size(); ++i) {
     if ((i & 1023) == 0) stop(cancelled);
-    const auto ids = corners(after, i);
-    const auto original = midpoint_support.empty() ? StableTriangle{} :
-        combine_corner_support({support(ids[0]),support(ids[1]),support(ids[2])});
+    const auto new_corners = corners(after,i);
+    const auto ids = sorted(new_corners);
+    const std::array parents{support(new_corners[0]),support(new_corners[1]),support(new_corners[2])};
+    const auto combined = midpoint_support.empty() ? CornerParents{} :
+        combine_corner_support({parents[0],parents[1],parents[2]});
+    const StableTriangle original{combined[0].vertex,combined[1].vertex,combined[2].vertex};
     const auto face = after.source_faces[i];
+    auto &reference = result[i];
     for (auto parent : {face, replacement.faces().at(face).split_from}) {
       if (!parent) break;
       const auto candidates = std::ranges::equal_range(before.source_faces, parent);
       for (auto it = candidates.begin(); it != candidates.end(); ++it) {
         const auto candidate = size_t(it - before.source_faces.begin());
-        const auto old_corners = corners(before,candidate);
+        const auto old_corners = sorted(corners(before,candidate));
         if (old_corners == ids || old_corners == original) {
-          result[i] = uint32_t(candidate);
+          reference.triangle = uint32_t(candidate);
           break;
         }
       }
-      if (result[i] != UINT32_MAX) break;
+      if (reference.triangle != UINT32_MAX) break;
     }
-    if (result[i] != UINT32_MAX || !original[2]) continue;
-    if (source_triangles.empty()) {
-      for (size_t triangle = 0; triangle < before.source_faces.size(); ++triangle) {
-        if ((triangle & 1023) == 0) stop(cancelled);
-        const auto [position, inserted] = source_triangles.try_emplace(corners(before,triangle),uint32_t(triangle));
-        if (!inserted) position->second = UINT32_MAX;
+    if (reference.triangle == UINT32_MAX && original[2]) {
+      if (source_triangles.empty()) {
+        for (size_t triangle = 0; triangle < before.source_faces.size(); ++triangle) {
+          if ((triangle & 1023) == 0) stop(cancelled);
+          const auto [position, inserted] = source_triangles.try_emplace(sorted(corners(before,triangle)),uint32_t(triangle));
+          if (!inserted) position->second = UINT32_MAX;
+        }
+      }
+      if (const auto found = source_triangles.find(original); found != source_triangles.end()) {
+        if (found->second == UINT32_MAX) throw std::invalid_argument("Retopology subdivision has ambiguous material ancestry");
+        reference.triangle = found->second;
       }
     }
-    if (const auto found = source_triangles.find(original); found != source_triangles.end()) {
-      if (found->second == UINT32_MAX) throw std::invalid_argument("Retopology subdivision has ambiguous material ancestry");
-      result[i] = found->second;
+    if (reference.triangle == UINT32_MAX || !witnessed_order) continue;
+    const auto old_corners = corners(before,reference.triangle);
+    for (size_t c=0;c<3;++c) {
+      for (size_t k=0;k<3;++k) {
+        const auto ancestor = std::ranges::find(parents[c],old_corners[k],&CornerParent::vertex);
+        if (ancestor != parents[c].end()) reference.corners[c][k] = ancestor->weight;
+      }
     }
+    reference.witnessed = true;
   }
   return result;
 }
@@ -524,9 +589,29 @@ std::shared_ptr<DeformationState> transfer_patch_deformation(const DeformationSt
   }
   if (targets || before.skin) {
     size_t entries = result->resource_entries();
+    std::vector<uint32_t> retained_corners;
     for (size_t vertex = 0; vertex < vertices; ++vertex) {
       if ((vertex & 1023) == 0) stop(transfer.cancelled());
-      const auto hit = transfer.match(new_mesh.positions[vertex], new_mesh.normals[vertex]);
+      const auto position = new_mesh.positions[vertex], normal = new_mesh.normals[vertex];
+      auto hit = transfer.match(position,normal);
+      if (!hit) {
+        if (retained_corners.empty()) {
+          transfer.reserve(vertices,sizeof(uint32_t));
+          transfer.work(new_mesh.indices.size());
+          retained_corners.assign(vertices,UINT32_MAX);
+          for (size_t corner=0;corner<new_mesh.indices.size();++corner) {
+            if ((corner & 1023) == 0) stop(transfer.cancelled());
+            auto &first = retained_corners[new_mesh.indices[corner]];
+            if (first==UINT32_MAX && transfer.has_retained(uint32_t(corner/3))) first=uint32_t(corner);
+          }
+        }
+        const auto corner=retained_corners[vertex];
+        if (corner!=UINT32_MAX) {
+          std::array<float,3> weights{};
+          weights[corner%3]=1;
+          hit=transfer.match_retained(position,normal,corner/3,weights);
+        }
+      }
       if (!hit)
         throw std::invalid_argument("Some retopology vertices have no matching rest surface for weights or shapekeys");
       std::array<uint32_t,3> old;
@@ -616,14 +701,15 @@ public:
     std::shared_ptr<const TextureSetCollection> texture_sets;
   };
 
-  RetopoReplacement(std::shared_ptr<const PaintedMesh> grid, AffineTransform old_world,
+  RetopoReplacement(std::shared_ptr<const PaintedMesh> grid,const Mesh &original_rest,AffineTransform old_world,
                     AffineTransform new_world, std::span<const TopologyID> old_faces,
-                    std::span<const TopologyID> new_faces, std::vector<uint32_t> source_triangles,
+                    std::span<const TopologyID> new_faces, std::vector<detail::RetopoCorrespondence> correspondence,
                     const std::function<bool()> &cancelled)
       : budget_(cancelled), old_world_(old_world), new_world_(new_world), first_grid_(std::move(grid)),
-        old_faces_(old_faces), new_faces_(new_faces), source_triangles_(std::move(source_triangles)) {
+        original_rest_(original_rest),
+        old_faces_(old_faces), new_faces_(new_faces), correspondence_(std::move(correspondence)) {
     const auto resolution = first_grid_->resolution();
-    budget_.reserve(source_triangles_.size(), sizeof(uint32_t));
+    budget_.reserve(correspondence_.size(), sizeof(detail::RetopoCorrespondence));
     budget_.reserve(1, detail::TextureSetPaintAccess::working_bytes(*first_grid_, resolution));
     charge_raster(*first_grid_);
     grids_.emplace(resolution, first_grid_);
@@ -665,8 +751,9 @@ private:
   detail::RetopoTransferBudget budget_;
   AffineTransform old_world_, new_world_;
   std::shared_ptr<const PaintedMesh> first_grid_;
+  const Mesh &original_rest_;
   std::span<const TopologyID> old_faces_, new_faces_;
-  std::vector<uint32_t> source_triangles_;
+  std::vector<detail::RetopoCorrespondence> correspondence_;
   std::map<uint32_t,std::shared_ptr<const PaintedMesh>> grids_;
   std::map<const Mesh *,std::unique_ptr<detail::RetopoTransfer>> surfaces_;
   struct Paint {const PaintedMesh *source; std::shared_ptr<const PaintedMesh> projected;};
@@ -741,7 +828,7 @@ private:
     slots.reserve(mesh.indices.size() / 3);
     for (size_t c = 0; c < mesh.indices.size(); c += 3) {
       if ((c & 1023) == 0) stop(budget_.cancelled());
-      const auto old_triangle = source_triangles_[c / 3];
+      const auto old_triangle = correspondence_[c / 3].triangle;
       if (old_triangle != UINT32_MAX) {
         // A quad can carry two material slots. Its stable corners survive
         // reflection, reordering and movement across the old material seam.
@@ -795,7 +882,12 @@ private:
 
   detail::RetopoTransfer &query(const PaintedMesh &paint) {
     auto &surface = surfaces_[paint.mesh_owner().get()];
-    if (!surface) surface = std::make_unique<detail::RetopoTransfer>(paint.mesh(), old_world_, new_world_, budget_);
+    if (!surface) {
+      std::span<const detail::RetopoCorrespondence> retained;
+      if (&paint.mesh()==&original_rest_ || same_rest_corners(paint.mesh(),original_rest_,budget_.cancelled()))
+        retained=correspondence_;
+      surface=std::make_unique<detail::RetopoTransfer>(paint.mesh(),old_world_,new_world_,budget_,retained);
+    }
     return *surface;
   }
 
@@ -934,13 +1026,15 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
       texture_sets = previous.texture_sets;
     } else {
       const auto size = previous.painted->resolution();
-      auto source_triangles = match_patch_triangles(old_surface, triangles, original, patch->topology, cancelled);
+      const auto &old_rest = previous.painted->mesh();
+      auto correspondence = match_patch_triangles(old_surface,triangles,original,patch->topology,
+          same_rest_corners(old_surface.mesh,old_rest,cancelled),cancelled);
       unwrap(triangles.mesh, size, 4, cancelled);
       PaintSurfaceOptions options;
       options.cancelled = cancelled;
       auto grid = PaintedMesh::from_mesh(std::move(triangles.mesh), size, options);
-      replacement = std::make_unique<RetopoReplacement>(std::move(grid), old_world, new_world,
-          old_surface.source_faces, triangles.source_faces, std::move(source_triangles), cancelled);
+      replacement = std::make_unique<RetopoReplacement>(std::move(grid),old_rest,old_world,new_world,
+          old_surface.source_faces, triangles.source_faces, std::move(correspondence), cancelled);
       auto current = replacement->project(*previous.painted,previous.material,previous.deformation,previous.material_bindings,
                                           previous.texture_sets);
       painted = current.paint->snapshot();

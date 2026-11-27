@@ -3170,7 +3170,9 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &from
     if ((at & 1023) == 0) paint_compute::checkpoint(transfer.cancelled());
     const auto &texel = surface.texels[at];
     if (!texel.covered) continue;
-    const auto hit = transfer.match(texel.position, texel.normal, old_domain.get());
+    const auto &w = texel.bary;
+    const auto hit = transfer.match_patch(texel.position,texel.normal,texel.face,
+                                         {w[0],w[1],1-w[0]-w[1]},old_domain.get());
     if (!hit) continue;
     ++hits;
     std::array<float, 2> uv{};
@@ -3437,7 +3439,9 @@ std::shared_ptr<const SourceMaterialBindings> detail::TextureSetPaintAccess::rep
     transfer.work(1+roles.size());
     const auto &texel=surface.texels[index];
     if (!texel.covered && surface.padding[index]>=0) continue;
-    const auto hit=texel.covered ? transfer.match(texel.position,texel.normal,from.texture_set_domain_.get()) : std::nullopt;
+    const auto &w=texel.bary;
+    const auto hit=texel.covered ? transfer.match_patch(texel.position,texel.normal,texel.face,
+        {w[0],w[1],1-w[0]-w[1]},from.texture_set_domain_.get()) : std::nullopt;
     ToonUv uv{};
     if (hit) {
       ++hits;
@@ -3528,7 +3532,8 @@ std::shared_ptr<const detail::BakedNormalField> detail::TextureSetPaintAccess::r
     if ((index&1023)==0) paint_compute::checkpoint(transfer.cancelled());
     const auto &texel=surface.texels[index];
     if (!texel.covered) continue;
-    const auto hit=transfer.match(texel.position,texel.normal);
+    const auto &w=texel.bary;
+    const auto hit=transfer.match_patch(texel.position,texel.normal,texel.face,{w[0],w[1],1-w[0]-w[1]});
     if (!hit) continue;
     transfer.work(64);
     ++hits;
@@ -3541,7 +3546,6 @@ std::shared_ptr<const detail::BakedNormalField> detail::TextureSetPaintAccess::r
     }
     const auto &b=hit->barycentric;
     const auto sampled=source->sample(basis(source_columns,hit->triangle,{b[0],b[1],b[2]}),uv);
-    const auto &w=texel.bary;
     const auto target=basis(target_columns,texel.face,{w[0],w[1],1.-w[0]-w[1]});
     for (size_t role=0;role<sampled.size();++role) {
       const auto value=encode_normal_bake(target,sampled[role]);
