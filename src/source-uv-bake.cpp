@@ -40,6 +40,119 @@ struct Budget {
  void cancel()const{if(o.cancelled&&o.cancelled())throw std::runtime_error("Source UV bake cancelled");}
  void work(){if(++r.sample_operations>o.max_sample_operations)throw std::length_error("Source UV sampling budget exceeded");if((r.sample_operations&4095)==0)cancel();}
 };
+using RoleSampler=detail::SourceUvSampler;
+struct RasterImageRole { const PaintSourceTexture *view; bool srgb; };
+template<size_t N,class Visit>
+void sample_material_raster(const Mesh &mesh,const PaintSourceMaps &sources,const Raster &layout,
+    const std::array<RasterImageRole,N> &roles,const Budget &budget,Visit &&visit){
+ const auto limit=budget.o.max_working_bytes;
+ size_t retained_bytes=0;
+ auto charge=[&](size_t bytes){
+  if(retained_bytes>limit||bytes>limit-retained_bytes)
+   throw std::length_error("Portable source material exceeds raster sampling working budget");
+  retained_bytes+=bytes;
+ };
+ charge(layout.hits.capacity()*sizeof(Hit));
+ charge(layout.padding.capacity()*sizeof(int32_t));
+ size_t active=0,image_bytes=0,largest_image=0;
+ for(const auto &role:roles)if(role.view&&role.view->image){
+  role.view->validate(sources.coordinate_count());
+  ++active;
+  const auto bytes=role.view->image->rgba.size()+RoleSampler::table_bytes;
+  image_bytes+=bytes;
+  largest_image=std::max(largest_image,bytes);
+ }
+ const std::array<float,4> white{1,1,1,1};
+ std::array<std::array<float,4>,N> values;
+ values.fill(white);
+ if(!active){
+  for(size_t at=0;at<layout.padding.size();++at){
+   if((at&1023)==0)budget.cancel();
+   if(layout.padding[at]==int32_t(at))visit(at,values);
+  }
+  return;
+ }
+ constexpr auto coordinate_bytes=sizeof(RoleSampler::Coordinate);
+ constexpr auto color_bytes=4*sizeof(uint32_t);
+ const size_t host_bytes=sizeof(uint32_t)+coordinate_bytes+active*color_bytes;
+ const size_t device_bytes=coordinate_bytes+color_bytes;
+ const auto remaining=limit-retained_bytes;
+ const bool resident=active==1||(remaining>=image_bytes&&
+    (remaining-image_bytes)/(host_bytes+active*device_bytes)>=
+        std::min(layout.padding.size(),RoleSampler::max_batch));
+ charge(resident?image_bytes:largest_image);
+ const auto per_sample=host_bytes+(resident?active:1)*device_bytes;
+ const size_t capacity=std::min({layout.padding.size(),RoleSampler::max_batch,(limit-retained_bytes)/per_sample});
+ if(!capacity)throw std::length_error("Portable source material lacks sampler batch storage");
+ std::array<std::unique_ptr<RoleSampler>,N> samplers;
+ std::array<std::vector<uint32_t>,N> words;
+ const auto upload=[&](size_t role){
+  budget.cancel();
+  return detail::upload_source_uv_sampler(*roles[role].view,roles[role].srgb,RoleSampler::Output::LinearRgba,
+      capacity,RoleSampler::Transform::SourceAffine);
+ };
+ std::array<size_t,N> ordered{};
+ size_t count=0;
+ for(size_t role=0;role<N;++role)if(roles[role].view&&roles[role].view->image){
+  ordered[count++]=role;
+  words[role].resize(4*capacity);
+  if(resident)samplers[role]=upload(role);
+ }
+ const auto active_roles=std::span(ordered).first(count);
+ std::ranges::sort(active_roles,{},[&](size_t role){return roles[role].view->texcoord;});
+ std::vector<uint32_t> texels;
+ texels.reserve(capacity);
+ std::vector<RoleSampler::Coordinate> coordinates(capacity);
+ const auto flush=[&]{
+  if(texels.empty())return;
+  int previous_set=-1;
+  for(const auto role:active_roles){
+   budget.cancel();
+   const int set=roles[role].view->texcoord;
+   if(set!=previous_set){
+    for(size_t index=0;index<texels.size();++index){
+     const auto &hit=layout.hits[texels[index]];
+     const auto q=source_texture_uv(mesh,sources,set,hit.face,hit.bary);
+     coordinates[index]={q[0],q[1]};
+    }
+    previous_set=set;
+   }
+   if(!resident)samplers[role]=upload(role);
+   samplers[role]->read(std::span(coordinates).first(texels.size()),std::span(words[role]).first(4*texels.size()));
+   if(!resident)samplers[role].reset();
+  }
+  for(size_t index=0;index<texels.size();++index){
+   if((index&1023)==0)budget.cancel();
+   for(const auto role:active_roles)
+    for(size_t channel=0;channel<4;++channel)
+     values[role][channel]=std::bit_cast<float>(words[role][4*index+channel]);
+   visit(texels[index],values);
+  }
+  texels.clear();
+ };
+ for(size_t at=0;at<layout.padding.size();++at){
+  if((at&1023)==0)budget.cancel();
+  if(layout.padding[at]!=int32_t(at))continue;
+  texels.push_back(uint32_t(at));
+  if(texels.size()==capacity)flush();
+ }
+ flush();
+}
+template<class Visit>
+void visit_material_padding(const Raster &layout,const Budget &budget,Visit &&visit){
+ for(size_t at=0;at<layout.padding.size();++at){
+  if((at&1023)==0)budget.cancel();
+  const auto owner=layout.padding[at];
+  if(owner>=0&&size_t(owner)!=at)visit(at,size_t(owner));
+ }
+}
+detail::PaintOverlayValues material_overlay(const detail::PaintOverlayPacket &packet,uint32_t r,size_t at){
+ const auto x=uint32_t(at%r),y=uint32_t(at/r);
+ // Writable grids are power-of-two. Equal raster resolutions land on
+ // exact texel centers, so the other three bilinear taps have zero weight.
+ if(r==packet.resolution())return detail::sample_overlay_texel_values(packet,x,y,true);
+ return detail::sample_overlay_values(packet,(float(x)+.5f)/r,(float(y)+.5f)/r,true);
+}
 uint8_t byte(float x){return uint8_t(std::lround(std::clamp(x,0.f,1.f)*255));}
 std::array<float,2> uv(const Mesh&m,const std::vector<std::array<float,2>> *values,const Hit&h){std::array<float,2> q{};auto &v=values?*values:m.uv;for(int k=0;k<3;++k){auto p=v.at(m.indices.at(size_t(h.face)*3+k));q[0]+=p[0]*h.bary[k];q[1]+=p[1]*h.bary[k];}return q;}
 Vec3 normal(const Mesh&m,const Hit&h){Vec3 n;for(int k=0;k<3;++k)n+=m.normals[m.indices[size_t(h.face)*3+k]]*h.bary[k];if(length(n)<1e-10f)throw std::runtime_error("Source UV bake interpolates a zero normal");return normalized(n);}
@@ -597,7 +710,11 @@ SourcePaintBakeResult bake_source_paint(const SourceUvBakeInput &input,const Mat
  if(operations>=options.max_sample_operations)throw std::length_error("Portable source material exceeds sampling work budget");
  auto bounded=options;bounded.max_output_bytes-=bytes;bounded.max_sample_operations-=size_t(operations);
  if(!bounded.max_output_bytes)throw std::length_error("Portable source material lacks original-role output budget");
- SourcePaintBakeResult result;result.sampling=bake_source_uv(input,bounded);Budget budget{bounded,result.sampling};
+ SourcePaintBakeResult result;result.sampling=bake_source_uv(input,bounded);
+ const auto retained=result.sampling.image_bytes+result.sampling.layer_bytes+result.sampling.baked_bytes+bytes;
+ if(retained>=bounded.max_working_bytes)throw std::length_error("Portable source output exceeds raster working budget");
+ bounded.max_working_bytes-=retained;
+ Budget budget{bounded,result.sampling};
  auto layout=raster(input.target,r,false,true,budget);auto packet=detail::PaintOverlayFactory::capture(*input.paint,options.cancelled);
  auto maps=std::make_shared<TextureMaps>();auto roles=std::make_shared<PaintSourceMaps>(*result.sampling.maps);
  // A finite portable paint image has its own linear, clamped sampling. Original
@@ -606,9 +723,13 @@ SourcePaintBakeResult bake_source_paint(const SourceUvBakeInput &input,const Mat
  maps->source_maps=std::move(roles);
  for(auto *image:{&maps->color,&maps->metal_rough,&maps->emission,&maps->color_coverage,&maps->emission_coverage}){image->width=image->height=r;image->rgba.assign(pixels*4,0);}
  const PaintSourceMaps empty;const auto &source=input.paint->source_maps()?*input.paint->source_maps():empty;const auto &mesh=input.paint->mesh();
- for(size_t at=0;at<pixels;++at){if((at&1023)==0)budget.cancel();const auto owner=layout.padding[at];if(owner<0)continue;const auto &hit=layout.hits[size_t(owner)];
-  const float u=(float(size_t(owner)%r)+.5f)/r,v=(float(size_t(owner)/r)+.5f)/r;const auto overlay=detail::sample_overlay_values(*packet,u,v,true);
-  const auto base=sample_surface_texture(mesh,source,source.color,hit.face,hit.bary,true),orm=sample_surface_texture(mesh,source,source.metal_rough,hit.face,hit.bary,false),emission=sample_surface_texture(mesh,source,source.emission,hit.face,hit.bary,true),occlusion=sample_surface_texture(mesh,source,source.occlusion,hit.face,hit.bary,false);
+ const bool source_emission=material.emissive!=std::array<float,3>{};
+ const std::array roles_to_sample{RasterImageRole{&source.color,true},RasterImageRole{&source.metal_rough,false},
+     RasterImageRole{source_emission?&source.emission:nullptr,true},RasterImageRole{&source.occlusion,false}};
+ sample_material_raster(mesh,source,layout,roles_to_sample,budget,
+    [&](size_t at,const auto &samples){
+  const auto overlay=material_overlay(*packet,r,at);
+  const auto &[base,orm,emission,occlusion]=samples;
   std::array<float,4> colour;for(size_t k=0;k<4;++k)colour[k]=material.color[k]*base[k]*(1-overlay[3][0])+overlay[0][k];
   const float ao=(1-source.occlusion_strength*(1-occlusion[0]))*(1-overlay[1][3])+overlay[1][0];
   const std::array<float,4> combined{ao,material.roughness*orm[1]*(1-overlay[3][2])+overlay[1][1],material.metallic*orm[2]*(1-overlay[3][1])+overlay[1][2],1};
@@ -616,7 +737,11 @@ SourcePaintBakeResult bake_source_paint(const SourceUvBakeInput &input,const Mat
   for(size_t k=0;k<3;++k){const float glow=material.emissive[k]*emission[k]*(1-overlay[3][3])+overlay[2][k]+overlay[4][k];if(glow>1)throw std::invalid_argument("Portable source paint radiance exceeds byte material representation");maps->emission.rgba[at*4+k]=byte(linear_to_srgb(glow));}
   maps->emission.rgba[at*4+3]=maps->color_coverage.rgba[at*4+3]=maps->emission_coverage.rgba[at*4+3]=255;
   maps->color_coverage.rgba[at*4]=byte(overlay[3][0]);maps->emission_coverage.rgba[at*4]=byte(overlay[3][3]);maps->transparent|=colour[3]<.999f;
- }
+ });
+ visit_material_padding(layout,budget,[&](size_t at,size_t owner){
+  for(auto *image:{&maps->color,&maps->metal_rough,&maps->emission,&maps->color_coverage,&maps->emission_coverage})
+   std::copy_n(image->rgba.data()+4*owner,4,image->rgba.data()+4*at);
+ });
  result.sampling.image_bytes+=bytes;result.sampling.sample_operations+=size_t(operations);if(result.sampling.sample_operations>options.max_sample_operations)throw std::length_error("Portable source material exceeds cumulative sampling budget");
  auto adopted=adopt_source_uv_bake(result.sampling);
  if(adopted.material_bindings){
@@ -730,21 +855,24 @@ detail::SourcePaintPhysicalResult detail::bake_source_paint_physical(
  auto background=material.emissive;
  if(input.current_material&&input.current_material->physical_emission)
   background=*input.current_material->physical_emission;
- for(size_t at=0;at<pixels;++at){
-  if((at&1023)==0)budget.cancel();const auto owner=layout.padding[at];if(owner<0)continue;
-  const auto &hit=layout.hits[size_t(owner)];
-  const float u=(float(size_t(owner)%r)+.5f)/r,v=(float(size_t(owner)/r)+.5f)/r;
+ const std::array roles_to_sample{RasterImageRole{background!=std::array<float,3>{}?&source.emission:nullptr,true}};
+ sample_material_raster(input.paint->mesh(),source,layout,roles_to_sample,budget,
+    [&](size_t at,const auto &samples){
   // Filtering follows layer composition; coverage is float, independent of
   // the legacy byte plane. Source image coordinates/samplers are actual roles.
-  const auto overlay=detail::sample_overlay_values(*packet,u,v,true);
-  const auto image=sample_surface_texture(input.paint->mesh(),source,source.emission,hit.face,hit.bary,true);
+  const auto overlay=material_overlay(*packet,r,at);
+  const auto &image=samples[0];
   for(size_t k=0;k<3;++k){
    budget.work();const double value=double(background[k])*image[k]*(1-overlay[3][3])+overlay[2][k]+overlay[4][k];
    if(!std::isfinite(value)||value<0||value>30000)
     throw std::invalid_argument("Physical portable radiance is outside its actual finite range");
    radiance[at][k]=float(value);peak[k]=std::max(peak[k],float(value));
   }
- }
+ });
+ visit_material_padding(layout,budget,[&](size_t at,size_t owner){
+  for(size_t k=0;k<3;++k)budget.work();
+  radiance[at]=radiance[owner];
+ });
  result.strength=std::max({1.f,peak[0],peak[1],peak[2]});
  for(size_t k=0;k<3;++k)result.factor[k]=peak[k]/result.strength;
  result.emission={r,r,std::vector<uint8_t>(size_t(pixels)*4)};
