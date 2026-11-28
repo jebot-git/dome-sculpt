@@ -1,7 +1,7 @@
 #include "paint-overlay-packet.hpp"
 #include "emission-authority.hpp"
 #include "source-bake-normal.hpp"
-#include "bake-ambient-device.hpp"
+#include "bake-ray-device.hpp"
 #include "bake-ray-query.hpp"
 #include "bake-paint-coordinates.hpp"
 #include "emission-bake-source.hpp"
@@ -138,11 +138,11 @@ std::array<Vec3,256> ambient_pattern(uint32_t count) {
   }
   return directions;
 }
-detail::bake_ambient::Frame ambient_frame(Vec3 position,Vec3 normal,float bias) {
+detail::bake_rays::Frame ambient_frame(Vec3 position,Vec3 normal,float bias) {
   const auto tangent=normalized(cross(std::abs(normal.x)<.8f?Vec3{1,0,0}:Vec3{0,1,0},normal));
   return {position+normal*bias,tangent,cross(normal,tangent),normal};
 }
-#ifdef DOME_BAKE_AMBIENT_REFERENCE
+#ifdef DOME_BAKE_RAY_REFERENCE
 float ambient(const SurfaceQuery &query, Vec3 position, Vec3 normal,
     std::span<const Vec3> pattern,const BakeOptions &o,BakeResult &result) {
   const auto [origin,tangent,bitangent,axis]=ambient_frame(position,normal,o.ray_bias);
@@ -481,25 +481,26 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     std::fill_n(result.ambient_occlusion.rgba.data()+at*4,3,value);
     result.ambient_occlusion.rgba[at*4+3]=255;
   };
-#ifndef DOME_BAKE_AMBIENT_REFERENCE
-  namespace ambient_device=detail::bake_ambient;
-  std::unique_ptr<ambient_device::Query> ambient_query;
+#ifndef DOME_BAKE_RAY_REFERENCE
+  namespace device=detail::bake_rays;
+  std::unique_ptr<device::Query> device_query;
+  if(ray_projection||!ambient_samples.empty())
+    device_query=detail::BakeRayQuery::upload(*query,ambient_samples,o.ao_distance,ray_projection,o.cancelled);
   struct AmbientTexel { uint32_t index;float material_ao; };
   std::vector<AmbientTexel> ambient_texels;
-  std::vector<ambient_device::Frame> ambient_frames;
+  std::vector<device::Frame> ambient_frames;
   std::vector<uint16_t> ambient_counts;
   size_t ambient_capacity=0;
   if(!ambient_samples.empty()){
-    ambient_query=detail::BakeRayQuery::upload_ambient(*query,ambient_samples,o.ao_distance,o.cancelled);
-    ambient_capacity=std::min({pixels,ambient_device::max_texels_per_batch,
-                               ambient_device::max_rays_per_batch/ambient_samples.size()});
+    ambient_capacity=std::min({pixels,device::max_texels_per_batch,
+                               device::max_rays_per_batch/ambient_samples.size()});
     ambient_texels.reserve(ambient_capacity);
     ambient_frames.reserve(ambient_capacity);
     ambient_counts.resize(ambient_capacity);
   }
   auto flush_ambient=[&]{
     if(ambient_frames.empty())return;
-    ambient_query->count_blocked(ambient_frames,std::span(ambient_counts).first(ambient_frames.size()),o.cancelled);
+    device_query->count_blocked(ambient_frames,std::span(ambient_counts).first(ambient_frames.size()),o.cancelled);
     for(size_t i=0;i<ambient_frames.size();++i){
       const auto [at,material_ao]=ambient_texels[i];
       write_ambient(at,material_ao*(1-float(ambient_counts[i])/ambient_samples.size()));
@@ -508,10 +509,193 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     ambient_frames.clear();
   };
 #endif
+  auto shade=[&](size_t at,size_t triangle,const std::array<float,3> &bary,Vec3 normal,
+                 const TangentFrame &frame,const std::optional<SurfaceHit> &hit){
+    bool backface=false;
+    if(hit){
+      const auto first=size_t(hit->triangle)*3;
+      const auto a=source.mesh.positions[source.mesh.indices[first]],
+          b=source.mesh.positions[source.mesh.indices[first+1]],
+          c=source.mesh.positions[source.mesh.indices[first+2]];
+      auto facing=dot(cross(b-a,c-a),normal);
+      if(source_placement.reverse_winding)facing=-facing;
+      backface=facing<=0;
+    }
+    if (!hit||(!o.allow_backfaces&&backface)) { result.coverage[at]=3; ++result.missed; return; }
+    auto material_id=source.triangle_materials.empty()?0:source.triangle_materials[hit->triangle];
+    const auto &m=source.materials[material_id];
+    std::optional<detail::RetainedSourceBakeHit> retained;
+    if(retained_field(material_id))
+      retained=source_fields[material_id].sample(hit->triangle,hit->barycentric);
+    auto high_uv=source.mesh.uv.empty()?std::array<float,2>{}:texcoord(source.mesh,hit->triangle,hit->barycentric);
+    if(retained)high_uv=retained->paint_uv;
+    const auto paint_uv=detail::bake_paint_coordinates(source_normals.paint_domain().get(),
+        hit->triangle,hit->barycentric,high_uv);
+    auto channels=material(m,source.mesh,hit->triangle,hit->barycentric,paint_uv); auto high_normal=normalized(hit->normal);
+    if(float_emission){
+      if(retained&&retained->emission)emission[at]=*retained->emission;
+      else if(gpu_emission&&m.emission_batch){
+        pending.push_back({material_id,hit->triangle,uint32_t(at),hit->barycentric});
+        if(pending.size()==emission_capacity)flush_emission();
+      }else if(m.resolved_emission)emission[at]=m.resolved_emission(hit->triangle,hit->barycentric);
+      else emission[at]=channels.emission;
+    }
+    auto pbr_color=m.maps&&m.maps->overlay?material(m,source.mesh,hit->triangle,hit->barycentric,paint_uv,true).color:channels.color;
+    const bool resolved_source=m.maps&&!m.maps->pbr_color.rgba.empty();
+    if(o.separate_pbr_color&&resolved_source)pbr_color=sample(m.maps->pbr_color,paint_uv,false,true);
+    if(!source.colors.empty()){
+      std::array<float,4> tint{};for(int i=0;i<3;++i)for(int c=0;c<4;++c)tint[c]+=source.colors[source.mesh.indices[hit->triangle*3+i]][c]*hit->barycentric[i];
+      for(int c=0;c<4;++c){if(!o.separate_pbr_color)channels.color[c]*=tint[c];else if(!resolved_source)pbr_color[c]*=tint[c];}
+    }
+    if(retained)high_normal=retained->normal;
+    else if(!source_normals){
+    if (normal_image(m)&&m.normal_strength>0) {
+      TangentFrame tangent;
+      if (source.tangents.empty())
+        tangent = tangent_frame(source.mesh, high_frames, hit->triangle, hit->barycentric);
+      else {
+        auto supplied = basis(source.mesh,hit->triangle,high_normal,hit->barycentric,source.tangents);
+        tangent = {supplied.tangent, supplied.bitangent, supplied.normal};
+      }
+      auto sampled=sample(*normal_image(m),high_uv,m.repeat_uv,false);
+      auto detail=Vec3{(sampled[0]*2-1)*m.normal_strength,(sampled[1]*2-1)*m.normal_strength,sampled[2]*2-1};
+      detail=length(detail)>1e-8f?normalized(detail):Vec3{0,0,1};
+      high_normal=tangent.to_world(detail);
+    }
+    else if(m.maps && m.maps->source_maps && m.normal_strength>0){
+      const auto &raw=*m.maps->source_maps;
+      if(source.tangents.empty() || !raw.normal.image || raw.normal_scale==0)
+        high_normal=source_texture_normal(source.mesh,raw,hit->triangle,hit->barycentric,m.normal_strength);
+      else {
+        // Explicit imported frames remain authoritative; affine UV applies to
+        // the lookup, while the supplied XYZ/handedness defines its basis.
+        auto supplied=basis(source.mesh,hit->triangle,high_normal,hit->barycentric,source.tangents);
+        auto encoded=sample_surface_texture(source.mesh,raw,raw.normal,hit->triangle,hit->barycentric,false);
+        double scale=double(raw.normal_scale)*m.normal_strength;
+        double x=(encoded[0]*2-1)*scale,y=(encoded[1]*2-1)*scale,z=encoded[2]*2-1;
+        double size=std::hypot(x,y,z);
+        if(size>1e-20)high_normal=TangentFrame{supplied.tangent,supplied.bitangent,supplied.normal}.to_world(
+          {float(x/size),float(y/size),float(z/size)});
+      }
+    }
+    if(m.maps&&m.maps->source_only&&m.maps->overlay&&m.maps->baked_base&&
+       !m.maps->baked_base->maps.normal.rgba.empty()&&m.normal_strength>0){
+      // Filter decoded legacy RGB8 vectors premultiplied by the independent
+      // common coverage, through the same immutable padding owner as all
+      // other paint planes. The original normal keeps its role UV basis;
+      // canonical baked detail keeps current UV0 Mikk corner frames.
+      const auto &packet=*m.maps->overlay;const auto &baked=*m.maps->baked_base;
+      const auto r=packet.resolution();const float x=std::clamp(high_uv[0],0.f,1.f)*r-.5f,
+        y=std::clamp(high_uv[1],0.f,1.f)*r-.5f;
+      const int ix=int(std::floor(x)),iy=int(std::floor(y));const float fx=x-ix,fy=y-iy;
+      Vec3 sum;float coverage=0;
+      for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){
+        const auto owner=packet.padding()->at(size_t(std::clamp(iy+dy,0,int(r)-1))*r+size_t(std::clamp(ix+dx,0,int(r)-1)));
+        if(owner<0)continue;const size_t at=size_t(owner);
+        const float w=(dx?fx:1-fx)*(dy?fy:1-fy)*(baked.coverage.at(at)/255.f);
+        coverage+=w;const auto *q=baked.maps.normal.rgba.data()+at*4;
+        sum+=Vec3{q[0]/255.f*2-1,q[1]/255.f*2-1,q[2]/255.f*2-1}*w;
+      }
+      if(coverage>0){
+        const auto canonical=tangent_frame(source.mesh,high_frames,hit->triangle,hit->barycentric);
+        const auto baked_world=canonical.to_world(sum/coverage);
+        high_normal=normalized(high_normal*(1-coverage)+baked_world*coverage);
+      }
+    }
+    }
+    auto desired=source_normals?source_normals(hit->triangle,hit->barycentric):std::array<Vec3,2>{high_normal,high_normal};
+    if(source_normals)for(auto &direction:desired){if(!finite(direction)||length(direction)<1e-10f)throw std::invalid_argument("Source normal resolver returned a singular direction");direction=normalized(direction);}
+    high_normal=desired[0];Vec3 mapped;
+    if(!canonical_pair_error&&(!o.encode_target_normal||!dual_normal)&&source_normals&&length(desired[0]-desired[1])>1e-6f)
+      throw std::invalid_argument("Source PBR/MToon normals differ; enable genuine target normal preparation to retain both roles");
+    if(canonical_pair_error){
+      std::array<detail::NormalBakeVertex,3> columns;
+      for(size_t k=0;k<3;++k){
+        const auto corner=triangle*3+k,vertex=size_t(low.indices[corner]);
+        const auto &t=o.low_tangents.empty()?low_frames[corner]:o.low_tangents[vertex];
+        columns[k]=detail::normal_bake_vertex(low.normals[vertex],{t[0],t[1],t[2]},t[3],
+            detail::NormalVertexBitangent::RawCross);
+      }
+      const auto basis=detail::normal_bake_basis(columns,{bary[0],bary[1],bary[2]},detail::NormalFragmentBasis::RawColumns);
+      const std::array outputs{&result.normal,&result.maps.mtoon_normal};
+      for(size_t role=0;role<outputs.size();++role){
+        const auto encoded=detail::encode_normal_bake(basis,desired[role]);
+        if(!encoded||encoded->quantized_angle_radians>*canonical_pair_error)
+          throw std::invalid_argument("Projected normal exceeds the writable Mikk basis conditioning or quantization limit");
+        std::copy_n(encoded->rgba.begin(),4,outputs[role]->rgba.data()+at*4);
+      }
+    }else if(o.encode_target_normal){
+      const auto pbr=o.encode_target_normal(uint32_t(triangle),bary,desired[0]);
+      if(pbr[0][3]!=255)throw std::invalid_argument("Explicit target normal encoder returned malformed normal data alpha");
+      std::copy_n(pbr[0].begin(),4,result.normal.rgba.data()+at*4);
+      if(o.normal_y_down)result.normal.rgba[at*4+1]=255-result.normal.rgba[at*4+1];
+      if(dual_normal){
+        const auto toon=source_normals?o.encode_target_normal(uint32_t(triangle),bary,desired[1]):pbr;
+        if(toon[1][3]!=255)throw std::invalid_argument("Explicit target normal encoder returned malformed normal data alpha");
+        std::copy_n(toon[1].begin(),4,result.maps.mtoon_normal.rgba.data()+at*4);
+        if(o.normal_y_down)result.maps.mtoon_normal.rgba[at*4+1]=255-result.maps.mtoon_normal.rgba[at*4+1];
+      }
+    }else mapped=frame.to_tangent(high_normal);
+    if (o.normal_y_down) mapped.y=-mapped.y;
+#ifdef DOME_BAKE_RAY_REFERENCE
+    const float occlusion=ambient_samples.empty()?1:
+        ambient(*query,hit->position,normalized(hit->normal),ambient_samples,o,result);
+    write_ambient(at,channels.ao*occlusion);
+#else
+    if(!ambient_samples.empty()){
+      if(ambient_samples.size()>o.max_rays-result.rays)throw std::length_error("Bake ray budget exceeded");
+      result.rays+=ambient_samples.size();
+      ambient_texels.push_back({uint32_t(at),channels.ao});
+      ambient_frames.push_back(ambient_frame(hit->position,normalized(hit->normal),o.ray_bias));
+      if(ambient_frames.size()==ambient_capacity)flush_ambient();
+    }else write_ambient(at,channels.ao);
+#endif
+    for (int c=0;c<3;++c) {
+      result.maps.color.rgba[at*4+c]=byte(linear_to_srgb(channels.color[c]));
+      if(!float_emission)result.maps.emission.rgba[at*4+c]=byte(linear_to_srgb(channels.emission[c]));
+    }
+    result.maps.color.rgba[at*4+3]=byte(channels.color[3]);
+    if(o.separate_pbr_color)for(int c=0;c<4;++c)result.maps.pbr_color.rgba[at*4+c]=byte(c<3?linear_to_srgb(pbr_color[c]):pbr_color[c]);
+    if(!float_emission)result.maps.emission.rgba[at*4+3]=255;
+    result.maps.metal_rough.rgba[at*4+1]=byte(channels.roughness);
+    result.maps.metal_rough.rgba[at*4+2]=byte(channels.metallic); result.maps.metal_rough.rgba[at*4+3]=255;
+    if(!o.encode_target_normal&&!canonical_pair_error){result.normal.rgba[at*4]=byte(mapped.x*.5f+.5f);result.normal.rgba[at*4+1]=byte(mapped.y*.5f+.5f);
+      result.normal.rgba[at*4+2]=byte(mapped.z*.5f+.5f);result.normal.rgba[at*4+3]=255;}
+    result.maps.transparent|=channels.color[3]<.9999f;
+    result.coverage[at]=1; ++result.projected;
+  };
+#ifndef DOME_BAKE_RAY_REFERENCE
+  struct ProjectionTexel {
+    uint32_t index,triangle;
+    std::array<float,3> bary;
+    Vec3 normal;
+    TangentFrame frame;
+  };
+  const auto projection_capacity=ray_projection?std::min(pixels,device::projection_batch_capacity):0;
+  std::vector<device::ProjectionRay> projection_rays;
+  std::vector<device::ProjectionHit> projection_hits(projection_capacity);
+  std::vector<ProjectionTexel> projection_texels;
+  projection_rays.reserve(projection_capacity);
+  projection_texels.reserve(projection_capacity);
+  auto flush_projection=[&]{
+    if(projection_rays.empty())return;
+    device_query->project(projection_rays,std::span(projection_hits).first(projection_rays.size()),
+                          uint32_t(SurfaceQueryOptions{}.max_triangle_tests),o.cancelled);
+    for(size_t i=0;i<projection_texels.size();++i){
+      if(i%64==0)cancel(o);
+      const auto &[at,triangle,bary,normal,frame]=projection_texels[i];
+      shade(at,triangle,bary,normal,frame,detail::BakeRayQuery::resolve(*query,projection_hits[i]));
+    }
+    projection_rays.clear();
+    projection_texels.clear();
+  };
+#endif
   std::vector<uint32_t> owner(pixels,UINT32_MAX);
   const size_t triangle_count=target_triangles.empty()?low.indices.size()/3:target_triangles.size();
+#ifdef DOME_BAKE_RAY_REFERENCE
   SurfaceQueryOptions ray_options;
   ray_options.cancelled=o.cancelled;
+#endif
   for (size_t face=0;face<triangle_count;++face) {
     const size_t triangle=target_triangles.empty()?face:target_triangles[face];
     const double rounding_radius=ray_projection?
@@ -565,8 +749,16 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
         const float front=length(offset);
         const auto direction=front>1e-8f?offset/front:normal;
         if(++result.rays>o.max_rays)throw std::length_error("Bake ray budget exceeded");
+#ifdef DOME_BAKE_RAY_REFERENCE
         hit=detail::BakeRayQuery::cast(*query,position+offset,direction*-1,front+o.back_distance,
                                        rounding_radius,ray_options);
+#else
+        projection_rays.push_back(detail::BakeRayQuery::projection_ray(position+offset,direction*-1,
+                                  front+o.back_distance,rounding_radius));
+        projection_texels.push_back({uint32_t(at),uint32_t(triangle),bary,normal,frame});
+        if(projection_rays.size()==projection_capacity)flush_projection();
+        continue;
+#endif
       }else{
         std::array<float,3> mapped{};
         for(int k=0;k<3;++k)for(int c=0;c<3;++c)mapped[c]+=bary[k]*o.source_corner_barycentrics[triangle*3+k][c];
@@ -574,166 +766,18 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
         hit=SurfaceHit{source_triangle,interpolate(source.mesh,source_triangle,mapped,false),
                        interpolate(source.mesh,source_triangle,mapped,true),mapped,0};
       }
-      bool backface=false;
-      if(hit){
-        const auto first=size_t(hit->triangle)*3;
-        const auto a=source.mesh.positions[source.mesh.indices[first]],
-            b=source.mesh.positions[source.mesh.indices[first+1]],
-            c=source.mesh.positions[source.mesh.indices[first+2]];
-        auto facing=dot(cross(b-a,c-a),normal);
-        if(source_placement.reverse_winding)facing=-facing;
-        backface=facing<=0;
-      }
-      if (!hit||(!o.allow_backfaces&&backface)) { result.coverage[at]=3; ++result.missed; continue; }
-      auto material_id=source.triangle_materials.empty()?0:source.triangle_materials[hit->triangle];
-      const auto &m=source.materials[material_id];
-      std::optional<detail::RetainedSourceBakeHit> retained;
-      if(retained_field(material_id))
-        retained=source_fields[material_id].sample(hit->triangle,hit->barycentric);
-      auto high_uv=source.mesh.uv.empty()?std::array<float,2>{}:texcoord(source.mesh,hit->triangle,hit->barycentric);
-      if(retained)high_uv=retained->paint_uv;
-      const auto paint_uv=detail::bake_paint_coordinates(source_normals.paint_domain().get(),
-          hit->triangle,hit->barycentric,high_uv);
-      auto channels=material(m,source.mesh,hit->triangle,hit->barycentric,paint_uv); auto high_normal=normalized(hit->normal);
-      if(float_emission){
-        if(retained&&retained->emission)emission[at]=*retained->emission;
-        else if(gpu_emission&&m.emission_batch){
-          pending.push_back({material_id,hit->triangle,uint32_t(at),hit->barycentric});
-          if(pending.size()==emission_capacity)flush_emission();
-        }else if(m.resolved_emission)emission[at]=m.resolved_emission(hit->triangle,hit->barycentric);
-        else emission[at]=channels.emission;
-      }
-      auto pbr_color=m.maps&&m.maps->overlay?material(m,source.mesh,hit->triangle,hit->barycentric,paint_uv,true).color:channels.color;
-      const bool resolved_source=m.maps&&!m.maps->pbr_color.rgba.empty();
-      if(o.separate_pbr_color&&resolved_source)pbr_color=sample(m.maps->pbr_color,paint_uv,false,true);
-      if(!source.colors.empty()){
-        std::array<float,4> tint{};for(int i=0;i<3;++i)for(int c=0;c<4;++c)tint[c]+=source.colors[source.mesh.indices[hit->triangle*3+i]][c]*hit->barycentric[i];
-        for(int c=0;c<4;++c){if(!o.separate_pbr_color)channels.color[c]*=tint[c];else if(!resolved_source)pbr_color[c]*=tint[c];}
-      }
-      if(retained)high_normal=retained->normal;
-      else if(!source_normals){
-      if (normal_image(m)&&m.normal_strength>0) {
-        TangentFrame tangent;
-        if (source.tangents.empty())
-          tangent = tangent_frame(source.mesh, high_frames, hit->triangle, hit->barycentric);
-        else {
-          auto supplied = basis(source.mesh,hit->triangle,high_normal,hit->barycentric,source.tangents);
-          tangent = {supplied.tangent, supplied.bitangent, supplied.normal};
-        }
-        auto sampled=sample(*normal_image(m),high_uv,m.repeat_uv,false);
-        auto detail=Vec3{(sampled[0]*2-1)*m.normal_strength,(sampled[1]*2-1)*m.normal_strength,sampled[2]*2-1};
-        detail=length(detail)>1e-8f?normalized(detail):Vec3{0,0,1};
-        high_normal=tangent.to_world(detail);
-      }
-      else if(m.maps && m.maps->source_maps && m.normal_strength>0){
-        const auto &raw=*m.maps->source_maps;
-        if(source.tangents.empty() || !raw.normal.image || raw.normal_scale==0)
-          high_normal=source_texture_normal(source.mesh,raw,hit->triangle,hit->barycentric,m.normal_strength);
-        else {
-          // Explicit imported frames remain authoritative; affine UV applies to
-          // the lookup, while the supplied XYZ/handedness defines its basis.
-          auto supplied=basis(source.mesh,hit->triangle,high_normal,hit->barycentric,source.tangents);
-          auto encoded=sample_surface_texture(source.mesh,raw,raw.normal,hit->triangle,hit->barycentric,false);
-          double scale=double(raw.normal_scale)*m.normal_strength;
-          double x=(encoded[0]*2-1)*scale,y=(encoded[1]*2-1)*scale,z=encoded[2]*2-1;
-          double size=std::hypot(x,y,z);
-          if(size>1e-20)high_normal=TangentFrame{supplied.tangent,supplied.bitangent,supplied.normal}.to_world(
-            {float(x/size),float(y/size),float(z/size)});
-        }
-      }
-      if(m.maps&&m.maps->source_only&&m.maps->overlay&&m.maps->baked_base&&
-         !m.maps->baked_base->maps.normal.rgba.empty()&&m.normal_strength>0){
-        // Filter decoded legacy RGB8 vectors premultiplied by the independent
-        // common coverage, through the same immutable padding owner as all
-        // other paint planes. The original normal keeps its role UV basis;
-        // canonical baked detail keeps current UV0 Mikk corner frames.
-        const auto &packet=*m.maps->overlay;const auto &baked=*m.maps->baked_base;
-        const auto r=packet.resolution();const float x=std::clamp(high_uv[0],0.f,1.f)*r-.5f,
-          y=std::clamp(high_uv[1],0.f,1.f)*r-.5f;
-        const int ix=int(std::floor(x)),iy=int(std::floor(y));const float fx=x-ix,fy=y-iy;
-        Vec3 sum;float coverage=0;
-        for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){
-          const auto owner=packet.padding()->at(size_t(std::clamp(iy+dy,0,int(r)-1))*r+size_t(std::clamp(ix+dx,0,int(r)-1)));
-          if(owner<0)continue;const size_t at=size_t(owner);
-          const float w=(dx?fx:1-fx)*(dy?fy:1-fy)*(baked.coverage.at(at)/255.f);
-          coverage+=w;const auto *q=baked.maps.normal.rgba.data()+at*4;
-          sum+=Vec3{q[0]/255.f*2-1,q[1]/255.f*2-1,q[2]/255.f*2-1}*w;
-        }
-        if(coverage>0){
-          const auto canonical=tangent_frame(source.mesh,high_frames,hit->triangle,hit->barycentric);
-          const auto baked_world=canonical.to_world(sum/coverage);
-          high_normal=normalized(high_normal*(1-coverage)+baked_world*coverage);
-        }
-      }
-      }
-      auto desired=source_normals?source_normals(hit->triangle,hit->barycentric):std::array<Vec3,2>{high_normal,high_normal};
-      if(source_normals)for(auto &direction:desired){if(!finite(direction)||length(direction)<1e-10f)throw std::invalid_argument("Source normal resolver returned a singular direction");direction=normalized(direction);}
-      high_normal=desired[0];Vec3 mapped;
-      if(!canonical_pair_error&&(!o.encode_target_normal||!dual_normal)&&source_normals&&length(desired[0]-desired[1])>1e-6f)
-        throw std::invalid_argument("Source PBR/MToon normals differ; enable genuine target normal preparation to retain both roles");
-      if(canonical_pair_error){
-        std::array<detail::NormalBakeVertex,3> columns;
-        for(size_t k=0;k<3;++k){
-          const auto corner=triangle*3+k,vertex=size_t(low.indices[corner]);
-          const auto &t=o.low_tangents.empty()?low_frames[corner]:o.low_tangents[vertex];
-          columns[k]=detail::normal_bake_vertex(low.normals[vertex],{t[0],t[1],t[2]},t[3],
-              detail::NormalVertexBitangent::RawCross);
-        }
-        const auto basis=detail::normal_bake_basis(columns,{bary[0],bary[1],bary[2]},detail::NormalFragmentBasis::RawColumns);
-        const std::array outputs{&result.normal,&result.maps.mtoon_normal};
-        for(size_t role=0;role<outputs.size();++role){
-          const auto encoded=detail::encode_normal_bake(basis,desired[role]);
-          if(!encoded||encoded->quantized_angle_radians>*canonical_pair_error)
-            throw std::invalid_argument("Projected normal exceeds the writable Mikk basis conditioning or quantization limit");
-          std::copy_n(encoded->rgba.begin(),4,outputs[role]->rgba.data()+at*4);
-        }
-      }else if(o.encode_target_normal){
-        const auto pbr=o.encode_target_normal(uint32_t(triangle),bary,desired[0]);
-        if(pbr[0][3]!=255)throw std::invalid_argument("Explicit target normal encoder returned malformed normal data alpha");
-        std::copy_n(pbr[0].begin(),4,result.normal.rgba.data()+at*4);
-        if(o.normal_y_down)result.normal.rgba[at*4+1]=255-result.normal.rgba[at*4+1];
-        if(dual_normal){
-          const auto toon=source_normals?o.encode_target_normal(uint32_t(triangle),bary,desired[1]):pbr;
-          if(toon[1][3]!=255)throw std::invalid_argument("Explicit target normal encoder returned malformed normal data alpha");
-          std::copy_n(toon[1].begin(),4,result.maps.mtoon_normal.rgba.data()+at*4);
-          if(o.normal_y_down)result.maps.mtoon_normal.rgba[at*4+1]=255-result.maps.mtoon_normal.rgba[at*4+1];
-        }
-      }else mapped=frame.to_tangent(high_normal);
-      if (o.normal_y_down) mapped.y=-mapped.y;
-#ifdef DOME_BAKE_AMBIENT_REFERENCE
-      const float occlusion=ambient_samples.empty()?1:
-          ambient(*query,hit->position,normalized(hit->normal),ambient_samples,o,result);
-      write_ambient(at,channels.ao*occlusion);
-#else
-      if(ambient_query){
-        if(ambient_samples.size()>o.max_rays-result.rays)throw std::length_error("Bake ray budget exceeded");
-        result.rays+=ambient_samples.size();
-        ambient_texels.push_back({uint32_t(at),channels.ao});
-        ambient_frames.push_back(ambient_frame(hit->position,normalized(hit->normal),o.ray_bias));
-        if(ambient_frames.size()==ambient_capacity)flush_ambient();
-      }else write_ambient(at,channels.ao);
-#endif
-      for (int c=0;c<3;++c) {
-        result.maps.color.rgba[at*4+c]=byte(linear_to_srgb(channels.color[c]));
-        if(!float_emission)result.maps.emission.rgba[at*4+c]=byte(linear_to_srgb(channels.emission[c]));
-      }
-      result.maps.color.rgba[at*4+3]=byte(channels.color[3]);
-      if(o.separate_pbr_color)for(int c=0;c<4;++c)result.maps.pbr_color.rgba[at*4+c]=byte(c<3?linear_to_srgb(pbr_color[c]):pbr_color[c]);
-      if(!float_emission)result.maps.emission.rgba[at*4+3]=255;
-      result.maps.metal_rough.rgba[at*4+1]=byte(channels.roughness);
-      result.maps.metal_rough.rgba[at*4+2]=byte(channels.metallic); result.maps.metal_rough.rgba[at*4+3]=255;
-      if(!o.encode_target_normal&&!canonical_pair_error){result.normal.rgba[at*4]=byte(mapped.x*.5f+.5f);result.normal.rgba[at*4+1]=byte(mapped.y*.5f+.5f);
-        result.normal.rgba[at*4+2]=byte(mapped.z*.5f+.5f);result.normal.rgba[at*4+3]=255;}
-      result.maps.transparent|=channels.color[3]<.9999f;
-      result.coverage[at]=1; ++result.projected;
+      shade(at,triangle,bary,normal,frame,hit);
     }
   }
+#ifndef DOME_BAKE_RAY_REFERENCE
+  flush_projection();
+#endif
   if (result.overlapping&&o.fail_on_overlap) throw std::runtime_error("Overlapping low UV coverage: "+std::to_string(result.overlapping)+" texels");
   if (result.missed&&o.fail_on_miss) throw std::runtime_error("Projection missed "+std::to_string(result.missed)+" low UV texels");
   if (!result.projected) throw std::runtime_error("No low UV texels projected onto the high source");
-#ifndef DOME_BAKE_AMBIENT_REFERENCE
+#ifndef DOME_BAKE_RAY_REFERENCE
   flush_ambient();
-  ambient_query.reset();
+  device_query.reset();
 #endif
   flush_emission();
   resident_sampler.reset();

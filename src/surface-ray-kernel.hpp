@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "dome/math.hpp"
+#include <bit>
 #include <cfloat>
 
 #if defined(__CUDACC__) || defined(__HIPCC__)
@@ -19,6 +20,14 @@ static_assert(double(parallel_limit)<1e-20);
 struct NativePrecision {
   using Scalar=double;
   static constexpr Scalar finite_max=DBL_MAX;
+  DOME_RAY_INLINE static Scalar from_bits(uint64_t bits){
+#if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
+    return __longlong_as_double(static_cast<long long>(bits));
+#else
+    return std::bit_cast<double>(bits);
+#endif
+  }
+  DOME_RAY_INLINE static float narrow(Scalar value){return float(value);}
 };
 
 template<class Real>
@@ -83,6 +92,70 @@ public:
     if(!(distance>=zero&&distance<=maximum&&distance<=limit))return false;
     result={distance,u,v,w,det};
     return true;
+  }
+};
+
+template<class Real> struct EdgeHit {
+  Real separation2,distance,weight;
+};
+
+template<class Precision> class BoundaryRay {
+  using Real=typename Precision::Scalar;
+  Vec3 origin_;
+  Real axis_[3],inverse_length2_,maximum_;
+
+  DOME_RAY_INLINE static void difference(Vec3 a,Vec3 b,Real (&delta)[3]){
+    delta[0]=Real(a.x)-Real(b.x);
+    delta[1]=Real(a.y)-Real(b.y);
+    delta[2]=Real(a.z)-Real(b.z);
+  }
+  DOME_RAY_INLINE static Real dot(const Real (&a)[3],const Real (&b)[3]){
+    return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+  }
+
+public:
+  DOME_RAY_INLINE BoundaryRay(Vec3 origin,Vec3 direction,Real maximum)
+      :origin_(origin),axis_{Real(direction.x),Real(direction.y),Real(direction.z)},
+       inverse_length2_(Real(1.f)/dot(axis_,axis_)),maximum_(maximum){}
+
+  DOME_RAY_INLINE bool nearest_edge(Vec3 a,Vec3 b,EdgeHit<Real> &hit) const {
+    Real start[3],edge[3];
+    difference(a,origin_,start);difference(b,a,edge);
+    const Real start_depth=dot(start,axis_)*inverse_length2_;
+    const Real depth_step=dot(edge,axis_)*inverse_length2_;
+    const Real zero(0.f);
+    Real lo=zero,hi(1.f);
+    if(!(depth_step==zero)){
+      Real first=-start_depth/depth_step,last=(maximum_-start_depth)/depth_step;
+      if(first>last){const Real saved=first;first=last;last=saved;}
+      if(first>lo)lo=first;
+      if(last<hi)hi=last;
+      if(lo>hi)return false;
+    }else if(start_depth<zero||start_depth>maximum_)return false;
+
+    Real across[3],across_step[3];
+    for(int k=0;k<3;++k){
+      across[k]=start[k]-start_depth*axis_[k];
+      across_step[k]=edge[k]-depth_step*axis_[k];
+    }
+    const Real square=dot(across_step,across_step);
+    Real weight=depth_step<zero?hi:lo;
+    if(square>zero){
+      const Real nearest=-dot(across,across_step)/square;
+      weight=nearest<lo?lo:nearest>hi?hi:nearest;
+    }
+    const Real depth=start_depth+weight*depth_step;
+    if(depth<zero||depth>maximum_)return false;
+    for(int k=0;k<3;++k)across[k]=across[k]+weight*across_step[k];
+    hit={dot(across,across),depth,weight};
+    return true;
+  }
+
+  DOME_RAY_INLINE static Vec3 position(Vec3 a,Vec3 b,Real weight) {
+    Real edge[3];difference(b,a,edge);
+    return {Precision::narrow(Real(a.x)+weight*edge[0]),
+            Precision::narrow(Real(a.y)+weight*edge[1]),
+            Precision::narrow(Real(a.z)+weight*edge[2])};
   }
 };
 } // namespace dome::detail::surface_ray

@@ -83,9 +83,21 @@ binary64 for the watertight test. Native Wayland and synthetic OpenXR qualify
 Bake and Save on Arc. Three paired 512² runs saved identical projects and
 reduced median Bake time from 7.10 to 5.51 seconds. The cold 128² fixture
 took 2.57 seconds with device startup and 0.47 seconds on the preceding
-revision. Surface projection and its edge recovery still use the native
-host query.
+revision.
 [GPU ambient occlusion evidence](validation/bake-ambient-gpu-20261128.json)
+
+Bake projection and its bounded edge recovery now share that resident source
+BVH on the selected GPU. Exact hits keep the original depth and traversal
+order. Only misses can recover an edge, within the same finite segment and
+triangle-test budget. The device returns the source triangle, barycentrics,
+hit position and distance for the existing native material resolver. The
+oneAPI module for edge recovery compiles only when needed. An oblique
+corpus matches 8,192 host results bit for bit after correcting the device
+division, including 1,458 recovered edges. The byte-identical 1024² fixture
+takes about 0.57 seconds after GPU startup and 4.96 seconds on its first Bake.
+The preceding host projection takes about 0.56 seconds. Target rasterization,
+cage construction and material resolution still run on the host.
+[GPU Bake projection evidence](validation/bake-projection-gpu-20261128.json)
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing

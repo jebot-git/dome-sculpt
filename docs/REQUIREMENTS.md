@@ -11,9 +11,15 @@ across the remaining workflows still require qualification.
 Bake traces ambient occlusion on the selected GPU through the native
 source BVH. It preserves the original biased cosine hemisphere, inclusive
 ray distance and ordered native output. Continuation batches poll for
-cancellation and read back blocked-ray counts. Ordinary projection and its
-bounded edge recovery still use the native host query.
+cancellation and read back blocked-ray counts.
 [GPU ambient occlusion evidence](validation/bake-ambient-gpu-20261128.json)
+
+Ordinary and cage-based Bake projection use the same device-resident index.
+The watertight ray and edge recovery preserve native triangle order, finite
+front and back bounds, their shared per-ray budget and the original tie
+rules. Projection returns bounded hit batches. Material resolution and
+construction of the published Bake fields remain on the host.
+[GPU Bake projection evidence](validation/bake-projection-gpu-20261128.json)
 
 Eligible 512–2048 current-grid RGB8 Bake materials now composite color, ORM
 and legacy emission on the selected GPU. Their ordered paint, coverage,

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/mesh-processing.hpp"
 #include "bake-ray-query.hpp"
-#include "bake-ambient-device.hpp"
+#include "bake-ray-device.hpp"
 #include "surface-ray-kernel.hpp"
 #include "affine-query-metric.hpp"
 #include "packed-material-query.hpp"
@@ -16,6 +16,14 @@ namespace {
 void cancel(const std::function<bool()> &fn) {
   if (fn && fn())
     throw std::runtime_error("Mesh processing cancelled");
+}
+Vec3 checked_ray_direction(Vec3 origin,Vec3 direction,float maximum){
+  const float magnitude=length(direction);
+  if(!finite(origin)||!finite(direction)||!std::isfinite(magnitude)||magnitude<1e-12f||
+     std::max({std::abs(origin.x),std::abs(origin.y),std::abs(origin.z)})>1000||
+     !std::isfinite(maximum)||maximum<0||maximum>1000)
+    throw std::invalid_argument("Invalid surface ray");
+  return normalized(direction);
 }
 uint32_t bits(float f) { return f == 0 ? 0 : std::bit_cast<uint32_t>(f); }
 using PointKey = std::array<uint32_t, 3>;
@@ -133,46 +141,14 @@ PrecisePoint precise_cross(const PrecisePoint &a, const PrecisePoint &b) {
 }
 struct BoundaryRay {
   Vec3 origin,direction;
-  PrecisePoint axis;
-  double inverse_length2,maximum,radius;
+  double maximum,radius;
+  detail::surface_ray::BoundaryRay<detail::surface_ray::NativePrecision> metric;
   BoundaryRay(Vec3 p,Vec3 d,double distance,double tolerance)
-      : origin(p),direction(d),axis{d.x,d.y,d.z},
-        inverse_length2(1/precise_dot(axis,axis)),maximum(distance),radius(tolerance) {}
-
-  struct Point {
-    Vec3 position;
-    double separation2=INFINITY,distance=INFINITY;
-    double weight=0;
-  };
-  Point nearest_edge(Vec3 a,Vec3 b) const {
-    const auto start=difference(a,origin),edge=difference(b,a);
-    const double start_depth=precise_dot(start,axis)*inverse_length2;
-    const double depth_step=precise_dot(edge,axis)*inverse_length2;
-    double lo=0,hi=1;
-    if(depth_step!=0){
-      double first=-start_depth/depth_step,last=(maximum-start_depth)/depth_step;
-      if(first>last)std::swap(first,last);
-      lo=std::max(lo,first);hi=std::min(hi,last);
-      if(lo>hi)return {};
-    }else if(start_depth<0||start_depth>maximum)return {};
-
-    PrecisePoint across,across_step;
-    for(size_t k=0;k<3;++k){
-      across[k]=start[k]-start_depth*axis[k];
-      across_step[k]=edge[k]-depth_step*axis[k];
-    }
-    const double square=precise_dot(across_step,across_step);
-    const double w=square>0?std::clamp(-precise_dot(across,across_step)/square,lo,hi):
-                           depth_step<0?hi:lo;
-    const double depth=start_depth+w*depth_step;
-    if(depth<0||depth>maximum)return {};
-    for(size_t k=0;k<3;++k)across[k]+=w*across_step[k];
-    return {{float(double(a.x)+w*edge[0]),float(double(a.y)+w*edge[1]),float(double(a.z)+w*edge[2])},
-            precise_dot(across,across),depth,w};
-  }
+      :origin(p),direction(d),maximum(distance),radius(tolerance),metric(p,d,distance){}
 };
 struct BoundaryHit {
-  BoundaryRay::Point point;
+  Vec3 position;
+  double separation2=INFINITY,distance=INFINITY;
   uint32_t triangle=UINT32_MAX;
   std::array<float,3> bary{};
 };
@@ -382,14 +358,15 @@ struct Bvh {
       if(options.triangle_filter&&!options.triangle_filter(t))continue;
       for(size_t a=0;a<3;++a){
         const auto b=(a+1)%3;
-        const auto candidate=ray.nearest_edge(point(t,a),point(t,b));
-        if(candidate.separation2>ray.radius*ray.radius)continue;
+        const auto start=point(t,a),end=point(t,b);
+        detail::surface_ray::EdgeHit<double> candidate;
+        if(!ray.metric.nearest_edge(start,end,candidate)||candidate.separation2>ray.radius*ray.radius)continue;
         if(std::tie(candidate.separation2,candidate.distance,t)>=
-           std::tie(best.point.separation2,best.point.distance,best.triangle))continue;
+           std::tie(best.separation2,best.distance,best.triangle))continue;
         std::array<float,3> bary{};
         bary[a]=float(1-candidate.weight);bary[b]=float(candidate.weight);
         if(options.ray_filter&&!options.ray_filter(t,bary))continue;
-        best={candidate,t,bary};
+        best={ray.metric.position(start,end,candidate.weight),candidate.separation2,candidate.distance,t,bary};
       }
     }
   }
@@ -577,14 +554,8 @@ std::optional<SurfaceQueryResult> SurfaceQuery::raycast_result(Vec3 origin,Vec3 
     const SurfaceQueryOptions &options,double rounding_radius) const {
   cancel(options.cancelled);
   if (!options.max_triangle_tests) throw std::invalid_argument("Empty surface ray budget");
-  if (!impl_ || !finite(origin) || !finite(direction) ||
-      !std::isfinite(length(direction)) ||
-      std::max({std::abs(origin.x), std::abs(origin.y), std::abs(origin.z)}) >
-          1000 ||
-      length(direction) < 1e-12f || !std::isfinite(maximum) || maximum < 0 ||
-      maximum > 1000)
-    throw std::invalid_argument("Invalid surface ray");
-  direction = normalized(direction);
+  if(!impl_)throw std::invalid_argument("Invalid surface ray");
+  direction=checked_ray_direction(origin,direction,maximum);
   double best = maximum;
   uint32_t triangle = UINT32_MAX;
   std::array<float, 3> bary{};
@@ -596,20 +567,32 @@ std::optional<SurfaceQueryResult> SurfaceQuery::raycast_result(Vec3 origin,Vec3 
   BoundaryHit boundary;
   impl_->tree.ray_boundary(BoundaryRay(origin,direction,maximum,rounding_radius),0,boundary,options,visited);
   if(boundary.triangle==UINT32_MAX)return {};
-  const double distance=boundary.point.distance;
-  return SurfaceQueryResult{impl_->hit(boundary.triangle,boundary.point.position,boundary.bary,float(distance)),distance*distance};
+  const double distance=boundary.distance;
+  return SurfaceQueryResult{impl_->hit(boundary.triangle,boundary.position,boundary.bary,float(distance)),distance*distance};
 }
 std::optional<SurfaceHit> detail::BakeRayQuery::cast(const SurfaceQuery &surface,Vec3 origin,Vec3 direction,
     float maximum,double rounding_radius,const SurfaceQueryOptions &options) {
   const auto result=surface.raycast_result(origin,direction,maximum,options,rounding_radius);
   return result?std::optional<SurfaceHit>(result->surface):std::nullopt;
 }
-#ifndef DOME_BAKE_AMBIENT_REFERENCE
-std::unique_ptr<detail::bake_ambient::Query> detail::BakeRayQuery::upload_ambient(const SurfaceQuery &surface,
-    std::span<const Vec3> pattern,float maximum,const std::function<bool()> &cancelled) {
+#ifndef DOME_BAKE_RAY_REFERENCE
+detail::bake_rays::ProjectionRay detail::BakeRayQuery::projection_ray(Vec3 origin,Vec3 direction,
+    float maximum,double radius){
+  const auto normalized_direction=checked_ray_direction(origin,direction,maximum);
+  if(!std::isfinite(radius)||radius<0)throw std::invalid_argument("Invalid Bake projection rounding radius");
+  return {origin,normalized_direction,std::bit_cast<uint64_t>(radius>0?radius:0.),maximum};
+}
+std::optional<SurfaceHit> detail::BakeRayQuery::resolve(const SurfaceQuery &surface,
+    const bake_rays::ProjectionHit &hit){
+  if(hit.triangle==UINT32_MAX)return {};
+  return surface.impl_->hit(hit.triangle,hit.position,
+      {hit.barycentric[0],hit.barycentric[1],hit.barycentric[2]},hit.distance);
+}
+std::unique_ptr<detail::bake_rays::Query> detail::BakeRayQuery::upload(const SurfaceQuery &surface,
+    std::span<const Vec3> pattern,float maximum,bool projection,const std::function<bool()> &cancelled) {
   cancel(cancelled);
   const auto &tree=surface.impl_->tree;
-  std::vector<bake_ambient::Node> nodes(tree.nodes.size());
+  std::vector<bake_rays::Node> nodes(tree.nodes.size());
   // Bvh::build places each left subtree immediately after its parent. A
   // right subtree inherits the escape of its parent.
   nodes.front().escape=uint32_t(nodes.size());
@@ -626,7 +609,7 @@ std::unique_ptr<detail::bake_ambient::Query> detail::BakeRayQuery::upload_ambien
       nodes[source.right].escape=node.escape;
     }
   }
-  auto query=bake_ambient::upload({nodes,tree.order,tree.m.indices,tree.m.positions},pattern,maximum);
+  auto query=bake_rays::upload({nodes,tree.order,tree.m.indices,tree.m.positions},pattern,maximum,projection);
   cancel(cancelled);
   return query;
 }

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake.hpp"
-#ifdef DOME_TEST_AMBIENT_DEVICE
-#include "bake-ambient-device.hpp"
+#ifdef DOME_TEST_BAKE_RAY_DEVICE
+#include "bake-ray-device.hpp"
 #include "bake-ray-query.hpp"
 #endif
 #include <algorithm>
@@ -73,9 +73,9 @@ void edge_projection() {
           "Rounding recovery never extends a front or back projection depth");
   }
 }
-#ifdef DOME_TEST_AMBIENT_DEVICE
+#ifdef DOME_TEST_BAKE_RAY_DEVICE
 void ambient_device_traversal() {
-  using namespace detail::bake_ambient;
+  using namespace detail::bake_rays;
   Mesh surface;
   surface.positions={{0,0,.25f},{1,0,.25f},{0,1,.25f}};
   surface.normals.assign(3,{0,0,1});
@@ -87,7 +87,7 @@ void ambient_device_traversal() {
     {{.5f,.5f,0},{1,0,0},{0,1,0},{0,0,1}},
     {{1.1f,.5f,0},{1,0,0},{0,1,0},{0,0,1}},
   }};
-  auto query=detail::BakeRayQuery::upload_ambient(reference,pattern,.25f,{});
+  auto query=detail::BakeRayQuery::upload(reference,pattern,.25f,true,{});
   std::array<uint16_t,3> counts{42,42,42};
   unsigned polls=0;
   check(rejects([&]{query->count_blocked(frames,counts,[&]{return ++polls==2;});})&&
@@ -96,16 +96,69 @@ void ambient_device_traversal() {
   query->count_blocked(frames,counts,[&]{++polls;return false;});
   check(polls>3&&counts==std::array<uint16_t,3>{0,1,0},
         "Long watertight GPU traversals resume and accept an exact shared-edge segment endpoint");
-  auto short_ray=detail::BakeRayQuery::upload_ambient(reference,pattern,std::nextafter(.25f,0.f),{});
+  auto short_ray=detail::BakeRayQuery::upload(reference,pattern,std::nextafter(.25f,0.f),false,{});
   short_ray->count_blocked(frames,counts,{});
   check(counts==std::array<uint16_t,3>{0,0,0},"The device rejects a blocker one float step past the ray endpoint");
+
+  const auto above=std::nextafter(.5f,1.f),shorter=std::nextafter(.25f,0.f);
+  const auto make_ray=[](Vec3 origin,float distance){
+    return detail::BakeRayQuery::projection_ray(origin,{0,0,1},distance,1e-6);
+  };
+  const std::array rays{make_ray({.5f,.5f,0},.25f),make_ray({.5f,above,0},.25f),
+                        make_ray({.5f,above,0},shorter),make_ray({.75f,.75f,0},.25f)};
+  std::array<ProjectionHit,rays.size()> hits;
+  for(auto &hit:hits)hit.triangle=42;
+  polls=0;
+  check(rejects([&]{query->project(rays,hits,9000,[&]{return ++polls==2;});})&&
+        std::ranges::all_of(hits,[](const auto &hit){return hit.triangle==42;}),
+        "Cancelled projection continuation publishes no staged hits");
+  const auto recovery=std::span(rays).subspan(1,1);
+  check(rejects([&]{query->project(recovery,std::span(hits).first(1),4100,{});})&&hits[0].triangle==42,
+        "The exact and edge passes share the original per-ray triangle-test budget");
+  query->project(rays,hits,9000,{});
+  check(hits[0].triangle!=hits[1].triangle&&hits[0].triangle!=UINT32_MAX&&hits[1].triangle==0&&
+        hits[2].triangle==UINT32_MAX&&hits[3].triangle==UINT32_MAX,
+        "Exact depth ties retain BVH order and the recovered edge tie uses original triangle ID");
+  for(size_t i=0;i<rays.size();++i){
+    const auto &ray=rays[i];
+    const auto host=detail::BakeRayQuery::cast(reference,ray.origin,ray.direction,ray.maximum,1e-6,{});
+    const auto device=detail::BakeRayQuery::resolve(reference,hits[i]);
+    check(bool(host)==bool(device)&&(!host||(host->triangle==device->triangle&&
+          host->barycentric==device->barycentric&&host->distance==device->distance&&
+          length(host->position-device->position)==0&&length(host->normal-device->normal)==0)),
+          "Device projection matches the original ray metric, barycentrics and hit reconstruction exactly");
+  }
+}
+
+void oblique_device_precision(){
+  // A ray that lands very close to a slanted triangle edge. Losing the
+  // low bits of the wide reciprocal changes its third barycentric value.
+  Mesh mesh;
+  mesh.positions={{-0x1.ep+3f,-0x1.ep+3f,0x1.04039cp-4f},
+                  {-0x1.cb22e6p+3f,-0x1.e09526p+3f,0x1.e6106cp-4f},
+                  {-0x1.e1ff64p+3f,-0x1.cb4b48p+3f,0x1.64a5ap-6f}};
+  mesh.indices={0,1,2};
+  mesh.normals.assign(3,{0,0,1});
+  const SurfaceQuery reference(mesh);
+  const Vec3 origin{-0x1.d4b06cp+3f,-0x1.dc3d94p+3f,0x1.d87c04p-2f};
+  const Vec3 direction{-0x1.1ecb8cp-4f,-0x1.4a6076p-2f,-0x1.e34aep-1f};
+  constexpr float maximum=0x1.91c582p-2f;
+  const auto host=detail::BakeRayQuery::cast(reference,origin,direction,maximum,0,{});
+  const auto ray=detail::BakeRayQuery::projection_ray(origin,direction,maximum,0);
+  detail::bake_rays::ProjectionHit hit;
+  auto query=detail::BakeRayQuery::upload(reference,{},0,true,{});
+  query->project(std::span(&ray,1),std::span(&hit,1),1,{});
+  const auto projected=detail::BakeRayQuery::resolve(reference,hit);
+  check(host&&projected&&projected->barycentric==host->barycentric&&projected->distance==host->distance,
+        "Oblique edge-adjacent projection keeps every bit of the wide reciprocal and resulting barycentrics");
 }
 #endif
 } // namespace
 int main()try {
   edge_projection();
-#ifdef DOME_TEST_AMBIENT_DEVICE
+#ifdef DOME_TEST_BAKE_RAY_DEVICE
   ambient_device_traversal();
+  oblique_device_precision();
 #endif
   auto low=quad();BakeSource source;source.mesh=quad();
   BakeOptions options;options.resolution=32;options.padding=0;options.ao_samples=0;

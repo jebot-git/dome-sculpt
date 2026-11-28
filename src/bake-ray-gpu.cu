@@ -6,10 +6,10 @@
 #include <cuda_runtime.h>
 #define DOME_GPU(name) cuda##name
 #endif
-#include "bake-ambient-device-query.hpp"
+#include "bake-ray-device-query.hpp"
 #include "paint-composite-kernel.hpp"
 
-namespace dome::detail::bake_ambient {
+namespace dome::detail::bake_rays {
 namespace {
 void checked(DOME_GPU(Error_t) status){
   if(status!=DOME_GPU(Success))throw std::runtime_error(DOME_GPU(GetErrorString)(status));
@@ -37,9 +37,22 @@ __global__ void ambient_counts(const uint32_t *states,size_t samples,uint16_t *c
   if(index<size)counts[index]=count_blocked_rays(states+index*samples,samples);
 }
 
+template<bool Edges>
+__global__ void project_rays(SurfaceView surface,const ProjectionRay *rays,ProjectionHit *hits,
+    ProjectionProgress<double> *progress,size_t count,uint32_t budget,uint32_t *status,bool first){
+  const size_t i=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+  if(i>=count)return;
+  using Precision=surface_ray::NativePrecision;
+  const uint32_t flags=Edges?trace_boundary<Precision>(surface,rays[i],budget,first,progress[i],hits[i]):
+                             trace_projection<Precision>(surface,rays[i],budget,first,progress[i],hits[i]);
+  if(flags)atomicOr(status,flags);
+}
+
 class GpuApi {
   DOME_GPU(Stream_t) stream_{};
 public:
+  using Precision=surface_ray::NativePrecision;
+  using Progress=ProjectionProgress<Precision::Scalar>;
   GpuApi(){checked(DOME_GPU(StreamCreateWithFlags)(&stream_,DOME_GPU(StreamNonBlocking)));}
   ~GpuApi(){(void)DOME_GPU(StreamDestroy)(stream_);}
   void *allocate(size_t bytes){
@@ -71,11 +84,20 @@ public:
     ambient_counts<<<(size+lanes-1)/lanes,lanes,0,stream_>>>(states,samples,counts,size);
     checked(DOME_GPU(GetLastError)());
   }
+
+  void project(SurfaceView surface,const ProjectionRay *rays,ProjectionHit *hits,Progress *progress,
+               size_t count,uint32_t budget,uint32_t *status,bool first,bool boundary){
+    constexpr unsigned lanes=128;
+    const auto groups=(count+lanes-1)/lanes;
+    if(boundary)project_rays<true><<<groups,lanes,0,stream_>>>(surface,rays,hits,progress,count,budget,status,first);
+    else project_rays<false><<<groups,lanes,0,stream_>>>(surface,rays,hits,progress,count,budget,status,first);
+    checked(DOME_GPU(GetLastError)());
+  }
 };
 } // namespace
 
-std::unique_ptr<Query> upload(const Surface &surface,std::span<const Vec3> pattern,float maximum){
-  return upload_device<GpuApi>(surface,pattern,maximum);
+std::unique_ptr<Query> upload(const Surface &surface,std::span<const Vec3> pattern,float maximum,bool projection){
+  return upload_device<GpuApi>(surface,pattern,maximum,projection);
 }
-} // namespace dome::detail::bake_ambient
+} // namespace dome::detail::bake_rays
 #undef DOME_GPU
