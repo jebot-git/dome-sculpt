@@ -12,6 +12,7 @@
 #include "deformation-active.hpp"
 #include "paint-normal-access.hpp"
 #include "retopo-transfer.hpp"
+#include "retopo-surface.hpp"
 #include "skin-affine.hpp"
 #include "source-paint-pairing.hpp"
 #include "source-skin-link.hpp"
@@ -246,6 +247,7 @@ RetopoWorkspace::RetopoWorkspace(const Scene &scene, const std::function<bool()>
     for (auto &n : mesh.normals) n = vec(ob::rotate(relative.orientation, obv(n)));
   }
   view_.source = std::make_shared<const SurfaceQuery>(mesh, cancelled);
+  projection_ = std::make_shared<detail::RetopoSurface>(*view_.source);
   if (active.retopology) {
     auto topology = active.retopology->topology;
     if (affine) topology.transform(scene.world_matrix(active.id), cancelled);
@@ -309,17 +311,17 @@ void RetopoWorkspace::edit(RetopoAction action, Vec3 point, float snap_mm,
     RetopoMesh draft = *(extrusion_sample && gesture_ ? gesture_->topology : view_.topology);
     auto selected = extrusion_sample && gesture_ ? gesture_->selected : view_.selected;
     float maximum = snap_mm * .001f / view_.transform.scale;
-    SurfaceQueryOptions options; options.cancelled = cancelled;
-    auto project = [&](Vec3 p) {
-      if (!finite(p)) throw std::invalid_argument("Invalid retopology point");
-      auto hit = view_.source->closest(p, options);
+    auto projected_position = [&](const SurfaceHit &hit) {
       if (hit.distance > maximum) throw std::runtime_error("Point is outside the source projection distance");
       return hit.position;
+    };
+    auto project = [&](Vec3 p) {
+      return projected_position(projection_->closest(p,cancelled));
     };
     auto outward = [&](const RetopoMesh &mesh, TopologyID face) {
       const auto &f = mesh.faces().at(face); Vec3 center{};
       for (auto id : f.vertices) center += mesh.vertices().at(id).position;
-      auto hit = view_.source->closest(center / float(f.vertices.size()), options);
+      auto hit = projection_->closest(center / float(f.vertices.size()),cancelled);
       return hit.distance <= maximum && dot(face_normal(mesh, f), hit.normal) > 0;
     };
     if (action == RetopoAction::Sample) {
@@ -345,7 +347,11 @@ void RetopoWorkspace::edit(RetopoAction action, Vec3 point, float snap_mm,
         } else {
           const auto offset = point - extrude_anchor_;
           if (dot(offset, offset) > 0) {
-            auto result = draft.extrude_edge(edge_id, {project(a + offset), project(b + offset)}, cancelled);
+            const std::array points{a+offset,b+offset};
+            std::array<SurfaceHit,2> hits;
+            projection_->closest(points,hits,cancelled);
+            auto result = draft.extrude_edge(edge_id,
+                {projected_position(hits[0]),projected_position(hits[1])},cancelled);
             bool valid = outward(draft, result.face);
             if (!incident && !valid) {
               // A wire has no adjacent face to fix its winding. Orient the
@@ -416,7 +422,7 @@ void RetopoWorkspace::edit(RetopoAction action, Vec3 point, float snap_mm,
       Vec3 normal = cross(draft.vertices().at(selected[1]).position - draft.vertices().at(selected[0]).position,
                           draft.vertices().at(selected[2]).position - draft.vertices().at(selected[0]).position);
       Vec3 center{}; for (auto id : selected) center = center + draft.vertices().at(id).position;
-      if (dot(normal, view_.source->closest(center / float(selected.size()), options).normal) < 0)
+      if (dot(normal, projection_->closest(center / float(selected.size()),cancelled).normal) < 0)
         std::reverse(selected.begin(), selected.end());
       draft.add_face(selected); selected.clear();
     } else if (action == RetopoAction::Wire || action == RetopoAction::Seam) {
@@ -438,10 +444,10 @@ void RetopoWorkspace::edit(RetopoAction action, Vec3 point, float snap_mm,
       selected.clear();
     } else if (action == RetopoAction::Relax) {
       RetopoRelaxOptions relax; relax.maximum_snap_distance = maximum; relax.cancelled = cancelled;
-      draft.relax(*view_.source, relax);
+      draft.relax(*projection_, relax);
     } else if (action == RetopoAction::Snap) {
       if (selected.empty()) throw std::runtime_error("Select points to project");
-      draft.project(selected, *view_.source, maximum, cancelled);
+      draft.project(selected, *projection_, maximum, cancelled);
     }
     stop(cancelled);
     bool changed = draft.encode() != view_.topology->encode();

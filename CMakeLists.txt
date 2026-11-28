@@ -82,6 +82,8 @@ endif()
 # when the caller enables native CPU/FMA optimization. Brush math is separate.
 set_property(SOURCE src/sculpt-resolution.cpp src/sparse-resample-cpu.cpp src/texture-set-resample.cpp
   APPEND PROPERTY COMPILE_OPTIONS "$<$<COMPILE_LANGUAGE:CXX>:-ffp-contract=off>")
+# Preserve binary64 nearest-surface expressions in the host/device oracle.
+set_source_files_properties(src/mesh-processing.cpp PROPERTIES COMPILE_OPTIONS -ffp-contract=off)
 
 include(GNUInstallDirs)
 find_package(Threads REQUIRED)
@@ -853,6 +855,7 @@ if(BUILD_TESTING)
   target_link_options(dome-sculpt-retopo-worker-faults-test PRIVATE
     -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE
     -Wl,--wrap=_ZN4dome8Document11retopo_loopEv
+    -Wl,--wrap=_ZN4dome6detail13RetopoSurface7closestENS_4Vec3ERKSt8functionIFbvEE
     -Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE
     -Wl,--wrap=_ZN4dome8Document14publish_lockedEbb)
   add_test(NAME retopology-worker-faults COMMAND dome-sculpt-retopo-worker-faults-test)

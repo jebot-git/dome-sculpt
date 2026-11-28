@@ -28,6 +28,13 @@ struct NativePrecision {
 #endif
   }
   DOME_RAY_INLINE static float narrow(Scalar value){return float(value);}
+  DOME_RAY_INLINE static uint64_t bits(Scalar value){
+#if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
+    return static_cast<uint64_t>(__double_as_longlong(value));
+#else
+    return std::bit_cast<uint64_t>(value);
+#endif
+  }
 };
 
 template<class Real>

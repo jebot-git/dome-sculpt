@@ -7,6 +7,7 @@
 #define DOME_GPU(name) cuda##name
 #endif
 #include "weight-transfer-device-query.hpp"
+#include "surface-ray-kernel.hpp"
 
 namespace dome::detail::weight_transfer {
 namespace {
@@ -29,6 +30,15 @@ __global__ void closest_triangles(SurfaceView view,const Vec3 *points,float radi
   if(id<count){
     Counter counter{visits};
     hits[id]=budgeted_search(view,points[id],radius,counter,work,all_queries_fit);
+  }
+}
+__global__ void nearest_triangles(SurfaceView view,const Vec3 *points,retopo_surface::Hit *hits,
+    retopo_surface::Progress *progress,size_t count,uint32_t budget,uint32_t *status,bool first){
+  const size_t i=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+  if(i<count){
+    const auto flags=retopo_surface::search<surface_ray::NativePrecision>(
+        view,points[i],budget,hits[i],progress[i],first);
+    if(flags)atomicOr(status,flags);
   }
 }
 
@@ -59,9 +69,21 @@ public:
     closest_triangles<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(view,points,radius,hits,count,visits,work,all_queries_fit);
     checked(DOME_GPU(GetLastError)());
   }
+  void nearest(SurfaceView view,const Vec3 *points,retopo_surface::Hit *hits,
+      retopo_surface::Progress *progress,size_t count,uint32_t budget,uint32_t *status,bool first){
+    constexpr unsigned lanes=128;
+    nearest_triangles<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(view,points,hits,progress,count,budget,status,first);
+    checked(DOME_GPU(GetLastError)());
+  }
 };
 } // namespace
 
 std::unique_ptr<Query> upload(const Surface &surface){return std::make_unique<DeviceQuery<GpuApi>>(surface);}
 } // namespace dome::detail::weight_transfer
+
+namespace dome::detail::retopo_surface {
+std::unique_ptr<Query> upload(const weight_transfer::Surface &surface){
+  return std::make_unique<DeviceQuery<weight_transfer::GpuApi>>(surface);
+}
+}
 #undef DOME_GPU

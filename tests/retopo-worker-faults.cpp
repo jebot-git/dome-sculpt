@@ -2,6 +2,7 @@
 #define main prior_affine_main
 #include "retopo-affine.cpp"
 #undef main
+#include "../src/retopo-surface.hpp"
 #include <atomic>
 #include <cstdlib>
 #include <fstream>
@@ -25,7 +26,9 @@ void visit() {
 }
 void *allocate(size_t n, size_t alignment = 0) {
   visit(); void *p = nullptr;
-  if (alignment) { if (posix_memalign(&p, alignment, n ? n : 1)) p = nullptr; }
+  if (alignment > alignof(std::max_align_t)) {
+    if (posix_memalign(&p, alignment, n ? n : 1)) p = nullptr;
+  }
   else p = std::malloc(n ? n : 1);
   if (!p) throw std::bad_alloc(); return p;
 }
@@ -47,6 +50,20 @@ extern "C" void real_worker(Document *) asm("__real__ZN4dome8Document11retopo_lo
 extern "C" void wrapped_worker(Document *) asm("__wrap__ZN4dome8Document11retopo_loopEv");
 extern "C" void wrapped_worker(Document *d) {
   worker_fault::worker = true; real_worker(d); worker_fault::worker = false;
+}
+SurfaceHit real_nearest(detail::RetopoSurface &,Vec3,const std::function<bool()> &)
+    asm("__real__ZN4dome6detail13RetopoSurface7closestENS_4Vec3ERKSt8functionIFbvEE");
+SurfaceHit wrapped_nearest(detail::RetopoSurface &,Vec3,const std::function<bool()> &)
+    asm("__wrap__ZN4dome6detail13RetopoSurface7closestENS_4Vec3ERKSt8functionIFbvEE");
+SurfaceHit wrapped_nearest(detail::RetopoSurface &surface,Vec3 point,const std::function<bool()> &cancelled){
+  // Exercise an actual operation failure at the submission boundary. The
+  // driver can make different internal allocations for the same dispatch.
+  worker_fault::visit();
+  struct ResumeFaults {
+    bool suspended=worker_fault::worker&&worker_fault::enabled.exchange(false);
+    ~ResumeFaults(){if(suspended)worker_fault::enabled=true;}
+  } resume;
+  return real_nearest(surface,point,cancelled);
 }
 namespace queued_fault {
 std::atomic<bool> armed{false}, entered{false}, released{false}, publication{false}, hit{false};
@@ -217,8 +234,12 @@ int main(int argc, char **argv) try {
     Document d; points(d, scene); worker_fault::arm(0);
     d.edit_retopology(RetopoAction::Face);
     const bool drained = d.wait_retopology(); worker_fault::enabled = false;
-    check(drained && d.frame().state->error.empty(), "Uninjected real worker operation completes");
-    if (repeat) check(count == worker_fault::calls.load(), "Worker allocation count is stable");
+    const auto frame=d.frame().state;
+    if(!frame->error.empty())throw std::runtime_error("Uninjected retopology worker: "+frame->error);
+    check(drained,"Uninjected real worker operation completes");
+    if(repeat&&count!=worker_fault::calls.load())
+      throw std::runtime_error("Worker allocation count changed from "+std::to_string(count)+
+          " to "+std::to_string(worker_fault::calls.load()));
     count = worker_fault::calls;
     const auto result = d.frame().state->retopology->topology->encode();
     if (repeat) check(endpoint == result, "Uninjected worker topology is deterministic");

@@ -38,6 +38,7 @@ public:
             const std::function<bool()> & = {});
 private:
   RetopoView view_;
+  std::shared_ptr<detail::RetopoSurface> projection_;
   uint64_t source_object_ = 0;
   std::shared_ptr<const RetopoMesh> original_;
   std::vector<RetopoView> undo_, redo_;

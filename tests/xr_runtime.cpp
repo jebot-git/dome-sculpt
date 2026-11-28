@@ -167,7 +167,7 @@ unsigned retopo_stage(){return retopo_step<=12?retopo_step:retopo_step<=20?13:re
 int color_slider_channel(unsigned step,unsigned first){
   return step>=first&&step<=first+4&&(step-first)%2==0?int((step-first)/2):-1;
 }
-bool retopo_source_ready = false, retopo_apply_ready = false;
+bool retopo_source_ready=false,retopo_face_ready=false,retopo_apply_ready=false;
 
 std::string voxel_mode() {
   auto mode = getenv("DOME_XR_FIXTURE_VOXEL");
@@ -729,9 +729,12 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
   }
   const bool cut_wait=!cut_mode().empty() && (cut_stage()==20 || (cut_mode()=="accept" && cut_stage()==30));
   const bool mask_gate=!mask_mode().empty() && (mask_step==68 || mask_step==79);
-  if (cut_wait || mask_gate || (!retopo_mode().empty() && (retopo_stage() == 27 || retopo_stage() == 60))) {
+  const auto retopo=retopo_mode();
+  const bool retopo_face_gate=(retopo=="accept"||retopo=="focus")&&retopo_stage()==57;
+  if (cut_wait || mask_gate || retopo_face_gate ||
+      (!retopo.empty() && (retopo_stage() == 27 || retopo_stage() == 60))) {
     const bool initial=cut_wait?cut_stage()==20:retopo_stage()==27;
-    const int sector = cut_wait?7:mask_gate || initial?0:10;
+    const int sector=cut_wait?7:mask_gate||initial?0:retopo_face_gate?2:10;
     float angle = sector * 6.28318530718f / 12;
     float world_x = (cut_wait?.045f:0.f) + .6f * 220.f / 640 * std::cos(angle);
     float world_y = 1.56f + .6f / 640 * (220.f * std::sin(angle) + (mask_gate ? 16.f : 0.f));
@@ -747,15 +750,18 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
         transparent+=bytes[at+3]<5;
         if (displayed(bytes[at]) < 150 && displayed(bytes[at+1]) > 130 && displayed(bytes[at+2]) > 220) ++accent;
       }
-    const char *pixels_key = cut_wait?(initial?"cut_preview_accent_pixels":"cut_apply_accent_pixels"):mask_gate ? "mask_work_accent_pixels" : retopo_stage() == 27 ? "retopo_source_accent_pixels" : "retopo_apply_accent_pixels";
+    const char *pixels_key = cut_wait?(initial?"cut_preview_accent_pixels":"cut_apply_accent_pixels"):mask_gate ? "mask_work_accent_pixels" :
+        retopo_face_gate?"retopo_face_accent_pixels":initial?"retopo_source_accent_pixels":"retopo_apply_accent_pixels";
     report[pixels_key] = std::max(report.value(pixels_key,0),accent);
     if(mask_gate && mask_step==68 && inspected && transparent*2>inspected) {
       mask_work_completed=true;report["mask_work_completed"]=true;
     }
     if ((!mask_gate || mask_step==79) && inspected && accent * 2 > inspected) {
-      bool first = cut_wait?(initial?!cut_preview_ready:!cut_apply_ready):mask_gate ? !mask_work_ready : retopo_stage() == 27 ? !retopo_source_ready : !retopo_apply_ready;
+      bool first = cut_wait?(initial?!cut_preview_ready:!cut_apply_ready):mask_gate ? !mask_work_ready :
+          retopo_face_gate?!retopo_face_ready:initial?!retopo_source_ready:!retopo_apply_ready;
       if (first) if (auto path = getenv("DOME_XR_FIXTURE_REPORT")) {
-        std::ofstream capture(std::string(path) + (cut_wait?(initial?".cut-preview-ready.ppm":".cut-apply-ready.ppm"):mask_gate ? ".work-ready.ppm" : retopo_stage() == 27 ? ".source-ready.ppm" : ".apply-ready.ppm"), std::ios::binary);
+        std::ofstream capture(std::string(path) + (cut_wait?(initial?".cut-preview-ready.ppm":".cut-apply-ready.ppm"):mask_gate ? ".work-ready.ppm" :
+            retopo_face_gate?".face-ready.ppm":initial?".source-ready.ppm":".apply-ready.ppm"), std::ios::binary);
         capture << "P6\n" << s->width << ' ' << s->height << "\n255\n";
         for (int y = int(s->height)-1; y >= 0; --y) for (unsigned x = 0; x < s->width; ++x)
           for (int channel = 0; channel < 3; ++channel)
@@ -765,6 +771,7 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
         if(initial){cut_preview_ready=true;report["cut_preview_ready"]=true;}
         else{cut_apply_ready=true;report["cut_apply_ready"]=true;}
       }else if (mask_gate) { mask_work_ready=true;report["mask_work_ready"]=true; }
+      else if(retopo_face_gate){retopo_face_ready=true;report["retopo_face_ready"]=true;}
       else if (retopo_stage() == 27) { retopo_source_ready = true; report["retopo_source_ready"] = true; }
       else { retopo_apply_ready = true; report["retopo_apply_ready"] = true; }
     }
@@ -947,6 +954,7 @@ FN(WaitFrame, XrSession, const XrFrameWaitInfo *, XrFrameState *p) {
   }
   if (auto mode=retopo_mode(); !mode.empty()) {
     bool waiting = !retopo_history()&&((retopo_stage() == 27 && !retopo_source_ready) ||
+                   ((mode=="accept"||mode=="focus")&&retopo_stage()==57&&!retopo_face_ready) ||
                    (mode!="unconfirmed" && retopo_stage() == 60 && !retopo_apply_ready));
     if (!waiting) ++retopo_step;
     report["retopo_script_step"] = retopo_stage();

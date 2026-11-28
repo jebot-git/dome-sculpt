@@ -5,6 +5,8 @@
 #include "surface-ray-kernel.hpp"
 #include "affine-query-metric.hpp"
 #include "packed-material-query.hpp"
+#include "retopo-surface.hpp"
+#include "surface-closest-kernel.hpp"
 #include <bit>
 #include <limits>
 #include <map>
@@ -108,10 +110,7 @@ struct Bounds {
     add(b.hi);
   }
   double distance2(Vec3 p) const {
-    double x = std::max({double(lo.x) - p.x, 0., double(p.x) - hi.x}),
-           y = std::max({double(lo.y) - p.y, 0., double(p.y) - hi.y}),
-           z = std::max({double(lo.z) - p.z, 0., double(p.z) - hi.z});
-    return x * x + y * y + z * z;
+    return detail::surface_closest::box_distance<double>(lo,hi,p);
   }
   bool ray(Vec3 p, Vec3 d,double radius=0,double maximum=INFINITY) const {
     return detail::surface_ray::intersects_box(lo,hi,p,d,radius,maximum);
@@ -128,17 +127,6 @@ struct SurfaceRay : detail::surface_ray::WatertightRay<detail::surface_ray::Nati
     return true;
   }
 };
-using PrecisePoint = std::array<double, 3>;
-PrecisePoint difference(Vec3 a, Vec3 b) {
-  return {double(a.x)-b.x, double(a.y)-b.y, double(a.z)-b.z};
-}
-double precise_dot(const PrecisePoint &a, const PrecisePoint &b) {
-  return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
-}
-PrecisePoint precise_cross(const PrecisePoint &a, const PrecisePoint &b) {
-  return {a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2],
-          a[0]*b[1]-a[1]*b[0]};
-}
 struct BoundaryRay {
   Vec3 origin,direction;
   double maximum,radius;
@@ -155,47 +143,13 @@ struct BoundaryHit {
 struct ClosestPoint {
   Vec3 position;
   std::array<float,3> bary;
-  double distance2, planar_distance2;
+  double distance2;
 };
-// Project onto the plane, then test its interior or the three closed segments.
-// Cross products avoid the cancellation in |AB|²|AC|²-(AB.AC)² for valid thin
-// faces. Keep the actual barycentrics: recovering them from the rounded output
-// point can lose a seam side or collapse an interior hit onto an edge.
 ClosestPoint closest(Vec3 p, Vec3 a, Vec3 b, Vec3 c) {
-  const auto ab=difference(b,a), ac=difference(c,a), ap=difference(p,a);
-  const auto n=precise_cross(ab,ac);
-  const double area2=precise_dot(n,n);
-  if(!(area2>0))throw std::runtime_error("Degenerate closest triangle");
-  const double plane_factor=precise_dot(ap,n)/area2;
-  PrecisePoint projection;
-  for(size_t k=0;k<3;++k)projection[k]=ap[k]-n[k]*plane_factor;
-  auto candidate=[&](const std::array<double,3> &bary) {
-    PrecisePoint q,delta,planar_delta;
-    for(size_t k=0;k<3;++k) {
-      q[k]=ab[k]*bary[1]+ac[k]*bary[2];
-      delta[k]=ap[k]-q[k];
-      planar_delta[k]=projection[k]-q[k];
-    }
-    return ClosestPoint{{float(double(a.x)+q[0]),float(double(a.y)+q[1]),float(double(a.z)+q[2])},
-      {float(bary[0]),float(bary[1]),float(bary[2])},precise_dot(delta,delta),precise_dot(planar_delta,planar_delta)};
-  };
-  const double v=precise_dot(precise_cross(ap,ac),n)/area2;
-  const double w=precise_dot(precise_cross(ab,ap),n)/area2;
-  const double u=1-v-w;
-  if(u>=0&&v>=0&&w>=0)return candidate({u,v,w});
-  const std::array<Vec3,3> vertices{a,b,c};
-  ClosestPoint best{{},{},INFINITY,INFINITY};
-  for(size_t i=0;i<3;++i) {
-    const size_t j=(i+1)%3;
-    const auto edge=difference(vertices[j],vertices[i]);
-    const double t=std::clamp(precise_dot(difference(p,vertices[i]),edge)/precise_dot(edge,edge),0.,1.);
-    std::array<double,3> bary{};bary[i]=1-t;bary[j]=t;
-    const auto hit=candidate(bary);
-    // Every edge shares the same plane-normal distance. Comparing totals can
-    // round distinct tiny in-plane distances to a tie for an off-plane query.
-    if(hit.planar_distance2<best.planar_distance2)best=hit;
-  }
-  return best;
+  detail::surface_closest::Hit<double> hit{};
+  if(!detail::surface_closest::triangle<detail::surface_ray::NativePrecision>(p,a,b,c,hit))
+    throw std::runtime_error("Degenerate closest triangle");
+  return {hit.position,{hit.bary[0],hit.bary[1],hit.bary[2]},hit.distance2};
 }
 // An optional private material-policy proof over immutable BVH triangle ID
 // bounds. Standalone SurfaceQuery never supplies it and retains exact legacy
@@ -434,9 +388,10 @@ SurfaceHit packed_query_hit(const Mesh&mesh,uint32_t triangle,Vec3 position,std:
       // The triangle was validated in double precision. Its geometric normal
       // can be much smaller than normalized(Vec3)'s fallback threshold (or
       // underflow when squared in float), without being degenerate.
-      const auto geometric=precise_cross(difference(mesh.positions[b],mesh.positions[a]),
-                                        difference(mesh.positions[c],mesh.positions[a]));
-      const double magnitude=std::sqrt(precise_dot(geometric,geometric));
+      using namespace detail::surface_closest;
+      const auto geometric=cross(difference<double>(mesh.positions[b],mesh.positions[a]),
+                                 difference<double>(mesh.positions[c],mesh.positions[a]));
+      const double magnitude=std::sqrt(dot(geometric,geometric));
       n={float(geometric[0]/magnitude),float(geometric[1]/magnitude),
          float(geometric[2]/magnitude)};
     }
@@ -515,6 +470,56 @@ SurfaceHit SurfaceQuery::closest(Vec3 p,
   auto result=nearest(p,options);
   if(!result)throw std::runtime_error("No eligible source surface triangle");
   return *result;
+}
+SurfaceHit detail::RetopoSurface::closest(Vec3 point,const std::function<bool()> &cancelled){
+  SurfaceHit hit;
+  closest(std::span(&point,1),std::span(&hit,1),cancelled);
+  return hit;
+}
+void detail::RetopoSurface::closest(std::span<const Vec3> points,std::span<SurfaceHit> hits,
+    const std::function<bool()> &cancelled,uint32_t triangle_budget){
+  cancel(cancelled);
+  if(points.size()!=hits.size()||!triangle_budget||triangle_budget>2'000'000)
+    throw std::invalid_argument("Invalid Retopology projection batch");
+  if(points.empty())return;
+#ifdef DOME_BAKE_RAY_REFERENCE
+  SurfaceQueryOptions options;
+  options.max_triangle_tests=triangle_budget;
+  if(cancelled)options.cancelled=std::cref(cancelled);
+  for(size_t i=0;i<points.size();++i)hits[i]=source_.closest(points[i],options);
+#else
+  for(size_t i=0;i<points.size();++i){
+    if(i%256==0)cancel(cancelled);
+    const auto point=points[i];
+    if(!finite(point)||std::max({std::abs(point.x),std::abs(point.y),std::abs(point.z)})>1000)
+      throw std::invalid_argument("Invalid closest-surface query");
+  }
+  if(!device_){
+    const auto &tree=source_.impl_->tree;
+    std::vector<weight_transfer::Node> nodes(tree.nodes.size());
+    for(size_t i=0;i<nodes.size();++i){
+      if(i%512==0)cancel(cancelled);
+      const auto &node=tree.nodes[i];
+      nodes[i]={node.box.lo,node.box.hi,uint32_t(node.start),
+                uint32_t(node.left<0?node.count:0),uint32_t(node.left),uint32_t(node.right)};
+    }
+    device_=retopo_surface::upload({nodes,tree.order,tree.m.indices,tree.m.positions});
+    cancel(cancelled);
+  }
+  std::array<retopo_surface::Hit,retopo_surface::batch_capacity> reply;
+  for(size_t first=0;first<points.size();first+=retopo_surface::batch_capacity){
+    const size_t count=std::min(retopo_surface::batch_capacity,points.size()-first);
+    device_->search(points.subspan(first,count),triangle_budget,std::span(reply).first(count),cancelled);
+    for(size_t i=0;i<count;++i){
+      const auto &hit=reply[i];
+      if(hit.triangle==UINT32_MAX)throw std::runtime_error("No eligible source surface triangle");
+      const auto distance=std::sqrt(std::bit_cast<double>(hit.distance_bits));
+      hits[first+i]=source_.impl_->hit(hit.triangle,hit.position,
+          {hit.bary[0],hit.bary[1],hit.bary[2]},float(distance));
+    }
+  }
+  cancel(cancelled);
+#endif
 }
 std::optional<SurfaceHit> SurfaceQuery::nearest(Vec3 p,const SurfaceQueryOptions &options) const {
   const auto result=nearest_result(p,options);return result?std::optional<SurfaceHit>(result->surface):std::nullopt;
@@ -814,7 +819,8 @@ void validate_packed_original(const Mesh&m,const std::function<bool()>&fn){
  if(m.positions.empty()||m.indices.empty()||m.indices.size()%3||m.indices.size()/3>UINT32_MAX)throw std::invalid_argument("Invalid original packed query size");
  if(m.normals.size()!=m.positions.size()||(!m.uv.empty()&&m.uv.size()!=m.positions.size())||(!m.uv_pins.empty()&&m.uv_pins.size()!=m.positions.size())||(!m.uv_seams.empty()&&m.uv_seams.size()!=m.indices.size()))throw std::invalid_argument("Invalid original packed query attributes");
  for(size_t v=0;v<m.positions.size();++v){if((v&511)==0)cancel(fn);const auto p=m.positions[v];if(std::max({std::abs(p.x),std::abs(p.y),std::abs(p.z)})>100)throw std::invalid_argument("Mesh outside 100m authoring workspace");if(!finite(p)||!finite(m.normals[v])||!std::isfinite(length(m.normals[v])))throw std::invalid_argument("Nonfinite original packed query vertex");if(!m.uv.empty()&&(!std::isfinite(m.uv[v][0])||!std::isfinite(m.uv[v][1])))throw std::invalid_argument("Nonfinite original packed query UV");if(!m.uv_pins.empty()&&m.uv_pins[v]>1)throw std::invalid_argument("Invalid original packed query pin");}
- for(size_t c=0;c<m.indices.size();c+=3){if(c%1536==0)cancel(fn);for(size_t k=0;k<3;++k){if(m.indices[c+k]>=m.positions.size())throw std::invalid_argument("Original packed query index out of range");if(!m.uv_seams.empty()&&m.uv_seams[c+k]>1)throw std::invalid_argument("Invalid original packed query seam");}const auto a=m.positions[m.indices[c]],b=m.positions[m.indices[c+1]],d=m.positions[m.indices[c+2]];const auto cross=precise_cross(difference(b,a),difference(d,a));if(cross[0]==0&&cross[1]==0&&cross[2]==0)throw std::invalid_argument("Degenerate original packed query face");}
+ using namespace detail::surface_closest;
+ for(size_t c=0;c<m.indices.size();c+=3){if(c%1536==0)cancel(fn);for(size_t k=0;k<3;++k){if(m.indices[c+k]>=m.positions.size())throw std::invalid_argument("Original packed query index out of range");if(!m.uv_seams.empty()&&m.uv_seams[c+k]>1)throw std::invalid_argument("Invalid original packed query seam");}const auto a=m.positions[m.indices[c]],b=m.positions[m.indices[c+1]],d=m.positions[m.indices[c+2]];const auto geometric=cross(difference<double>(b,a),difference<double>(d,a));if(geometric[0]==0&&geometric[1]==0&&geometric[2]==0)throw std::invalid_argument("Degenerate original packed query face");}
  cancel(fn);
 }
 std::vector<uint32_t> packed_references(const Mesh&m,size_t first,size_t triangles,const std::function<bool()>&fn){

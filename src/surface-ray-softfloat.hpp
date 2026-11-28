@@ -90,5 +90,6 @@ struct SoftPrecision {
   static constexpr Scalar finite_max=Scalar::from_bits(UINT64_C(0x7fefffffffffffff));
   static Scalar from_bits(uint64_t bits){return Scalar::from_bits(bits);}
   static float narrow(Scalar value){return std::bit_cast<float>(paint_grid::narrow_float_bits(value.bits()));}
+  static uint64_t bits(Scalar value){return value.bits();}
 };
 } // namespace dome::detail::surface_ray

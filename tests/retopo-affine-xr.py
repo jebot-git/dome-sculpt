@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """Focused existing real-loader retopo controls on a genuine affine fixture.
 
-Synthetic tracking and software GL only: no physical HMD or device claim.
-The runtime retains its independently fixed world-z=0 triangle positions.
+The runtime uses synthetic controller tracking and hardware stereo rendering.
 """
 import hashlib,json,signal,subprocess,sys
 from pathlib import Path
-from xr_test_graphics import hardware_environment
+from xr_test_graphics import hardware_environment, hardware_renderer
 signal.pthread_sigmask(signal.SIG_SETMASK, [])
 binary,runtime,inspector,fixture,out=map(lambda p:Path(p).resolve(),sys.argv[1:])
 out.mkdir(parents=True,exist_ok=True)
@@ -47,7 +46,9 @@ def run(mode,frames):
         rc=p.wait(timeout=120)
     check(rc==0,'Actual loader retopology '+mode+' exits cleanly without suppression')
     check(path.is_file(),'Actual '+mode+' writes its requested native output')
-    return scene(path),json.loads(report.read_text())
+    detail=json.loads(report.read_text())
+    check(hardware_renderer(detail),'Actual '+mode+' uses hardware OpenGL')
+    return scene(path),detail
 # Allow the three component edits, their trigger releases, and Apply to finish
 # before saving the committed comparison scene.
 committed,_=run('committed',22)
@@ -57,7 +58,7 @@ check(source['material']['color'][2]>.7 and source['material']['color'][0]<.1,
 expected=dict(before['objects'][0]);actual=dict(source);expected.pop('material');actual.pop('material')
 check(expected==actual,'Committed controller prefix retains every affine, posed, painted and sculpt source channel')
 for mode in ('accept','focus','unconfirmed'):
-    after,report=run(mode,110)
+    after,report=run(mode,360)
     check(report.get('retopo_source_ready') is True and report.get('retopo_script_step',0)>=63 and report.get('tracking_losses',0)==0,
           mode+' reaches actual menu Resume without a tracking-loss shortcut')
     check(report['frames_waited']==report['frames_begun']==report['frames_ended'] and
@@ -67,7 +68,7 @@ for mode in ('accept','focus','unconfirmed'):
         check(after==committed,'Unconfirmed standalone Save cancels the draft and preserves the exact committed prefix')
         check(report.get('retopo_pressure_samples',0)>=3,'Unconfirmed case contains actual pressure placement')
         continue
-    check(report.get('retopo_apply_ready') is True and len(after['objects'])==2 and
+    check(report.get('retopo_face_ready') is True and report.get('retopo_apply_ready') is True and len(after['objects'])==2 and
           not after['objects'][0]['visible'] and after['objects'][1]['visible'],
           mode+' uses genuine Face/Apply and retains the hidden affine source')
     retained=dict(after['objects'][0]);expected=dict(source)

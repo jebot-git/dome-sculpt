@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/retopo.hpp"
+#include "../src/retopo-surface.hpp"
+#include <algorithm>
+#include <bit>
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <numeric>
@@ -44,7 +47,46 @@ void join(Mesh &a, const Mesh &b) {
   for (auto i : b.indices)
     a.indices.push_back(base + i);
 }
+void projection_regression(){
+  const auto equal=[](const SurfaceHit &a,const SurfaceHit &b){
+    if(a.triangle!=b.triangle)return false;
+    const auto same=[](float x,float y){return std::bit_cast<uint32_t>(x)==std::bit_cast<uint32_t>(y);};
+    return same(a.position.x,b.position.x)&&same(a.position.y,b.position.y)&&
+        same(a.position.z,b.position.z)&&same(a.distance,b.distance)&&
+        std::ranges::equal(a.barycentric,b.barycentric,same)&&
+        same(a.normal.x,b.normal.x)&&same(a.normal.y,b.normal.y)&&same(a.normal.z,b.normal.z);
+  };
+  SurfaceQuery source(cube(.2f));
+  detail::RetopoSurface projector(source);
+  std::vector<Vec3> points{{0,0,0},{.2f,.2f,.28f},{.2f,.2f,.2f},{0,-.2f,.2f}};
+  for(int y=-8;y<=8;++y)for(int x=-8;x<=8;++x)
+    points.push_back({float(x)/29,float(y)/31,.32f});
+  std::vector<SurfaceHit> hits(points.size());
+  projector.closest(points,hits);
+  bool exact=true;
+  for(size_t i=0;i<points.size();++i)exact&=equal(hits[i],source.closest(points[i]));
+  require(exact,"Bounded batches preserve exact interior, edge, corner and tied BVH hits");
+
+  Mesh crowded;
+  crowded.positions={{0,0,0},{1,0,0},{1,1e-13f,0}};
+  crowded.normals.assign(3,{0,0,1});
+  for(int i=0;i<2048;++i)crowded.indices.insert(crowded.indices.end(),{0,1,2});
+  SurfaceQuery full(crowded);
+  detail::RetopoSurface continuation(full);
+  const Vec3 point{.5f,1e-14f,.2f};
+  const auto expected=full.closest(point);
+  auto hit=continuation.closest(point);
+  require(equal(hit,expected)&&hit.barycentric[2]>0,
+          "Long traversal preserves the first tied face and the interior barycentrics of a thin triangle");
+  rejects([&]{continuation.closest(std::span(&point,1),std::span(&hit,1),{},1024);},
+          "A continued traversal enforces its total triangle budget");
+  size_t polls=0;
+  rejects([&]{continuation.closest(point,[&]{return ++polls>=5;});},
+          "A continued traversal observes cancellation before publication");
+  require(equal(continuation.closest(point),expected),"The same resident surface retries cleanly after failure and cancellation");
+}
 int main() try {
+  projection_regression();
   RetopoMesh patch;
   std::array<TopologyID, 9> ids;
   for (int y = 0; y < 3; y++)
@@ -157,9 +199,9 @@ int main() try {
         cancelling.project(selection, source, .2f,
                            [&] { return ++cancellation_calls > 1; });
       },
-      "Projection can cancel after modifying a draft vertex");
+          "Projection can cancel during preparation of a detached patch");
   require(cancelling.encode() == cancelling_before,
-          "Mid-projection cancellation never publishes the modified draft");
+          "Mid-projection cancellation preserves the complete patch");
   auto probe = snapshot;
   int relax_calls = 0;
   probe.relax(source,

@@ -6,6 +6,7 @@
 #include "dome/retopo.hpp"
 #include "dome/affine.hpp"
 #include "retopo-archive.hpp"
+#include "retopo-surface.hpp"
 #include <bit>
 #include <limits>
 #include <nlohmann/json.hpp>
@@ -558,19 +559,30 @@ RetopoSurface RetopoMesh::triangulate(const std::function<bool()> &fn) const {
 void RetopoMesh::project(std::span<const TopologyID> ids,
                          const SurfaceQuery &source, float maximum,
                          const std::function<bool()> &fn) {
+  detail::RetopoSurface projection(source);
+  project(ids,projection,maximum,fn);
+}
+void RetopoMesh::project(std::span<const TopologyID> ids,detail::RetopoSurface &source,float maximum,
+                         const std::function<bool()> &fn) {
   if (!std::isfinite(maximum) || maximum < 0 || maximum > 100)
     throw std::invalid_argument("Invalid snap distance");
   if (ids.size() > vertices_.size() ||
       std::set<TopologyID>(ids.begin(), ids.end()).size() != ids.size())
     throw std::invalid_argument("Invalid or duplicate projection selection");
   RetopoMesh draft = *this;
+  std::vector<Vec3> points;
+  points.reserve(ids.size());
   for (auto id : ids) {
     stop(fn);
-    auto &v = draft.vertices_.at(id);
-    auto hit = source.closest(v.position);
-    if (hit.distance > maximum)
+    points.push_back(draft.vertices_.at(id).position);
+  }
+  std::vector<SurfaceHit> hits(points.size());
+  source.closest(points,hits,fn);
+  for(size_t i=0;i<ids.size();++i){
+    stop(fn);
+    if (hits[i].distance > maximum)
       throw std::runtime_error("Surface is outside snap distance");
-    v.position = hit.position;
+    draft.vertices_.at(ids[i]).position=hits[i].position;
   }
   draft.validate(fn);
   preserve_orientation(faces_, vertices_, draft.vertices_);
@@ -579,6 +591,10 @@ void RetopoMesh::project(std::span<const TopologyID> ids,
 }
 void RetopoMesh::relax(const SurfaceQuery &source,
                        const RetopoRelaxOptions &o) {
+  detail::RetopoSurface projection(source);
+  relax(projection,o);
+}
+void RetopoMesh::relax(detail::RetopoSurface &source,const RetopoRelaxOptions &o) {
   if (o.iterations > 100 || !std::isfinite(o.strength) || o.strength < 0 ||
       o.strength > 1 || !std::isfinite(o.maximum_snap_distance) ||
       o.maximum_snap_distance < 0 || o.maximum_snap_distance > 100)
@@ -601,23 +617,31 @@ void RetopoMesh::relax(const SurfaceQuery &source,
       fixed.insert(e.b);
     }
   }
+  std::vector<TopologyID> movable;
+  for(const auto &[id,vertex]:vertices_){
+    stop(o.cancelled);
+    if(!vertex.pinned&&!fixed.contains(id)&&neighbors.contains(id))movable.push_back(id);
+  }
+  std::vector<Vec3> points(movable.size());
+  std::vector<SurfaceHit> hits(movable.size());
   for (unsigned iteration = 0; iteration < o.iterations; iteration++) {
-    auto previous = draft.vertices_;
-    for (auto &[id, v] : draft.vertices_) {
+    for(size_t i=0;i<movable.size();++i){
       stop(o.cancelled);
-      if (v.pinned || fixed.contains(id) || neighbors[id].empty())
-        continue;
+      const auto id=movable[i];
+      const auto &adjacent=neighbors.at(id);
+      const auto current=draft.vertices_.at(id).position;
       Vec3 sum{};
-      for (auto other : neighbors[id])
-        sum += previous.at(other).position;
+      for (auto other : adjacent)
+        sum += draft.vertices_.at(other).position;
       // VCGLib's blended Laplacian, with Jacobi snapshots and hard boundaries.
-      auto p = previous.at(id).position +
-               (sum / float(neighbors[id].size()) - previous.at(id).position) *
-                   o.strength;
-      auto hit = source.closest(p);
-      if (hit.distance > o.maximum_snap_distance)
+      points[i]=current+(sum/float(adjacent.size())-current)*o.strength;
+    }
+    source.closest(points,hits,o.cancelled);
+    for(size_t i=0;i<movable.size();++i){
+      stop(o.cancelled);
+      if (hits[i].distance > o.maximum_snap_distance)
         throw std::runtime_error("Relax projection exceeds snap distance");
-      v.position = hit.position;
+      draft.vertices_.at(movable[i]).position=hits[i].position;
     }
     draft.validate(o.cancelled);
     for (auto &[id, f] : faces_) {

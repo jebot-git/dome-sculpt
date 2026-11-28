@@ -40,6 +40,7 @@ struct RetopoExtrusion {
 // are never recycled inside a history branch. Wire edges and isolated vertices
 // are allowed.
 class RetopoMesh {
+  friend class RetopoWorkspace;
   TopologyID next_ = 1;
   std::map<TopologyID, RetopoVertex> vertices_;
   std::map<TopologyID, RetopoEdge> edges_;
@@ -47,6 +48,9 @@ class RetopoMesh {
   TopologyID edge_id(TopologyID, TopologyID) const;
   void transform_impl(const AffineTransform &, const RetopoMesh *original_view,
                       const RetopoMesh *original_local, const std::function<bool()> &);
+  void project(std::span<const TopologyID>,detail::RetopoSurface &,float,
+               const std::function<bool()> &);
+  void relax(detail::RetopoSurface &,const RetopoRelaxOptions &);
 
 public:
   const auto &vertices() const { return vertices_; }
