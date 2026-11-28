@@ -24,7 +24,7 @@ Mesh mesh(){
   quad.indices={0,1,2,0,2,3};
   return quad;
 }
-enum class Fixture { Paint, LegacyBake, DenseBake, PackedBake };
+enum class Fixture { Paint, LegacyBake, DenseBake, PackedBake, BakeOnly };
 Scene model(Fixture fixture){
   Scene scene;
   auto &object=scene.active();
@@ -38,7 +38,8 @@ Scene model(Fixture fixture){
   maps->emission.wrap_s=33648;
   maps->emission.wrap_t=10497;
   maps->emission.mag_filter=fixture==Fixture::DenseBake?9728:9729;
-  auto paint=PaintedMesh::from_maps(mesh(),maps,resolution);
+  auto paint=fixture==Fixture::BakeOnly?std::make_shared<PaintedMesh>(mesh(),resolution):
+                                       PaintedMesh::from_maps(mesh(),maps,resolution);
   object.painted=paint;
   if(fixture!=Fixture::Paint){
     const size_t count=size_t(resolution)*resolution;
@@ -65,6 +66,7 @@ Scene model(Fixture fixture){
     }
     paint->install_bake(std::move(bake));
   }
+  if(fixture==Fixture::BakeOnly)return scene;
   auto stroke=[&](PaintSettings settings,float y){
     Brush brush;
     brush.from={-.35f,y,0};brush.to={.38f,y+.04f,0};
@@ -122,7 +124,7 @@ int main(int argc,char **argv)try{
     catch(const std::exception &error){std::cout<<"REFUSED "<<error.what()<<'\n';return 0;}
     throw std::runtime_error("Missing selected device returned a FLOAT raster");
   }
-  for(auto fixture:{Fixture::Paint,Fixture::LegacyBake,Fixture::DenseBake,Fixture::PackedBake}){
+  for(auto fixture:{Fixture::BakeOnly,Fixture::Paint,Fixture::LegacyBake,Fixture::DenseBake,Fixture::PackedBake}){
     const auto scene=model(fixture);
     const auto owner=scene.active().painted->baked();
     const auto layers=scene.active().painted->layers();

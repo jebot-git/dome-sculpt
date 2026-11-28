@@ -13,7 +13,7 @@
 #if defined(__SYCL_DEVICE_ONLY__)
 // Keep the integer binary64 implementation shared between the many blend
 // and resolve operations in the Arc program instead of cloning its body.
-#define DOME_EMISSION_MATH [[clang::noinline]] inline
+#define DOME_EMISSION_MATH [[clang::noinline]] static inline
 #else
 #define DOME_EMISSION_MATH DOME_EMISSION_FN
 #endif
@@ -98,31 +98,34 @@ DOME_EMISSION_FN bool apply_layer(const DeviceInput &input,size_t layer,Entry en
   }
   return true;
 }
+template<bool bake_only=false>
 DOME_EMISSION_FN void render(const DeviceInput &input,size_t at,uint32_t *destination){
   const auto owner=input.padding[at];
   const auto source=owner<0?at:size_t(owner);
   if(source>=size_t(input.resolution)*input.resolution){destination[0]=invalid;return;}
-  const auto x=uint32_t(source%input.resolution),y=uint32_t(source/input.resolution);
-  const auto tile=(y/32)*(input.resolution/32)+x/32,within=(y%32)*32+x%32;
   uint32_t value[7]{};
   base(input.bake,*input.quantization,source,value);
-  for(unsigned layer=0;layer<input.layer_count;++layer){
-    if(!apply_layer(input,layer,input.entries[size_t(layer)*input.tiles_per_layer+tile],within,value)){
-      destination[0]=invalid;
-      return;
+  uint32_t background[]{input.background[0],input.background[1],input.background[2]};
+  if constexpr(!bake_only){
+    const auto x=uint32_t(source%input.resolution),y=uint32_t(source/input.resolution);
+    const auto tile=(y/32)*(input.resolution/32)+x/32,within=(y%32)*32+x%32;
+    for(unsigned layer=0;layer<input.layer_count;++layer){
+      if(!apply_layer(input,layer,input.entries[size_t(layer)*input.tiles_per_layer+tile],within,value)){
+        destination[0]=invalid;
+        return;
+      }
+    }
+    if(input.source.rgba){
+      const auto &job=input.source.coordinates;
+      const auto taps=paint_compute::source_coordinates(job,x,y);
+      float source_rgba[4];
+      paint_compute::sample_source_taps(input.source.rgba,job.width,job.nearest,taps,true,*input.quantization,source_rgba);
+      for(unsigned k=0;k<3;++k)background[k]=product(background[k],paint_compute::bits(source_rgba[k]));
     }
   }
   if(!valid_coefficients(value,input.bake.physical)){
     destination[0]=invalid;
     return;
-  }
-  uint32_t background[]{input.background[0],input.background[1],input.background[2]};
-  if(input.source.rgba){
-    const auto &job=input.source.coordinates;
-    const auto taps=paint_compute::source_coordinates(job,x,y);
-    float source_rgba[4];
-    paint_compute::sample_source_taps(input.source.rgba,job.width,job.nearest,taps,true,*input.quantization,source_rgba);
-    for(unsigned k=0;k<3;++k)background[k]=product(background[k],paint_compute::bits(source_rgba[k]));
   }
   const auto residual=input.bake.physical?complement(value[6]):widen(narrow(complement(value[6])));
   for(unsigned k=0;k<3;++k){

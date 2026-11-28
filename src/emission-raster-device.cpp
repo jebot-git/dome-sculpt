@@ -72,6 +72,8 @@ std::unique_ptr<EmissionRasterDevice> create_emission_raster_device(
   for(const auto &layer:paint.layers()){
     if(!layer.visible||layer.opacity<=0)continue;
     stop();
+    const auto first_entry=input.entries.size();
+    bool contributes=false;
     auto &scales=input.layers.emplace_back().opacity;
     for(unsigned mask=0;mask<scales.size();++mask)
       scales[mask]=std::bit_cast<uint32_t>((layer.opacity*float(mask))/255.f);
@@ -83,11 +85,13 @@ std::unique_ptr<EmissionRasterDevice> create_emission_raster_device(
       const bool use_mask=physical||(tile&&std::any_of(tile->pixels.begin(),tile->pixels.end(),
           [](const auto &pixel){return pixel.data[12]!=0;}));
       if(use_mask&&tile&&!PaintTile::is_shared_default(tile)){
+        contributes=true;
         const auto [found,inserted]=common_ids.try_emplace(tile,input.common.size());
         entry.common=found->second;
         if(inserted)input.common.push_back(tile);
       }
       if(physical){
+        contributes=true;
         const auto [found,inserted]=physical_ids.try_emplace(physical,input.physical.size());
         entry.physical=found->second;
         if(inserted){
@@ -98,6 +102,10 @@ std::unique_ptr<EmissionRasterDevice> create_emission_raster_device(
           coefficient_offset+=uint32_t(view.samples.size());
         }
       }
+    }
+    if(!contributes){
+      input.layers.pop_back();
+      input.entries.resize(first_entry);
     }
   }
   stop();

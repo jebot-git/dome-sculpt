@@ -4,6 +4,8 @@
 #include "emission-raster-upload.hpp"
 
 namespace dome::detail::emission_raster {
+void launch_bake(sycl::queue &,DeviceInput,size_t,size_t,uint32_t *);
+
 namespace {
 class Device {
 public:
@@ -24,6 +26,10 @@ public:
   void upload(void *device,const void *host,size_t bytes){queue_.memcpy(device,host,bytes).wait_and_throw();}
   void download(void *host,const void *device,size_t bytes){queue_.memcpy(host,device,bytes).wait_and_throw();}
   void render(DeviceInput input,size_t first,size_t count,uint32_t *out){
+    if(!input.layer_count&&!input.source.rgba){
+      launch_bake(queue_,input,first,count,out);
+      return;
+    }
     queue_.parallel_for(sycl::range<1>{count},[=](sycl::id<1> id){
       emission_raster::render(input,first+id[0],out+10*id[0]);
     });
