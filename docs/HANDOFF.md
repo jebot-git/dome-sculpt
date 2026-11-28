@@ -19,8 +19,10 @@ compute hardware. Command-line export also requires the selected compute GPU.
 CPU numerical and sanitizer references build as opt-in headless tests and
 refuse installation. CTest verifies that the application refuses desktop,
 OpenXR and both export entry points when the selected GPU is unavailable.
-Production CPU configuration was rechecked at `5440467a` and refused for
-desktop, OpenXR and headless builds. Volume Geodesic now propagates closed-mesh
+CTest now checks five refused CPU configurations in both the oneAPI Release
+and headless reference build trees. The current Release binary on Arc A770
+passes demo GLB export and three synthetic OpenXR frames, and refuses forced
+llvmpipe for both FLTK and OpenXR. Volume Geodesic now propagates closed-mesh
 bone fields on the selected GPU. The Arc A770 results differ from the headless
 reference by at most `5.96e-8` in the two tested resolutions. Native FLTK and
 synthetic OpenXR save the same project byte for byte. The native worker and

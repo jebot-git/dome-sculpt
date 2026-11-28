@@ -78,6 +78,15 @@ else()
   message(FATAL_ERROR "Unknown DOME_COMPUTE_BACKEND=${DOME_COMPUTE_BACKEND}")
 endif()
 
+if(BUILD_TESTING)
+  add_test(NAME cpu-production-config-refused
+    COMMAND "${CMAKE_COMMAND}" "-DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
+      "-DGENERATOR=${CMAKE_GENERATOR}" "-DBUILD_PROGRAM=${CMAKE_MAKE_PROGRAM}"
+      "-DC_COMPILER=${CMAKE_C_COMPILER}" "-DCXX_COMPILER=${CMAKE_CXX_COMPILER}"
+      -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/cpu-production-config.cmake")
+  set_tests_properties(cpu-production-config-refused PROPERTIES TIMEOUT 120)
+endif()
+
 # Sparse interpolation has a separate nearest-even binary64 contract. Keep
 # multiply/add boundaries identical to the integer GPU implementation even
 # when the caller enables native CPU/FMA optimization. Brush math is separate.

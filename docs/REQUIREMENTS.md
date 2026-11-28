@@ -9,6 +9,11 @@ Command-line export also requires the selected compute device. GPU coverage
 and data-transfer efficiency across the remaining workflows still require
 qualification.
 
+`cpu-production-config-refused` exercises the production build gate in both
+GPU and headless test builds. It independently rejects CPU configuration
+without the reference opt-in or CTest, and with either desktop or XR enabled.
+The reference build also tests rejection before staging any installation files.
+
 Bake traces ambient occlusion on the selected GPU through the native
 source BVH. It preserves the original biased cosine hemisphere, inclusive
 ray distance and ordered native output. Continuation batches poll for
