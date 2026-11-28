@@ -24,6 +24,7 @@ struct EmissionExportImage {
  bool native_paint_domain=false;
  std::shared_ptr<const Mesh> prepared_source_mesh;
  std::shared_ptr<const BakedTextures> prepared_mtoon_bake;
+ PaintSourceTexture prepared_mtoon_shade;
  unsigned texcoord=0;
  std::optional<uint32_t> texture_set;
  // Package4 only: actual independently authenticated canonical writable owner.

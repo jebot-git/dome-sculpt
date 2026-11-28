@@ -146,7 +146,8 @@ public:
     device_.download(pixels.data(),material_output_,pixels.size_bytes());
     stop();
     for(const auto &pixel:pixels)if(pixel.reserved)
-      throw std::invalid_argument("Portable source paint radiance exceeds byte material representation");
+      throw std::invalid_argument(material_.shared_shade?"Prepared MToon1 shade exceeds the portable texture range":
+          "Portable source paint radiance exceeds byte material representation");
   }
 
 private:
@@ -184,6 +185,8 @@ private:
     material_.bake_orm=upload(input.bake_orm);
     material_.bake_coverage=upload(input.bake_coverage);
     material_.factors=input.factors;
+    std::ranges::copy(input.shade_factor,material_.shade_factor);
+    material_.shared_shade=input.shared_shade;
     material_.occlusion_strength=input.occlusion_strength;
     material_coordinates_.resize(input.capacity);
     material_texels_=allocate<uint32_t>(input.capacity);

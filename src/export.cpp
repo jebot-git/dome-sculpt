@@ -1152,6 +1152,11 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     constexpr auto emission_slot=size_t(MToonSlot::Emission);
     typed.textures[emission_slot].index=-1;
     if(baked)typed.textures[size_t(MToonSlot::Base)].index=-1;
+    const auto &shade=field->prepared_mtoon_shade;
+    if(shade.image){
+      typed.textures[size_t(MToonSlot::Shade)].index=-1;
+      effective.shade_color={1,1,1};
+    }
     if(baked_normal){
       typed.textures[size_t(MToonSlot::Normal)].index=-1;
       effective.normal_enabled=false;
@@ -1188,6 +1193,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     if(effective.alpha==MToonAlpha::Mask)output["alphaCutoff"]=effective.alpha_cutoff;
     else output.erase("alphaCutoff");
     output["extensions"]["VRMC_materials_mtoon"]=std::move(source["extensions"].at("VRMC_materials_mtoon"));
+    if(shade.image)output["extensions"]["VRMC_materials_mtoon"]["shadeMultiplyTexture"]=source_info(shade);
     extensions.erase("KHR_materials_emissive_strength"); // Finalized with the compiled emission.
     for(const auto &extension:extensions)use_extension(extension.c_str());
   };

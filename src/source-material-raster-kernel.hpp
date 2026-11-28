@@ -23,8 +23,16 @@ struct MaterialView {
   const paint_compute::ColorPixel *pbr=nullptr;
   const uint8_t *bake_color=nullptr,*bake_orm=nullptr,*bake_coverage=nullptr;
   paint_compute::Parameters factors;
+  float shade_factor[3]{};
   float occlusion_strength=1;
+  bool shared_shade=false;
 };
+
+DOME_MATERIAL_FN float resolved_shared_shade(float source,float uncovered,float paint,float base,float shade){
+  using namespace paint_compute;
+  const float contribution=base!=0?paint/base:paint;
+  return shade==0?0:mul(shade,add(mul(source,uncovered),contribution));
+}
 struct MaterialSources {
   uint32_t *values[paint_compute::SourceRoleCount]{};
   DOME_MATERIAL_FN float channel(unsigned role,size_t index,unsigned component) const {
@@ -127,6 +135,17 @@ DOME_MATERIAL_FN paint_compute::Output render_material(const DeviceInput &input,
   output.orm[1]=linear_byte(add(mul(mul(m.roughness,sampled(SourceOrm,1)),sub(1,value.coverage[2])),value.orm[1]));
   output.orm[2]=linear_byte(add(mul(mul(m.metallic,sampled(SourceOrm,2)),sub(1,value.coverage[1])),value.orm[2]));
   output.orm[3]=output.emission[3]=255;
+  output.color_coverage=linear_byte(value.coverage[0]);
+  if(view.shared_shade){
+    // HDR supplies a separate emission atlas, so reuse the output for shade.
+    for(unsigned c=0;c<3;++c){
+      const float shade=resolved_shared_shade(sampled(SourceColor,c),sub(1,value.coverage[0]),
+          value.color[c],m.color[c],view.shade_factor[c]);
+      if(shade>1.000001f)output.reserved=1;
+      output.emission[c]=srgb_byte(shade,q);
+    }
+    return output;
+  }
   uint32_t emission[7]{};
   filter_finite(input,grid,x,y,emission);
   const auto coverage=material_float(emission[6]);
@@ -136,7 +155,6 @@ DOME_MATERIAL_FN paint_compute::Output render_material(const DeviceInput &input,
     if(glow>1)output.reserved=1;
     output.emission[c]=srgb_byte(glow,q);
   }
-  output.color_coverage=linear_byte(value.coverage[0]);
   output.emission_coverage=linear_byte(coverage);
   return output;
 }

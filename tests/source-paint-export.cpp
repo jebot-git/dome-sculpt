@@ -816,13 +816,19 @@ void prepared_mtoon_emission(const std::filesystem::path &out,const Scene &initi
 }
 
 void prepared_mtoon_bake(const std::filesystem::path &out,const Scene &initial,
-    const ImportAuthoringOptions &options,SurfaceRenderer &renderer) {
+    const ImportAuthoringOptions &options,SurfaceRenderer &renderer,bool shared) {
  auto fixture=prepared_mtoon_fixture(1,0);
  auto &material=fixture.j["materials"][0];
- material["extensions"]["VRMC_materials_mtoon"]["shadeMultiplyTexture"]["texCoord"]=0;
+ auto &toon=material["extensions"]["VRMC_materials_mtoon"];
+ if(shared){
+  toon["shadeMultiplyTexture"]=material["pbrMetallicRoughness"]["baseColorTexture"];
+  toon["shadingShiftFactor"]=-.62f;
+  material["pbrMetallicRoughness"]["baseColorFactor"]={0.f,.47f,.66f,.75f};
+ }else toon["shadeMultiplyTexture"]["texCoord"]=0;
  material["normalTexture"]["extensions"]={{"KHR_texture_transform",{{"rotation",.34f}}}};
  fixture.j["meshes"][0]["primitives"][0]["attributes"].erase("COLOR_0");
- const auto input=out/"prepared-mtoon-baked-input.glb";
+ const std::string stem=shared?"prepared-mtoon-shared-shade-bake":"prepared-mtoon-baked";
+ const auto input=out/(stem+"-input.glb");
  fixture.save(input);
  auto scene=prepare_authoring_import(initial,input,options).scene;
  const auto recipient=scene.active().id;
@@ -855,7 +861,7 @@ void prepared_mtoon_bake(const std::filesystem::path &out,const Scene &initial,
  settings.ao_samples=0;
  settings.padding=1;
  document.bake_from_object(donor_id,settings);
- const auto native=out/"prepared-mtoon-baked.dsculpt";
+ const auto native=out/(stem+".dsculpt");
  auto ordered=document.save_async(native);
  check(document.wait_asset(std::chrono::seconds(90)),"Prepared imported MToon Bake reaches the asset worker fence");
  if(!document.frame().state->error.empty())throw std::runtime_error(document.frame().state->error);
@@ -902,29 +908,59 @@ void prepared_mtoon_bake(const std::filesystem::path &out,const Scene &initial,
  check(document.redo()&&document.copy_scene().encode()==exact,"Redo restores the exact typed Bake");
  settled(document);
  check(delta(reference,draw(renderer,document.frame().surface))<=1,"Redo restores the authored Bake viewport");
- const auto path=out/"prepared-mtoon-baked.glb";
+ const auto path=out/(stem+".glb");
  document.export_asset(path).get();
  PreviewGlb file(path);
  const auto &entry=file.json.at("extras").at("domeSculptEmission").at("images").at(0);
  const auto &emitted=file.json.at("materials").at(entry.at("material").get<size_t>());
  const auto atlas=entry.at("domain").at("texCoord");
+ const auto &base=emitted.at("pbrMetallicRoughness").at("baseColorTexture");
+ const auto &typed=emitted.at("extensions").at("VRMC_materials_mtoon");
+ const auto &shade=typed.at("shadeMultiplyTexture");
  check(entry.at("view")=="authored-mtoon"&&entry.at("fallback").at("version")==2&&
-       emitted.at("pbrMetallicRoughness").at("baseColorTexture").at("texCoord")==atlas&&
-       emitted.at("normalTexture").at("texCoord")==atlas&&
-       emitted.at("extensions").at("VRMC_materials_mtoon").at("shadeMultiplyTexture").value("texCoord",0)==0,
-       "Standard GLB uses the writable color, normal and FLOAT emission atlas and the original independent shade");
+       base.at("texCoord")==atlas&&emitted.at("normalTexture").at("texCoord")==atlas,
+       "Standard GLB uses the writable color, normal and FLOAT emission atlas");
+ if(shared){
+  check(shade.at("texCoord")==atlas&&shade.at("index")!=base.at("index")&&
+        typed.at("shadeColorFactor")==nlohmann::json::array({1,1,1}),
+        "Shared shade has its own atlas with the original shade factor already applied");
+ }else check(shade.value("texCoord",0)==0,"Originally separate shade keeps its independent sampler");
  auto restored=extract_native_emission(file.bytes);
  check(restored&&restored->encode()==exact,"The prepared typed Bake reopens with exact native normal, color and emission data");
  document.replace(std::move(*restored));
- const auto retry=out/"prepared-mtoon-baked-retry.glb";
+ const auto retry=out/(stem+"-retry.glb");
  document.export_asset(retry).get();
  check(file_bytes(retry)==file.bytes,"Native re-export of the typed Bake is byte-identical");
- document.replace(open_portable_mtoon(file,out/"prepared-mtoon-baked-portable.glb",initial,options));
+ document.replace(open_portable_mtoon(file,out/(stem+"-portable.glb"),initial,options));
  document.authored_shading();
  settled(document);
  const auto error=delta(reference,draw(renderer,document.frame().surface));
- std::cout<<"MTOON_BAKE_STANDARD max="<<error<<'\n';
+ std::cout<<"MTOON_BAKE_STANDARD "<<stem<<" max="<<error<<'\n';
  check(error<=7,"Portable MToon1 reproduces the actual projected Bake");
+ if(shared){
+  auto changed=file;
+  changed.json["materials"][entry.at("material").get<size_t>()]["extensions"]["VRMC_materials_mtoon"]
+      ["shadeMultiplyTexture"]=base;
+  document.replace(open_portable_mtoon(changed,out/(stem+"-wrong-shade.glb"),initial,options));
+  document.authored_shading();
+  settled(document);
+  const auto wrong_shade=delta(reference,draw(renderer,document.frame().surface));
+  std::cout<<"MTOON_BAKE_WRONG_SHADE max="<<wrong_shade<<'\n';
+  check(wrong_shade>12,
+        "Substituting the painted base texture demonstrably changes the shade");
+  auto overbright=baked_scene.snapshot();
+  overbright.object(recipient).material.color[1]=.002f;
+  const auto prior=overbright.encode();
+  document.replace(std::move(overbright));
+  auto refused=document.export_asset(path);
+  auto saved=document.save_async(out/(stem+"-guard.dsculpt"));
+  std::string reason;
+  try{refused.get();}catch(const std::exception &error){reason=error.what();}
+  saved.get();
+  check(reason.find("shade exceeds the portable texture range")!=std::string::npos&&file_bytes(path)==file.bytes&&
+        document.copy_scene().encode()==prior&&Scene::load(out/(stem+"-guard.dsculpt")).encode()==prior,
+        "Unrepresentable shade preserves the earlier export and the exact immediately queued native Save");
+ }
 }
 
 enum class BakeFrame { AuthoredTangents, ImportedNormals, NativeNormals };
@@ -1144,7 +1180,7 @@ int main(int argc,char **argv)try{
  std::cout<<"GL_VENDOR="<<vendor<<" GL_RENDERER="<<device<<'\n';check(argc<3||std::string_view(argv[2])!="--hardware"||(vendor.find("Intel")!=std::string::npos&&device.find("Arc")!=std::string::npos&&device.find("A770")!=std::string::npos),"Requested standard source export proof requires actual A770");
  Fbo fbo;fbo.bind();SurfaceRenderer native;color_consumer::Renderer independent;prepared_normal_consumer::Renderer separate_roles;int maximum=0;
  Scene initial;initial.active().visible=false;ImportAuthoringOptions options;options.paint_resolution=64;options.prepare_texture_atlas=true;
- prepared_mtoon_bake(out,initial,options,native);
+ for(const bool shared:{false,true})prepared_mtoon_bake(out,initial,options,native,shared);
  for(int kind=0;kind<4;++kind)for(bool flat:{false,true})for(const char *alpha:{"OPAQUE","MASK","BLEND"})for(float weight:{0.f,.65f}){
   auto fixture=source(kind,flat,alpha,weight);const auto prefix=std::to_string(kind)+(flat?"-flat-":"-artist-")+alpha+"-"+std::to_string(weight);const auto path=out/(prefix+"-input.glb");fixture.save(path);
   auto imported=prepare_authoring_import(initial,path,options);const auto before=imported.scene.encode();

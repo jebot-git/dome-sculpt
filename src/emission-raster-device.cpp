@@ -240,9 +240,17 @@ void plan_material_upload(const emission_raster::Input &input,emission_raster::M
 
 std::unique_ptr<SourceMaterialRaster> create_source_material_raster(const PaintedMesh &paint,
     const Material &material,const SourceMaterialRaster::Roles &roles,float occlusion_strength,
-    uint32_t resolution,size_t working_bytes,const std::function<bool()> &cancelled,bool include_emission){
+    uint32_t resolution,size_t working_bytes,const std::function<bool()> &cancelled,bool include_emission,
+    std::optional<std::array<float,3>> shared_shade){
   if(!resolution||resolution>8192)throw std::invalid_argument("Invalid portable source material grid");
   emission_raster::MaterialInput raster;
+  if(shared_shade){
+    if(include_emission||!roles[paint_compute::SourceColor]||std::ranges::any_of(*shared_shade,
+        [](float x){return !std::isfinite(x)||x<0||x>1;}))
+      throw std::invalid_argument("Shared shade requires the original color image and the spare emission output");
+    raster.shared_shade=true;
+    raster.shade_factor=*shared_shade;
+  }
   raster.roles=roles;
   for(const auto *role:roles)if(role&&!role->image)
     throw std::invalid_argument("Portable source material needs actual role images");

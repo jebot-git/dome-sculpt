@@ -7,6 +7,7 @@
 #include "source-uv-sampler.hpp"
 #include <array>
 #include <cstddef>
+#include <optional>
 #include <span>
 
 namespace dome {struct MToonTexture;struct PaintSourceTexture;}
@@ -24,7 +25,7 @@ public:
 std::unique_ptr<SourceMaterialRaster> create_source_material_raster(
     const PaintedMesh &,const Material &,const SourceMaterialRaster::Roles &,
     float occlusion_strength,uint32_t resolution,size_t working_bytes,const std::function<bool()> &,
-    bool include_emission=true);
+    bool include_emission=true,std::optional<std::array<float,3>> shared_shade={});
 
 class EmissionRasterDevice {
 public:
@@ -71,9 +72,10 @@ struct MaterialInput {
   std::vector<const PaintColorTile *> pbr;
   std::span<const uint8_t> bake_color,bake_orm,bake_coverage;
   paint_compute::Parameters factors;
+  std::array<float,3> shade_factor{};
   float occlusion_strength=1;
   size_t capacity=0,largest_image=0;
-  bool resident=false;
+  bool resident=false,shared_shade=false;
 };
 struct PackedField {
   uint32_t constants[7]{},mask=0,stride=0,offset=0;

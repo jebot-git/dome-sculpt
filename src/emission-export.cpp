@@ -491,7 +491,7 @@ EmissionExportPrepared prepare_emission_export(std::span<const ObjectSurface> ob
  safe.material.emissive={};
  if(prepared_mtoon)safe.material.unlit=false;
  if(entry.prepared_source_mesh){
-  if(owner.painted->baked())source_baked_hdr_export(owner,safe,cancelled);
+  if(owner.painted->baked())entry.prepared_mtoon_shade=source_baked_hdr_export(owner,safe,cancelled);
   else{
    auto paint=EmissionExportAccess::without_emission(*owner.painted);
    safe.textures=paint->preview(safe.material,cancelled);

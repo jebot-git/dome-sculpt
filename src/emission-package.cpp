@@ -9,6 +9,7 @@
 #include "native-paint-frame-export-policy.hpp"
 #include "canonical-paint-export-policy.hpp"
 #include "normal-frame-export.hpp"
+#include "mtoon-role-sampling.hpp"
 #include "emission-paint-access.hpp"
 #include <bit>
 #include "emission-exr-access.hpp"
@@ -386,6 +387,12 @@ void prepared_source_domain(const Json &j,std::span<const uint8_t> binary,const 
      (!object.painted->baked()->maps.normal.rgba.empty()&&
        (!same_atlas(material.at("normalTexture"))||!primitives[0].at("attributes").contains("TANGENT"))))
    throw std::invalid_argument("Prepared MToon1 Bake lost its compiled color or normal atlas");
+  if(detail::mtoon_shared_shade(*object.material_bindings)){
+   const auto &toon=extensions->at("VRMC_materials_mtoon");
+   const auto &shade=toon.at("shadeMultiplyTexture");
+   if(!same_atlas(shade)||toon.value("shadeColorFactor",std::array{1.f,1.f,1.f})!=std::array{1.f,1.f,1.f})
+    throw std::invalid_argument("Prepared MToon1 Bake lost its compiled shared-shade atlas");
+  }
  }
  const auto &info=material.at("emissiveTexture");
  if(info.value("texCoord",size_t(0))!=coordinate||info.contains("extensions"))
@@ -574,12 +581,19 @@ void detail::attach_native_emission(GltfDocument &document,const NativeEmissionE
  if(entry.prepared_source_mesh){
   const auto mesh=current_object.painted?current_object.painted->mesh_owner():nullptr;
   const auto baked=entry.authored_mtoon&&current_object.painted?current_object.painted->baked():nullptr;
+  const bool shared_shade=baked&&current_object.material_bindings&&mtoon_shared_shade(*current_object.material_bindings);
   if(entry.native_paint_domain||entry.canonical_paint_domain||entry.texture_set||
      entry.prepared_source_mesh!=mesh||entry.prepared_source_mesh.owner_before(mesh)||mesh.owner_before(entry.prepared_source_mesh)||
-     entry.prepared_mtoon_bake!=baked||entry.prepared_mtoon_bake.owner_before(baked)||baked.owner_before(entry.prepared_mtoon_bake))
+     entry.prepared_mtoon_bake!=baked||entry.prepared_mtoon_bake.owner_before(baked)||baked.owner_before(entry.prepared_mtoon_bake)||
+     bool(entry.prepared_mtoon_shade.image)!=shared_shade)
    throw std::invalid_argument("Prepared HDR record lost its immutable mesh owner");
   record["domain"]={{"version",1},{"kind","prepared-source"},{"texCoord",entry.texcoord}};
   prepared_source_domain(j,document.binary,record,current_object,cancelled);
+  if(shared_shade){
+   const auto &material=j.at("materials").at(entry.material);
+   const auto &shade=material.at("extensions").at("VRMC_materials_mtoon").at("shadeMultiplyTexture");
+   validate_canonical_role_png(j,document.binary,shade,*entry.prepared_mtoon_shade.image,cancelled);
+  }
  }
  if(entry.texture_set){
   record["textureSet"]={{"id",*entry.texture_set},{"texCoord",entry.texcoord}};

@@ -11,7 +11,7 @@ inline bool mtoon_shared_shade(const SourceMaterialBindings &binding) {
   const auto &x=binding.material.textures[base], &y=binding.material.textures[shade];
   return a.image && a.image==b.image && a.wrap_s==b.wrap_s && a.wrap_t==b.wrap_t &&
       a.min_filter==b.min_filter && a.mag_filter==b.mag_filter &&
-      mtoon_coordinate(x)==mtoon_coordinate(y) &&
+      mtoon_coordinate(x,7)==mtoon_coordinate(y,7) &&
       (binding.material.version()==MToonVersion::V0 ||
        (x.offset==y.offset && x.scale==y.scale && x.rotation==y.rotation));
 }

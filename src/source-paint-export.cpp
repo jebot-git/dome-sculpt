@@ -420,6 +420,7 @@ struct PaintAtlas {
   bool transparent=false;
   std::shared_ptr<Image> normal{};
   bool includes_occlusion=false;
+  std::shared_ptr<Image> shade{};
 };
 
 void prepare_baked_export_frame(const SculptObject &owner,ObjectSurface &out,
@@ -503,9 +504,8 @@ void validate_baked_mtoon_color(const SculptObject &owner) {
   const auto &typed=binding.material;
   const auto &params=typed.parameters;
   if(typed.version()!=MToonVersion::V1||params.base_color!=binding.native_reference.color||
-     int(params.alpha)+1!=binding.native_reference.alpha||params.alpha_cutoff!=binding.native_reference.alpha_cutoff||
-     mtoon_shared_shade(binding))
-    throw std::invalid_argument("Prepared MToon1 color Bake requires its shared base role and separate shade sampling");
+     int(params.alpha)+1!=binding.native_reference.alpha||params.alpha_cutoff!=binding.native_reference.alpha_cutoff)
+    throw std::invalid_argument("Prepared MToon1 color Bake requires its original shared glTF base role");
   const auto &before=*owner.painted->source_sampling_original();
   const PaintSourceTexture empty;
   const auto &source=before.source_maps()?before.source_maps()->color:empty;
@@ -529,7 +529,12 @@ PaintAtlas compile_baked_hdr_atlas(const SculptObject &owner,const ObjectSurface
   const auto padding=EmissionExportAccess::writable_padding(paint);
   const auto r=paint.resolution();
   ProofWork work{cancelled};
-  work.charge(padding.size()*6);
+  std::optional<std::array<float,3>> shade_factor;
+  if(owner.material_bindings&&owner.material_bindings->has_mtoon&&mtoon_shared_shade(*owner.material_bindings)){
+    const auto shade=owner.material_bindings->material.parameters.shade_color;
+    shade_factor=std::array{shade.x,shade.y,shade.z};
+  }
+  work.charge(padding.size()*(shade_factor?9:6));
   if(owner.material_bindings&&owner.material_bindings->has_mtoon&&material.alpha==Material::AlphaMode::Automatic)
     material.alpha=Material::AlphaMode(owner.material_bindings->native_reference.alpha);
   AtlasAlpha alpha;
@@ -543,11 +548,13 @@ PaintAtlas compile_baked_hdr_atlas(const SculptObject &owner,const ObjectSurface
   }
   const auto image=[&]{return std::make_shared<Image>(Image{r,r,std::vector<uint8_t>(padding.size()*4)});};
   PaintAtlas atlas{image(),image(),{},alpha.transparent,baked_normal_atlas(owner,out,padding,work),true};
+  if(shade_factor)atlas.shade=image();
   const auto store=[&](size_t at,const paint_compute::Output &pixel){
     auto *rgba=atlas.color->rgba.data()+at*4;
     std::copy_n(pixel.color,4,rgba);
     if(alpha.constant)rgba[3]=255;
     std::copy_n(pixel.orm,4,atlas.orm->rgba.data()+at*4);
+    if(atlas.shade)std::copy_n(pixel.emission,4,atlas.shade->rgba.data()+at*4);
     atlas.transparent|=!alpha.constant&&pixel.transparent;
   };
   const SourceMaterialRaster::Roles roles{maps.color.image?&maps.color:nullptr,
@@ -556,8 +563,9 @@ PaintAtlas compile_baked_hdr_atlas(const SculptObject &owner,const ObjectSurface
   for(size_t i=0;i<roles.size();++i)if(roles[i])uv[i]=source_texture_coordinates(paint.mesh(),maps,roles[i]->texcoord);
   if(compute_backend()!="CPU"){
     constexpr size_t working_bytes=256u*1024u*1024u;
+    const size_t atlas_bytes=padding.size()*(8+(atlas.normal?4:0)+(atlas.shade?4:0));
     auto device=create_source_material_raster(paint,material,roles,maps.occlusion_strength,r,
-        working_bytes-padding.size()*(atlas.normal?12:8),cancelled,false);
+        working_bytes-atlas_bytes,cancelled,false,shade_factor);
     std::vector<uint32_t> texels;
     texels.reserve(device->capacity());
     std::vector<paint_compute::Output> output(device->capacity());
@@ -601,6 +609,16 @@ PaintAtlas compile_baked_hdr_atlas(const SculptObject &owner,const ObjectSurface
         pixel.color[k]=unorm8(k<3?linear_to_srgb(c):c);
         if(k==3)pixel.transparent=c<.999f;
       }
+      if(shade_factor){
+        for(size_t k=0;k<3;++k){
+          const float base=material.color[k],factor=(*shade_factor)[k];
+          const float ink=base!=0?value[0][k]/base:value[0][k];
+          const float shade=factor==0?0:factor*(color[k]*(1-value[3][0])+ink);
+          if(shade>1.000001f)throw std::invalid_argument("Prepared MToon1 shade exceeds the portable texture range");
+          pixel.emission[k]=unorm8(linear_to_srgb(shade));
+        }
+        pixel.emission[3]=255;
+      }
       pixel.orm[0]=unorm8((1-maps.occlusion_strength*(1-ao[0]))*(1-value[1][3])+value[1][0]);
       pixel.orm[1]=unorm8(material.roughness*orm[1]*(1-value[3][2])+value[1][1]);
       pixel.orm[2]=unorm8(material.metallic*orm[2]*(1-value[3][1])+value[1][2]);
@@ -612,7 +630,7 @@ PaintAtlas compile_baked_hdr_atlas(const SculptObject &owner,const ObjectSurface
     if((at&1023)==0)work.stop();
     const auto from=padding[at];
     if(from<0||size_t(from)==at)continue;
-    for(auto *image:{atlas.color.get(),atlas.orm.get(),atlas.normal.get()})if(image)
+    for(auto *image:{atlas.color.get(),atlas.orm.get(),atlas.normal.get(),atlas.shade.get()})if(image)
       std::copy_n(image->rgba.data()+size_t(from)*4,4,image->rgba.data()+at*4);
   }
   if(prove_mask&&!certify_baked_mask(out,packet,maps,*atlas.color,material,work))
@@ -868,7 +886,7 @@ void install_atlas(PaintSourceMaps &source,PaintAtlas atlas,const ObjectSurface 
   }
 }
 
-void compile_source_surface(const PaintedMesh &paint,ObjectSurface &out,
+PaintSourceTexture compile_source_surface(const PaintedMesh &paint,ObjectSurface &out,
     const std::function<bool()> &cancelled,SourcePaintExport mode,const SculptObject *baked_owner) {
   auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Source paint export cancelled");};
   stop();
@@ -909,7 +927,13 @@ void compile_source_surface(const PaintedMesh &paint,ObjectSurface &out,
     values=std::make_shared<const std::vector<std::array<float,2>>>(remap(*values));
   auto uv0=remap(before->mesh().uv);
   const bool transparent=atlas.transparent;
+  auto shade_image=std::move(atlas.shade);
   install_atlas(*source,std::move(atlas),out,uv0,bytes_limit,mode==SourcePaintExport::StandardHdr);
+  PaintSourceTexture shade;
+  if(shade_image){
+    shade=source->color;
+    shade.image=std::move(shade_image);
+  }
   out.mesh.uv=std::move(uv0);
   // The pins and seams describe the native atlas editor.
   out.mesh.uv_pins.clear();
@@ -924,6 +948,7 @@ void compile_source_surface(const PaintedMesh &paint,ObjectSurface &out,
   out.material=std::move(material);
   out.textures=std::move(textures);
   stop();
+  return shade;
 }
 } // namespace
 
@@ -932,7 +957,7 @@ void source_paint_export(const PaintedMesh &paint,ObjectSurface &out,
   compile_source_surface(paint,out,cancelled,mode,nullptr);
 }
 
-void source_baked_hdr_export(const SculptObject &owner,ObjectSurface &out,
+PaintSourceTexture source_baked_hdr_export(const SculptObject &owner,ObjectSurface &out,
     const std::function<bool()> &cancelled) {
   const auto &paint=owner.painted;
   auto marker=source_baked_preview(owner,cancelled);
@@ -943,6 +968,6 @@ void source_baked_hdr_export(const SculptObject &owner,ObjectSurface &out,
   out.textures=std::move(marker);
   if(owner.material_bindings&&owner.material_bindings->has_mtoon)validate_baked_mtoon_color(owner);
   prepare_baked_export_frame(owner,out,cancelled);
-  compile_source_surface(*paint,out,cancelled,SourcePaintExport::StandardHdr,&owner);
+  return compile_source_surface(*paint,out,cancelled,SourcePaintExport::StandardHdr,&owner);
 }
 } // namespace dome::detail
