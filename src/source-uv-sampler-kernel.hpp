@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
+#include "dome/paint.hpp"
 #include "dome/source-maps.hpp"
 #include "paint-composite-kernel.hpp"
 #include "paint-source-coordinate-kernel.hpp"
@@ -41,9 +42,8 @@ inline uint64_t source_affine_axis(uint32_t c0,uint32_t c1,uint32_t offset,uint6
 #if defined(__CUDACC__) || defined(__HIPCC__)
 __host__ __device__
 #endif
-inline void sample_mapped_source(MappedSourceImage image,
-    SourceUvSampler::Coordinate coordinate, const paint_compute::Quantization &table,
-    uint32_t *output, size_t at) {
+inline void sample_mapped_source_channels(MappedSourceImage image,
+    SourceUvSampler::Coordinate coordinate,const paint_compute::Quantization &table,float (&color)[4]) {
   using namespace paint_compute;
   auto u = paint_grid::widen_float_bits(bits(coordinate.u));
   auto v = paint_grid::widen_float_bits(bits(coordinate.v));
@@ -58,8 +58,18 @@ inline void sample_mapped_source(MappedSourceImage image,
     coordinates::axis(u, image.width, image.wrap_s, image.nearest),
     coordinates::axis(v, image.height, image.wrap_t, image.nearest)
   };
-  float color[4];
   sample_source_taps(image.rgba, image.width, image.nearest, taps, image.srgb, table, color);
+}
+
+#if defined(__CUDACC__) || defined(__HIPCC__)
+__host__ __device__
+#endif
+inline void sample_mapped_source(MappedSourceImage image,
+    SourceUvSampler::Coordinate coordinate, const paint_compute::Quantization &table,
+    uint32_t *output, size_t at) {
+  using namespace paint_compute;
+  float color[4];
+  sample_mapped_source_channels(image,coordinate,table,color);
   using Output = SourceUvSampler::Output;
   if (image.format == Output::EncodedRgba) {
     uint32_t rgba = 0;

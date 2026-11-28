@@ -113,14 +113,25 @@ The compacted atlas now feeds automatic and explicit cage-ray preparation
 and BVH projection on the same device queue. The worker uploads corner
 data once per raster span. It receives ordered target samples and source
 hits after projection. Source provenance and matching-topology bakes use
-their existing direct mapping. The native worker still builds the final
-tangent frames and resolves materials from the projected samples. Arc
+their existing direct mapping. Arc
 matches 16,384 host-prepared ray records bit for bit. In the byte-identical
 1024² fixture, 32 corner uploads carry 4 KiB in place of 256 ray uploads
 carrying 40 MiB. Warm Bake stays near 0.64 seconds. The first Bake takes
 7.27 seconds with resident preparation and 6.53 seconds on the preceding
 revision.
 [Resident cage-ray evidence](validation/bake-resident-cage-20261128.json)
+
+Bake now samples original and precomposited texture maps on the selected GPU.
+Original base color, metallic/roughness, separate occlusion and legacy emission
+use each role's retained UV set, transform, wrapping and filter. Baked maps use
+the original FLOAT texel-centre arithmetic. This also covers separate prepared
+PBR color and standalone tangent-normal image filtering. The worker keeps
+sparse paint blending, raw normal-frame evaluation and authored FLOAT emission
+resolution in their existing domains. It reads bounded linear sample batches
+and shades in original atlas order. Arc matches 16,384 independent baked-map
+samples bit for bit. The byte-identical 1024² original-material fixture drops
+from 0.73 to 0.42 seconds warm and rises from 6.09 to 7.11 seconds cold.
+[GPU Bake material evidence](validation/bake-material-gpu-20261128.json)
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing

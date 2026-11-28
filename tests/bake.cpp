@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake.hpp"
 #ifdef DOME_TEST_BAKE_RAY_DEVICE
+#include "bake-material-input.hpp"
 #include "bake-raster-device.hpp"
 #include "bake-ray-device.hpp"
 #include "bake-ray-query.hpp"
@@ -258,6 +259,56 @@ void resident_cage_projection(){
   check(rejects([&]{limited->rasterize_and_project(std::span(&span,1),std::span(&face,1),
         resolution*resolution,1,2000,{});}),"The resident pipeline refuses an insufficient ray budget before tracing");
 }
+
+void original_material_device_sampling(){
+  namespace device=detail::bake_material;
+  auto mesh=quad();
+  auto image=std::make_shared<Image>(Image{11,7,std::vector<uint8_t>(11*7*4)});
+  for(size_t i=0;i<image->rgba.size();++i)image->rgba[i]=uint8_t((i*71+i/9*31)%256);
+  auto maps=std::make_shared<PaintSourceMaps>();
+  maps->uv1=std::make_shared<const std::vector<std::array<float,2>>>(
+      std::initializer_list<std::array<float,2>>{{-.2f,2.5f},{-1.2f,.1f},{2.8f,-.9f},{-.4f,-.3f}});
+  maps->extra_uv_sets[2]=std::make_shared<const std::vector<std::array<float,2>>>(
+      std::initializer_list<std::array<float,2>>{{.4f,-.1f},{2.3f,2.1f},{-4.8f,.9f},{2.4f,.3f}});
+  maps->color.image=maps->metal_rough.image=maps->emission.image=maps->occlusion.image=image;
+  maps->color.texcoord=1;maps->color.wrap_s=33648;maps->color.uv_transform={.713f,-.231f,.147f,.866f,-.81f,.37f};
+  maps->metal_rough.texcoord=2;maps->metal_rough.wrap_t=33071;
+  maps->emission.texcoord=1;maps->emission.mag_filter=9728;maps->emission.wrap_t=33648;
+  maps->occlusion.texcoord=2;maps->occlusion_strength=.47f;
+  maps->occlusion.uv_transform={-.926f,.211f,.08f,.773f,-.5f,1.34f};
+  maps->validate_surface(mesh);
+  BakeMaterial material;
+  material.material.color={.31f,.67f,.83f,.72f};
+  material.material.emissive={.53f,.11f,.41f};
+  material.material.roughness=.61f;material.material.metallic=.29f;
+  auto texture=std::make_shared<TextureMaps>();
+  texture->source_only=true;texture->source_maps=maps;
+  material.maps=texture;
+  const device::MaterialInput input(material,false,nullptr);
+  std::vector<device::Coordinates> coordinates;
+  std::vector<std::array<float,3>> weights;
+  for(unsigned y=0;y<37;++y)for(unsigned x=0;x<=y;++x){
+    const float u=(x+.3f)/37.f,v=(y-x+.2f)/37.f;
+    weights.push_back({u,v,1-u-v});
+    coordinates.push_back(input.coordinates(mesh,0,weights.back(),{},{}));
+  }
+  auto sampler=device::upload(input.images,input.parameters);
+  std::vector<device::Values> values(coordinates.size());
+  sampler->read(coordinates,values,{});
+  for(size_t i=0;i<weights.size();++i){
+    const auto color=sample_surface_texture(mesh,*maps,maps->color,0,weights[i],true);
+    const auto orm=sample_surface_texture(mesh,*maps,maps->metal_rough,0,weights[i],false);
+    const auto emission=sample_surface_texture(mesh,*maps,maps->emission,0,weights[i],true);
+    const auto ao=sample_surface_texture(mesh,*maps,maps->occlusion,0,weights[i],false);
+    const auto &actual=values[i];
+    bool exact=actual.roughness==orm[1]*material.material.roughness&&actual.metallic==orm[2]*material.material.metallic&&
+        actual.occlusion==1-maps->occlusion_strength*(1-ao[0]);
+    for(unsigned c=0;c<4;++c)exact&=actual.color[c]==color[c]*material.material.color[c];
+    for(unsigned c=0;c<3;++c)exact&=actual.emission[c]==emission[c]*material.material.emissive[c];
+    if(!exact)throw std::runtime_error("Device material lost exact extra-UV, affine, sampler or factor semantics");
+  }
+  check(true,"GPU material values exactly preserve UV1 and UV2, affine filtering, opacity and separate occlusion");
+}
 #endif
 } // namespace
 int main()try {
@@ -267,6 +318,7 @@ int main()try {
   ambient_device_traversal();
   oblique_device_precision();
   resident_cage_projection();
+  original_material_device_sampling();
 #endif
   auto low=quad();BakeSource source;source.mesh=quad();
   BakeOptions options;options.resolution=32;options.padding=0;options.ao_samples=0;

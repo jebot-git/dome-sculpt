@@ -1,11 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include <sycl/sycl.hpp>
+#include "bake-material-device-job.hpp"
 #include "bake-raster-device-job.hpp"
 #include "bake-ray-device-query.hpp"
 #include "paint-composite-kernel.hpp"
 #include "surface-ray-softfloat.hpp"
 
 namespace dome::detail {
+namespace bake_material {
+void launch_material(sycl::queue &,View,const Coordinates *,const paint_compute::Quantization *,Values *,size_t);
+}
 namespace bake_raster {
 void launch_raster(sycl::queue &,View,const Span *,uint32_t span_count,uint32_t count,uint32_t first,Sample *);
 void launch_compact(sycl::queue &,View,const Sample *,uint32_t count,uint32_t first,uint32_t blocks,Block *,Sample *,Totals *);
@@ -48,6 +52,10 @@ public:
   void prepare_cage_rays(const bake_raster::ProjectionFace *faces,bake_raster::ProjectionSettings settings,
                          const bake_raster::Sample *samples,size_t count,ProjectionRay *rays,uint32_t *status){
     bake_raster::launch_cage_rays(queue_,faces,settings,samples,count,rays,status);
+  }
+  void sample_bake_material(bake_material::View view,const bake_material::Coordinates *coordinates,
+                            const paint_compute::Quantization *table,bake_material::Values *values,size_t count){
+    bake_material::launch_material(queue_,view,coordinates,table,values,count);
   }
 
   void trace(SurfaceView surface,const Frame *frames,const Vec3 *pattern,size_t samples,float maximum,
@@ -97,5 +105,8 @@ std::unique_ptr<Query> upload(const Surface &surface,std::span<const Vec3> patte
 
 std::unique_ptr<bake_raster::Raster> bake_raster::create(std::span<const float> axis,std::span<const uint8_t> writable){
   return create_device<bake_rays::SyclApi>(axis,writable);
+}
+std::unique_ptr<bake_material::Sampler> bake_material::upload(const ImageInput (&roles)[RoleCount],Parameters parameters){
+  return std::make_unique<DeviceSampler<bake_rays::SyclApi>>(roles,parameters);
 }
 } // namespace dome::detail

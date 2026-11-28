@@ -3,6 +3,7 @@
 #include "source-bake-normal.hpp"
 #include "bake-ray-device.hpp"
 #include "bake-raster-device.hpp"
+#include "bake-material-input.hpp"
 #include "bake-ray-query.hpp"
 #include "bake-paint-coordinates.hpp"
 #include "emission-bake-source.hpp"
@@ -21,6 +22,7 @@
 #include <cmath>
 #include <deque>
 #include <limits>
+#include <numeric>
 namespace dome {
 namespace {
 constexpr float Pi = 3.14159265358979323846f;
@@ -91,8 +93,8 @@ std::array<float,4> sample(const Image &image, std::array<float,2> uv, bool repe
 }
 uint8_t byte(float value) { return uint8_t(std::lround(std::clamp(value,0.f,1.f)*255)); }
 struct Channels { std::array<float,4> color; std::array<float,3> emission; float roughness,metallic,ao=1; };
-Channels material(const BakeMaterial &m, const Mesh &mesh, size_t triangle,
-                  const std::array<float,3> &bary, std::array<float,2> uv, bool pbr=false) {
+Channels material_base(const BakeMaterial &m,const Mesh &mesh,size_t triangle,
+                       const std::array<float,3> &bary,std::array<float,2> uv) {
   Channels result{m.material.color,m.material.emissive,m.material.roughness,m.material.metallic,1};
   if (!m.maps) return result;
   if(m.maps->source_only){
@@ -106,14 +108,6 @@ Channels material(const BakeMaterial &m, const Mesh &mesh, size_t triangle,
     }
     result.roughness*=orm[1];result.metallic*=orm[2];
     if(raw.occlusion.image)result.ao=1-raw.occlusion_strength*(1-sample_surface_texture(mesh,raw,raw.occlusion,triangle,bary,false)[0]);
-    if(m.maps->overlay){
-      const auto contribution=detail::sample_overlay_values(*m.maps->overlay,uv[0],uv[1],pbr);
-      for(size_t c=0;c<4;++c)result.color[c]=result.color[c]*(1-contribution[3][0])+contribution[0][c];
-      result.ao=result.ao*(1-contribution[1][3])+contribution[1][0];
-      result.roughness=result.roughness*(1-contribution[3][2])+contribution[1][1];
-      result.metallic=result.metallic*(1-contribution[3][1])+contribution[1][2];
-      for(size_t c=0;c<3;++c)result.emission[c]=result.emission[c]*(1-contribution[3][3])+contribution[2][c];
-    }
     return result;
   }
   const auto color=sample(m.maps->color,uv,m.repeat_uv,true), orm=sample(m.maps->metal_rough,uv,m.repeat_uv,false);
@@ -124,6 +118,17 @@ Channels material(const BakeMaterial &m, const Mesh &mesh, size_t triangle,
   }
   result.roughness=orm[1]*(m.maps_are_composited?1:result.roughness);
   result.metallic=orm[2]*(m.maps_are_composited?1:result.metallic); result.ao=orm[0]; return result;
+}
+Channels material_overlay(const BakeMaterial &m,Channels result,std::array<float,2> uv,bool pbr){
+  if(m.maps&&m.maps->source_only&&m.maps->overlay){
+    const auto contribution=detail::sample_overlay_values(*m.maps->overlay,uv[0],uv[1],pbr);
+    for(size_t c=0;c<4;++c)result.color[c]=result.color[c]*(1-contribution[3][0])+contribution[0][c];
+    result.ao=result.ao*(1-contribution[1][3])+contribution[1][0];
+    result.roughness=result.roughness*(1-contribution[3][2])+contribution[1][1];
+    result.metallic=result.metallic*(1-contribution[3][1])+contribution[1][2];
+    for(size_t c=0;c<3;++c)result.emission[c]=result.emission[c]*(1-contribution[3][3])+contribution[2][c];
+  }
+  return result;
 }
 float radical_inverse(uint32_t n) {
   n=(n<<16)|(n>>16); n=((n&0x55555555u)<<1)|((n&0xaaaaaaaau)>>1);
@@ -510,29 +515,25 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     ambient_frames.clear();
   };
 #endif
-  auto shade=[&](size_t at,size_t triangle,const std::array<float,3> &bary,Vec3 normal,
-                 const TangentFrame &frame,const std::optional<SurfaceHit> &hit){
-    bool backface=false;
-    if(hit){
-      const auto first=size_t(hit->triangle)*3;
-      const auto a=source.mesh.positions[source.mesh.indices[first]],
-          b=source.mesh.positions[source.mesh.indices[first+1]],
-          c=source.mesh.positions[source.mesh.indices[first+2]];
-      auto facing=dot(cross(b-a,c-a),normal);
-      if(source_placement.reverse_winding)facing=-facing;
-      backface=facing<=0;
-    }
-    if (!hit||(!o.allow_backfaces&&backface)) { result.coverage[at]=3; ++result.missed; return; }
-    auto material_id=source.triangle_materials.empty()?0:source.triangle_materials[hit->triangle];
-    const auto &m=source.materials[material_id];
+  struct ShadePoint {
+    size_t at,triangle;
+    std::array<float,3> bary;
+    TangentFrame frame;
+    SurfaceHit hit;
+    uint32_t material_id;
     std::optional<detail::RetainedSourceBakeHit> retained;
-    if(retained_field(material_id))
-      retained=source_fields[material_id].sample(hit->triangle,hit->barycentric);
-    auto high_uv=source.mesh.uv.empty()?std::array<float,2>{}:texcoord(source.mesh,hit->triangle,hit->barycentric);
-    if(retained)high_uv=retained->paint_uv;
-    const auto paint_uv=detail::bake_paint_coordinates(source_normals.paint_domain().get(),
-        hit->triangle,hit->barycentric,high_uv);
-    auto channels=material(m,source.mesh,hit->triangle,hit->barycentric,paint_uv); auto high_normal=normalized(hit->normal);
+    std::array<float,2> high_uv,paint_uv;
+  };
+  namespace shade_device=detail::bake_material;
+  auto shade_resolved=[&](const ShadePoint &point,const shade_device::Values *sampled){
+    const auto &[at,triangle,bary,frame,projection,material_id,retained,high_uv,paint_uv]=point;
+    const auto *hit=&projection;
+    const auto &m=source.materials[material_id];
+    const auto base=sampled?Channels{{sampled->color[0],sampled->color[1],sampled->color[2],sampled->color[3]},
+        {sampled->emission[0],sampled->emission[1],sampled->emission[2]},sampled->roughness,sampled->metallic,sampled->occlusion}:
+        material_base(m,source.mesh,hit->triangle,hit->barycentric,paint_uv);
+    auto channels=material_overlay(m,base,paint_uv,false);
+    auto high_normal=normalized(hit->normal);
     if(float_emission){
       if(retained&&retained->emission)emission[at]=*retained->emission;
       else if(gpu_emission&&m.emission_batch){
@@ -541,9 +542,13 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       }else if(m.resolved_emission)emission[at]=m.resolved_emission(hit->triangle,hit->barycentric);
       else emission[at]=channels.emission;
     }
-    auto pbr_color=m.maps&&m.maps->overlay?material(m,source.mesh,hit->triangle,hit->barycentric,paint_uv,true).color:channels.color;
+    auto pbr_color=channels.color;
     const bool resolved_source=m.maps&&!m.maps->pbr_color.rgba.empty();
-    if(o.separate_pbr_color&&resolved_source)pbr_color=sample(m.maps->pbr_color,paint_uv,false,true);
+    if(o.separate_pbr_color){
+      if(resolved_source)pbr_color=sampled?std::array<float,4>{sampled->pbr[0],sampled->pbr[1],sampled->pbr[2],sampled->pbr[3]}:
+          sample(m.maps->pbr_color,paint_uv,false,true);
+      else if(m.maps&&m.maps->overlay)pbr_color=material_overlay(m,base,paint_uv,true).color;
+    }
     if(!source.colors.empty()){
       std::array<float,4> tint{};for(int i=0;i<3;++i)for(int c=0;c<4;++c)tint[c]+=source.colors[source.mesh.indices[hit->triangle*3+i]][c]*hit->barycentric[i];
       for(int c=0;c<4;++c){if(!o.separate_pbr_color)channels.color[c]*=tint[c];else if(!resolved_source)pbr_color[c]*=tint[c];}
@@ -558,8 +563,9 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
         auto supplied = basis(source.mesh,hit->triangle,high_normal,hit->barycentric,source.tangents);
         tangent = {supplied.tangent, supplied.bitangent, supplied.normal};
       }
-      auto sampled=sample(*normal_image(m),high_uv,m.repeat_uv,false);
-      auto detail=Vec3{(sampled[0]*2-1)*m.normal_strength,(sampled[1]*2-1)*m.normal_strength,sampled[2]*2-1};
+      const auto normal_sample=sampled?std::array<float,4>{sampled->normal[0],sampled->normal[1],sampled->normal[2],0.f}:
+          sample(*normal_image(m),high_uv,m.repeat_uv,false);
+      auto detail=Vec3{(normal_sample[0]*2-1)*m.normal_strength,(normal_sample[1]*2-1)*m.normal_strength,normal_sample[2]*2-1};
       detail=length(detail)>1e-8f?normalized(detail):Vec3{0,0,1};
       high_normal=tangent.to_world(detail);
     }
@@ -664,6 +670,95 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       result.normal.rgba[at*4+2]=byte(mapped.z*.5f+.5f);result.normal.rgba[at*4+3]=255;}
     result.maps.transparent|=channels.color[3]<.9999f;
     result.coverage[at]=1; ++result.projected;
+  };
+#ifndef DOME_BAKE_RAY_REFERENCE
+  std::vector<shade_device::MaterialInput> material_inputs;
+  material_inputs.reserve(source.materials.size());
+  std::vector<uint8_t> device_material(source.materials.size());
+  bool have_device_materials=false;
+  for(size_t i=0;i<source.materials.size();++i){
+    const auto &input=material_inputs.emplace_back(source.materials[i],o.separate_pbr_color,
+        !source_normals&&needs_map(i)?normal_image(source.materials[i]):nullptr);
+    device_material[i]=input.textured();
+    have_device_materials|=device_material[i];
+  }
+  const auto material_capacity=have_device_materials?std::min(pixels,shade_device::batch_capacity):0;
+  std::vector<ShadePoint> material_points;
+  material_points.reserve(material_capacity);
+  std::vector<size_t> material_order;
+  material_order.reserve(material_capacity);
+  std::vector<shade_device::Coordinates> material_coordinates(material_capacity);
+  std::vector<shade_device::Values> material_sampled(material_capacity),material_results(material_capacity);
+  uint32_t resident_input=UINT32_MAX;
+  std::unique_ptr<shade_device::Sampler> material_sampler;
+  auto flush_materials=[&]{
+    if(material_points.empty())return;
+    cancel(o);
+    material_order.resize(material_points.size());
+    std::iota(material_order.begin(),material_order.end(),size_t(0));
+    const auto id=[&](size_t row){return material_points[row].material_id;};
+    if(!std::ranges::is_sorted(material_order,{},id))std::ranges::sort(material_order,{},id);
+    for(size_t first=0;first<material_order.size();){
+      const auto material_id=id(material_order[first]);
+      size_t end=first+1;
+      while(end<material_order.size()&&id(material_order[end])==material_id)++end;
+      if(device_material[material_id]){
+        const auto &input=material_inputs[material_id];
+        for(size_t i=first;i<end;++i){
+          if((i&255)==0)cancel(o);
+          const auto &point=material_points[material_order[i]];
+          material_coordinates[i-first]=input.coordinates(source.mesh,point.hit.triangle,point.hit.barycentric,
+                                                         point.paint_uv,point.high_uv);
+        }
+        if(resident_input!=material_id){
+          material_sampler.reset();
+          material_sampler=shade_device::upload(input.images,input.parameters);
+          resident_input=material_id;
+        }
+        const auto count=end-first;
+        material_sampler->read(std::span(material_coordinates).first(count),std::span(material_sampled).first(count),o.cancelled);
+        for(size_t i=first;i<end;++i)material_results[material_order[i]]=material_sampled[i-first];
+      }
+      first=end;
+    }
+    for(size_t i=0;i<material_points.size();++i){
+      if((i&63)==0)cancel(o);
+      const auto &point=material_points[i];
+      shade_resolved(point,device_material[point.material_id]?&material_results[i]:nullptr);
+    }
+    material_points.clear();
+  };
+#endif
+  auto shade=[&](size_t at,size_t triangle,const std::array<float,3> &bary,Vec3 normal,
+                 const TangentFrame &frame,const std::optional<SurfaceHit> &hit){
+    bool backface=false;
+    if(hit){
+      const auto first=size_t(hit->triangle)*3;
+      const auto a=source.mesh.positions[source.mesh.indices[first]],
+          b=source.mesh.positions[source.mesh.indices[first+1]],
+          c=source.mesh.positions[source.mesh.indices[first+2]];
+      auto facing=dot(cross(b-a,c-a),normal);
+      if(source_placement.reverse_winding)facing=-facing;
+      backface=facing<=0;
+    }
+    if (!hit||(!o.allow_backfaces&&backface)) { result.coverage[at]=3; ++result.missed; return; }
+    auto material_id=source.triangle_materials.empty()?0:source.triangle_materials[hit->triangle];
+    std::optional<detail::RetainedSourceBakeHit> retained;
+    if(retained_field(material_id))
+      retained=source_fields[material_id].sample(hit->triangle,hit->barycentric);
+    auto high_uv=source.mesh.uv.empty()?std::array<float,2>{}:texcoord(source.mesh,hit->triangle,hit->barycentric);
+    if(retained)high_uv=retained->paint_uv;
+    const auto paint_uv=detail::bake_paint_coordinates(source_normals.paint_domain().get(),
+        hit->triangle,hit->barycentric,high_uv);
+    ShadePoint point{at,triangle,bary,frame,*hit,material_id,std::move(retained),high_uv,paint_uv};
+#ifndef DOME_BAKE_RAY_REFERENCE
+    if(device_material[material_id]||!material_points.empty()){
+      material_points.push_back(std::move(point));
+      if(material_points.size()==material_capacity)flush_materials();
+      return;
+    }
+#endif
+    shade_resolved(point,nullptr);
   };
 #ifdef DOME_BAKE_RAY_REFERENCE
   SurfaceQueryOptions ray_options;
@@ -833,6 +928,8 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
 #ifndef DOME_BAKE_RAY_REFERENCE
   flush_raster();
   atlas.reset();
+  flush_materials();
+  material_sampler.reset();
 #endif
   if (result.overlapping&&o.fail_on_overlap) throw std::runtime_error("Overlapping low UV coverage: "+std::to_string(result.overlapping)+" texels");
   if (result.missed&&o.fail_on_miss) throw std::runtime_error("Projection missed "+std::to_string(result.missed)+" low UV texels");

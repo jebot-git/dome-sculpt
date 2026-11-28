@@ -17,8 +17,7 @@ cancellation and read back blocked-ray counts.
 Ordinary and cage-based Bake projection use the same device-resident index.
 The watertight ray and edge recovery preserve native triangle order, finite
 front and back bounds, their shared per-ray budget and the original tie
-rules. Projection returns bounded hit batches. Material resolution and
-construction of the published Bake fields remain on the host.
+rules. Projection returns bounded hit batches for the Bake material stages.
 [GPU Bake projection evidence](validation/bake-projection-gpu-20261128.json)
 
 Bake's target atlas uses the selected GPU for pixel-centre coverage,
@@ -34,6 +33,13 @@ host upload of one ray per target texel. Destination samples, hit records
 and ordered block ranges are read after tracing. Cage bounds, overlap,
 protection, cancellation and both work budgets retain their native rules.
 [Resident cage-ray evidence](validation/bake-resident-cage-20261128.json)
+
+Bake samples original material role images and precomposited maps in
+bounded GPU batches. The device preserves independent UV sets, glTF affine
+sampling, legacy wrapped and clamped texel centres, and one application of
+material factors. The worker keeps original atlas order when applying
+sparse paint, normal frames, FLOAT emission authority and publication.
+[GPU Bake material evidence](validation/bake-material-gpu-20261128.json)
 
 Eligible 512–2048 current-grid RGB8 Bake materials now composite color, ORM
 and legacy emission on the selected GPU. Their ordered paint, coverage,

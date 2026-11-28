@@ -1,0 +1,66 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#pragma once
+#include "bake-material-device.hpp"
+#include "dome/bake.hpp"
+#include "dome/source-maps.hpp"
+
+namespace dome::detail::bake_material {
+struct MaterialInput {
+  Parameters parameters{};
+  ImageInput images[RoleCount]{};
+  const PaintSourceMaps *source=nullptr;
+
+  MaterialInput(const BakeMaterial &material,bool separate_pbr,const Image *normal) {
+    const auto &factor=material.material;
+    std::copy_n(factor.color.begin(),4,parameters.color);
+    std::copy_n(factor.emissive.begin(),3,parameters.emission);
+    parameters.roughness=factor.roughness;
+    parameters.metallic=factor.metallic;
+    parameters.composited=material.maps_are_composited;
+    if(material.maps&&material.maps->source_only) {
+      source=material.maps->source_maps.get();
+      parameters.original=true;
+      parameters.occlusion_strength=source->occlusion_strength;
+      const auto set=[&](Role role,const PaintSourceTexture &texture){
+        if(texture.image)images[role]={texture.image.get(),&texture};
+      };
+      set(Color,source->color);
+      set(Orm,source->metal_rough);
+      if(!material.emission_batch)set(Emission,source->emission);
+      set(Occlusion,source->occlusion);
+    }else if(material.maps){
+      const auto &maps=*material.maps;
+      images[Color]={&maps.color,nullptr,material.repeat_uv};
+      images[Orm]={&maps.metal_rough,nullptr,material.repeat_uv};
+      if(!material.emission_batch)images[Emission]={&maps.emission,nullptr,material.repeat_uv};
+      if(separate_pbr&&!maps.pbr_color.rgba.empty())images[PbrColor]={&maps.pbr_color};
+    }
+    if(normal)images[TangentNormal]={normal,nullptr,material.repeat_uv};
+  }
+
+  bool textured() const {
+    return std::ranges::any_of(images,[](const auto &role){return role.image!=nullptr;});
+  }
+
+  Coordinates coordinates(const Mesh &mesh,uint32_t triangle,std::array<float,3> bary,
+                          std::array<float,2> paint_uv,std::array<float,2> high_uv) const {
+    Coordinates result{};
+    std::array<std::array<float,2>,8> source_uv;
+    unsigned ready=0;
+    for(unsigned i=0;i<RoleCount;++i){
+      if(!images[i].image)continue;
+      auto uv=i==TangentNormal?high_uv:paint_uv;
+      if(const auto *original=images[i].original){
+        const unsigned set=original->texcoord;
+        if(!(ready&(1u<<set))){
+          source_uv[set]=source_texture_uv(mesh,*source,int(set),triangle,bary);
+          ready|=1u<<set;
+        }
+        uv=source_uv[set];
+      }
+      result.uv[i][0]=uv[0];result.uv[i][1]=uv[1];
+    }
+    return result;
+  }
+};
+} // namespace dome::detail::bake_material

@@ -6,6 +6,7 @@
 #include <cuda_runtime.h>
 #define DOME_GPU(name) cuda##name
 #endif
+#include "bake-material-device-job.hpp"
 #include "bake-cage-ray-kernel.hpp"
 #include "bake-raster-device-job.hpp"
 #include "bake-ray-device-query.hpp"
@@ -92,6 +93,12 @@ __global__ void prepare_cage(const bake_raster::ProjectionFace *faces,bake_raste
   }
 }
 
+__global__ void bake_material_samples(bake_material::View view,const bake_material::Coordinates *coordinates,
+    const paint_compute::Quantization *table,bake_material::Values *values,size_t count){
+  const size_t i=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+  if(i<count)values[i]=bake_material::evaluate(view,coordinates[i],*table);
+}
+
 class GpuApi {
   DOME_GPU(Stream_t) stream_{};
 public:
@@ -139,6 +146,12 @@ public:
     prepare_cage<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(faces,settings,samples,count,rays,status);
     checked(DOME_GPU(GetLastError)());
   }
+  void sample_bake_material(bake_material::View view,const bake_material::Coordinates *coordinates,
+                            const paint_compute::Quantization *table,bake_material::Values *values,size_t count){
+    constexpr unsigned lanes=128;
+    bake_material_samples<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(view,coordinates,table,values,count);
+    checked(DOME_GPU(GetLastError)());
+  }
 
   void trace(SurfaceView surface,const Frame *frames,const Vec3 *pattern,size_t samples,float maximum,
              uint32_t *states,size_t rays,uint32_t *remaining,bool first){
@@ -171,6 +184,9 @@ std::unique_ptr<Query> upload(const Surface &surface,std::span<const Vec3> patte
 
 std::unique_ptr<bake_raster::Raster> bake_raster::create(std::span<const float> axis,std::span<const uint8_t> writable){
   return create_device<bake_rays::GpuApi>(axis,writable);
+}
+std::unique_ptr<bake_material::Sampler> bake_material::upload(const ImageInput (&roles)[RoleCount],Parameters parameters){
+  return std::make_unique<DeviceSampler<bake_rays::GpuApi>>(roles,parameters);
 }
 } // namespace dome::detail
 #undef DOME_GPU
