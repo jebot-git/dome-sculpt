@@ -17,6 +17,12 @@ selected compute backend. ONEAPI is the default. CUDA and ROCm remain
 explicit build choices. Desktop and OpenXR refuse software OpenGL or missing
 compute hardware. Command-line export also requires the selected compute GPU.
 CPU numerical and sanitizer references build as opt-in headless tests.
+Production CPU configuration was rechecked at `5440467a` and refused for
+desktop, OpenXR and headless builds. The closed-volume binding reference
+passes its focused native, Wayland and synthetic OpenXR checks on a
+[development branch](https://github.com/jebot-git/dome-sculpt/blob/work/gpu-volume-binding-reference-20261128/docs/VOLUME-BINDING-GPU-REFERENCE.md).
+Its weight-field solve still runs on the host. Production admission requires
+the selected GPU to run the solve.
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.
