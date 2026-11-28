@@ -1,0 +1,127 @@
+{
+  "date": "2026-11-28",
+  "product": "9a284bff16921bda767740f13ab3f2427e8e007b",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Standard GLB for prepared Core PBR HDR bakes with source-dependent MASK alpha and provable per-triangle visibility.",
+  "baseline": "The preceding release refused the exact mixed fixture and preserved a pre-existing GLB.",
+  "proof": "Bound each complete triangle using the actual source alpha envelope, writable FLOAT contribution and coverage taps, vertex alpha, and the padded portable PNG alpha.",
+  "real_bake_fixture": {
+    "partial_donor_projection": true,
+    "live_physical_touch_up": true,
+    "mixed_original_base_texcoord": 1,
+    "mixed_writable_texcoord": 2,
+    "mixed_cutoff": 0.28
+  },
+  "interior_edge": "The native image contains a visible cutout within a single triangle. Export refused, with the prior file and ordered native Save exact.",
+  "fixtures": {
+    "baked-mask-visible": {
+      "khronos": {
+        "validator": "2.0.0-dev.3.10",
+        "bytes": 431264,
+        "sha256": "7829e58d94294a184e1d04ef606a6511b10c12dd8c50bb343648c114401e61cf",
+        "errors": 0,
+        "warnings": 0
+      },
+      "native_project_sha256": "7679b33cccc249855bf541b784905341d79f323617edf0646cfa32e8de6f0d83",
+      "exact_fragment_membership": true,
+      "maximum_pixel_difference_bytes": 1
+    },
+    "baked-mask-hidden": {
+      "khronos": {
+        "validator": "2.0.0-dev.3.10",
+        "bytes": 431256,
+        "sha256": "b83e6cd6a27af1a137093069194dcf0a009b09e6618fd57efa66f5b9d442c218",
+        "errors": 0,
+        "warnings": 0
+      },
+      "native_project_sha256": "4165634a91dc1fa65abc9f8861b70cedf956bc452e795cd296781da84b193cb8",
+      "exact_fragment_membership": true,
+      "maximum_pixel_difference_bytes": 0
+    },
+    "baked-mask-mixed": {
+      "khronos": {
+        "validator": "2.0.0-dev.3.10",
+        "bytes": 427192,
+        "sha256": "679d0e26b8bcd883e9d3b3b34038fba217614469e96874d9130bdcea5b88d882",
+        "errors": 0,
+        "warnings": 0
+      },
+      "native_project_sha256": "eaea8e12b993aa2b3a07907c373bc485336eebb8641672baabffeb403c244812",
+      "exact_fragment_membership": true,
+      "maximum_pixel_difference_bytes": 1
+    }
+  },
+  "larger_fixture": {
+    "dimensions": [
+      512,
+      512
+    ],
+    "checks": 18,
+    "exact_fragment_membership": true,
+    "maximum_pixel_difference_bytes": 1,
+    "khronos": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 20537460,
+      "sha256": "a573183d28ae1f6e3784b1423164c7c8b426c3b89d84a7d4a95a6f1817741e6c",
+      "errors": 0,
+      "warnings": 0
+    }
+  },
+  "arc": {
+    "device": "Intel Arc A770 with oneAPI Level Zero and hardware EGL",
+    "checks": 626,
+    "material_and_emission_kernels": true
+  },
+  "release_ctest": [
+    "baked-emission-native",
+    "emission-raster-finite-compute",
+    "source-material-raster-compute",
+    "emission-raster-mapped-compute",
+    "emission-raster-mapped-missing-gpu",
+    "emission-raster-texture-set-compute",
+    "baked-emission-workflow",
+    "baked-emission-source",
+    "baked-emission-uv1-worker",
+    "emission-export",
+    "emission-export-worker",
+    "source-paint-export",
+    "source-paint-bake",
+    "source-paint-authoring",
+    "source-paint-physical-authoring",
+    "vrm1-source-export",
+    "raw-hdr-authoring",
+    "xr-editable-export"
+  ],
+  "asan_ubsan": {
+    "mode": "opt-in headless CPU reference",
+    "checks": 626,
+    "all_new_glbs_match_arc": true
+  },
+  "missing_gpu": "Release CLI rejected the prepared Bake export and preserved the existing GLB.",
+  "native_wayland": {
+    "checks": 7,
+    "artifact_sha256": "679d0e26b8bcd883e9d3b3b34038fba217614469e96874d9130bdcea5b88d882"
+  },
+  "openxr": {
+    "checks": 10,
+    "synthetic_tracking": true,
+    "artifact_sha256": "679d0e26b8bcd883e9d3b3b34038fba217614469e96874d9130bdcea5b88d882",
+    "native_sha256": "eaea8e12b993aa2b3a07907c373bc485336eebb8641672baabffeb403c244812",
+    "focus_loss_cancelled_export": true
+  },
+  "prior_glbs_byte_identical": {
+    "baked-source-hdr.glb": "7a8d9dd3f41218ef527fe2fed9346a0607ca554d28ea1b10b2e328f939c95729",
+    "baked-generated-tangents-hdr.glb": "40b51a7c7cfe9259bd9f0c6ad8c66cfa95b9090b7661495dca255255d2ae4f70",
+    "baked-native-tangents-hdr.glb": "5c8f728a32c527c18eec64ad30f8aab5664e1dae3ae7158ea75c89696e826273",
+    "varying-source-hdr.glb": "497b70223ba5aeb39e6556950e824b471cc39714ff83de0966c42081cfaf9cc6",
+    "single-surface-hdr.glb": "54fe8dccaaf6fc0ba69ace992aade6199eaea18b60dc5aa19d6bd6a444527971",
+    "mixed-source.glb": "ff769fff8afebfb62309e67abf0bc5efc1843dc13151d909bb2d981ebe9c84fa",
+    "mixed-source-hidden.glb": "484678692c4aad88173eb79876d79241c09895fa3faf1a52c04020612a689f5d",
+    "spatial-color.glb": "e68f51a66633e6f97b50b960578072e9968b38851e87419a4027ff42e54824a0",
+    "uniform-mask-cross.glb": "98e526883365742fef5b60880641cb918d3f4b761424f88089ab9c3a948b1b9a"
+  },
+  "open": [
+    "Cutout edges within triangles and prepared typed MToon require their own adapters.",
+    "Physical headset and positive CUDA and ROCm hardware qualification."
+  ]
+}

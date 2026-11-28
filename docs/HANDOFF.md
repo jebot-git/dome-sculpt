@@ -532,8 +532,16 @@ normal morph deltas remain intact. A prepared native mesh without an
 attribute frame uses its actual rest geometry and shape targets. Both
 cases emit tangent morph deltas and recover the editable project exactly.
 The independent renderer matches both fixtures within one byte on Arc.
-Prepared typed MToon and unproved MASK alpha remain open.
 [Generated Bake tangent evidence](validation/baked-generated-tangents-20261128.json)
+
+Prepared Core PBR HDR Bake now exports varying MASK alpha when the original
+source and baked paint give a definite visibility verdict over each triangle.
+The compiler bounds the actual atlas taps and texture alpha, including tighter
+source bounds for clamped non-mipmapped roles. Arc fixtures cover whole
+meshes that pass or fail and mixed geometry with both visible and hidden
+triangles. A real interior cutout edge still requires a portable adapter.
+Prepared typed MToon remains open.
+[Baked MASK evidence](validation/baked-mask-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with

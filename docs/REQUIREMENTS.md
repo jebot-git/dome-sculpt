@@ -164,9 +164,14 @@ native package preserves the donor, exact FLOAT Bake and editable layers.
 
 For prepared HDR bakes without tangents, the exporter generates an outbound
 MikkTSpace frame and tangent morph deltas from the writable atlas. Imported
-normal and POSITION targets remain intact. Prepared typed MToon and
-unproved MASK alpha remain open.
+normal and POSITION targets remain intact.
 [Generated Bake tangent evidence](validation/baked-generated-tangents-20261128.json)
+
+Prepared Core PBR HDR Bake preserves varying MASK alpha where the compiler
+can bound native and emitted visibility over each entire triangle. The
+export can keep distinct visible and hidden triangles in a single material.
+Cutout edges within a triangle and prepared typed MToon remain open.
+[Baked MASK evidence](validation/baked-mask-20261128.json)
 
 ## Current validation — 2026-11-27
 

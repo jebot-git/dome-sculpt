@@ -33,8 +33,16 @@ frame the GLB emits. If the mesh has no tangents, the exporter generates
 MikkTSpace tangents and tangent morph deltas on the writable atlas before
 it emits any texture coordinates. The native project retains the original
 source, bake recipe, exact FLOAT coefficients, normal layers and deformation.
-Prepared typed MToon and cutouts with unproved varying alpha still need
-their own adapters.
+
+Prepared Core PBR Bake can export varying MASK alpha when every triangle
+has the same visibility throughout its native and emitted filtering domains.
+Source alpha bounds include every source texel for wrapping or mipmapping.
+Clamped non-mipmapped source roles can use tighter bounds on the actual
+affine UV footprint. The compiler checks the padded PNG taps and original
+vertex alpha against the cutoff. It can move the cutoff within a proven gap
+to account for quantization. Cutout edges within a triangle still require a
+portable representation with a continuous visibility proof. Prepared typed
+MToon still needs its own material and normal adapter.
 
 ## First GLB implementation
 
