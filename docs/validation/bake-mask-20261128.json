@@ -1,0 +1,44 @@
+{
+  "date": "2026-11-28",
+  "product": "ebbded70fc951913477fd9d0f74db87b35228c6b",
+  "preceding": "3219254c728ba4064dfb806306ffe51a199dee41",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Bake through an authored target paint-layer mask, with exact preservation and independent retained normal UVs.",
+  "oneapi_arc_release": {
+    "application_sha256": "bba6c96c122f37c4536639bca6a123e3bdf061a85e03b5c2aa9f34a816b95627",
+    "ctest_passed": 16,
+    "ctest_log_sha256": "ab22122fc6e93801df354a07cdb68fc5a0fb5a48b704c9acd44cacf433f82d84",
+    "stricter_layer_comparison_ctest_passed": 2,
+    "stricter_layer_log_sha256": "77555415bafbc431354407b1d6920cbb0954205034dbd5d20f232576b8b20f05",
+    "wayland_assertions": 14,
+    "wayland_report_sha256": "1336896f832fb715e5d8b1ae9566fa2ae2de2c734d7991cfc9afd307d9d214a1",
+    "synthetic_openxr_mask_assertions": 20,
+    "openxr_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "openxr_expected_and_accepted_project_sha256": "7ba815ff3456c391d0dd1eb1588324e2cd46f439270d1a460b214342fbc570f7",
+    "openxr_input_cancel_and_focus_loss_project_sha256": "5335bfaa8cb150deaba763c8935fddffe195dc778f781de32a8cc9de7ff2518e",
+    "masked_cage_fixture": {
+      "resolution": 128,
+      "updated_color_texels": 14504,
+      "preserved_texels": 1880,
+      "protected_channels": [
+        "color",
+        "ORM",
+        "normal",
+        "FLOAT emission coefficients and coverage"
+      ]
+    },
+    "retained_normal_fixture": {
+      "assertions": 238,
+      "covers": "Independent triangle and UV oracle, both retained normal roles, immutable prior field and layer owners, native save and reopen.",
+      "accepted_project_sha256": "65498ddc9182c0c05da21f2d78843b0c8564c794aa736d7f1f1965c3611ce4d4"
+    }
+  },
+  "headless_reference": {
+    "ctest_passed": 5,
+    "stricter_layer_comparison_ctest_passed": 1,
+    "sanitizer": "ASan and UBSan on Bake, authoring, recipe and paint translation units and two fixtures linked to the matching headless Release core.",
+    "sanitizer_log_sha256": "e1130b0ac16115c559938267dc0cceaa9c40bdb25c2159b8967532353c59eea4"
+  },
+  "cuda_and_rocm": "Both compiled the Bake worker, authoring and shared device kernel units. Positive hardware execution and device loss remain unverified.",
+  "physical_headset": false
+}

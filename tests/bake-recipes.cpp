@@ -64,9 +64,10 @@ void verify_masked_cage(const Scene &input,const Scene &output,const ObjectBakeR
   require_cage(protected_count>0&&updated>0&&protected_count==report.protected_texels&&
       updated==report.projected&&!report.missed,
       "Masked rebake changes only writable texels and preserves protected channels and exact HDR bits");
+  const auto input_layers=paint.encode().at("payload").at("layers");
+  const auto output_layers=output.active().painted->encode().at("payload").at("layers");
   require_cage(output.active().bake_recipe&&output.active().bake_recipe->settings.mask_layer==layer&&
-      cage_sources(input)==cage_sources(output)&&
-      input.encode()["objects"][0]["painted"]["layers"]==output.encode()["objects"][0]["painted"]["layers"],
+      cage_sources(input)==cage_sources(output)&&input_layers==output_layers,
       "Mask recipe preserves the stable layer ID, editable layers and readonly sources");
 }
 

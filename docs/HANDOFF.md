@@ -251,6 +251,16 @@ Cancel and focus loss on the same hardware.
 [Four-sample Bake controls](BAKE-RECIPES.md#four-samples-per-texel) ·
 [Validation evidence](validation/bake-supersample-20261128.json)
 
+Bake can now use a target paint-layer mask. The recipe recalls the layer by
+ID and uses its current painted values. GPU projection and padding respect
+the protected texels. The Arc cage fixture updated 14,504 texels and kept all
+1,880 protected texels, including their exact FLOAT emission words. A separate
+retained normal atlas was verified through an independent UV oracle for both
+normal roles. Wayland and synthetic OpenXR selected the mask through the
+actual controls and saved the expected native project.
+[Paint-layer mask controls](BAKE-RECIPES.md#limit-bake-with-a-paint-layer-mask) ·
+[Validation evidence](validation/bake-mask-20261128.json)
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.
