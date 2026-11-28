@@ -855,6 +855,21 @@ void surface_heat_texture_accessory(const std::filesystem::path &out, Scene scen
   SkinAuthoringOptions options;
   options.reference = rig;
   options.mode = SkinAuthoringMode::SurfaceHeat;
+  {
+    auto accessory_first = scene.snapshot();
+    auto reference = *accessory_first.object(rig).deformation;
+    reference.skin.reset();
+    accessory_first.set_deformation(rig, std::move(reference));
+    auto reference_first = accessory_first.snapshot();
+    const std::array first{accessory, rig};
+    const std::array second{rig, accessory};
+    check(author_surface_heat_skin(accessory_first, first, options, {}) &&
+          author_surface_heat_skin(reference_first, second, options, {}) &&
+          accessory_first.object(rig).deformation->skin &&
+          accessory_first.object(accessory).deformation->source_skin_joints == scene.object(rig).appearance->source_joint_nodes &&
+          accessory_first.encode() == reference_first.encode(),
+          "One Surface Heat bind can create the VRM reference skin and its native link in either selection order");
+  }
   doc.bind_skin(options, doc.draft_scene().source);
   auto saved = out / "heat-bound.dsculpt";
   doc.save_async(saved).get();

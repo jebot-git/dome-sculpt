@@ -10,8 +10,7 @@
 #include "partial-current-surface-heat.hpp"
 #include "normal-frame-runtime.hpp"
 namespace dome::detail {
-// Private owning source-informed SURFACE heat route. No public method/default
-// redirection. Existing retention and lease primitives keep their exact meaning.
+// Surface Heat prepares detached weights and publishes them against one scene lease.
 struct NativeSurfaceHeatOptions:NativeAnatomicalOptions {
   WeightLimits limits{};
   float seed_distance=.3f;
@@ -24,9 +23,8 @@ struct NativeSurfaceHeatReport {
 class NativeSurfaceHeatPrepared;
 class NativeSurfaceHeatRequest {
   Scene input_;
-  std::vector<uint64_t>targets_,support_;
+  std::vector<uint64_t>targets_,support_,source_targets_,native_targets_;
   uint64_t reference_=0;
-  bool source_head_=false;
   NativeSurfaceHeatOptions options_;
   NativeWeightRetention retained_;
   size_t capture_bytes_=0;
@@ -57,7 +55,8 @@ inline NativeSurfaceHeatRequest capture_native_surface_heat(const Scene&source,
   const auto retained=native_weight_retention(source,options.maximum_total-options.maximum_workspace,options.maximum_work);
   geometry_weight_authoring::Bytes capture{65536,options.maximum_workspace};
   weight_surface::Budget capture_work{retained.work,options.maximum_work,{}};
-  capture.add(source.objects().size(),2048);capture.add(source.groups().size(),4096);capture.add(options.locks.size()+selected.size()*sizeof(uint64_t));
+  capture.add(source.objects().size(),2048);capture.add(source.groups().size(),4096);
+  capture.add(options.locks.size()+3*selected.size()*sizeof(uint64_t));
   for(const auto&o:source.objects()){
     if(!o.volume||o.volume->in_stroke()||(o.mesh_active&&!o.painted)||(o.painted&&o.painted->in_stroke()))throw std::invalid_argument("Native surface heat capture requires complete stable objects");
     capture.text(o.name);capture.text(o.material.name);capture_work.step(512+4*(o.name.size()+o.material.name.size()));
@@ -68,22 +67,30 @@ inline NativeSurfaceHeatRequest capture_native_surface_heat(const Scene&source,
   if(capture_work.used>=capture_work.maximum)throw std::length_error("Native surface heat capture exhausted work before staging");
   NativeSurfaceHeatRequest request;request.capture_bytes_=capture.used;
   request.retained_=retained;request.retained_.work=capture_work.used;request.options_=options;request.reference_=reference;request.identity_=std::make_shared<const uint64_t>(0);
+  request.targets_.reserve(selected.size());
   std::set<uint64_t> unique;
   for(auto id:selected){const auto&o=source.object(id);if(!unique.insert(id).second||!o.visible||o.locked||!o.mesh_active||!o.painted||!o.volume||o.painted->in_stroke()||o.volume->in_stroke())throw std::invalid_argument("Choose explicit editable anatomical targets");request.targets_.push_back(id);}
   const auto&ref=source.object(reference);
   if(!ref.mesh_active||!ref.painted||!ref.deformation||!ref.deformation->skeleton)throw std::invalid_argument("Choose the current native humanoid reference");
   if(!options.locks.empty()&&options.locks.size()!=ref.deformation->skeleton->bones.size())throw std::invalid_argument("Native surface heat lock/joint identity");
-  // Select the actual current source instance from explicit targets; foreign
-  // instances/objects stay in the full lease and owning resource admission.
-  // Prospective input policy, never a retry after a failed domain or solve.
-  // A complete authenticated humanoid source uses its existing geometry-only
-  // head/ocular domain; ordinary native geometry uses each actual requested
-  // one-owner surface and the same exact visibility/screened energy.
-  bool any_source=false;for(auto id:selected){capture_work.step(16);any_source|=bool(source.object(id).appearance);}
-  request.source_head_=bool(ref.deformation->humanoid)&&any_source&&
-    ref.deformation->humanoid->joints.contains("head")&&ref.deformation->humanoid->joints.contains("leftEye")&&ref.deformation->humanoid->joints.contains("rightEye");
-  if(request.source_head_){auto domain=native_anatomical_domain(source,selected,capture_work);request.support_=std::move(domain.objects);}
-  else request.support_=request.targets_;
+  // Retained parts of one authenticated avatar share its source boundary.
+  // Each native target contributes a separate mesh under the same rig.
+  const auto &humanoid=ref.deformation->humanoid;
+  if(humanoid&&humanoid->joints.contains("head")&&humanoid->joints.contains("leftEye")&&humanoid->joints.contains("rightEye")){
+    request.source_targets_.reserve(selected.size());
+    request.native_targets_.reserve(selected.size());
+    for(auto id:selected){
+      capture_work.step(16);
+      auto &domain=source.object(id).appearance?request.source_targets_:request.native_targets_;
+      domain.push_back(id);
+    }
+  }
+  if(request.source_targets_.empty())request.support_=request.targets_;
+  else{
+    auto domain=native_anatomical_domain(source,request.source_targets_,capture_work);
+    request.support_=std::move(domain.objects);
+    request.support_.insert(request.support_.end(),request.native_targets_.begin(),request.native_targets_.end());
+  }
   request.retained_.work=capture_work.used;
   for(auto id:request.targets_)if(std::find(request.support_.begin(),request.support_.end(),id)==request.support_.end())throw std::invalid_argument("Native surface heat target lacks current source correspondence");
   if(!options.locks.empty())for(auto id:request.targets_){const auto&o=source.object(id);if(!o.deformation||!o.deformation->skin||!o.deformation->skeleton)throw std::invalid_argument("Native surface heat locks require actual current skin authority");}
@@ -152,17 +159,33 @@ inline NativeSurfaceHeatPrepared prepare_native_surface_heat(const NativeSurface
       if(!d->humanoid)d->humanoid=ref.humanoid;
       if(!d->landmarks&&ref.landmarks){if(same)d->landmarks=ref.landmarks;else{SkinGeometryWork geometry(work.maximum-work.used,cancelled);auto before=geometry.remaining();d->landmarks=skin_reframe_landmarks(*ref.landmarks,target_world.inverse()*reference_world,geometry);work.step(before-geometry.remaining());}}
     }
-    if(request.source_head_&&(!d->humanoid||d->humanoid->joints!=ref.humanoid->joints))throw std::invalid_argument("Surface heat current humanoid joint identities differ");
+    if(!request.source_targets_.empty()&&o.appearance&&(!d->humanoid||d->humanoid->joints!=ref.humanoid->joints))throw std::invalid_argument("Surface heat current humanoid joint identities differ");
     support.object(id).deformation=std::move(d);
   }
-  HumanoidHeatDomains anatomy;
-  if(request.source_head_)anatomy=source_humanoid_heat_domains(support,request.support_,request.reference_,work,std::min(size_t(128u*1024u*1024u),options.maximum_workspace-fixed_bytes));
-  else if(ref.humanoid&&ref.humanoid->joints.contains("head")&&ref.humanoid->joints.contains("leftEye")&&ref.humanoid->joints.contains("rightEye"))anatomy=current_humanoid_heat_domains(support,request.support_,request.reference_,work,std::min(size_t(128u*1024u*1024u),options.maximum_workspace-fixed_bytes));
-  else{for(auto id:request.support_){work.step(32);anatomy.parts.push_back({id,input.object(id).painted->mesh_owner(),{},false,false});}anatomy.forecast_bytes=65536+anatomy.parts.capacity()*sizeof(HumanoidHeatDomains::Part);}
-  // Analysis temporary storage is released by its factory; retained per-row
-  // boundary data stays charged alongside output and one active field.
-  const size_t boundary_bytes=anatomy.forecast_bytes;
-  bytes.add(boundary_bytes);
+  HumanoidHeatDomains source_anatomy,native_anatomy;
+  size_t analysis_peak=fixed_bytes;
+  const auto analysis_limit=[&]{
+    const auto available=options.maximum_workspace-bytes.used;
+    if(available<65536)throw std::length_error("Native surface heat staging leaves no boundary workspace");
+    return std::min(size_t(128u*1024u*1024u),available);
+  };
+  const auto charge_analysis=[&](const HumanoidHeatDomains &domain){
+    analysis_peak=std::max(analysis_peak,bytes.used+domain.analysis_bytes);
+    bytes.add(domain.forecast_bytes);
+  };
+  // Retained source boundary data stays charged during native analysis and
+  // both domains stay charged alongside the active visibility field.
+  if(!request.source_targets_.empty()){
+    source_anatomy=source_humanoid_heat_domains(support,request.source_targets_,request.reference_,work,analysis_limit());
+    charge_analysis(source_anatomy);
+  }
+  if(!request.native_targets_.empty()){
+    native_anatomy=current_humanoid_heat_domains(support,request.native_targets_,request.reference_,work,analysis_limit());
+    charge_analysis(native_anatomy);
+  }else if(request.source_targets_.empty()){
+    for(auto id:request.support_){work.step(32);native_anatomy.parts.push_back({id,input.object(id).painted->mesh_owner(),{},false,false});}
+    bytes.add(65536+native_anatomy.parts.capacity()*sizeof(HumanoidHeatDomains::Part));
+  }
   std::vector<HeatSourceSegment>profile;
   if(ref.humanoid)profile=humanoid_heat_sources(world_rig,*ref.humanoid,work);
   else{const auto segments=world_rig.segments();profile.reserve(world_rig.bones.size());for(uint32_t j=0;j<world_rig.bones.size();++j)if(world_rig.bones[j].deform){work.step(8);const auto&a=segments[j][0],&b=segments[j][1];profile.push_back({{a.x,a.y,a.z},{b.x,b.y,b.z},j});}}
@@ -170,8 +193,9 @@ inline NativeSurfaceHeatPrepared prepare_native_surface_heat(const NativeSurface
   NativeSurfaceHeatPrepared result;result.identity_=request.identity_;
   result.report_.retained_input=request.retained_.bytes;
   result.report_.total_admission=request.retained_.bytes+options.maximum_workspace;
-  result.report_.workspace=std::max(bytes.used,fixed_bytes+anatomy.analysis_bytes);
+  result.report_.workspace=std::max(bytes.used,analysis_peak);
   for(auto id:request.targets_){work.stop();const auto&before=input.object(id);const auto&current=support.object(id);const auto&mesh=before.painted->mesh();
+    const auto&anatomy=before.appearance&&!request.source_targets_.empty()?source_anatomy:native_anatomy;
     const auto found=std::find_if(anatomy.parts.begin(),anatomy.parts.end(),[&](const auto&p){return p.object==id;});
     if(found==anatomy.parts.end()||found->mesh!=before.painted->mesh_owner())throw std::runtime_error("Surface heat lost its captured current boundary owner");
     // A completely locked current field is a true no-op; no source capsule or
@@ -224,8 +248,11 @@ inline bool adopt_native_surface_heat(Scene&scene,const NativeSurfaceHeatRequest
     auto &object=staged.object(change.object);
     object.deformation=change.deformation;
     object.rig_source=change.origin;
-    link_native_source_skin(staged,change.object,request.reference_,cancelled);
   }
+  // A reference receiving its first skin in this batch must be ready before
+  // a native accessory uses that skin to establish its retained attachment.
+  for(const auto &change:result.changes_)
+    link_native_source_skin(staged,change.object,request.reference_,cancelled);
   staged.validate();
   if(cancelled&&cancelled())throw std::runtime_error("Surface heat binding cancelled before publication");
   if(!request.lease_.matches(scene))throw std::runtime_error("Surface heat source changed during final validation");
