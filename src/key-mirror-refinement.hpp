@@ -28,4 +28,8 @@ KeyMirrorRefinement refine_reflected_key(std::shared_ptr<const Mesh>, KeyMirrorP
                                          float tolerance, const KeyMirrorLimits & = {});
 KeyMirrorRefinement refine_reflected_key(std::shared_ptr<const Mesh>, float tolerance,
                                          const KeyMirrorLimits & = {});
+// Authoring may keep an already paired corner domain intact when an exact
+// involution resolves a near-zero contact in the clipping path.
+KeyMirrorRefinement refine_authoring_key(std::shared_ptr<const Mesh>,KeyMirrorPlane,
+                                        float tolerance,const KeyMirrorLimits &);
 } // namespace dome::detail

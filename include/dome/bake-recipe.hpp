@@ -16,11 +16,20 @@ struct BakeObjectReference {
   std::string name;
   bool operator==(const BakeObjectReference &)const=default;
 };
+struct BakeTopologyRefinement {
+  uint64_t before=0, after=0;
+  double plane=0;
+  float tolerance=0;
+  bool operator==(const BakeTopologyRefinement &)const=default;
+};
 struct ObjectBakeRecipe {
   BakeObjectReference source;
   std::optional<BakeObjectReference> cage;
   ObjectBakeSettings settings;
   std::vector<BakeObjectReference> additional_sources;
+  // Replay on the actual Shape Restore mesh before using its ordered cage or
+  // donor. The recipe stores parameters, never arbitrary correspondence rows.
+  std::optional<BakeTopologyRefinement> refinement;
   void validate()const;
   nlohmann::json encode()const;
   static std::shared_ptr<const ObjectBakeRecipe> decode(const nlohmann::json &);

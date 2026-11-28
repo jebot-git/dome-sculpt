@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "shapekey-refinement.hpp"
 #include "bake-canonical-frame.hpp"
+#include "dome/bake-recipe.hpp"
 #include "dome/material-bindings.hpp"
-#include "key-mirror-refinement.hpp"
+#include "refined-mirror-topology.hpp"
 #include "normal-bake-frames.hpp"
 #include "normal-frame-runtime.hpp"
 #include "polygon-conversion.hpp"
@@ -177,6 +178,37 @@ std::shared_ptr<NormalFrames> refine_frame(const NormalFrames &before,const KeyM
 }
 }
 
+IndexedMirrorRefinement index_mirror_refinement(const KeyMirrorRefinement &refined,
+    const std::function<bool()> &cancelled,size_t max_bytes){
+  const auto &rest=*refined.source;
+  const auto corners=refined.corners.size();
+  const size_t bytes_per_corner=sizeof(RefinedVertex)+4*sizeof(void *)+3*sizeof(uint32_t)+
+      2*sizeof(Vec3)+sizeof(std::array<float,2>);
+  if(corners>max_bytes/bytes_per_corner)
+    throw std::length_error("Indexed Mirror topology exceeds its working budget");
+  IndexedMirrorRefinement result;
+  auto &[mesh,parents,representatives]=result;
+  mesh.positions.reserve(corners);mesh.normals.reserve(corners);mesh.uv.reserve(corners);
+  mesh.indices.reserve(corners);parents.reserve(corners/3);representatives.reserve(corners);
+  std::map<RefinedVertex,uint32_t> vertices;
+  for(size_t at=0;at<corners;++at){
+    if((at&1023)==0)stop(cancelled);
+    const auto &corner=refined.corners[at];
+    const auto p=corner.position;
+    if(at%3==0)parents.push_back(corner.current.triangle);
+    const RefinedVertex identity{{std::bit_cast<uint32_t>(p.x),std::bit_cast<uint32_t>(p.y),
+      std::bit_cast<uint32_t>(p.z)},support(rest,corner.current),support(rest,corner.reflected)};
+    const auto [vertex,inserted]=vertices.try_emplace(identity,uint32_t(mesh.positions.size()));
+    mesh.indices.push_back(vertex->second);
+    if(!inserted)continue;
+    representatives.push_back(uint32_t(at));
+    mesh.positions.push_back(p);
+    mesh.normals.push_back(vector_at(corner.current,[&](size_t c){return rest.normals[rest.indices[c]];}));
+    mesh.uv.push_back(interpolate<std::array<float,2>>(corner.current,[&](size_t c){return rest.uv[rest.indices[c]];}));
+  }
+  return result;
+}
+
 ShapeKeyResult author_refined_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &edit,
     std::string name,const std::function<bool()> &cancelled){
   const auto &source=scene.object(object);
@@ -198,7 +230,7 @@ ShapeKeyResult author_refined_shapekey(Scene &scene,uint64_t object,const ShapeK
        !constant_bake_frame(*old->canonical,rest,source.deformation.get(),true,cancelled)))
       throw std::invalid_argument("Refined surface Mirror needs a retained constant tangent frame for baked normals");
   }
-  const auto refined=refine_reflected_key(source.painted->mesh_owner(),{edit.mirror_plane},
+  const auto refined=refine_authoring_key(source.painted->mesh_owner(),{edit.mirror_plane},
       edit.mirror_tolerance,{128*1024*1024,64*1024*1024,cancelled});
   const auto corners=refined.corners.size();
   const auto &original_deformation=*source.deformation;
@@ -209,28 +241,7 @@ ShapeKeyResult author_refined_shapekey(Scene &scene,uint64_t object,const ShapeK
                             (slot+1)*sizeof(Vec3)*10+skin_bytes*2))
     throw std::length_error("Refined Mirror mesh and key data exceed the authoring quota");
 
-  Mesh mesh;
-  std::vector<uint32_t> parents,representatives;
-  mesh.positions.reserve(corners);mesh.normals.reserve(corners);mesh.uv.reserve(corners);
-  mesh.indices.reserve(corners);parents.reserve(corners/3);representatives.reserve(corners);
-  {
-    std::map<RefinedVertex,uint32_t> vertices;
-    for(size_t at=0;at<corners;++at){
-      if((at&1023)==0)stop(cancelled);
-      const auto &corner=refined.corners[at];
-      const auto p=corner.position;
-      if(at%3==0)parents.push_back(corner.current.triangle);
-      const RefinedVertex identity{{std::bit_cast<uint32_t>(p.x),std::bit_cast<uint32_t>(p.y),
-        std::bit_cast<uint32_t>(p.z)},support(rest,corner.current),support(rest,corner.reflected)};
-      const auto [vertex,inserted]=vertices.try_emplace(identity,uint32_t(mesh.positions.size()));
-      mesh.indices.push_back(vertex->second);
-      if(!inserted)continue;
-      representatives.push_back(uint32_t(at));
-      mesh.positions.push_back(p);
-      mesh.normals.push_back(vector_at(corner.current,[&](size_t c){return rest.normals[rest.indices[c]];}));
-      mesh.uv.push_back(interpolate<std::array<float,2>>(corner.current,[&](size_t c){return rest.uv[rest.indices[c]];}));
-    }
-  }
+  auto [mesh,parents,representatives]=index_mirror_refinement(refined,cancelled);
   refine_uv_flags(rest,refined,mesh,cancelled);
   PaintSurfaceOptions paint_options;paint_options.cancelled=cancelled;
   auto paint=refined_paint_geometry(*source.painted,std::move(mesh),parents,paint_options);
@@ -307,6 +318,14 @@ ShapeKeyResult author_refined_shapekey(Scene &scene,uint64_t object,const ShapeK
   Scene next=scene;
   auto &output=next.object(object);
   output.shape_source=capture_polygon_origin(scene,object);
+  if(source.bake_recipe&&(source.bake_recipe->cage||source.bake_recipe->settings.corresponding_topology)&&
+      original_deformation.source!=deformation->source){
+    auto recipe=std::make_shared<ObjectBakeRecipe>(*source.bake_recipe);
+    recipe->refinement=BakeTopologyRefinement{original_deformation.source,deformation->source,
+                                             edit.mirror_plane,edit.mirror_tolerance};
+    recipe->validate();
+    output.bake_recipe=std::move(recipe);
+  }
   output.painted=std::move(paint);
   output.material_bindings=std::move(binding);
   output.deformation=std::move(deformation);

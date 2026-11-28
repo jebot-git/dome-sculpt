@@ -160,7 +160,7 @@ target_link_libraries(dome-sculpt-core PRIVATE dome-sculpt-baked-emission)
 target_sources(dome-sculpt-core PRIVATE src/emission-bake-source.cpp)
 target_sources(dome-sculpt-core PRIVATE src/key-material-preview.cpp)
 target_sources(dome-sculpt-core PRIVATE src/key-mirror-refinement.cpp)
-target_sources(dome-sculpt-core PRIVATE src/shapekey-refinement.cpp)
+target_sources(dome-sculpt-core PRIVATE src/shapekey-refinement.cpp src/refined-bake.cpp)
 target_sources(dome-sculpt-core PRIVATE src/mtoon-normal-raster.cpp)
 target_sources(dome-sculpt-core PRIVATE src/scene-bake-archive.cpp)
 target_sources(dome-sculpt-core PRIVATE src/creator-vrm.cpp)
@@ -4032,6 +4032,9 @@ if(BUILD_TESTING)
   add_test(NAME key-mirror-refinement-baked COMMAND dome-sculpt-key-mirror-refinement-test
     --baked-authoring "${CMAKE_CURRENT_BINARY_DIR}/key-mirror-refinement-baked")
   set_tests_properties(key-mirror-refinement-baked PROPERTIES TIMEOUT 120)
+  add_test(NAME key-mirror-topology-bake COMMAND dome-sculpt-key-mirror-refinement-test
+    --topology-bake "${CMAKE_CURRENT_BINARY_DIR}/key-mirror-topology-bake")
+  set_tests_properties(key-mirror-topology-bake PROPERTIES TIMEOUT 120)
   if(NOT DOME_COMPUTE_BACKEND STREQUAL "CPU")
     add_test(NAME key-mirror-refinement-missing-gpu COMMAND dome-sculpt-key-mirror-refinement-test --require-device)
     set_tests_properties(key-mirror-refinement-missing-gpu PROPERTIES TIMEOUT 30
@@ -4311,6 +4314,12 @@ if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
     $<TARGET_FILE:dome-sculpt-bake-recipes-test>
     ${CMAKE_CURRENT_BINARY_DIR}/bake-recipes-xr)
   set_tests_properties(bake-recipes-openxr PROPERTIES TIMEOUT 600)
+  add_test(NAME refined-cage-bake-openxr COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-recipes-xr.py
+    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    $<TARGET_FILE:dome-sculpt-key-mirror-refinement-test>
+    ${CMAKE_CURRENT_BINARY_DIR}/refined-cage-bake-xr --refined-cage)
+  set_tests_properties(refined-cage-bake-openxr PROPERTIES TIMEOUT 600)
   add_test(NAME bake-supersample-openxr COMMAND ${Python3_EXECUTABLE}
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-recipes-xr.py
     $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>

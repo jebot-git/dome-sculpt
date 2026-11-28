@@ -29,6 +29,10 @@ P operator-(P a, P b) { return {a.x - b.x, a.y - b.y}; }
 P operator*(P a, double s) { return {a.x * s, a.y * s}; }
 double det(P a, P b) { return a.x * b.y - a.y * b.x; }
 constexpr double roundoff = 256 * std::numeric_limits<double>::epsilon();
+struct UnresolvedContact : std::invalid_argument {
+  explicit UnresolvedContact(size_t used):std::invalid_argument("Mirror refinement contact is numerically unresolved"),work(used){}
+  size_t work;
+};
 struct Polygon {
   std::array<P, 8> p{};
   size_t count = 0;
@@ -383,7 +387,7 @@ KeyMirrorRefinement refine_reflected_key(std::shared_ptr<const Mesh> source, Key
       if (area <= 0)
         continue;
       if (area <= roundoff * std::max(1., std::abs(signed_area(pa))))
-        throw std::invalid_argument("Mirror refinement contact is numerically unresolved");
+        throw UnresolvedContact(budget.work);
       std::vector<MirrorRefinementCorner> vertices;
       vertices.reserve(intersection.count);
       for (size_t k = 0; k < intersection.count; ++k) {
@@ -447,6 +451,10 @@ KeyMirrorRefinement refine_reflected_key(std::shared_ptr<const Mesh> source, Key
         if (!same_weights(center.current.barycentric, center.reflected.barycentric))
           throw std::invalid_argument(
               "Self-mirrored refinement center lacks an exact source involution");
+        // The intersection of a triangle and its own reflection is symmetric.
+        // Its fixed center belongs on the plane. Rounding a cancellation
+        // residual to float can otherwise create a sliver on a later Mirror.
+        center.position.x=float(plane.offset);
         std::array<size_t, 8> opposite{};
         for (size_t k = 0; k < vertices.size(); ++k) {
           size_t matches = 0;
@@ -513,5 +521,37 @@ KeyMirrorRefinement refine_reflected_key(std::shared_ptr<const Mesh> source, Key
   }
   out.work_units = budget.work;
   return out;
+}
+KeyMirrorRefinement refine_authoring_key(std::shared_ptr<const Mesh> source,KeyMirrorPlane plane,
+    float tolerance,const KeyMirrorLimits &limits){
+  try{
+    return refine_reflected_key(source,plane,tolerance,limits);
+  }catch(const UnresolvedContact &contact){
+    const auto count=source->indices.size();
+    if(contact.work>=limits.max_work||count>limits.max_bytes/(sizeof(MirrorRefinementCorner)+sizeof(uint32_t)))
+      throw;
+    auto budget=limits;
+    budget.max_work-=contact.work;
+    auto exact=reflected_key_correspondence(*source,plane,tolerance,budget);
+    std::vector<uint32_t>().swap(exact.vertices);
+    KeyMirrorRefinement result;
+    result.source=std::move(source);
+    result.plane_offset=plane.offset;
+    result.maximum_rest_error=exact.maximum_rest_error;
+    result.work_units=limits.max_work;
+    result.opposite=std::move(exact.corners);
+    result.corners.reserve(count);
+    for(size_t c=0;c<count;++c){
+      if((c&1023)==0&&limits.cancelled&&limits.cancelled())
+        throw std::runtime_error("Mirror refinement cancelled");
+      const auto other=result.opposite[c];
+      MirrorRefinementCorner corner{result.source->positions[result.source->indices[c]],
+          {uint32_t(c/3),{}},{other/3,{}}};
+      corner.current.barycentric[c%3]=1;
+      corner.reflected.barycentric[other%3]=1;
+      result.corners.push_back(corner);
+    }
+    return result;
+  }
 }
 } // namespace dome::detail

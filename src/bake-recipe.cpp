@@ -45,6 +45,10 @@ void ObjectBakeRecipe::validate()const{
     throw std::invalid_argument("Bake recipe lost its explicit cage binding");
   if(settings.corresponding_topology&&cage)
     throw std::invalid_argument("Matching source triangles requires a bake without a cage");
+  if(refinement&&((!settings.corresponding_topology&&!cage)||refinement->before==refinement->after||
+      !std::isfinite(refinement->plane)||std::abs(refinement->plane)>1e6||
+      !std::isfinite(refinement->tolerance)||refinement->tolerance<=0||refinement->tolerance>1))
+    throw std::invalid_argument("Invalid Bake topology refinement");
   if(settings.mask_layer==UINT64_MAX||
      (settings.mask_layer&&(settings.prepare_colors||settings.prepare_normals)))
     throw std::invalid_argument("Invalid Bake mask layer or incompatible whole-surface preparation");
@@ -58,7 +62,7 @@ void ObjectBakeRecipe::validate()const{
 }
 nlohmann::json ObjectBakeRecipe::encode()const{
   validate();const auto &s=settings;
-  const int version=!additional_sources.empty()?5:s.mask_layer?4:s.supersample?3:s.corresponding_topology?2:1;
+  const int version=refinement?6:!additional_sources.empty()?5:s.mask_layer?4:s.supersample?3:s.corresponding_topology?2:1;
   nlohmann::json out={{"version",version},{"source",encode_reference(source)},
     {"cage",cage?nlohmann::json(encode_reference(*cage)):nlohmann::json(nullptr)},
     {"settings",{{"front_mm",s.front_mm},{"back_mm",s.back_mm},{"ao_distance_mm",s.ao_distance_mm},
@@ -68,29 +72,40 @@ nlohmann::json ObjectBakeRecipe::encode()const{
   if(s.corresponding_topology)out["settings"]["corresponding_topology"]=true;
   if(s.supersample)out["settings"]["supersample"]=true;
   if(s.mask_layer)out["settings"]["mask_layer"]=s.mask_layer;
-  if(version==5){
+  if(!additional_sources.empty()){
     auto &sources=out["additional_sources"]=nlohmann::json::array();
     for(const auto &donor:additional_sources)sources.push_back(encode_reference(donor));
   }
+  if(refinement)out["refinement"]={{"before",refinement->before},{"after",refinement->after},
+      {"plane",refinement->plane},{"tolerance",refinement->tolerance}};
   return out;
 }
 std::shared_ptr<const ObjectBakeRecipe> ObjectBakeRecipe::decode(const nlohmann::json &j){
-  if(!j.is_object()||!j.at("version").is_number_integer()||j.at("version")<1||j.at("version")>5||
-      j.size()!=(j.at("version")==5?5:4))
+  if(!j.is_object()||!j.at("version").is_number_integer()||j.at("version")<1||j.at("version")>6)
     throw std::invalid_argument("Invalid bake recipe record");
   const auto version=j.at("version").get<int>();
+  const bool grouped=version==5||(version==6&&j.contains("additional_sources"));
+  if(j.size()!=4u+unsigned(grouped)+unsigned(version==6))
+    throw std::invalid_argument("Invalid bake recipe record");
   auto result=std::make_shared<ObjectBakeRecipe>();result->source=decode_reference(j.at("source"));
-  if(version==5){
+  if(grouped){
     const auto &sources=j.at("additional_sources");
     if(!sources.is_array()||sources.empty()||sources.size()>255)
       throw std::invalid_argument("Invalid Bake recipe source group");
     for(const auto &donor:sources)result->additional_sources.push_back(decode_reference(donor));
   }
+  if(version==6){
+    const auto &r=j.at("refinement");
+    if(!r.is_object()||r.size()!=4||!r.at("plane").is_number()||!r.at("tolerance").is_number())
+      throw std::invalid_argument("Invalid Bake topology refinement record");
+    result->refinement=BakeTopologyRefinement{number(r.at("before")),number(r.at("after")),
+        r.at("plane").get<double>(),r.at("tolerance").get<float>()};
+  }
   if(!j.at("cage").is_null())result->cage=decode_reference(j.at("cage"));
   const auto &v=j.at("settings");auto &s=result->settings;
   const bool corresponding=version==2||(version>=3&&v.contains("corresponding_topology"));
   const bool supersampled=version==3||(version>=4&&v.contains("supersample"));
-  const bool masked=version==4||(version==5&&v.contains("mask_layer"));
+  const bool masked=version==4||(version>=5&&v.contains("mask_layer"));
   if(!v.is_object()||v.size()!=11u+unsigned(corresponding)+unsigned(supersampled)+unsigned(masked))
     throw std::invalid_argument("Incomplete bake recipe settings");
   auto real=[&](const char *key){if(!v.at(key).is_number())throw std::invalid_argument("Invalid bake recipe scalar");return v.at(key).get<float>();};

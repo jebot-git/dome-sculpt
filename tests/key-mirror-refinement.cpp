@@ -2,6 +2,7 @@
 #include "mirror-host-allocation-fault.hpp"
 namespace allocation=mirror_failure;
 #include "key-mirror-refinement.hpp"
+#include "bake-cage.hpp"
 #include "cgltf.h"
 #include "dome/bake-recipe.hpp"
 #include "dome/document.hpp"
@@ -131,14 +132,33 @@ Scene native_fixture(bool split_edge=false,bool planar_key=false){
   return scene;
 }
 
-Scene baked_fixture(bool masked=false){
+enum class BakeDependency { Projection, Cage, Matching };
+
+Vec3 cage_point(Vec3 p){
+  return {p.x+.025f*(p.y+.5f),p.y+.015f*p.x,.31f+.043f*p.x+.022f*p.y};
+}
+
+Scene baked_fixture(bool masked=false,BakeDependency dependency=BakeDependency::Projection){
   auto scene=native_fixture(false,true);
   const auto target=scene.active().id;
   ObjectBakeSettings settings;
   settings.front_mm=320;settings.back_mm=160;settings.ao_distance_mm=85;
   settings.ao_samples=4;settings.padding=2;
+  if(dependency==BakeDependency::Cage){
+    settings.cage_object=scene.add("Ordered Bake cage",Volume{});
+    settings.front_mm=450;
+    auto cages=*square();
+    for(auto &p:cages.positions)p=cage_point(p);
+    auto &cage=scene.object(settings.cage_object);
+    cage.painted=std::make_shared<PaintedMesh>(std::move(cages),64);
+    cage.mesh_active=true;cage.visible=false;
+  }
+  if(dependency==BakeDependency::Matching){
+    settings.corresponding_topology=true;
+    settings.ao_samples=0;
+  }
   if(masked){
-    const auto &paint=scene.active().painted;
+    const auto &paint=scene.object(target).painted;
     paint->add_layer("Bake protection");
     settings.mask_layer=paint->active_layer();
     PaintSettings protection;protection.channel=PaintChannel::Mask;protection.mask=0;
@@ -147,7 +167,10 @@ Scene baked_fixture(bool masked=false){
   }
   const auto donor=scene.add("Sloped material donor",Volume{});
   auto surface=*square();
-  for(auto &p:surface.positions){p.x*=1.3f;p.y*=1.3f;p.z=.12f+.21f*p.x-.12f*p.y;}
+  for(auto &p:surface.positions){
+    if(dependency!=BakeDependency::Matching){p.x*=1.3f;p.y*=1.3f;}
+    p.z=.12f+.21f*p.x-.12f*p.y;
+  }
   surface.normals.assign(surface.positions.size(),normalized(Vec3{-.21f,.12f,1}));
   auto &high=scene.object(donor);
   high.mesh_active=true;high.painted=std::make_shared<PaintedMesh>(std::move(surface),64);
@@ -179,7 +202,13 @@ void check_bake(const Scene &before,const Scene &after){
   check(in&&out&&paint_fields(prior).at("baked")==paint_fields(current).at("baked")&&
         out->coverage==in->coverage&&bool(out->emission_field)==bool(in->emission_field),
         "Canonical normals, material channels and native Bake coverage survive exactly");
-  check(a.bake_recipe&&b.bake_recipe&&a.bake_recipe->encode()==b.bake_recipe->encode(),
+  if(!a.bake_recipe||!b.bake_recipe)throw std::runtime_error("Missing fixture Bake recipe");
+  auto recipe_before=a.bake_recipe->encode(),recipe_after=b.bake_recipe->encode();
+  for(auto &recipe:{&recipe_before,&recipe_after}){
+    recipe->erase("version");
+    recipe->erase("refinement");
+  }
+  check(recipe_before==recipe_after,
         "The named donor, mask and saved Bake settings stay attached to the refined mesh");
   const auto original=a.painted->preview(a.material),refined=b.painted->preview(b.material);
   check(original->color.rgba==refined->color.rgba&&original->metal_rough.rgba==refined->metal_rough.rgba&&
@@ -516,6 +545,86 @@ void baked_workflow(const std::filesystem::path &out){
         legacy.encode()==before,"Legacy baked normals without captured frames remain intact on refusal");
 }
 
+void topology_bake_workflow(const std::filesystem::path &out){
+  std::filesystem::create_directories(out);
+  ShapeKeyEdit edit;edit.action=ShapeKeyAction::Mirror;edit.mirror_frames=ShapeKeyMirrorFrames::RefinedSurface;
+  edit.name="Reflected slide";
+  for(const auto dependency:{BakeDependency::Cage,BakeDependency::Matching}){
+    const bool cage=dependency==BakeDependency::Cage;
+    const auto tag=cage?"cage":"matching";
+    const auto source=baked_fixture(cage,dependency);
+    const auto id=source.active().id;
+    auto direct=source;
+    author_shapekey(direct,id,edit);
+    check_authored(source,direct);
+    Document document;document.replace(source);
+    document.author_shape(edit);
+    const auto path=out/(std::string(tag)+"-refined.dsculpt");
+    document.save_async(path).get();
+    auto refined=Scene::load(path);
+    check(refined.encode()==direct.encode()&&document.undo()&&document.copy_scene().encode()==source.encode()&&
+          document.redo()&&document.copy_scene().encode()==refined.encode(),
+          "Cold Open and one global Undo or Redo preserve the Bake refinement lineage");
+    const auto recipe=refined.active().bake_recipe;
+    check(recipe->refinement&&recipe->refinement->before==source.active().deformation->source&&
+          recipe->refinement->after==refined.active().deformation->source,
+          "The recipe retains the actual old and refined topology identities");
+    const auto donor=recipe->source.object;
+    const auto reference=cage?recipe->settings.cage_object:donor;
+    if(cage){
+      const auto &mesh=refined.active().painted->mesh();
+      bool replayed=false;
+      const auto sampled=object_bake_cage(refined,id,reference,mesh,mesh,{},nullptr,nullptr,&replayed);
+      float maximum=0;
+      for(size_t v=0;v<sampled.size();++v)
+        maximum=std::max(maximum,length(sampled[v]-cage_point(mesh.positions[v])));
+      std::cout<<"REFINED_CAGE vertices="<<sampled.size()<<" max_position_error="<<maximum<<std::endl;
+      check(replayed&&sampled.size()>source.active().painted->mesh().positions.size()&&maximum<1e-7f,
+            "Refined cage samples agree with the independent skewed-cage position field");
+    }
+    RigEdit rest;rest.morph=MorphWeightEdit{0,0};
+    edit_rig(refined,id,rest);
+    auto &high=refined.object(donor);
+    high.material.color={.7f,.21f,.3f,1};
+    auto invalid=refined;
+    auto reversed=invalid.object(reference).painted->mesh();
+    std::rotate(reversed.indices.begin(),reversed.indices.begin()+3,reversed.indices.end());
+    invalid.object(reference).painted=std::make_shared<PaintedMesh>(std::move(reversed),64);
+    const auto bad=invalid.encode();
+    check(refuses([&]{bake_object(invalid,donor,recipe->settings);},"Saved Bake refinement")&&invalid.encode()==bad,
+          "Changing the referenced mesh's ordered triangles leaves the current Bake untouched");
+    if(!cage){
+      auto distant=refined;
+      distant.object(donor).transform.position.z+=2;
+      const auto unchanged=distant.encode();
+      check(refuses([&]{bake_object(distant,donor,recipe->settings);},"Projection missed")&&distant.encode()==unchanged,
+            "Refined matching Bake still enforces the ordinary front and back projection bounds");
+    }
+    auto rebaked=refined;
+    const auto bake_report=bake_object(rebaked,donor,recipe->settings);
+    check(bake_report.projected&&bool(bake_report.rays)==cage&&
+          rebaked.active().bake_recipe->encode()==recipe->encode()&&
+          rebaked.active().painted->baked()->maps.color.rgba!=refined.active().painted->baked()->maps.color.rgba,
+          "Saved cage or matching-donor settings rebake changed source color and keep the verified lineage");
+    document.replace(refined);
+    document.bake_from_object(donor,recipe->settings);
+    const auto after=out/(std::string(tag)+"-rebaked.dsculpt");
+    document.save_async(after).get();
+    check(document.wait_asset()&&document.wait_mesh()&&document.frame().state->error.empty()&&
+          Scene::load(after).encode()==rebaked.encode(),
+          "The document worker publishes the rebake before the immediately queued Save");
+    auto repeat=Scene::load(after);
+    edit.name="Reflected again";
+    author_shapekey(repeat,id,edit);
+    const auto repeated_recipe=repeat.active().bake_recipe;
+    check(bake_object(repeat,donor,repeated_recipe->settings).projected&&
+          repeat.active().bake_recipe->encode()==repeated_recipe->encode(),
+          "Rebaking follows the retained mesh through a second Refined Surface edit");
+    edit.name="Reflected slide";
+    source.save(out/(std::string(tag)+"-source.dsculpt"));
+  }
+}
+
 void workflow(const std::filesystem::path &out,bool rigged){
   std::filesystem::create_directories(out);
   const auto source=rigged?rigged_fixture():native_fixture();
@@ -588,10 +697,28 @@ void workflow(const std::filesystem::path &out,bool rigged){
 } // namespace
 int main(int argc,char **argv) try {
   const auto source = square();
+  if(argc==4&&std::string_view(argv[1])=="--xr-cage-recipe-fixture"){
+    auto scene=baked_fixture(false,BakeDependency::Cage);
+    ShapeKeyEdit change;change.action=ShapeKeyAction::Mirror;change.name="Reflected slide";
+    change.mirror_frames=ShapeKeyMirrorFrames::RefinedSurface;
+    const auto id=scene.active().id;
+    author_shapekey(scene,id,change);
+    RigEdit rest;rest.morph=MorphWeightEdit{0,0};
+    edit_rig(scene,id,rest);
+    const auto recipe=scene.active().bake_recipe;
+    scene.object(recipe->source.object).material.color={.7f,.21f,.3f,1};
+    for(const auto &object:scene.objects())scene.object(object.id).transform.position={0,1.3f,-1.1f};
+    scene.save(argv[2]);
+    bake_object(scene,recipe->source.object,recipe->settings);
+    scene.save(argv[3]);
+    return 0;
+  }
   if(argc==3&&std::string_view(argv[1])=="--ui-fixture"){native_fixture().save(argv[2]);return 0;}
   if(argc==3&&std::string_view(argv[1])=="--ui-rig-fixture"){rigged_fixture().save(argv[2]);return 0;}
   if(argc==3&&std::string_view(argv[1])=="--ui-baked-fixture"){baked_fixture().save(argv[2]);return 0;}
   if(argc==3&&std::string_view(argv[1])=="--baked-authoring"){baked_workflow(argv[2]);return 0;}
+  if(argc==3&&std::string_view(argv[1])=="--topology-bake"){topology_bake_workflow(argv[2]);return 0;}
+  if(argc==3&&std::string_view(argv[1])=="--ui-cage-fixture"){baked_fixture(true,BakeDependency::Cage).save(argv[2]);return 0;}
   if(argc==3&&std::string_view(argv[1])=="--xr-baked-fixture"){
     auto scene=baked_fixture(true);scene.active().transform.position={0,1.3f,-1.1f};scene.save(argv[2]);return 0;
   }

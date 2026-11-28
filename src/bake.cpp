@@ -352,7 +352,7 @@ void validate_source(const BakeSource &source,std::span<const detail::RetainedSo
     if ((m.maps||m.normal_map)&&source.mesh.uv.size()!=source.mesh.positions.size()) throw std::invalid_argument("Textured high mesh requires UV coordinates");
   }
 }
-void validate_provenance(const Mesh &low,const Mesh &source,const BakeOptions &o) {
+void validate_provenance(const Mesh &low,const Mesh &source,const BakeOptions &o,bool corresponding) {
   if (!o.source_triangles.empty() || !o.source_corner_barycentrics.empty()) {
     if (o.source_triangles.size()!=low.indices.size()/3 || o.source_corner_barycentrics.size()!=low.indices.size())
       throw std::invalid_argument("Exact bake provenance count mismatch");
@@ -364,8 +364,10 @@ void validate_provenance(const Mesh &low,const Mesh &source,const BakeOptions &o
         auto b=o.source_corner_barycentrics[t*3+k];float sum=0;
         for(auto value:b){if(!std::isfinite(value)||value<-.00001f||value>1.00001f)throw std::invalid_argument("Invalid exact bake barycentrics");sum+=value;}
         if(std::abs(sum-1)>1e-5f)throw std::invalid_argument("Exact bake barycentrics are not normalized");
-        auto expected=interpolate(source,source_triangle,b,false),actual=low.positions[low.indices[t*3+k]];
-        if(length(expected-actual)>1e-5f+1e-6f*length(actual))throw std::invalid_argument("Exact bake provenance does not match target geometry");
+        if(!corresponding){
+          auto expected=interpolate(source,source_triangle,b,false),actual=low.positions[low.indices[t*3+k]];
+          if(length(expected-actual)>1e-5f+1e-6f*length(actual))throw std::invalid_argument("Exact bake provenance does not match target geometry");
+        }
       }
     }
   }
@@ -551,8 +553,8 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   if(!source_placement.domains.empty()&&(corresponding_topology||!o.source_triangles.empty()||
       !o.source_corner_barycentrics.empty()))
     throw std::invalid_argument("Multiple Bake sources require ray projection");
-  if(corresponding_topology&&(!o.cage_positions.empty()||!o.source_triangles.empty()||
-      low.indices.size()!=source.mesh.indices.size()))
+  if(corresponding_topology&&(!o.cage_positions.empty()||(o.source_triangles.empty()&&
+      low.indices.size()!=source.mesh.indices.size())))
     throw std::invalid_argument("Matching source triangles requires an intact corner order and no cage");
   if(!source_placement.tangent_corners.empty()&&
       source_placement.tangent_corners.size()!=source.mesh.indices.size())
@@ -636,7 +638,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   }
   if(first_material!=source.materials.size()||first_triangle!=source.mesh.indices.size()/3)
     throw std::invalid_argument("Bake donor domains do not cover the combined surface");
-  validate_provenance(low,source.mesh,o);
+  validate_provenance(low,source.mesh,o,corresponding_topology);
   const auto donor_at=[&](size_t material)->const Donor &{return donors[donor_for_material.at(material)];};
   const bool float_emission=absolute_emission||std::any_of(source.materials.begin(),source.materials.end(),[](const auto &m){return bool(m.resolved_emission);})||
       std::ranges::any_of(source_fields,[](const auto &field){return field.emission_background.has_value();});
@@ -1131,13 +1133,19 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     }
     const auto [frame,normal]=target_frame(triangle,bary);
     std::optional<SurfaceHit> hit;
-    if(corresponding_topology){
-      const auto position=interpolate(low,triangle,bary,false);
-      const auto matched=interpolate(source.mesh,triangle,bary,false);
-      if(within_projection_bounds(position,matched,normal,o))
-        hit=SurfaceHit{uint32_t(triangle),matched,
-                       interpolate(source.mesh,triangle,bary,true),bary,0};
-    }else if(ray_projection){
+    if(!ray_projection){
+      const auto source_triangle=o.source_triangles.empty()?uint32_t(triangle):o.source_triangles[triangle];
+      auto source_bary=bary;
+      if(!o.source_triangles.empty()){
+        source_bary={};
+        for(size_t k=0;k<3;++k)for(size_t axis=0;axis<3;++axis)
+          source_bary[axis]+=bary[k]*o.source_corner_barycentrics[triangle*3+k][axis];
+      }
+      const auto matched=interpolate(source.mesh,source_triangle,source_bary,false);
+      if(!corresponding_topology||within_projection_bounds(interpolate(low,triangle,bary,false),matched,normal,o))
+        hit=SurfaceHit{source_triangle,matched,
+                       interpolate(source.mesh,source_triangle,source_bary,true),source_bary,0};
+    }else{
 #ifdef DOME_BAKE_RAY_REFERENCE
       const auto position=interpolate(low,triangle,bary,false);
       Vec3 offset=normal*o.front_distance;
@@ -1153,12 +1161,6 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
 #else
       hit=detail::BakeRayQuery::resolve(*query,*projected);
 #endif
-    }else{
-      std::array<float,3> mapped{};
-      for(int k=0;k<3;++k)for(int c=0;c<3;++c)mapped[c]+=bary[k]*o.source_corner_barycentrics[triangle*3+k][c];
-      auto source_triangle=o.source_triangles[triangle];
-      hit=SurfaceHit{source_triangle,interpolate(source.mesh,source_triangle,mapped,false),
-                     interpolate(source.mesh,source_triangle,mapped,true),mapped,0};
     }
     shade(at,triangle,bary,normal,frame,hit);
   };

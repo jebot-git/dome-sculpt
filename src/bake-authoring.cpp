@@ -463,6 +463,7 @@ ObjectBakeReport bake_objects(Scene &scene, std::span<const uint64_t> source_ids
 
   if (!target.visible || target.locked || !target.mesh_active || !target.painted)
     throw std::logic_error("Show, unlock and prepare the target painting mesh before baking");
+  std::optional<detail::RefinedBakeMap> matching_refinement;
   if(settings.corresponding_topology){
     if(settings.cage_object)
       throw std::invalid_argument("Matching source triangles requires a bake without a cage");
@@ -470,12 +471,9 @@ ObjectBakeReport bake_objects(Scene &scene, std::span<const uint64_t> source_ids
       throw std::invalid_argument("Matching source triangles requires an editable source mesh");
     const auto &source_mesh=source.painted->mesh();
     const auto &target_mesh=target.painted->mesh();
-    if(source_mesh.positions.size()!=target_mesh.positions.size()||
-       source_mesh.indices.size()!=target_mesh.indices.size())
-      throw std::invalid_argument("Matching source triangles requires the same vertex count and ordered indices");
-    for(size_t corner=0;corner<target_mesh.indices.size();++corner){
-      if((corner&1023)==0)check();
-      if(source_mesh.indices[corner]!=target_mesh.indices[corner])
+    if(!detail::same_bake_order(source_mesh,target_mesh)){
+      matching_refinement=detail::replay_refined_bake(target,source,false,cancelled);
+      if(!matching_refinement)
         throw std::invalid_argument("Matching source triangles requires the same vertex count and ordered indices");
     }
   }
@@ -661,10 +659,11 @@ ObjectBakeReport bake_objects(Scene &scene, std::span<const uint64_t> source_ids
       options.low_tangents.push_back(frame.tangents[c]);
     }
   }else low=detail::retained_bake_basis(target,options);
+  bool refined_cage=false;
   if(settings.cage_object)
     options.cage_positions=detail::object_bake_cage(scene,target.id,settings.cage_object,
         target.painted->mesh(),low?*low:target.painted->mesh(),cancelled,
-        target_placement?&metric_from_world:nullptr,posed_target?&*posed_target:nullptr);
+        target_placement?&metric_from_world:nullptr,posed_target?&*posed_target:nullptr,&refined_cage);
   std::vector<Tangent> target_metric_corners;
   if(target_placement){
     if(!low)low=target.painted->mesh();
@@ -725,6 +724,22 @@ ObjectBakeReport bake_objects(Scene &scene, std::span<const uint64_t> source_ids
     };
   }
   const auto &low_mesh=low?*low:target.painted->mesh();
+  if(matching_refinement){
+    const auto &corners=matching_refinement->corners;
+    if(corners.size()!=low_mesh.indices.size())
+      throw std::invalid_argument("Matching Bake refinement lost the ordered target corners");
+    options.source_triangles.reserve(corners.size()/3);
+    options.source_corner_barycentrics.reserve(corners.size());
+    for(size_t c=0;c<corners.size();++c){
+      if((c&1023)==0)check();
+      const auto &corner=corners[c];
+      if(c%3==0)options.source_triangles.push_back(corner.triangle);
+      if(options.source_triangles.back()!=corner.triangle)
+        throw std::invalid_argument("Matching Bake refinement crosses an original donor triangle");
+      const auto &b=corner.barycentric;
+      options.source_corner_barycentrics.push_back({float(b[0]),float(b[1]),float(b[2])});
+    }
+  }
   if(options.supersample){
     // The laid-out normal and retained UV bases may have split raster
     // vertices. Their corner order still names the original logical mesh.
@@ -899,6 +914,12 @@ ObjectBakeReport bake_objects(Scene &scene, std::span<const uint64_t> source_ids
   }else painting->install_bake(std::move(textures));
   auto next = scene;
   auto recipe=multiple?capture_bake_recipe(scene,source_ids,settings):capture_bake_recipe(scene,source_id,settings);
+  if(refined_cage||matching_refinement){
+    auto retained=std::make_shared<ObjectBakeRecipe>(*recipe);
+    retained->refinement=target.bake_recipe->refinement;
+    retained->validate();
+    recipe=std::move(retained);
+  }
   if(recipient){
     TextureSetLimits limits;limits.cancelled=cancelled;
     detail::stage_texture_set_bake(next.active(),target.texture_sets,*recipient,std::move(painting),std::move(recipe),limits,std::move(native_normal));

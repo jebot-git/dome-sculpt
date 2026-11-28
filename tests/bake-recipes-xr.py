@@ -11,11 +11,13 @@ p.add_argument('--mtoon',action='store_true',help='Use a typed MToon material on
 p.add_argument('--supersample',action='store_true',help='Select four samples with the actual controller before baking')
 p.add_argument('--mask',action='store_true',help='Select a target mask with the actual controller before rebaking')
 p.add_argument('--group',action='store_true',help='Recall an ordered group after choosing an individual source')
+p.add_argument('--refined-cage',action='store_true',help='Rebake the saved cage after a Refined Surface Mirror')
 a=p.parse_args()
 if a.mtoon and not a.texture_set:p.error('--mtoon requires --texture-set')
 if a.supersample and a.texture_set:p.error('--supersample uses the primary-field cage fixture')
 if a.mask and (a.supersample or a.texture_set):p.error('--mask uses the primary-field mask fixture')
 if a.group and (a.texture_set or a.supersample or a.mask):p.error('--group uses its own overlapping source fixture')
+if a.refined_cage and (a.texture_set or a.supersample or a.mask or a.group):p.error('--refined-cage uses its own fixture')
 out=a.out;out.mkdir(parents=True,exist_ok=True);checks=[]
 def check(ok,label):
  checks.append({'passed':bool(ok),'check':label});(out/'report.json').write_text(json.dumps({'checks':checks,'physical_headset':False},indent=2)+'\n');print(('PASS ' if ok else 'FAIL ')+label,flush=True);assert ok,label
@@ -23,7 +25,9 @@ with tempfile.TemporaryDirectory(prefix='dome-cage-xr-') as directory:
  root=Path(directory);manifest=root/'runtime.json';manifest.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(a.runtime)}}))
  env={**hardware_environment(),'DOME_XR_FIXTURE_RECIPE':'1','XR_RUNTIME_JSON':str(manifest),'LP_NUM_THREADS':'2','HOME':str(root),'XDG_RUNTIME_DIR':str(root),'XDG_CONFIG_HOME':str(root/'config'),'XDG_STATE_HOME':str(root/'state'),'XDG_CACHE_HOME':str(root/'cache'),'XDG_DATA_HOME':str(root/'data')}
  source=out/'source.dsculpt';reference=out/'reference.dsculpt'
- if a.texture_set:
+ if a.refined_cage:
+  subprocess.run([str(a.helper),'--xr-cage-recipe-fixture',str(source),str(reference)],env=env,check=True)
+ elif a.texture_set:
   if a.mtoon:env['DOME_BAKE_FIXTURE_MTOON']='1'
   subprocess.run([str(a.helper),'--texture-set-xr-fixture',str(source),str(reference)],env=env,check=True)
  elif a.mask:
@@ -39,7 +43,8 @@ with tempfile.TemporaryDirectory(prefix='dome-cage-xr-') as directory:
    subprocess.run([str(a.helper),'--ui-supersample-reference',str(source),str(reference)],env=env,check=True)
  before=source.read_bytes()
  def inspect(path):return json.loads(subprocess.check_output([str(a.helper),'--inspect',str(path)],env=env,text=True))
- original_inspection=inspect(source);original=original_inspection['scene'];(out/'source.json').write_text(json.dumps(original,indent=2)+'\n')
+ if not a.refined_cage:
+  original_inspection=inspect(source);original=original_inspection['scene'];(out/'source.json').write_text(json.dumps(original,indent=2)+'\n')
  for mode in ['accept','cancel','focus']:
   target=out/(mode+'.dsculpt');report=out/(mode+'.json')
   with (out/(mode+'.log')).open('w') as log:
@@ -56,12 +61,13 @@ with tempfile.TemporaryDirectory(prefix='dome-cage-xr-') as directory:
    finally:
     if r.poll() is None:r.terminate();r.wait()
 
-  check(r.returncode==0,mode+': actual native XR client exits and ordered Save drains');detail=json.loads(report.read_text());after=inspect(target)
+  check(r.returncode==0,mode+': actual native XR client exits and ordered Save drains');detail=json.loads(report.read_text())
+  if not a.refined_cage:after=inspect(target)
   check(hardware_renderer(detail),mode+': hardware OpenGL renders the actual swapchains')
   check(detail.get('acquires',0)>0 and detail.get('acquires')==detail.get('image_waits')==detail.get('releases') and detail.get('left_eye_nonblank',0)>0 and detail.get('right_eye_nonblank',0)>0,mode+': actual stereo ownership balances and both eyes contain rendered output')
   check(all(detail.get('cage_images',{}).get('58',{}).get(eye,0)>1000 for eye in ['0','1']),mode+': both real GL eyes render the edited Source/Cage controls')
   check(source.read_bytes()==before,mode+': input project bytes remain untouched')
-  if a.texture_set or a.group:
+  if a.texture_set or a.group or a.refined_cage:
    expected=reference.read_bytes() if mode=='accept' else before
    check(target.read_bytes()==expected,mode+': exact native project matches the Bake reference or the cancelled project')
   elif mode=='accept':
