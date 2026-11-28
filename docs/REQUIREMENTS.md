@@ -33,6 +33,14 @@ diagnostic. Native Wayland, synthetic OpenXR and the headless reference cover
 the current authored workflows.
 [Authored corner Mirror evidence](validation/key-mirror-authored-gpu-20261128.json)
 
+The mesh worker performs deep keyed material preview validation with the
+current cancellation token. Render and picking authenticate the exact
+published owners. A view or placement change can reuse the proof within the
+same generation, and new generations receive independent verification.
+The prepared Mirror fixture records zero replays while consuming a worker
+snapshot and pixel equality against the standalone range.
+[Key material preview evidence](validation/key-material-preview-20261128.json)
+
 Bake traces ambient occlusion on the selected GPU through the native
 source BVH. It preserves the original biased cosine hemisphere, inclusive
 ray distance and ordered native output. Continuation batches poll for

@@ -1,0 +1,92 @@
+{
+  "date": "2026-11-28",
+  "product": "5990ed37520c4a1359d2362f0c3e00f0dd52b945",
+  "preceding": "37c4e9e28ca6f291689f2eaa3197ff702782ba52",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Deep validation precedes publication of the actual immutable keyed material preview. The consumer verifies object and exact shared owners. Reuse is limited to the same document generation and immutable material and packed textures.",
+  "arc_a770": {
+    "application_sha256": "a6b241a9af1450fd19facd1504e158c9f64fff2455b4f20a2043dee446350d92",
+    "render_node": "/dev/dri/renderD129",
+    "release": {
+      "tests": [
+        "independent-seam-key-mirror-prepared",
+        "independent-seam-key-mirror-retained",
+        "independent-seam-key-mirror-retained-render",
+        "normal-preview-current",
+        "normal-preview-tamper",
+        "independent-seam-key-mirror-prepared-render",
+        "application-missing-gpu",
+        "key-mirror-relative-owning",
+        "material-visibility",
+        "shapekey-mirror-openxr"
+      ],
+      "log_sha256": "7bd5ad2690eab1c0029399cf9f26a676b9e9111db2f5e197d919c174fd926ccd"
+    },
+    "prepared_graphics": {
+      "checks": 46,
+      "log_sha256": "b6ee22802a875e5cd8605b623e375a4ae3483cb7e05b637bc191d7c7b2727ca8"
+    },
+    "retained_graphics": {
+      "checks": 36,
+      "log_sha256": "c1e255ee3d0a385af403551b08744ed2fa7315b7b39b2a2ca71ebba685f4acb2"
+    },
+    "prepared_render_probe": {
+      "cold_render_and_picking_replays": 0,
+      "geometry_reposition_render_replays": 0,
+      "standalone_cold_render_replays": 3,
+      "pixels_identical": true,
+      "worker_replay_receives_cancellation_callback": true,
+      "byte_identical_foreign_map_and_binding_refused": true,
+      "borrowed_control_block_refused": true,
+      "new_generation_revalidates": true
+    },
+    "nested_domed_wayland": {
+      "checks": 10,
+      "report_sha256": "f53780ad04c1573bf2950b1655d2385725cbdb1df6564cc6fa9383a08818e2e4",
+      "compute_trace_sha256": "fd138a24fc169ab8b0c8a13c12434038a1febad8ff1fa4dec44ed4b5503f8eb4",
+      "preserved_projects": {
+        "mirror-after.dsculpt": "7d498b501b9bbf2415bf1f46f1c0330929d349cabe355721cf98a5397c9d5140",
+        "mirror-before.dsculpt": "8d96a9438a86dfdf9db9abfe8eeafc1a90c8d3a2b7a40744cbe5fa1ccb5962bc"
+      }
+    },
+    "synthetic_openxr": {
+      "checks": 40,
+      "report_sha256": "ae59a811a329ca35b6bbe8e63e9a21ad9909e6279128b01cf211d648c9df2780",
+      "physical_headset": false,
+      "preserved_projects": {
+        "accept-0.dsculpt": "cf3a4871e1d88af8e8313ba2772e406fef16e5c9bbbf2129b9be5347437e3992",
+        "accept-1.dsculpt": "6a5ce46bca85bcde074bc2251b1ddf69684d6a3b1336aeb83ff2b0db3b481080",
+        "accept-2.dsculpt": "16ea54370d05fb55095be502ff9926c03c06e953f724b123304b080f361b0451",
+        "cancel-0.dsculpt": "8e16ca54b46ba261d92562c5aa0667c14121df4db80cd233367e66799910d23d",
+        "focus-0.dsculpt": "8e16ca54b46ba261d92562c5aa0667c14121df4db80cd233367e66799910d23d",
+        "source.dsculpt": "8e16ca54b46ba261d92562c5aa0667c14121df4db80cd233367e66799910d23d"
+      }
+    },
+    "native_relative_project_sha256": "65787b17d6bd78403b4e599bd81b7beda1a4eb4b1e9d61f36a8335c14000a147",
+    "prior_output_comparison_log_sha256": "ef5819c76de56b97176525f27e570db3972ea4f815bde7d80431c505ec85bdc2"
+  },
+  "headless_reference": {
+    "tests": [
+      "cpu-reference-install-refused",
+      "material-visibility",
+      "independent-seam-key-mirror-prepared",
+      "key-mirror-relative-owning"
+    ],
+    "log_sha256": "66eb1ffc17966392f65c599a60466f38ea1b7e55be59cafd451fc5dad1950366"
+  },
+  "scoped_asan_ubsan": {
+    "fixture": {
+      "checks": 46,
+      "log_sha256": "b6ee22802a875e5cd8605b623e375a4ae3483cb7e05b637bc191d7c7b2727ca8"
+    },
+    "instrumented": [
+      "key-material-preview.cpp",
+      "normal-key-derivation.cpp",
+      "material-visibility.cpp",
+      "document.cpp",
+      "render.cpp",
+      "tests/independent-seam-key-mirror-prepared-render.cpp"
+    ],
+    "leak_detection": false
+  }
+}

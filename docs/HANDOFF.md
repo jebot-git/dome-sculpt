@@ -175,6 +175,17 @@ ROCm compile and refuse absent devices in direct probes. Physical headset and
 positive AMD and NVIDIA execution remain open.
 [Authored corner Mirror evidence](validation/key-mirror-authored-gpu-20261128.json)
 
+The mesh worker now verifies keyed material ranges before publishing their
+immutable preview snapshot. It reuses verification for the same material and
+texture owners within a document generation. Cold viewport drawing, picking,
+and an actual object move perform zero Mirror replays on the consuming thread.
+The standalone range replays the proof three times and renders identical
+pixels. Render and picking reject borrowed verification on foreign owners.
+Native Wayland and synthetic OpenXR reproduce their prior project bytes.
+Arc shader and independent GLB checks pass for the prepared and retained
+fixtures. Scoped ASan/UBSan covers the prepared fixture.
+[Key material preview evidence](validation/key-material-preview-20261128.json)
+
 Ambient occlusion in Bake now traces the biased hemisphere on the selected
 GPU against the existing immutable source BVH. The device returns one
 blocked-ray count per projected texel. Long traversals resume on the device
