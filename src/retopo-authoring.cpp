@@ -122,13 +122,6 @@ detail::RetopoTransfer::RetopoTransfer(const Mesh &previous_mesh,
     const auto normal = cross(b - a, c - a);
     world_normals_.push_back(length(normal) > 0 ? normal_direction(previous_metric_, normal) : Vec3{});
   }
-  options_.cancelled = cancelled();
-  // This is the maximum projection span exposed in the retopology editor.
-  options_.closest_maximum = .2f;
-  options_.triangle_filter = [this](uint32_t face) {
-    work();
-    return (!current_domain_ || current_domain_->contains(face)) && dot(world_normals_[face], current_normal_) > 0;
-  };
 }
 
 void detail::RetopoTransferBudget::work(size_t amount) {
@@ -141,23 +134,41 @@ void detail::RetopoTransferBudget::reserve(size_t count, size_t stride) {
   bytes_left_ -= count * stride;
 }
 
-std::optional<SurfaceHit> detail::RetopoTransfer::match(Vec3 position, Vec3 normal,
-    const TextureSetFaceDomain *source_domain) {
-  work();
-  current_domain_ = source_domain;
-  current_normal_ = normal_direction(replacement_metric_, normal);
-  const auto point = skin_affine_point(replacement_metric_, position);
-  if (previous_metric_.matrix() == AffineTransform{}.matrix())
-    return old_surface_->nearest(point, options_);
-  const auto result = old_surface_->nearest_result(point, previous_metric_, options_);
-  return result ? std::optional(result->surface) : std::nullopt;
+void detail::RetopoTransfer::prepare_batch(size_t size) {
+  if(queries_.capacity()||!size)return;
+  const auto capacity=retopo_surface::transfer_capacity;
+  reserve(capacity,sizeof(RetopoMatchPoint)+sizeof(retopo_surface::TransferPoint)+sizeof(retopo_surface::TransferHit));
+  queries_.reserve(capacity);
+}
+
+void detail::RetopoTransfer::submit(std::span<RetopoMatch> hits,const TextureSetFaceDomain *domain){
+  if(queries_.empty())return;
+  if(!projection_)projection_=std::make_unique<RetopoSurface>(*old_surface_);
+  if(domain&&!membership_reserved_){
+    reserve(world_normals_.size(),sizeof(uint8_t));
+    membership_reserved_=true;
+  }
+  const auto members=domain?std::optional(domain->triangles()):std::nullopt;
+  work(projection_->match(queries_,hits,previous_metric_,world_normals_,members,
+                          uint32_t(remaining_work()),cancelled()));
+}
+void detail::RetopoTransfer::match(std::span<const RetopoMatchPoint> points,std::span<RetopoMatch> hits){
+  if(points.size()!=hits.size()||points.size()>retopo_surface::transfer_capacity)
+    throw std::logic_error("Invalid Retopology transfer batch");
+  work(points.size());
+  queries_.clear();
+  prepare_batch(points.size());
+  for(const auto &point:points)
+    queries_.push_back({skin_affine_point(replacement_metric_,point.position),
+                        normal_direction(replacement_metric_,point.normal),false});
+  submit(hits,nullptr);
 }
 
 bool detail::RetopoTransfer::has_retained(uint32_t face) const noexcept {
   return face < retained_.size() && retained_[face].witnessed && retained_[face].triangle < world_normals_.size();
 }
 
-std::optional<SurfaceHit> detail::RetopoTransfer::match_retained(Vec3 position, Vec3 normal,
+detail::RetopoMatch detail::RetopoTransfer::match_retained(Vec3 normal,
     uint32_t face, std::array<float,3> weights, const TextureSetFaceDomain *source_domain) {
   work();
   if (!has_retained(face)) return {};
@@ -165,39 +176,42 @@ std::optional<SurfaceHit> detail::RetopoTransfer::match_retained(Vec3 position, 
   if ((source_domain && !source_domain->contains(reference.triangle)) ||
       dot(world_normals_[reference.triangle],normal_direction(replacement_metric_,normal)) <= 0)
     return {};
-  auto hit = SurfaceHit{.triangle=reference.triangle};
+  auto hit = RetopoMatch{.triangle=reference.triangle};
   for (size_t i=0;i<3;++i) for (size_t k=0;k<3;++k)
     hit.barycentric[k] += std::max(0.f,weights[i])*reference.corners[i][k];
   const auto total = hit.barycentric[0]+hit.barycentric[1]+hit.barycentric[2];
   if (!(total>0)) return {};
-  const auto &mesh = old_surface_->mesh();
-  for (size_t k=0;k<3;++k) {
-    hit.barycentric[k] /= total;
-    const auto vertex = mesh.indices[size_t(reference.triangle)*3+k];
-    hit.position += mesh.positions[vertex]*hit.barycentric[k];
-  }
-  hit.normal = world_normals_[reference.triangle];
-  hit.distance = length(skin_affine_point(previous_metric_,hit.position)-skin_affine_point(replacement_metric_,position));
+  for(auto &weight:hit.barycentric)weight/=total;
   return hit;
 }
 
-std::optional<SurfaceHit> detail::RetopoTransfer::match_patch(Vec3 position, Vec3 normal,
-    uint32_t face, std::array<float,3> weights, const TextureSetFaceDomain *source_domain) {
-  if (first_patch_ && source_domain && std::ranges::min(weights) > 1e-6f) {
-    // Without earlier patch corners, every interior texel must agree with
-    // the material picked at the face centre. The same-slot lookup alone
-    // could project sideways across a source material boundary.
-    auto hit = match(position, normal);
-    if (!hit)
-      throw std::invalid_argument("A patch face is outside the source material surface");
-    if (!source_domain->contains(hit->triangle))
-      throw std::invalid_argument("Split the patch along its source material boundary before Apply");
-    return hit;
+void detail::RetopoTransfer::match_patch(std::span<const RetopoPatchPoint> points,std::span<RetopoMatch> hits,
+    const TextureSetFaceDomain *domain) {
+  if(points.size()!=hits.size()||points.size()>retopo_surface::transfer_capacity)
+    throw std::logic_error("Invalid Retopology patch batch");
+  work(points.size());
+  queries_.clear();
+  prepare_batch(points.size());
+  for(const auto &point:points){
+    // On the first patch, an interior texel must agree with the material
+    // picked at the centre. Looking only in that slot hides crossed seams.
+    const bool restricted=domain&&!(first_patch_&&std::ranges::min(point.barycentric)>1e-6f);
+    queries_.push_back({skin_affine_point(replacement_metric_,point.position),
+                        normal_direction(replacement_metric_,point.normal),restricted});
   }
-  if (auto spatial = match(position,normal,source_domain)) return spatial;
-  if (first_patch_ && !source_domain)
-    throw std::invalid_argument("A retopology texel has no matching source surface within the projection range");
-  return match_retained(position,normal,face,weights,source_domain);
+  submit(hits,domain);
+  for(size_t i=0;i<hits.size();++i){
+    if(domain&&!queries_[i].restrict_material){
+      if(!hits[i])throw std::invalid_argument("A patch face is outside the source material surface");
+      if(!domain->contains(hits[i].triangle))
+        throw std::invalid_argument("Split the patch along its source material boundary before Apply");
+    }
+    if(hits[i])continue;
+    if(first_patch_&&!domain)
+      throw std::invalid_argument("A retopology texel has no matching source surface within the projection range");
+    const auto &point=points[i];
+    hits[i]=match_retained(point.normal,point.face,point.barycentric,domain);
+  }
 }
 RetopoWorkspace::RetopoWorkspace(const Scene &scene, const std::function<bool()> &cancelled) {
   const auto &active = scene.active();
@@ -627,10 +641,23 @@ std::shared_ptr<DeformationState> transfer_patch_deformation(const DeformationSt
   if (targets || before.skin) {
     size_t entries = result->resource_entries();
     std::vector<uint32_t> retained_corners;
+    const auto batch=std::min(vertices,detail::retopo_surface::transfer_capacity);
+    transfer.reserve(batch,sizeof(detail::RetopoMatchPoint)+sizeof(detail::RetopoMatch));
+    std::vector<detail::RetopoMatchPoint> points;
+    std::vector<detail::RetopoMatch> hits(batch);
+    points.reserve(batch);
     for (size_t vertex = 0; vertex < vertices; ++vertex) {
       if ((vertex & 1023) == 0) stop(transfer.cancelled());
-      const auto position = new_mesh.positions[vertex], normal = new_mesh.normals[vertex];
-      auto hit = transfer.match(position,normal);
+      const auto normal=new_mesh.normals[vertex];
+      const auto index=vertex%batch;
+      if(index==0){
+        points.clear();
+        const auto end=vertex+std::min(batch,vertices-vertex);
+        for(size_t i=vertex;i<end;++i)
+          points.push_back({new_mesh.positions[i],new_mesh.normals[i]});
+        transfer.match(points,std::span(hits).first(points.size()));
+      }
+      auto hit=hits[index];
       if (!hit) {
         if (retained_corners.empty()) {
           transfer.reserve(vertices,sizeof(uint32_t));
@@ -646,14 +673,14 @@ std::shared_ptr<DeformationState> transfer_patch_deformation(const DeformationSt
         if (corner!=UINT32_MAX) {
           std::array<float,3> weights{};
           weights[corner%3]=1;
-          hit=transfer.match_retained(position,normal,corner/3,weights);
+          hit=transfer.match_retained(normal,corner/3,weights);
         }
       }
       if (!hit)
         throw std::invalid_argument("Some retopology vertices have no matching rest surface for weights or shapekeys");
       std::array<uint32_t,3> old;
-      std::copy_n(old_mesh.indices.begin() + size_t(hit->triangle) * 3, 3, old.begin());
-      const auto &bary = hit->barycentric;
+      std::copy_n(old_mesh.indices.begin() + size_t(hit.triangle) * 3, 3, old.begin());
+      const auto &bary = hit.barycentric;
       if (before.skin) {
         const auto bones = before.skeleton->bones.size();
         std::array<double,256> by_joint{};
@@ -919,15 +946,30 @@ private:
         new_faces_.size() != mesh.indices.size() / 3)
       throw std::invalid_argument("Retopology source material slots differ from its genuine mesh");
     budget_.reserve(mesh.indices.size() / 3, sizeof(TextureSetId));
-    std::vector<TextureSetId> slots;
-    slots.reserve(mesh.indices.size() / 3);
+    std::vector<TextureSetId> slots(mesh.indices.size()/3);
+    const auto batch=std::min(slots.size(),detail::retopo_surface::transfer_capacity);
+    std::vector<detail::RetopoMatchPoint> points;
+    std::vector<detail::RetopoMatch> hits;
+    std::vector<size_t> pending;
+    const auto flush=[&]{
+      if(points.empty())return;
+      hits.resize(points.size());
+      projection.match(points,hits);
+      for(size_t i=0;i<hits.size();++i){
+        if(first_patch&&!hits[i])
+          throw std::invalid_argument("A patch face is outside the source material surface");
+        slots[pending[i]]=hits[i]?existing[hits[i].triangle]:0;
+      }
+      points.clear();
+      pending.clear();
+    };
     for (size_t c = 0; c < mesh.indices.size(); c += 3) {
       if ((c & 1023) == 0) stop(budget_.cancelled());
       const auto old_triangle = first_patch ? UINT32_MAX : correspondence_[c / 3].triangle;
       if (old_triangle != UINT32_MAX) {
         // A quad can carry two material slots. Its stable corners survive
         // reflection, reordering and movement across the old material seam.
-        slots.push_back(existing[old_triangle]);
+        slots[c/3]=existing[old_triangle];
         continue;
       }
       budget_.work(2 * std::bit_width(old_faces_.size()) + 2);
@@ -937,18 +979,24 @@ private:
         // A moved face keeps its authored material even when its centre now
         // overlaps another face. Newly created faces use the rest surface.
         if (std::ranges::all_of(fields, [&](auto slot) { return slot == fields.front(); })) {
-          slots.push_back(fields.front());
+          slots[c/3]=fields.front();
           continue;
         }
         throw std::invalid_argument("Retopology changed a quad diagonal that carries a material boundary");
       }
       const auto a = mesh.positions[mesh.indices[c]], b = mesh.positions[mesh.indices[c + 1]],
                  d = mesh.positions[mesh.indices[c + 2]];
-      const auto hit = projection.match((a + b + d) / 3.f, cross(b - a,d - a));
-      if (first_patch && !hit)
-        throw std::invalid_argument("A patch face is outside the source material surface");
-      slots.push_back(hit ? existing[hit->triangle] : 0);
+      if(points.capacity()==0){
+        budget_.reserve(batch,sizeof(detail::RetopoMatchPoint)+sizeof(detail::RetopoMatch)+sizeof(size_t));
+        points.reserve(batch);
+        hits.reserve(batch);
+        pending.reserve(batch);
+      }
+      points.push_back({(a+b+d)/3.f,cross(b-a,d-a)});
+      pending.push_back(c/3);
+      if(points.size()==batch)flush();
     }
+    flush();
     auto result = detail::project_retopology_texture_sets(primary, primary_material, recipe, primary_binding, sets,
         first_grid_->mesh_owner(), slots, budget_, [&](const TextureSetView &field,
             const std::shared_ptr<const TextureSetFaceDomain> &domain) {

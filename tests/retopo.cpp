@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/retopo.hpp"
 #include "../src/retopo-surface.hpp"
+#include "../src/retopo-affine-dot.hpp"
+#include "dome/affine.hpp"
 #include <algorithm>
 #include <bit>
 #include <iostream>
@@ -85,8 +87,133 @@ void projection_regression(){
           "A continued traversal observes cancellation before publication");
   require(equal(continuation.closest(point),expected),"The same resident surface retries cleanly after failure and cancellation");
 }
+void affine_direction_regression(){
+  using detail::retopo_surface::Extended;
+  using detail::retopo_surface::affine_dot;
+  if constexpr(std::numeric_limits<long double>::digits!=64)return;
+  uint64_t rng=2654435769u;
+  const auto next=[&] {
+    rng^=rng<<13;
+    rng^=rng>>7;
+    rng^=rng<<17;
+    return rng;
+  };
+  bool exact=true;
+  for(unsigned i=0;i<100'000;++i){
+    const unsigned span=i%2?2047:103,offset=i%2?0:972;
+    const auto word=[&] {
+      const auto fraction=next()&~Extended::infinity;
+      return fraction|((next()%span+offset)<<52);
+    };
+    uint64_t row[3],direction[3];
+    for(size_t k=0;k<3;++k){row[k]=word();direction[k]=word();}
+    if(i%3==0){
+      row[1]=row[0]^Extended::leading;
+      direction[1]=direction[0]^(next()&2047);
+    }
+    volatile long double value=0;
+    for(size_t k=0;k<3;++k){
+      const volatile long double product=static_cast<long double>(std::bit_cast<double>(row[k]))*
+                                         std::bit_cast<double>(direction[k]);
+      value=value+product;
+    }
+    const double expected=value;
+    bool valid=true;
+    const auto bits=affine_dot(row,direction,valid);
+    exact&=valid==(std::isfinite(expected)&&(expected!=0||value==0));
+    if(valid&&expected!=0)exact&=bits==std::bit_cast<uint64_t>(expected);
+  }
+  require(exact,"Device affine rows match native extended precision across cancellation, subnormals and range limits");
+}
+
+void material_projection_regression(){
+  using detail::RetopoMatch;
+  using detail::RetopoMatchPoint;
+  Mesh mesh=cube(.2f);
+  auto other=cube(.1f);
+  for(auto &p:other.positions){p.x+=.32f;p.y-=.08f;p.z+=.11f;}
+  join(mesh,other);
+  SurfaceQuery source(mesh);
+  auto reflected=AffineTransform{}.matrix();
+  reflected[0]=-.73;reflected[1]=.21;reflected[4]=.37;reflected[5]=1.2;
+  reflected[8]=.19;reflected[9]=.11;reflected[10]=.91;
+  reflected[12]=.25;reflected[13]=-.25;reflected[14]=-.11;
+
+  for(const auto &world:{AffineTransform{},AffineTransform(reflected)}){
+    const bool affine=world.matrix()!=AffineTransform{}.matrix();
+    detail::RetopoSurface device(source);
+    std::vector<Vec3> normals;
+    for(size_t c=0;c<mesh.indices.size();c+=3){
+      const auto a=mesh.positions[mesh.indices[c]],b=mesh.positions[mesh.indices[c+1]],d=mesh.positions[mesh.indices[c+2]];
+      const auto n=cross(b-a,d-a);
+      const auto frame=world.normal({n.x,n.y,n.z});
+      normals.push_back(normalized({float(frame[0]),float(frame[1]),float(frame[2])}));
+    }
+    std::vector<RetopoMatchPoint> points;
+    for(int y=-8;y<=8;++y)for(int x=-8;x<=8;++x){
+      const auto position=world.point({double(x)/29,double(y)/31,(x+y)%3==0?.27:.38});
+      auto normal=world.normal({0,0,(x+y)%2==0?1.:-1.});
+      points.push_back({{float(position[0]),float(position[1]),float(position[2])},
+                        normalized({float(normal[0]),float(normal[1]),float(normal[2])}),x%3!=0});
+    }
+    for(const auto &domain:{std::array<uint32_t,4>{2,3,14,15},std::array<uint32_t,4>{3,5,9,15}}){
+      std::vector<RetopoMatch> hits(points.size());
+      const auto visits=device.match(points,hits,world,normals,domain,50'000,{});
+      size_t expected_visits=0,matched=0;
+      bool exact=true;
+      for(size_t i=0;i<points.size();++i){
+        const auto &point=points[i];
+        SurfaceQueryOptions options;
+        options.closest_maximum=.2f;
+        options.triangle_filter=[&](uint32_t triangle){
+          ++expected_visits;
+          return (!point.restrict_material||std::ranges::binary_search(domain,triangle))&&
+                 dot(normals[triangle],point.normal)>0;
+        };
+        const auto hit=affine?source.nearest_result(point.position,world,options):
+                              source.nearest_result(point.position,options);
+        if(hit){
+          ++matched;
+          exact&=hits[i].triangle==hit->surface.triangle&&
+                 std::ranges::equal(hits[i].barycentric,hit->surface.barycentric,
+                   [](float a,float b){return std::bit_cast<uint32_t>(a)==std::bit_cast<uint32_t>(b);});
+        }else exact&=!hits[i];
+      }
+      require(exact&&matched>0&&matched<points.size()&&visits==expected_visits,
+              "Filtered GPU correspondence matches source triangle, barycentrics and charged visits");
+      rejects([&]{device.match(points,hits,world,normals,domain,1,{});},
+              "Filtered correspondence enforces the total triangle budget");
+    }
+  }
+
+  Mesh crowded;
+  crowded.positions={{0,0,0},{1,0,0},{1,1e-13f,0}};
+  crowded.normals.assign(3,{0,0,1});
+  for(uint32_t i=0;i<2048;++i)crowded.indices.insert(crowded.indices.end(),{0,1,2});
+  SurfaceQuery full(crowded);
+  detail::RetopoSurface device(full);
+  const std::vector<Vec3> normals(2048,{0,0,1});
+  const std::array<uint32_t,2> domain{93,2047};
+  const auto world=AffineTransform(reflected);
+  const auto position=world.point({.75,2e-14,0});
+  const RetopoMatchPoint point{{float(position[0]),float(position[1]),float(position[2])},{0,0,1},true};
+  RetopoMatch hit;
+  const auto run=[&](auto cancelled) {
+    return device.match(std::span(&point,1),std::span(&hit,1),world,normals,domain,4096,cancelled);
+  };
+  require(run(std::function<bool()>{})==2048&&hit.triangle==domain.front(),
+          "Filtered continuation retains the lowest affine tie across multiple dispatches");
+  size_t polls=0;
+  rejects([&]{run([&]{return ++polls>=5;});},
+          "Filtered continuation checks cancellation before publishing");
+  require(run(std::function<bool()>{})==2048&&hit.triangle==domain.front(),
+          "Filtered resident surface remains usable after cancellation");
+}
+
 int main() try {
   projection_regression();
+  affine_direction_regression();
+  material_projection_regression();
   RetopoMesh patch;
   std::array<TopologyID, 9> ids;
   for (int y = 0; y < 3; y++)

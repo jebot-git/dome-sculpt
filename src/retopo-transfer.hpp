@@ -3,6 +3,7 @@
 #include "dome/affine.hpp"
 #include "dome/mesh-processing.hpp"
 #include "dome/texture-sets.hpp"
+#include "retopo-surface.hpp"
 
 namespace dome::detail {
 
@@ -25,6 +26,11 @@ struct RetopoCorrespondence {
   std::array<std::array<float,3>,3> corners{};
   bool witnessed = false;
 };
+struct RetopoPatchPoint {
+  Vec3 position,normal;
+  uint32_t face;
+  std::array<float,3> barycentric;
+};
 
 class RetopoTransfer {
 public:
@@ -34,11 +40,10 @@ public:
                  const DeformationState *source_pose = nullptr);
   RetopoTransfer(const RetopoTransfer &) = delete;
   RetopoTransfer &operator=(const RetopoTransfer &) = delete;
-  std::optional<SurfaceHit> match(Vec3 position, Vec3 normal,
-                                const TextureSetFaceDomain *source_domain = nullptr);
-  std::optional<SurfaceHit> match_patch(Vec3 position, Vec3 normal, uint32_t face,
-      std::array<float,3> weights, const TextureSetFaceDomain *source_domain = nullptr);
-  std::optional<SurfaceHit> match_retained(Vec3 position, Vec3 normal, uint32_t face,
+  void match(std::span<const RetopoMatchPoint>,std::span<RetopoMatch>);
+  void match_patch(std::span<const RetopoPatchPoint>,std::span<RetopoMatch>,
+                   const TextureSetFaceDomain *source_domain=nullptr);
+  RetopoMatch match_retained(Vec3 normal,uint32_t face,
       std::array<float,3> weights, const TextureSetFaceDomain *source_domain = nullptr);
   bool has_retained(uint32_t face) const noexcept;
   bool first_patch() const noexcept { return first_patch_; }
@@ -56,13 +61,14 @@ public:
 private:
   RetopoTransferBudget &budget_;
   std::span<const RetopoCorrespondence> retained_;
-  bool first_patch_, posed_source_;
+  bool first_patch_, posed_source_, membership_reserved_=false;
   AffineTransform previous_metric_, replacement_metric_, placement_change_;
   std::unique_ptr<SurfaceQuery> old_surface_;
   std::vector<Vec3> world_normals_;
-  SurfaceQueryOptions options_;
-  Vec3 current_normal_;
-  const TextureSetFaceDomain *current_domain_ = nullptr;
+  std::unique_ptr<RetopoSurface> projection_;
+  std::vector<RetopoMatchPoint> queries_;
+  void prepare_batch(size_t);
+  void submit(std::span<RetopoMatch>,const TextureSetFaceDomain *);
 };
 
 struct RetopoTextureSets {

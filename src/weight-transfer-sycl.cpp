@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#include <sycl/sycl.hpp>
+#include "weight-transfer-sycl-memory.hpp"
 #include "weight-transfer-device-query.hpp"
 #include "surface-ray-softfloat.hpp"
 
@@ -17,21 +17,8 @@ struct Counter {
   }
 };
 
-class SyclApi {
-  sycl::queue queue_{sycl::gpu_selector_v,[](sycl::exception_list errors){
-    for(auto error:errors)std::rethrow_exception(error);
-  },sycl::property_list{sycl::property::queue::in_order{}}};
+class SyclApi : public SyclSurfaceMemory {
 public:
-  void *allocate(size_t bytes){
-    auto *pointer=sycl::malloc_device(bytes,queue_);
-    if(!pointer)throw std::bad_alloc();
-    return pointer;
-  }
-  void release(void *pointer) noexcept {try{sycl::free(pointer,queue_);}catch(...){}}
-  void wait(){queue_.wait_and_throw();}
-  void drain() noexcept {try{wait();}catch(...){}}
-  void upload(void *to,const void *from,size_t bytes){queue_.memcpy(to,from,bytes);}
-  void read(void *to,const void *from,size_t bytes){queue_.memcpy(to,from,bytes).wait_and_throw();}
   void reset(uint32_t *value){queue_.fill(value,uint32_t(0),1);}
   void launch(SurfaceView view,const Vec3 *points,float radius,Hit *hits,size_t count,
               uint32_t *visits,uint32_t work,bool all_queries_fit){
@@ -50,6 +37,7 @@ public:
           sycl::access::address_space::global_space>(*status).fetch_or(flags);
     });
   }
+
 };
 } // namespace
 
@@ -60,4 +48,5 @@ namespace dome::detail::retopo_surface {
 std::unique_ptr<Query> upload(const weight_transfer::Surface &surface){
   return std::make_unique<DeviceQuery<weight_transfer::SyclApi>>(surface);
 }
+
 }

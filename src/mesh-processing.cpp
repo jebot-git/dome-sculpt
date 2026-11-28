@@ -464,6 +464,32 @@ const Mesh &SurfaceQuery::mesh() const {
 }
 SurfaceQuery::SurfaceQuery(SurfaceQuery &&) noexcept = default;
 SurfaceQuery &SurfaceQuery::operator=(SurfaceQuery &&) noexcept = default;
+
+struct detail::RetopoSurface::MaterialState {
+  AffineTransform world,inverse;
+  std::span<const Vec3> normals;
+  std::optional<std::span<const uint32_t>> members;
+  std::unique_ptr<retopo_surface::TransferQuery> device;
+  std::vector<retopo_surface::TransferPoint> input;
+  std::vector<retopo_surface::TransferHit> output;
+  std::vector<uint8_t> member_mask;
+};
+detail::RetopoSurface::RetopoSurface(const SurfaceQuery &source):source_(source){}
+detail::RetopoSurface::~RetopoSurface()=default;
+#ifndef DOME_BAKE_RAY_REFERENCE
+namespace {
+std::vector<detail::weight_transfer::Node> retopo_nodes(const Bvh &tree,const std::function<bool()> &cancelled){
+  std::vector<detail::weight_transfer::Node> nodes(tree.nodes.size());
+  for(size_t i=0;i<nodes.size();++i){
+    if(i%512==0)cancel(cancelled);
+    const auto &node=tree.nodes[i];
+    nodes[i]={node.box.lo,node.box.hi,uint32_t(node.start),
+              uint32_t(node.left<0?node.count:0),uint32_t(node.left),uint32_t(node.right)};
+  }
+  return nodes;
+}
+}
+#endif
 SurfaceHit SurfaceQuery::closest(Vec3 p) const { return closest(p, {}); }
 SurfaceHit SurfaceQuery::closest(Vec3 p,
                                  const SurfaceQueryOptions &options) const {
@@ -496,13 +522,7 @@ void detail::RetopoSurface::closest(std::span<const Vec3> points,std::span<Surfa
   }
   if(!device_){
     const auto &tree=source_.impl_->tree;
-    std::vector<weight_transfer::Node> nodes(tree.nodes.size());
-    for(size_t i=0;i<nodes.size();++i){
-      if(i%512==0)cancel(cancelled);
-      const auto &node=tree.nodes[i];
-      nodes[i]={node.box.lo,node.box.hi,uint32_t(node.start),
-                uint32_t(node.left<0?node.count:0),uint32_t(node.left),uint32_t(node.right)};
-    }
+    const auto nodes=retopo_nodes(tree,cancelled);
     device_=retopo_surface::upload({nodes,tree.order,tree.m.indices,tree.m.positions});
     cancel(cancelled);
   }
@@ -519,6 +539,83 @@ void detail::RetopoSurface::closest(std::span<const Vec3> points,std::span<Surfa
     }
   }
   cancel(cancelled);
+#endif
+}
+uint32_t detail::RetopoSurface::match(std::span<const RetopoMatchPoint> points,std::span<RetopoMatch> hits,
+    const AffineTransform &world,std::span<const Vec3> normals,std::optional<std::span<const uint32_t>> members,
+    uint32_t work,const std::function<bool()> &cancelled){
+  cancel(cancelled);
+  if(points.size()!=hits.size()||points.size()>retopo_surface::transfer_capacity||
+      normals.size()!=source_.mesh().indices.size()/3)
+    throw std::invalid_argument("Invalid Retopology material query");
+  if(points.empty())return 0;
+  const bool affine=world.matrix()!=AffineTransform{}.matrix();
+#ifdef DOME_BAKE_RAY_REFERENCE
+  uint32_t visits=0;
+  SurfaceQueryOptions options;
+  options.closest_maximum=.2f;
+  if(cancelled)options.cancelled=std::cref(cancelled);
+  for(size_t i=0;i<points.size();++i){
+    const auto &point=points[i];
+    options.triangle_filter=[&](uint32_t triangle) {
+      if(visits==work)throw std::length_error("Retopology transfer exceeds the surface work budget");
+      ++visits;
+      return (!point.restrict_material||std::ranges::binary_search(members.value(),triangle))&&
+          dot(normals[triangle],point.normal)>0;
+    };
+    const auto p=point.position;
+    const auto result=affine?source_.nearest_result(p,world,options):source_.nearest_result(p,options);
+    hits[i]=result?RetopoMatch{result->surface.triangle,result->surface.barycentric}:RetopoMatch{};
+  }
+  return visits;
+#else
+  if(!material_){
+    auto state=std::make_unique<MaterialState>();
+    state->world=world;state->inverse=world.inverse();state->normals=normals;
+    retopo_surface::TransferMetric metric{};
+    metric.affine=affine;
+    metric.distance_limit=std::bit_cast<uint64_t>(std::nextafter(double(.2f)*.2f,INFINITY));
+    for(size_t row=0;row<3;++row)for(size_t k=0;k<3;++k)
+      metric.rows[row][k]=std::bit_cast<uint64_t>(world.matrix()[4*k+row]);
+    const auto &tree=source_.impl_->tree;
+    const auto nodes=retopo_nodes(tree,cancelled);
+    state->device=retopo_surface::upload_transfer({nodes,tree.order,tree.m.indices,tree.m.positions},normals,metric);
+    state->input.reserve(retopo_surface::transfer_capacity);
+    state->output.reserve(retopo_surface::transfer_capacity);
+    material_=std::move(state);
+    cancel(cancelled);
+  }
+  auto &state=*material_;
+  if(state.world.matrix()!=world.matrix()||state.normals.data()!=normals.data())
+    throw std::logic_error("Retopology material query changed its immutable source");
+  if(members&&(!state.members||state.members->data()!=members->data()||state.members->size()!=members->size())){
+    state.member_mask.assign(normals.size(),0);
+    for(size_t i=0;i<members->size();++i){
+      if(i%512==0)cancel(cancelled);
+      state.member_mask.at((*members)[i])=1;
+    }
+    state.device->material(state.member_mask);
+    state.members=members;
+  }
+  state.input.clear();
+  for(size_t i=0;i<points.size();++i){
+    if(i%256==0)cancel(cancelled);
+    const auto &point=points[i];
+    const auto p=point.position;
+    if(!finite(p)||std::max({std::abs(p.x),std::abs(p.y),std::abs(p.z)})>1000||
+       !finite(point.normal)||(point.restrict_material&&!members))
+      throw std::invalid_argument("Invalid closest-surface query");
+    const auto value=affine?state.inverse.point(query_point(p)):query_point(p);
+    state.input.push_back({{std::bit_cast<uint64_t>(value[0]),std::bit_cast<uint64_t>(value[1]),
+                            std::bit_cast<uint64_t>(value[2])},point.normal,point.restrict_material});
+  }
+  state.output.resize(hits.size());
+  const auto visits=state.device->search(state.input,state.output,work,cancelled);
+  for(size_t i=0;i<hits.size();++i){
+    const auto &hit=state.output[i];
+    hits[i]={hit.triangle,{hit.bary[0],hit.bary[1],hit.bary[2]}};
+  }
+  return visits;
 #endif
 }
 std::optional<SurfaceHit> SurfaceQuery::nearest(Vec3 p,const SurfaceQueryOptions &options) const {

@@ -31,7 +31,9 @@ original_hash=hashlib.sha256(fixture.read_bytes()).hexdigest()
 before=scene(fixture)
 def run(mode,frames):
     path=out/(mode+'.dsculpt');report=out/(mode+'.json')
-    e={**env,'DOME_XR_FIXTURE_RETOPO':mode,'DOME_XR_FIXTURE_REPORT':str(report)}
+    path.unlink(missing_ok=True);report.unlink(missing_ok=True)
+    e={**env,'DOME_XR_FIXTURE_RETOPO':mode,'DOME_XR_FIXTURE_REPORT':str(report),
+       'DOME_XR_FIXTURE_RETOPO_EXIT_AFTER_RESUME':'1'}
     with (out/(mode+'.log')).open('w') as log:
         p=subprocess.Popen([str(binary),'--xr','--frames',str(frames),'--save',str(path),'--open',str(fixture)],env=e,stdout=log,stderr=subprocess.STDOUT)
         # Actual process maps are provenance; clean exit remains mandatory.
@@ -58,8 +60,10 @@ check(source['material']['color'][2]>.7 and source['material']['color'][0]<.1,
 expected=dict(before['objects'][0]);actual=dict(source);expected.pop('material');actual.pop('material')
 check(expected==actual,'Committed controller prefix retains every affine, posed, painted and sculpt source channel')
 for mode in ('accept','focus','unconfirmed'):
-    after,report=run(mode,360)
-    check(report.get('retopo_source_ready') is True and report.get('retopo_script_step',0)>=63 and report.get('tracking_losses',0)==0,
+    # Wait for actual menu readiness on cold device compilation, then stop
+    # through the runtime once the final action and its release are observed.
+    after,report=run(mode,1800)
+    check(report.get('retopo_source_ready') is True and report.get('retopo_script_step',0)>=72 and report.get('tracking_losses',0)==0,
           mode+' reaches actual menu Resume without a tracking-loss shortcut')
     check(report['frames_waited']==report['frames_begun']==report['frames_ended'] and
           report['acquires']==report['image_waits']==report['releases'] and report['swapchains_destroyed']==2,

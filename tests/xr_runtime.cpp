@@ -732,7 +732,7 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
   const auto retopo=retopo_mode();
   const bool retopo_face_gate=(retopo=="accept"||retopo=="focus")&&retopo_stage()==57;
   if (cut_wait || mask_gate || retopo_face_gate ||
-      (!retopo.empty() && (retopo_stage() == 27 || retopo_stage() == 60))) {
+      (!retopo.empty() && (retopo_stage() == 27 || retopo_stage() == 62))) {
     const bool initial=cut_wait?cut_stage()==20:retopo_stage()==27;
     const int sector=cut_wait?7:mask_gate||initial?0:retopo_face_gate?2:10;
     float angle = sector * 6.28318530718f / 12;
@@ -807,7 +807,9 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
   const bool voxel_complete = voxel_mode() == "undo" && frame >= 50;
   const bool scene_complete = getenv("DOME_XR_FIXTURE_SCENE") && frame >= 45;
   const bool uv_complete = getenv("DOME_XR_FIXTURE_UV") && frame >= 45;
-  if ((menu_complete || voxel_complete || scene_complete || uv_complete) && menu_completion_event < 2) {
+  const bool retopo_complete = getenv("DOME_XR_FIXTURE_RETOPO_EXIT_AFTER_RESUME") &&
+      !retopo_mode().empty() && retopo_stage() >= 72;
+  if ((menu_complete || voxel_complete || scene_complete || uv_complete || retopo_complete) && menu_completion_event < 2) {
     auto e = reinterpret_cast<XrEventDataSessionStateChanged *>(out);
     e->type = XR_TYPE_EVENT_DATA_SESSION_STATE_CHANGED;
     e->session = reinterpret_cast<XrSession>(&session_tag);
@@ -955,7 +957,7 @@ FN(WaitFrame, XrSession, const XrFrameWaitInfo *, XrFrameState *p) {
   if (auto mode=retopo_mode(); !mode.empty()) {
     bool waiting = !retopo_history()&&((retopo_stage() == 27 && !retopo_source_ready) ||
                    ((mode=="accept"||mode=="focus")&&retopo_stage()==57&&!retopo_face_ready) ||
-                   (mode!="unconfirmed" && retopo_stage() == 60 && !retopo_apply_ready));
+                   (mode!="unconfirmed" && retopo_stage() == 62 && !retopo_apply_ready));
     if (!waiting) ++retopo_step;
     report["retopo_script_step"] = retopo_stage();
   }
@@ -1134,7 +1136,7 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
     auto step = retopo_stage();
     bool common = step==8 || step==10 || step==12 || retopo_step==20 || step==16 || step==18 || step==20 ||
                   step==22 || step==24 || step==26 || step==28;
-    bool apply = (mode=="accept" || mode=="focus") && (step==56 || step==58 || step==62);
+    bool apply = (mode=="accept" || mode=="focus") && (step==56 || step==58 || step==59 || step==64 || step==65);
     out->currentState = button && (common || apply);
     out->changedSinceLastSync = button;
   }
@@ -1436,8 +1438,8 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
     if(step==15 || step==16 || step==17 || step==18) out->currentState={-.5f,-.8660254f};
     if(step==21 || step==22) out->currentState={.8660254f,-.5f};
     if(step==23 || step==24 || step==27 || step==28) out->currentState={1,0};
-    if(step==57 || step==58) out->currentState={.5f,.8660254f};
-    if(step>=60 && step<=62) out->currentState={.5f,-.8660254f};
+    if(step>=57 && step<=61) out->currentState={.5f,.8660254f};
+    if(step>=62 && step<=65) out->currentState={.5f,-.8660254f};
   }
   if(!cut_mode().empty()&&right(p->subactionPath)&&a->name=="right_stick"){
     auto step=cut_stage();out->currentState={0,0};

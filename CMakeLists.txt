@@ -61,7 +61,7 @@ elseif(DOME_COMPUTE_BACKEND STREQUAL "ONEAPI")
   set(compute_source src/backend_sycl.cpp)
   set(volume_compute_source src/volume-binding-sycl.cpp)
   set(surface_heat_compute_source src/surface-heat-sycl.cpp)
-  set(weight_transfer_compute_source src/weight-transfer-sycl.cpp)
+  set(weight_transfer_compute_source src/weight-transfer-sycl.cpp src/retopo-transfer-sycl.cpp)
   set_source_files_properties(${weight_transfer_compute_source} PROPERTIES COMPILE_OPTIONS "-fsycl;-ffp-contract=off")
   set(bake_ray_compute_source src/bake-ray-sycl.cpp src/bake-ray-edge-sycl.cpp src/bake-raster-sycl.cpp
     src/bake-cage-ray-sycl.cpp src/bake-material-sycl.cpp src/bake-overlay-sycl.cpp src/bake-padding-sycl.cpp)

@@ -104,4 +104,65 @@ public:
     }catch(...){api_.drain();throw;}
   }
 };
+
+template<class Api>
+class DeviceTransferQuery final:public TransferQuery,private weight_transfer::DeviceSurface<Api> {
+  template<class T> using Buffer=typename weight_transfer::DeviceSurface<Api>::template Buffer<T>;
+  using weight_transfer::DeviceSurface<Api>::api_;
+  Buffer<Vec3> normals_;
+  Buffer<uint8_t> membership_;
+  Buffer<TransferPoint> points_;
+  Buffer<Progress> progress_;
+  Buffer<TransferHit> hits_;
+  Buffer<TransferStatus> status_;
+  size_t faces_;
+  TransferMetric metric_;
+public:
+  DeviceTransferQuery(const weight_transfer::Surface &surface,std::span<const Vec3> normals,TransferMetric metric):
+      weight_transfer::DeviceSurface<Api>(surface),normals_(api_,normals.size()),
+      membership_(api_,normals.size()),points_(api_,transfer_capacity),
+      progress_(api_,transfer_capacity),hits_(api_,transfer_capacity),status_(api_,1),
+      faces_(normals.size()),metric_(metric){
+    try{
+      api_.upload(normals_.data,normals.data(),normals.size_bytes());
+      api_.wait();
+    }catch(...){api_.drain();throw;}
+  }
+  void material(std::span<const uint8_t> membership) override {
+    if(membership.size()!=faces_)throw std::logic_error("Invalid Retopology material membership");
+    try{
+      api_.upload(membership_.data,membership.data(),membership.size_bytes());
+      api_.wait();
+    }catch(...){api_.drain();throw;}
+  }
+  uint32_t search(std::span<const TransferPoint> points,std::span<TransferHit> hits,
+                  uint32_t work,const std::function<bool()> &cancelled) override {
+    if(points.empty()||points.size()>transfer_capacity||points.size()!=hits.size())
+      throw std::logic_error("Invalid Retopology material query batch");
+    auto check=[&]{if(cancelled&&cancelled())throw std::runtime_error("Retopology transfer cancelled");};
+    check();
+    uint32_t visits=0;
+    try{
+      api_.upload(points_.data,points.data(),points.size_bytes());
+      bool first=true;
+      TransferStatus status{};
+      do{
+        check();
+        api_.reset_transfer(status_.data);
+        api_.transfer(this->view_,normals_.data,membership_.data,metric_,points_.data,
+                      hits_.data,progress_.data,points.size(),status_.data,first);
+        api_.read(&status,status_.data,sizeof(status));
+        if(status.flags&invalid_triangle)throw std::runtime_error("Retopology lost a valid closest triangle metric");
+        if((status.flags&over_budget)||status.visits>work-visits)
+          throw std::length_error("Retopology transfer exceeds the surface work budget");
+        visits+=status.visits;
+        first=false;
+      }while(status.flags&pending_nodes);
+      check();
+      api_.read(hits.data(),hits_.data,hits.size_bytes());
+      check();
+    }catch(...){api_.drain();throw;}
+    return visits;
+  }
+};
 }

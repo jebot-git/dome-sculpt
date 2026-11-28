@@ -3510,7 +3510,7 @@ struct ImportedRetopoPbr {
   detail::SourceBakeNormalResolver normal;
   std::vector<std::array<float,4>> colors;
 
-  BakedPixel sample(const SurfaceHit &hit) const {
+  BakedPixel sample(const detail::RetopoMatch &hit) const {
     const auto role = [&](const PaintSourceTexture &texture, bool srgb) {
       return sample_surface_texture(mesh,maps,texture,hit.triangle,hit.barycentric,srgb);
     };
@@ -3527,7 +3527,7 @@ struct ImportedRetopoPbr {
     return value;
   }
 
-  std::array<float,4> tint(const SurfaceHit &hit) const {
+  std::array<float,4> tint(const detail::RetopoMatch &hit) const {
     if (colors.empty()) return {1,1,1,1};
     std::array<float,4> result{};
     for (size_t i=0; i<3; ++i) {
@@ -3609,6 +3609,52 @@ std::array<uint8_t,4> retained_retopology_detail(const detail::NormalBakeBasis &
     throw std::invalid_argument("Retopology cannot preserve this prepared normal at its current material Bake coverage");
   return rgba;
 }
+template<class Raster>
+class RetopoTexelMatches {
+public:
+  RetopoTexelMatches(const Raster &surface, detail::RetopoTransfer &transfer,
+                     const TextureSetFaceDomain *domain=nullptr)
+      : surface_(surface), transfer_(transfer), domain_(domain) {}
+
+  const detail::RetopoMatch *at(size_t index) {
+    if(index>=end_) load(index);
+    const auto &hit=hits_[slots_[index-start_]];
+    return hit?&hit:nullptr;
+  }
+
+private:
+  void load(size_t index) {
+    if(points_.capacity()==0) {
+      const auto capacity=std::min(detail::retopo_surface::transfer_capacity,surface_.texels.size());
+      transfer_.reserve(capacity,sizeof(detail::RetopoPatchPoint)+sizeof(detail::RetopoMatch)+sizeof(uint32_t));
+      points_.reserve(capacity);
+      hits_.reserve(capacity);
+      slots_.reserve(capacity);
+    }
+    start_=index;
+    end_=start_+std::min(detail::retopo_surface::transfer_capacity,surface_.texels.size()-start_);
+    slots_.resize(end_-start_);
+    points_.clear();
+    for(size_t i=start_;i<end_;++i) {
+      const auto &texel=surface_.texels[i];
+      if(!texel.covered())continue;
+      const auto &w=texel.bary;
+      slots_[i-start_]=uint32_t(points_.size());
+      points_.push_back({surface_.rest_position(texel),surface_.rest_normal(texel),texel.face,
+                        {w[0],w[1],1-w[0]-w[1]}});
+    }
+    hits_.resize(points_.size());
+    transfer_.match_patch(points_,hits_,domain_);
+  }
+
+  const Raster &surface_;
+  detail::RetopoTransfer &transfer_;
+  const TextureSetFaceDomain *domain_;
+  size_t start_=0,end_=0;
+  std::vector<detail::RetopoPatchPoint> points_;
+  std::vector<detail::RetopoMatch> hits_;
+  std::vector<uint32_t> slots_;
+};
 }
 
 void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &source,
@@ -3819,14 +3865,14 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &sour
     tile = std::make_shared<Tile>();
   };
   size_t hits = 0;
+  RetopoTexelMatches matches(surface,transfer,old_domain.get());
   bool emission_sealing_reserved = false;
   for (size_t at = 0; at < texels; ++at) {
     if ((at & 1023) == 0) paint_compute::checkpoint(transfer.cancelled());
     const auto &texel = surface.texels[at];
     if (!texel.covered()) continue;
     const auto &w = texel.bary;
-    const auto hit = transfer.match_patch(surface.rest_position(texel),surface.rest_normal(texel),texel.face,
-                                         {w[0],w[1],1-w[0]-w[1]},old_domain.get());
+    const auto hit = matches.at(at);
     if (!hit) {
       if (imported) throw std::invalid_argument("A retopology texel falls outside the original imported material surface");
       continue;
@@ -4280,14 +4326,14 @@ std::shared_ptr<const SourceMaterialBindings> detail::TextureSetPaintAccess::rep
     main.rotation=0;
   }
   size_t hits=0;
+  RetopoTexelMatches matches(surface,transfer,from.texture_set_domain_.get());
   for (size_t index=0;index<surface.texels.size();++index) {
     if ((index&1023)==0) paint_compute::checkpoint(transfer.cancelled());
     transfer.work(1+roles.size()+core_fields.size());
     const auto &texel=surface.texels[index];
     if (!texel.covered() && surface.padding[index]>=0) continue;
     const auto &w=texel.bary;
-    const auto hit=texel.covered() ? transfer.match_patch(surface.rest_position(texel),surface.rest_normal(texel),texel.face,
-        {w[0],w[1],1-w[0]-w[1]},from.texture_set_domain_.get()) : std::nullopt;
+    const auto hit=texel.covered() ? matches.at(index) : nullptr;
     if (texel.covered() && !hit && imported)
       throw std::invalid_argument("A patch texel is outside the imported MToon source surface");
     RetopoToonFrame target{};
@@ -4422,12 +4468,13 @@ std::shared_ptr<const detail::BakedNormalField> detail::TextureSetPaintAccess::r
   const auto &normal_uv=before.canonical_uv;
   const auto bound=before.canonical_attributes->receipt().accepted_angular_error;
   size_t hits=0;
+  RetopoTexelMatches matches(surface,transfer);
   for (size_t index=0;index<count;++index) {
     if ((index&1023)==0) paint_compute::checkpoint(transfer.cancelled());
     const auto &texel=surface.texels[index];
     if (!texel.covered()) continue;
     const auto &w=texel.bary;
-    const auto hit=transfer.match_patch(surface.rest_position(texel),surface.rest_normal(texel),texel.face,{w[0],w[1],1-w[0]-w[1]});
+    const auto hit=matches.at(index);
     if (!hit) continue;
     transfer.work(64);
     ++hits;
