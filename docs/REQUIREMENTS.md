@@ -194,7 +194,10 @@ Bake and paint while preserving the original image samplers. The selected
 compute GPU filters Bake color, alpha, ORM, coverage, legacy emission and
 both tangent normal planes. It also filters baked FLOAT emission from
 native dense and compact storage, preserving subnormal coefficients and
-the full finite Bake radiance range.
+the full finite Bake radiance range. The same dispatch converts and encodes
+both normal planes in the new Mikk frame and enforces the 0.02-radian error
+limit. Arc matches the reference normal bytes and refuses singular frames,
+mixed handedness within a triangle, and excessive quantization error.
 Topology-changing transfer, broader deformation and physical headset
 workflows remain open.
 [Prepared MToon1 Bake evidence](validation/prepared-mtoon-bake-20261128.json)
@@ -203,6 +206,7 @@ workflows remain open.
 [Paired Bake UV evidence](validation/prepared-mtoon-uv-bake-20261128.json)
 [GPU Bake UV evidence](validation/prepared-mtoon-uv-gpu-20261128.json)
 [Fused GPU Bake UV evidence](validation/prepared-mtoon-uv-map-gpu-20261128.json)
+[GPU Bake tangent conversion evidence](validation/prepared-mtoon-uv-normal-gpu-20261128.json)
 
 ## Current validation — 2026-11-27
 

@@ -610,12 +610,22 @@ fixture produces the existing native project and both GLBs byte for byte.
 All 31 focused Arc tests, native DomeD Wayland export, synthetic OpenXR
 export and controller UV Apply, and the headless sanitizer reference pass.
 The updated CUDA and ROCm kernels compile.
-Atlas correspondence, editable layer transfer, final tangent-frame conversion
-and native field packing run on the host. Topology-changing transfer remains
-open.
+The selected device now also converts and encodes both filtered normals in the
+new tangent frame. Integer binary64 arithmetic works on devices without native
+FP64. The device checks handedness, frame conditioning and the 0.02-radian
+packing error limit before the worker publishes the maps. Arc matches the
+previous native project and both GLBs byte for byte. For a warm 512-square
+synthetic paired-normal conversion, three runs give medians of 39 ms on Arc
+including transfers and 92 ms on the previous scalar host path. All 31 focused
+Arc tests, native DomeD Wayland export, synthetic OpenXR controller Apply and
+the headless sanitizer reference pass. CUDA and ROCm Release applications
+link, and both compute fixtures refuse execution without a usable device. Atlas
+correspondence, Mikk tangent generation, editable layer transfer and native
+field packing still run on the host. Topology-changing transfer remains open.
 [Paired Bake UV evidence](validation/prepared-mtoon-uv-bake-20261128.json)
 [GPU Bake UV evidence](validation/prepared-mtoon-uv-gpu-20261128.json)
 [Fused GPU Bake UV evidence](validation/prepared-mtoon-uv-map-gpu-20261128.json)
+[GPU Bake tangent conversion evidence](validation/prepared-mtoon-uv-normal-gpu-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with

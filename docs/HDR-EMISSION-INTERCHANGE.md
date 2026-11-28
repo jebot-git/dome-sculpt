@@ -80,12 +80,13 @@ projected normals through the old and new tangent frames, filters FLOAT
 emission and layer samples, and retains the original UV mapping for each
 material sampler. The selected compute GPU filters the Bake color, alpha,
 ORM, coverage, legacy emission and both tangent normal planes. The same
-dispatch can filter independent FLOAT emission from its original dense or
-packed field. It preserves subnormal values and the full finite baked
-radiance range. Apply rejects a result if its nonzero energy cannot be
-represented with the rounded coverage. Atlas correspondence, editable layer
-transfer, final tangent-frame conversion and native field storage run on
-the host. Independently selectable portable material variants,
+dispatch interpolates the raw Mikk frames, encodes the new normal maps and
+checks the 0.02-radian error limit. It can also filter independent FLOAT
+emission from its original dense or packed field and preserves subnormal
+values and the full finite baked radiance range. Apply rejects a result if
+its nonzero energy cannot be represented with the rounded coverage. Atlas
+correspondence, Mikk tangent generation, editable layer transfer and native
+field storage run on the host. Independently selectable portable material variants,
 topology-changing transfer and animated UVs remain open.
 
 ## First GLB implementation
