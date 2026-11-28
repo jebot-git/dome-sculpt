@@ -684,15 +684,53 @@ void single_surface_emission(const std::filesystem::path &out,const Scene &initi
  check(file_bytes(mapped_retry)==mapped_bytes,"Reopening mapped HDR reproduces every byte of the GLB");
 }
 enum class BakeFrame { AuthoredTangents, ImportedNormals, NativeNormals };
+enum class BakeMask { None, Visible, Hidden, Mixed };
 
 void baked_surface_emission(const std::filesystem::path &out,const Scene &initial,
     const ImportAuthoringOptions &options,SurfaceRenderer &native,Fbo &fbo,
-    prepared_normal_consumer::Renderer &consumer,BakeFrame frame) {
+    prepared_normal_consumer::Renderer &consumer,BakeFrame frame,BakeMask mask=BakeMask::None) {
  const bool authored_tangents=frame==BakeFrame::AuthoredTangents;
  const bool native_frame=frame==BakeFrame::NativeNormals;
- auto fixture=source(1,false,"BLEND",0.f);
- fixture.j["meshes"][0]["primitives"][0]["attributes"].erase("COLOR_0");
+ auto fixture=source(1,false,mask==BakeMask::None?"BLEND":"MASK",0.f);
+ auto &primitive_input=fixture.j["meshes"][0]["primitives"][0];
  auto &m=fixture.j["materials"][0];
+ primitive_input["attributes"].erase("COLOR_0");
+ if(mask!=BakeMask::None){
+  Image color{16,2,{}};
+  for(unsigned y=0;y<color.height;++y)for(unsigned x=0;x<color.width;++x){
+   const auto alpha=mask==BakeMask::Mixed&&x>=8?uint8_t(20+10*y):uint8_t(165+35*y+10*(x%5));
+   color.rgba.insert(color.rgba.end(),{188,140,95,alpha});
+  }
+  const auto texture=color.png();
+  while(fixture.bin.size()%4)fixture.bin.push_back(0);
+  const auto &view=fixture.j["images"][0]["bufferView"].get<size_t>();
+  fixture.j["bufferViews"][view]["byteOffset"]=fixture.bin.size();
+  fixture.j["bufferViews"][view]["byteLength"]=texture.size();
+  fixture.bin.insert(fixture.bin.end(),texture.begin(),texture.end());
+  m["alphaCutoff"]=mask==BakeMask::Visible?.12f:mask==BakeMask::Hidden?.95f:.28f;
+  fixture.j["samplers"][0]["wrapS"]=33071;
+ }
+ if(mask==BakeMask::Mixed){
+  while(fixture.bin.size()%4)fixture.bin.push_back(0);
+  const auto position=fixture.values({-.1f,-.1f,0,-.02f,-.1f,0,-.02f,.1f,0,
+                                      .02f,-.1f,0,.1f,-.1f,0,.02f,.1f,0},3,"VEC3");
+  fixture.j["accessors"][position]["min"]={-.1f,-.1f,0};
+  fixture.j["accessors"][position]["max"]={.1f,.1f,0};
+  auto &attrs=primitive_input["attributes"];
+  attrs["POSITION"]=position;
+  attrs["NORMAL"]=fixture.values({0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1},3,"VEC3");
+  attrs["TANGENT"]=fixture.values({1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1},4,"VEC4");
+  attrs["TEXCOORD_0"]=fixture.values({0,0,.4f,0,.4f,1,.6f,0,1,0,.6f,1},2,"VEC2");
+  attrs["TEXCOORD_1"]=fixture.values({.1f,.3f,.29f,.3f,.29f,.8f,.71f,.3f,.9f,.3f,.71f,.8f},2,"VEC2");
+  const auto start=fixture.bin.size();
+  for(uint32_t vertex=0;vertex<6;++vertex)import_fixture::word(fixture.bin,vertex);
+  const auto index=primitive_input["indices"].get<size_t>();
+  fixture.j["bufferViews"][fixture.j["accessors"][index]["bufferView"].get<size_t>()]["byteOffset"]=start;
+  const auto target=fixture.values({0,0,0,0,0,0,0,.02f,0,0,0,0,0,0,0,0,.02f,0},3,"VEC3");
+  fixture.j["accessors"][target]["min"]={0,0,0};
+  fixture.j["accessors"][target]["max"]={0,.02f,0};
+  primitive_input["targets"][0]={{"POSITION",target}};
+ }
  if(!authored_tangents){
   auto &primitive=fixture.j["meshes"][0]["primitives"][0];
   primitive["attributes"].erase("TANGENT");
@@ -704,7 +742,9 @@ void baked_surface_emission(const std::filesystem::path &out,const Scene &initia
  m["pbrMetallicRoughness"]["metallicRoughnessTexture"]={{"index",0},{"texCoord",1}};
  fixture.j["samplers"][0]["magFilter"]=9729;
  fixture.j["samplers"][0]["minFilter"]=9729;
- const std::string stem=authored_tangents?"baked-source-hdr":native_frame?"baked-native-tangents-hdr":"baked-generated-tangents-hdr";
+ const std::string stem=mask==BakeMask::Visible?"baked-mask-visible":
+     mask==BakeMask::Hidden?"baked-mask-hidden":mask==BakeMask::Mixed?"baked-mask-mixed":
+     authored_tangents?"baked-source-hdr":native_frame?"baked-native-tangents-hdr":"baked-generated-tangents-hdr";
  const auto input=out/(stem+"-input.glb");
  fixture.save(input);
  auto scene=prepare_authoring_import(initial,input,options).scene;
@@ -717,6 +757,7 @@ void baked_surface_emission(const std::filesystem::path &out,const Scene &initia
  const auto donor_id=scene.duplicate(id);
  auto &donor=scene.object(donor_id);
  auto mesh=donor.painted->mesh();
+ if(mask==BakeMask::Mixed)mesh.indices.resize(3);
  for(auto &position:mesh.positions){position.x+=.035f;position.z+=.003f;}
  for(auto &normal:mesh.normals)normal=normalized(Vec3{.14f,-.17f,1});
  donor.painted=std::make_shared<PaintedMesh>(std::move(mesh),64);
@@ -788,9 +829,56 @@ void baked_surface_emission(const std::filesystem::path &out,const Scene &initia
  }
  fbo.bind();
  consumer.render(glb.data);
- const auto error=delta(reference,read());
+ const auto rendered=read();
+ const auto error=delta(reference,rendered);
  std::cout<<"BAKED_SOURCE_STANDARD "<<stem<<" max="<<error<<'\n';
  check(error<=8,"Independent GLB renderer reproduces the finite source Bake preview");
+ if(mask!=BakeMask::None){
+  check(material.alpha_mode==cgltf_alpha_mode_mask,"Standard HDR retains the masked draw mode");
+  size_t visible=0;
+  for(size_t at=3;at<reference.size();at+=4){
+   if(reference[at]!=rendered[at])throw std::runtime_error("Export changed cutout membership");
+   visible+=reference[at]!=0;
+  }
+  check(mask==BakeMask::Hidden?visible==0:visible>128,"Independent GLB has exact masked fragment membership");
+  if(mask==BakeMask::Mixed){
+   check(material.alpha_cutoff==.28f,"A single unchanged cutoff separates both exported triangles");
+   auto visible_count=[&](Scene value,float cutoff){
+    value.active().material.alpha_cutoff=cutoff;
+    Document preview;
+    preview.replace(std::move(value));
+    preview.shading(false);
+    settled(preview);
+    const auto pixels=draw(native,preview.frame().surface);
+    size_t count=0;
+    for(size_t at=3;at<pixels.size();at+=4)count+=pixels[at]!=0;
+    return count;
+   };
+   check(visible_count(scene.snapshot(),0)>visible+128,
+         "The passing cutoff removes a substantial second triangle");
+   auto ambiguous=scene.snapshot();
+   ambiguous.active().material.alpha_cutoff=.56f;
+   const auto crossing=visible_count(ambiguous.snapshot(),.56f);
+   check(crossing>0&&crossing<visible,"The negative fixture has an actual interior cutout edge");
+   const auto before=ambiguous.encode();
+   const auto protected_file=out/"baked-mask-protected.glb";
+   std::filesystem::copy_file(path,protected_file,std::filesystem::copy_options::overwrite_existing);
+   Document rejected;
+   rejected.replace(ambiguous.snapshot());
+   auto failed=rejected.export_asset(protected_file);
+   const auto queued=out/"baked-mask-rejected.dsculpt";
+   auto saved=rejected.save_async(queued);
+   bool refused=false;
+   try{failed.get();}
+   catch(const std::exception &e){
+    refused=std::string_view(e.what()).find("requires an explicit portable material bake")!=std::string_view::npos;
+   }
+   check(refused,"A cutoff within a triangle's native interval refuses Standard HDR");
+   saved.get();
+   check(file_bytes(protected_file)==file_bytes(path)&&Scene::load(queued).encode()==before&&rejected.copy_scene().encode()==before,
+         "An unproved cutout leaves the existing GLB, native project and immediately ordered Save exact");
+  }
+ }
  const auto encoded=file_bytes(path);
  const auto length=size_t(encoded[12])|(size_t(encoded[13])<<8)|(size_t(encoded[14])<<16)|(size_t(encoded[15])<<24);
  const auto json=nlohmann::json::parse(encoded.begin()+20,encoded.begin()+20+length);
@@ -850,5 +938,7 @@ int main(int argc,char **argv)try{
  single_surface_emission(out,initial,options,native,fbo,separate_roles);
  for(const auto frame:{BakeFrame::AuthoredTangents,BakeFrame::ImportedNormals,BakeFrame::NativeNormals})
   baked_surface_emission(out,initial,options,native,fbo,separate_roles,frame);
+ for(const auto mask:{BakeMask::Visible,BakeMask::Hidden,BakeMask::Mixed})
+  baked_surface_emission(out,initial,options,native,fbo,separate_roles,BakeFrame::AuthoredTangents,mask);
  std::cout<<"PASS "<<checks<<" source-aware original standard export checks maxerror="<<maximum<<'\n';return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

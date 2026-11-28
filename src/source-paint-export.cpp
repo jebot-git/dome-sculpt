@@ -13,6 +13,7 @@
 #include "source-paint-pairing.hpp"
 #include "source-bake-normal.hpp"
 #include <limits>
+#include <numeric>
 
 namespace dome::detail {
 namespace {
@@ -34,50 +35,60 @@ struct ProofWork {
 };
 
 template<class Visit>
-void visit_footprint(const Mesh &mesh,const PaintOverlayPacket &packet,ProofWork &work,Visit visit) {
-  const int r=int(packet.resolution());
+void visit_triangle_footprint(const Mesh &mesh,size_t face,int r,ProofWork &work,Visit visit) {
   // The bilinear footprint of one texel is a two-texel-wide rectangle.
   // Include a conservative margin for the viewport's FLOAT UV interpolation.
   const double radius=1+double(r)*32*std::numeric_limits<float>::epsilon();
-  std::vector<bool> examined(packet.padding()->size()+1);
-  bool visited=false;
   struct Axis { double x,y,limit; };
-  for(size_t face=0;face<mesh.indices.size();face+=3) {
+  work.stop();
+  std::array<std::array<double,2>,3> q;
+  for(size_t k=0;k<3;++k){
+    const auto uv=mesh.uv[mesh.indices[face+k]];
+    q[k]={double(uv[0])*r-.5,double(uv[1])*r-.5};
+  }
+  const auto &a=q[0],&b=q[1],&c=q[2];
+  const double area=(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
+  if(!area)portable_required();
+  const double sign=area>0?1:-1;
+  std::array<Axis,3> axes;
+  for(size_t k=0;k<3;++k){
+    const auto &p=q[k],&next=q[(k+1)%3];
+    const double x=sign*(next[1]-p[1]),y=sign*(p[0]-next[0]);
+    axes[k]={x,y,x*p[0]+y*p[1]+radius*(std::abs(x)+std::abs(y))};
+  }
+  const int left=std::max(0,int(std::ceil(std::min({a[0],b[0],c[0]})-radius)));
+  const int right=std::min(r-1,int(std::floor(std::max({a[0],b[0],c[0]})+radius)));
+  const int bottom=std::max(0,int(std::ceil(std::min({a[1],b[1],c[1]})-radius)));
+  const int top=std::min(r-1,int(std::floor(std::max({a[1],b[1],c[1]})+radius)));
+  if(right<left)return;
+  for(int y=bottom;y<=top;++y){
     work.stop();
-    std::array<std::array<double,2>,3> q;
-    for(size_t k=0;k<3;++k){
-      const auto uv=mesh.uv[mesh.indices[face+k]];
-      q[k]={double(uv[0])*r-.5,double(uv[1])*r-.5};
+    work.charge(size_t(right-left+1)*3);
+    for(int x=left;x<=right;++x){
+      if(std::ranges::any_of(axes,[&](const auto &axis){return axis.x*x+axis.y*y>axis.limit;}))continue;
+      if(!visit(size_t(y)*r+x))return;
     }
-    const auto &a=q[0],&b=q[1],&c=q[2];
-    const double area=(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
-    if(!area)portable_required();
-    const double sign=area>0?1:-1;
-    std::array<Axis,3> axes;
-    for(size_t k=0;k<3;++k){
-      const auto &p=q[k],&next=q[(k+1)%3];
-      const double x=sign*(next[1]-p[1]),y=sign*(p[0]-next[0]);
-      axes[k]={x,y,x*p[0]+y*p[1]+radius*(std::abs(x)+std::abs(y))};
-    }
-    const int left=std::max(0,int(std::ceil(std::min({a[0],b[0],c[0]})-radius)));
-    const int right=std::min(r-1,int(std::floor(std::max({a[0],b[0],c[0]})+radius)));
-    const int bottom=std::max(0,int(std::ceil(std::min({a[1],b[1],c[1]})-radius)));
-    const int top=std::min(r-1,int(std::floor(std::max({a[1],b[1],c[1]})+radius)));
-    for(int y=bottom;y<=top;++y){
-      work.stop();
-      work.charge(size_t(right-left+1)*3);
-      for(int x=left;x<=right;++x){
-        if(std::ranges::any_of(axes,[&](const auto &axis){return axis.x*x+axis.y*y>axis.limit;}))continue;
-        const int32_t owner=packet.padding()->at(size_t(y)*r+x);
-        const size_t key=size_t(owner+1);
-        if(examined.at(key))continue;
-        examined[key]=true;
-        const auto sample=owner<0?PaintOverlayTexel{}:sample_overlay_texel_owner(packet,size_t(owner),true);
-        work.charge(sample.work+1);
-        visited=true;
-        if(!visit(sample.values))return;
-      }
-    }
+  }
+}
+
+template<class Visit>
+void visit_footprint(const Mesh &mesh,const PaintOverlayPacket &packet,ProofWork &work,Visit visit) {
+  const auto &padding=*packet.padding();
+  std::vector<bool> examined(padding.size()+1);
+  bool visited=false;
+  for(size_t face=0;face<mesh.indices.size();face+=3) {
+    bool complete=true;
+    visit_triangle_footprint(mesh,face,int(packet.resolution()),work,[&](size_t at){
+      const int32_t owner=padding.at(at);
+      const size_t key=size_t(owner+1);
+      if(examined.at(key))return true;
+      examined[key]=true;
+      const auto sample=owner<0?PaintOverlayTexel{}:sample_overlay_texel_owner(packet,size_t(owner),true);
+      work.charge(sample.work+1);
+      visited=true;
+      return complete=visit(sample.values);
+    });
+    if(!complete)return;
   }
   if(!visited)portable_required();
 }
@@ -270,7 +281,7 @@ void fold_orm(PaintSourceTexture &,Material &,const PaintOverlayValues &,ProofWo
 // Preserve masked coverage exactly. A constant alpha can be carried outside
 // the texture even when its value falls between two PNG alpha bytes.
 struct AtlasAlpha { std::optional<float> constant;bool transparent=false; };
-AtlasAlpha atlas_alpha(const PaintedMesh &paint,const PaintOverlayPacket &packet,
+std::optional<AtlasAlpha> atlas_alpha(const PaintedMesh &paint,const PaintOverlayPacket &packet,
     float background,bool masked,ProofWork &work) {
   std::optional<float> constant;
   bool uniform=true,unorm=true,transparent=false;
@@ -282,8 +293,120 @@ AtlasAlpha atlas_alpha(const PaintedMesh &paint,const PaintOverlayPacket &packet
     transparent|=alpha<1;
     return masked?(uniform||unorm):(uniform||!transparent);
   });
-  if(masked&&!uniform&&!unorm)portable_required();
-  return {uniform?constant:std::nullopt,transparent};
+  if(masked&&!uniform&&!unorm)return std::nullopt;
+  return AtlasAlpha{uniform?constant:std::nullopt,transparent};
+}
+
+// A clamp sampler without mip levels can narrow the source alpha interval
+// to the original texture taps reachable by this triangle's affine UVs.
+std::optional<std::array<uint8_t,2>> clamped_source_alpha(const PaintSourceTexture &view,
+    std::span<const std::array<float,2>> uv,std::span<const uint32_t> vertices,ProofWork &work) {
+  const auto &image=*view.image;
+  const auto &t=view.uv_transform;
+  std::array<int,2> first,last;
+  for(size_t axis=0;axis<2;++axis){
+    double lo=1,hi=0;
+    const int size=axis==0?image.width:image.height;
+    for(const auto vertex:vertices){
+      const auto &q=uv[vertex];
+      const double a=double(t[axis*2])*q[0],b=double(t[axis*2+1])*q[1],d=t[4+axis];
+      const double error=64*std::numeric_limits<float>::epsilon()*(1+std::abs(a)+std::abs(b)+std::abs(d));
+      lo=std::min(lo,std::clamp(a+b+d-error,0.,1.));
+      hi=std::max(hi,std::clamp(a+b+d+error,0.,1.));
+    }
+    // Enclose both nearest and linear taps, including sampler subtexel rounding.
+    first[axis]=std::max(0,int(std::floor(lo*size-1.5)));
+    last[axis]=std::min(size-1,int(std::floor(hi*size+1.5)));
+  }
+  const size_t count=size_t(last[0]-first[0]+1)*(last[1]-first[1]+1);
+  if(count>4096)return std::nullopt;
+  work.charge(count+6);
+  std::array<uint8_t,2> result{255,0};
+  for(int y=first[1];y<=last[1];++y)
+    for(int x=first[0];x<=last[0];++x){
+      const auto alpha=image.rgba[(size_t(y)*image.width+x)*4+3];
+      result[0]=std::min(result[0],alpha);
+      result[1]=std::max(result[1],alpha);
+    }
+  return result;
+}
+
+// The native shader filters source alpha, coverage and premultiplied paint
+// separately. Use the source interval and the extrema of all writable taps
+// touching each triangle to bound both native and emitted alpha.
+bool certify_baked_mask(const ObjectSurface &out,const PaintOverlayPacket &packet,
+    const PaintSourceMaps &maps,const Image &encoded,Material &material,ProofWork &work) {
+  if(material.alpha_cutoff==0)return true;
+  const auto &view=maps.color;
+  std::array<uint8_t,2> all{255,255};
+  const bool textured=view.image&&material.color[3]!=0;
+  if(textured){
+    const auto &rgba=view.image->rgba;
+    all[1]=0;
+    work.charge(rgba.size()/4);
+    for(size_t at=3;at<rgba.size();at+=4){
+      if((at&16383)==3)work.stop();
+      all[0]=std::min(all[0],rgba[at]);
+      all[1]=std::max(all[1],rgba[at]);
+    }
+  }
+  const bool local=textured&&all[0]!=all[1]&&view.wrap_s==33071&&view.wrap_t==33071&&
+      (view.min_filter==9728||view.min_filter==9729);
+  const auto source_uv=local?source_texture_coordinates(out.mesh,maps,view.texcoord):
+      std::span<const std::array<float,2>>{};
+  const auto colors=current_vertex_colors(out,work.cancelled);
+  const auto &padding=*packet.padding();
+  constexpr double slack=64*std::numeric_limits<float>::epsilon();
+  std::optional<double> visible_floor,hidden_ceiling;
+  for(size_t face=0;face<out.mesh.indices.size();face+=3){
+    work.stop();
+    const auto vertices=std::span(out.mesh.indices).subspan(face,3);
+    const auto alpha_range=local?clamped_source_alpha(view,source_uv,vertices,work).value_or(all):all;
+    const double source_low=double(alpha_range[0])/255*material.color[3];
+    const double source_high=double(alpha_range[1])/255*material.color[3];
+    double vertex_low=1,vertex_high=colors.empty()?1:0;
+    if(!colors.empty())for(size_t k=0;k<3;++k){
+      const double alpha=colors.at(out.mesh.indices[face+k])[3];
+      if(!std::isfinite(alpha)||alpha<0||alpha>1)portable_required();
+      vertex_low=std::min(vertex_low,alpha);
+      vertex_high=std::max(vertex_high,alpha);
+    }
+    double native_low=1,native_high=0,encoded_low=1,encoded_high=0;
+    bool reached=false;
+    visit_triangle_footprint(out.mesh,face,int(packet.resolution()),work,[&](size_t at){
+      const auto owner=padding.at(at);
+      const auto sample=owner<0?PaintOverlayTexel{}:sample_overlay_texel_owner(packet,size_t(owner),true);
+      work.charge(sample.work+1);
+      const double uncovered=1.-sample.values[3][0],addition=sample.values[0][3];
+      native_low=std::min(native_low,source_low*uncovered+addition);
+      native_high=std::max(native_high,source_high*uncovered+addition);
+      const double alpha=double(encoded.rgba.at(at*4+3))/255;
+      encoded_low=std::min(encoded_low,alpha);
+      encoded_high=std::max(encoded_high,alpha);
+      reached=true;
+      return true;
+    });
+    if(!reached)portable_required();
+    if(native_low*vertex_low>=material.alpha_cutoff+slack){
+      const double limit=encoded_low*vertex_low-slack;
+      visible_floor=std::min(visible_floor.value_or(limit),limit);
+    }else if(native_high*vertex_high<material.alpha_cutoff-slack){
+      const double limit=encoded_high*vertex_high+slack;
+      hidden_ceiling=std::max(hidden_ceiling.value_or(limit),limit);
+    }else portable_required();
+  }
+  if(!visible_floor)return hidden_ceiling&&*hidden_ceiling<material.alpha_cutoff;
+  if(!hidden_ceiling){
+    if(*visible_floor<material.alpha_cutoff)material.alpha_cutoff=0;
+    return true;
+  }
+  const auto separates=[&](float cutoff){return cutoff>*hidden_ceiling&&cutoff<=*visible_floor;};
+  if(!separates(material.alpha_cutoff)){
+    const auto cutoff=float(std::midpoint(*hidden_ceiling,*visible_floor));
+    if(!separates(cutoff))portable_required();
+    material.alpha_cutoff=cutoff;
+  }
+  return true;
 }
 
 // The source contribution in each rewritten channel is either constant or
@@ -380,10 +503,13 @@ PaintAtlas compile_baked_hdr_atlas(const SculptObject &owner,const ObjectSurface
   ProofWork work{cancelled};
   work.charge(padding.size()*6);
   AtlasAlpha alpha;
+  bool prove_mask=false;
   if(material.alpha==Material::AlphaMode::Mask){
-    const float original=maps.color.image&&material.color[3]!=0?
-        material.color[3]*constant_channel(*maps.color.image,3,false,work):material.color[3];
-    alpha=atlas_alpha(paint,packet,original,true,work);
+    const auto original=maps.color.image&&material.color[3]!=0?
+        constant_source_channel(*maps.color.image,3,false,work):std::optional(1.f);
+    const auto exact=original?atlas_alpha(paint,packet,material.color[3]*(*original),true,work):std::nullopt;
+    if(exact)alpha=*exact;
+    else prove_mask=true;
   }
   const auto image=[&]{return std::make_shared<Image>(Image{r,r,std::vector<uint8_t>(padding.size()*4)});};
   PaintAtlas atlas{image(),image(),{},alpha.transparent,baked_normal_atlas(owner,out,padding,work),true};
@@ -459,6 +585,8 @@ PaintAtlas compile_baked_hdr_atlas(const SculptObject &owner,const ObjectSurface
     for(auto *image:{atlas.color.get(),atlas.orm.get(),atlas.normal.get()})if(image)
       std::copy_n(image->rgba.data()+size_t(from)*4,4,image->rgba.data()+at*4);
   }
+  if(prove_mask&&!certify_baked_mask(out,packet,maps,*atlas.color,material,work))
+    alpha.constant=0;
   material.color={1,1,1,alpha.constant.value_or(1)};
   material.roughness=material.metallic=1;
   return atlas;
@@ -481,7 +609,9 @@ PaintAtlas compile_atlas(const PaintedMesh &paint,const ObjectSurface &object,co
     if(material.alpha==Material::AlphaMode::Opaque)alpha.constant=1;
     else{
       background.color[3]=atlas_background(source.color,3,false,material.color[3],value[3][0],work);
-      alpha=atlas_alpha(paint,packet,background.color[3],material.alpha==Material::AlphaMode::Mask,work);
+      const auto exact=atlas_alpha(paint,packet,background.color[3],material.alpha==Material::AlphaMode::Mask,work);
+      if(!exact)portable_required();
+      alpha=*exact;
     }
     material.color={1,1,1,alpha.constant.value_or(1)};
   }else if(range.high[3][0]!=0){
