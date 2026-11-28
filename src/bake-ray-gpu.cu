@@ -6,10 +6,12 @@
 #include <cuda_runtime.h>
 #define DOME_GPU(name) cuda##name
 #endif
+#include "bake-raster-device-job.hpp"
 #include "bake-ray-device-query.hpp"
 #include "paint-composite-kernel.hpp"
 
-namespace dome::detail::bake_rays {
+namespace dome::detail {
+namespace bake_rays {
 namespace {
 void checked(DOME_GPU(Error_t) status){
   if(status!=DOME_GPU(Success))throw std::runtime_error(DOME_GPU(GetErrorString)(status));
@@ -48,6 +50,36 @@ __global__ void project_rays(SurfaceView surface,const ProjectionRay *rays,Proje
   if(flags)atomicOr(status,flags);
 }
 
+struct ClaimTexel {
+  __host__ __device__ void operator()(uint32_t *owner,uint32_t candidate) const {
+#if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
+    atomicMin(owner,candidate);
+#endif
+  }
+};
+struct AddCount {
+  uint32_t *counter;
+  __host__ __device__ uint32_t operator()(uint32_t count) const {
+#if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
+    return atomicAdd(counter,count);
+#else
+    return 0;
+#endif
+  }
+};
+
+__global__ void raster_bake(bake_raster::View view,const bake_raster::Span *spans,uint32_t span_count,
+                            uint32_t count,uint32_t first,bake_raster::Sample *output){
+  const uint32_t slot=blockIdx.x*blockDim.x+threadIdx.x;
+  if(slot<count)output[slot]=bake_raster::raster<surface_ray::NativePrecision>(view,spans,span_count,slot,first,ClaimTexel{});
+}
+__global__ void compact_bake(bake_raster::View view,const bake_raster::Sample *candidates,uint32_t count,
+    uint32_t first,uint32_t blocks,bake_raster::Block *ranges,bake_raster::Sample *output,bake_raster::Totals *totals){
+  const uint32_t block=blockIdx.x*blockDim.x+threadIdx.x;
+  if(block<blocks)bake_raster::compact(view,candidates,count,first,block,ranges,output,
+                                      AddCount{&totals->samples},AddCount{&totals->overlaps});
+}
+
 class GpuApi {
   DOME_GPU(Stream_t) stream_{};
 public:
@@ -71,6 +103,24 @@ public:
     wait();
   }
   void reset(uint32_t *value){checked(DOME_GPU(MemsetAsync)(value,0,sizeof(*value),stream_));}
+  void clear_owners(uint32_t *owners,size_t count){
+    checked(DOME_GPU(MemsetAsync)(owners,0xff,count*sizeof(*owners),stream_));
+  }
+  void clear_totals(bake_raster::Totals *totals){
+    checked(DOME_GPU(MemsetAsync)(totals,0,sizeof(*totals),stream_));
+  }
+  void raster(bake_raster::View view,const bake_raster::Span *spans,uint32_t span_count,uint32_t count,
+              uint32_t first,bake_raster::Sample *output){
+    constexpr unsigned lanes=128;
+    raster_bake<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(view,spans,span_count,count,first,output);
+    checked(DOME_GPU(GetLastError)());
+  }
+  void compact(bake_raster::View view,const bake_raster::Sample *candidates,uint32_t count,uint32_t first,
+               uint32_t blocks,bake_raster::Block *ranges,bake_raster::Sample *output,bake_raster::Totals *totals){
+    constexpr unsigned lanes=128;
+    compact_bake<<<(blocks+lanes-1)/lanes,lanes,0,stream_>>>(view,candidates,count,first,blocks,ranges,output,totals);
+    checked(DOME_GPU(GetLastError)());
+  }
 
   void trace(SurfaceView surface,const Frame *frames,const Vec3 *pattern,size_t samples,float maximum,
              uint32_t *states,size_t rays,uint32_t *remaining,bool first){
@@ -99,5 +149,10 @@ public:
 std::unique_ptr<Query> upload(const Surface &surface,std::span<const Vec3> pattern,float maximum,bool projection){
   return upload_device<GpuApi>(surface,pattern,maximum,projection);
 }
-} // namespace dome::detail::bake_rays
+} // namespace bake_rays
+
+std::unique_ptr<bake_raster::Raster> bake_raster::create(std::span<const float> axis,std::span<const uint8_t> writable){
+  return create_device<bake_rays::GpuApi>(axis,writable);
+}
+} // namespace dome::detail
 #undef DOME_GPU

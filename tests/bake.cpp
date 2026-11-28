@@ -73,6 +73,57 @@ void edge_projection() {
           "Rounding recovery never extends a front or back projection depth");
   }
 }
+
+void ordered_raster_batches(){
+  constexpr uint32_t resolution=263;
+  const auto target=quad();
+  auto overlapping=target;
+  append(overlapping,quad(-1,1,0,0,1,1,0));
+  BakeSource source;
+  source.mesh=overlapping;
+  source.materials.front().material.color={1,0,0,1};
+  source.materials.emplace_back().material.color={0,0,1,1};
+  source.triangle_materials={0,0,1,1};
+  BakeOptions options;
+  options.resolution=resolution;
+  options.ao_samples=0;
+  options.padding=0;
+  options.fail_on_overlap=false;
+  options.source_triangles={0,1,2,3};
+  for(unsigned triangle=0;triangle<4;++triangle)
+    options.source_corner_barycentrics.insert(options.source_corner_barycentrics.end(),{{1,0,0},{0,1,0},{0,0,1}});
+  options.writable.resize(resolution*resolution);
+  uint32_t writable=0;
+  for(uint32_t i=0;i<options.writable.size();++i){
+    options.writable[i]=i%7!=0;
+    writable+=options.writable[i];
+  }
+  size_t encoded=0;
+  uint32_t previous=0;
+  bool ordered=true;
+  options.encode_target_normal=[&](uint32_t triangle,std::array<float,3> bary,Vec3){
+    const float x=triangle==0?bary[1]+bary[2]:bary[1];
+    const float y=triangle==0?bary[2]:bary[1]+bary[2];
+    const auto index=triangle*resolution*resolution+uint32_t(y*resolution)*resolution+uint32_t(x*resolution);
+    ordered&=triangle<2&&(!encoded||previous<index);
+    previous=index;
+    ++encoded;
+    return std::array<std::array<uint8_t,4>,2>{{{128,128,255,255},{128,128,255,255}}};
+  };
+  const auto result=bake_mesh(overlapping,source,options);
+  check(ordered&&encoded==writable&&result.raster_samples==4ull*resolution*resolution&&
+        result.projected==writable&&result.overlapping==writable&&result.rays==0,
+        "Split rectangles keep exact face and pixel order, count mirrored overlaps and skip protected texels");
+  for(uint32_t i=0;i<options.writable.size();++i){
+    const auto color=pixel(result.maps.color,int(i%resolution),int(i/resolution));
+    const auto expected=options.writable[i]?std::array<uint8_t,4>{255,0,0,255}:std::array<uint8_t,4>{};
+    if(color!=expected||result.coverage[i]!=(options.writable[i]?1:4))
+      throw std::runtime_error("Bake atlas ownership or writable mask changed between batches");
+  }
+  check(true,"The first owning material and every mask byte survive cross-batch overlap");
+  options.max_raster_samples=result.raster_samples-1;
+  check(rejects([&]{bake_mesh(overlapping,source,options);}),"A late raster budget refusal charges all rectangle candidates");
+}
 #ifdef DOME_TEST_BAKE_RAY_DEVICE
 void ambient_device_traversal() {
   using namespace detail::bake_rays;
@@ -156,6 +207,7 @@ void oblique_device_precision(){
 } // namespace
 int main()try {
   edge_projection();
+  ordered_raster_batches();
 #ifdef DOME_TEST_BAKE_RAY_DEVICE
   ambient_device_traversal();
   oblique_device_precision();

@@ -95,9 +95,20 @@ oneAPI module for edge recovery compiles only when needed. An oblique
 corpus matches 8,192 host results bit for bit after correcting the device
 division, including 1,458 recovered edges. The byte-identical 1024² fixture
 takes about 0.57 seconds after GPU startup and 4.96 seconds on its first Bake.
-The preceding host projection takes about 0.56 seconds. Target rasterization,
-cage construction and material resolution still run on the host.
+The preceding host projection takes about 0.56 seconds.
 [GPU Bake projection evidence](validation/bake-projection-gpu-20261128.json)
+
+Bake's target atlas now rasterizes on the selected GPU. It keeps ownership
+and writability on the device, resolves overlapping coverage by original
+face order, and returns compact winning samples in original face and pixel
+order. Mirrored charts, protected texels, exact barycentrics, non-power-of-two
+resolutions and the rectangle work budget follow the native rules. Arc
+matches the host across 573,467 candidates and passes the 2048² retained
+Bake. The 1024² projection fixture saves the same project. Median warm time
+is 0.59 seconds with device rasterization and 0.58 seconds on the preceding
+revision. The host prepares triangle bounds and cage rays and resolves
+materials.
+[GPU Bake target raster evidence](validation/bake-raster-gpu-20261128.json)
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing

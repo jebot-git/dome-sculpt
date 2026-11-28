@@ -21,6 +21,13 @@ rules. Projection returns bounded hit batches. Material resolution and
 construction of the published Bake fields remain on the host.
 [GPU Bake projection evidence](validation/bake-projection-gpu-20261128.json)
 
+Bake's target atlas uses the selected GPU for pixel-centre coverage,
+writable-mask admission, deterministic first-face ownership and overlap
+counting. It preserves native top-left boundaries and the rectangle sample
+budget. GPU batches read back only winning barycentrics and ordered block
+ranges for the existing target-frame and material stages.
+[GPU Bake target raster evidence](validation/bake-raster-gpu-20261128.json)
+
 Eligible 512–2048 current-grid RGB8 Bake materials now composite color, ORM
 and legacy emission on the selected GPU. Their ordered paint, coverage,
 native normal-map output, and GLB export match the preceding implementation.

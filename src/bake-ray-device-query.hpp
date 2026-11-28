@@ -1,18 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
+#include "bake-device-buffer.hpp"
 #include "bake-ray-kernel.hpp"
 
 namespace dome::detail::bake_rays {
 template<class Api>
 class DeviceQuery final:public Query {
   using Progress=ProjectionProgress<typename Api::Precision::Scalar>;
-  template<class T> struct Buffer {
-    Api &api;
-    T *data;
-    Buffer(Api &context,size_t size):api(context),data(size?static_cast<T*>(api.allocate(size*sizeof(T))):nullptr){}
-    ~Buffer(){if(data)api.release(data);}
-    Buffer(const Buffer &)=delete;
-  };
+  template<class T> using Buffer=BakeDeviceBuffer<Api,T>;
   Api api_;
   size_t samples_,capacity_;
   float maximum_;

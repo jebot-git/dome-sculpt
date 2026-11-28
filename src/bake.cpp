@@ -2,6 +2,7 @@
 #include "emission-authority.hpp"
 #include "source-bake-normal.hpp"
 #include "bake-ray-device.hpp"
+#include "bake-raster-device.hpp"
 #include "bake-ray-query.hpp"
 #include "bake-paint-coordinates.hpp"
 #include "emission-bake-source.hpp"
@@ -690,12 +691,86 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     projection_texels.clear();
   };
 #endif
-  std::vector<uint32_t> owner(pixels,UINT32_MAX);
-  const size_t triangle_count=target_triangles.empty()?low.indices.size()/3:target_triangles.size();
 #ifdef DOME_BAKE_RAY_REFERENCE
   SurfaceQueryOptions ray_options;
   ray_options.cancelled=o.cancelled;
 #endif
+  auto project_texel=[&](size_t at,size_t triangle,const std::array<float,3> &bary,double rounding_radius){
+    auto position=interpolate(low,triangle,bary,false),normal=interpolate(low,triangle,bary,true);
+    TangentFrame frame;
+    if (o.low_tangents.empty()) {
+      frame = tangent_frame(low, low_frames, triangle, bary);
+      normal = normalized(frame.normal);
+    } else {
+      auto supplied = basis(low,triangle,normal,bary,o.low_tangents);
+      frame = {supplied.tangent, supplied.bitangent, supplied.normal};
+    }
+    std::optional<SurfaceHit> hit;
+    if(corresponding_topology){
+      const auto matched=interpolate(source.mesh,triangle,bary,false);
+      if(within_projection_bounds(position,matched,normal,o))
+        hit=SurfaceHit{uint32_t(triangle),matched,
+                       interpolate(source.mesh,triangle,bary,true),bary,0};
+    }else if(ray_projection){
+      Vec3 offset=normal*o.front_distance;
+      if(!o.cage_positions.empty()){
+        Vec3 cage;
+        for(int i=0;i<3;++i)cage+=o.cage_positions[low.indices[triangle*3+i]]*bary[i];
+        offset=cage-position;
+      }
+      const float front=length(offset);
+      const auto direction=front>1e-8f?offset/front:normal;
+      if(++result.rays>o.max_rays)throw std::length_error("Bake ray budget exceeded");
+#ifdef DOME_BAKE_RAY_REFERENCE
+      hit=detail::BakeRayQuery::cast(*query,position+offset,direction*-1,front+o.back_distance,
+                                     rounding_radius,ray_options);
+#else
+      projection_rays.push_back(detail::BakeRayQuery::projection_ray(position+offset,direction*-1,
+                                front+o.back_distance,rounding_radius));
+      projection_texels.push_back({uint32_t(at),uint32_t(triangle),bary,normal,frame});
+      if(projection_rays.size()==projection_capacity)flush_projection();
+      return;
+#endif
+    }else{
+      std::array<float,3> mapped{};
+      for(int k=0;k<3;++k)for(int c=0;c<3;++c)mapped[c]+=bary[k]*o.source_corner_barycentrics[triangle*3+k][c];
+      auto source_triangle=o.source_triangles[triangle];
+      hit=SurfaceHit{source_triangle,interpolate(source.mesh,source_triangle,mapped,false),
+                     interpolate(source.mesh,source_triangle,mapped,true),mapped,0};
+    }
+    shade(at,triangle,bary,normal,frame,hit);
+  };
+#ifdef DOME_BAKE_RAY_REFERENCE
+  std::vector<uint32_t> owner(pixels,UINT32_MAX);
+#else
+  namespace raster=detail::bake_raster;
+  std::vector<float> axis(o.resolution);
+  for(uint32_t i=0;i<o.resolution;++i)axis[i]=(i+.5f)/o.resolution;
+  auto atlas=raster::create(axis,o.writable);
+  struct RasterFace {uint32_t triangle;double rounding_radius;};
+  std::vector<raster::Span> raster_spans;
+  std::vector<RasterFace> raster_faces;
+  raster_spans.reserve(raster::span_capacity);
+  raster_faces.reserve(raster::span_capacity);
+  uint32_t pending_candidates=0;
+  auto flush_raster=[&]{
+    if(!pending_candidates)return;
+    const auto batch=atlas->rasterize(raster_spans,pending_candidates,o.cancelled);
+    result.overlapping+=batch.overlaps;
+    for(const auto &block:batch.blocks){
+      cancel(o);
+      for(const auto &sample:batch.samples.subspan(block.offset,block.count)){
+        const auto &face=raster_faces[sample.span];
+        project_texel(sample.pixel,face.triangle,
+            {sample.barycentric[0],sample.barycentric[1],sample.barycentric[2]},face.rounding_radius);
+      }
+    }
+    raster_spans.clear();
+    raster_faces.clear();
+    pending_candidates=0;
+  };
+#endif
+  const size_t triangle_count=target_triangles.empty()?low.indices.size()/3:target_triangles.size();
   for (size_t face=0;face<triangle_count;++face) {
     const size_t triangle=target_triangles.empty()?face:target_triangles[face];
     const double rounding_radius=ray_projection?
@@ -709,6 +784,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
           miny=std::min({uv[0][1],uv[1][1],uv[2][1]}),maxy=std::max({uv[0][1],uv[1][1],uv[2][1]});
     int left=std::max(0,int(std::ceil(minx*o.resolution-.5f))),right=std::min(int(o.resolution)-1,int(std::floor(maxx*o.resolution-.5f))),
         bottom=std::max(0,int(std::ceil(miny*o.resolution-.5f))),top=std::min(int(o.resolution)-1,int(std::floor(maxy*o.resolution-.5f)));
+#ifdef DOME_BAKE_RAY_REFERENCE
     for (int y=bottom;y<=top;++y) for (int x=left;x<=right;++x) {
       if (!(result.raster_samples++%64)) cancel(o);
       if (result.raster_samples>o.max_raster_samples) throw std::length_error("Bake UV raster budget exceeded");
@@ -724,52 +800,36 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       if (result.coverage[at]==4) continue;
       if (owner[at]!=UINT32_MAX) { ++result.overlapping; continue; }
       owner[at]=uint32_t(triangle);
-      auto position=interpolate(low,triangle,bary,false),normal=interpolate(low,triangle,bary,true);
-      TangentFrame frame;
-      if (o.low_tangents.empty()) {
-        frame = tangent_frame(low, low_frames, triangle, bary);
-        normal = normalized(frame.normal);
-      } else {
-        auto supplied = basis(low,triangle,normal,bary,o.low_tangents);
-        frame = {supplied.tangent, supplied.bitangent, supplied.normal};
-      }
-      std::optional<SurfaceHit> hit;
-      if(corresponding_topology){
-        const auto matched=interpolate(source.mesh,triangle,bary,false);
-        if(within_projection_bounds(position,matched,normal,o))
-          hit=SurfaceHit{uint32_t(triangle),matched,
-                         interpolate(source.mesh,triangle,bary,true),bary,0};
-      }else if(ray_projection){
-        Vec3 offset=normal*o.front_distance;
-        if(!o.cage_positions.empty()){
-          Vec3 cage;
-          for(int i=0;i<3;++i)cage+=o.cage_positions[low.indices[triangle*3+i]]*bary[i];
-          offset=cage-position;
-        }
-        const float front=length(offset);
-        const auto direction=front>1e-8f?offset/front:normal;
-        if(++result.rays>o.max_rays)throw std::length_error("Bake ray budget exceeded");
-#ifdef DOME_BAKE_RAY_REFERENCE
-        hit=detail::BakeRayQuery::cast(*query,position+offset,direction*-1,front+o.back_distance,
-                                       rounding_radius,ray_options);
-#else
-        projection_rays.push_back(detail::BakeRayQuery::projection_ray(position+offset,direction*-1,
-                                  front+o.back_distance,rounding_radius));
-        projection_texels.push_back({uint32_t(at),uint32_t(triangle),bary,normal,frame});
-        if(projection_rays.size()==projection_capacity)flush_projection();
-        continue;
-#endif
-      }else{
-        std::array<float,3> mapped{};
-        for(int k=0;k<3;++k)for(int c=0;c<3;++c)mapped[c]+=bary[k]*o.source_corner_barycentrics[triangle*3+k][c];
-        auto source_triangle=o.source_triangles[triangle];
-        hit=SurfaceHit{source_triangle,interpolate(source.mesh,source_triangle,mapped,false),
-                       interpolate(source.mesh,source_triangle,mapped,true),mapped,0};
-      }
-      shade(at,triangle,bary,normal,frame,hit);
+      project_texel(at,triangle,bary,rounding_radius);
     }
+#else
+    if(left>right||bottom>top)continue;
+    const auto width=uint32_t(right-left+1),count=width*uint32_t(top-bottom+1);
+    if(count>o.max_raster_samples-result.raster_samples)
+      throw std::length_error("Bake UV raster budget exceeded");
+    result.raster_samples+=count;
+    raster::Span descriptor{std::bit_cast<uint64_t>(area),{},0,uint32_t(left),uint32_t(bottom),width,0,0};
+    for(unsigned i=0;i<3;++i){
+      descriptor.uv[i][0]=uv[i][0];descriptor.uv[i][1]=uv[i][1];
+      auto a=uv[(i+1)%3],b=uv[(i+2)%3];
+      if(area<0)std::swap(a,b);
+      if(top_left(a,b))descriptor.top_left_edges|=1u<<i;
+    }
+    for(uint32_t first=0;first<count;){
+      const auto accepted=std::min(count-first,raster::candidate_capacity-pending_candidates);
+      descriptor.first=pending_candidates;
+      descriptor.rectangle_offset=first;
+      raster_spans.push_back(descriptor);
+      raster_faces.push_back({uint32_t(triangle),rounding_radius});
+      first+=accepted;
+      pending_candidates+=accepted;
+      if(pending_candidates==raster::candidate_capacity||raster_spans.size()==raster::span_capacity)flush_raster();
+    }
+#endif
   }
 #ifndef DOME_BAKE_RAY_REFERENCE
+  flush_raster();
+  atlas.reset();
   flush_projection();
 #endif
   if (result.overlapping&&o.fail_on_overlap) throw std::runtime_error("Overlapping low UV coverage: "+std::to_string(result.overlapping)+" texels");

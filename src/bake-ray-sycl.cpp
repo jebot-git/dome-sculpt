@@ -1,10 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include <sycl/sycl.hpp>
+#include "bake-raster-device-job.hpp"
 #include "bake-ray-device-query.hpp"
 #include "paint-composite-kernel.hpp"
 #include "surface-ray-softfloat.hpp"
 
-namespace dome::detail::bake_rays {
+namespace dome::detail {
+namespace bake_raster {
+void launch_raster(sycl::queue &,View,const Span *,uint32_t span_count,uint32_t count,uint32_t first,Sample *);
+void launch_compact(sycl::queue &,View,const Sample *,uint32_t count,uint32_t first,uint32_t blocks,Block *,Sample *,Totals *);
+}
+namespace bake_rays {
 void launch_boundary(sycl::queue &,SurfaceView,const ProjectionRay *,ProjectionHit *,
     ProjectionProgress<surface_ray::SoftScalar> *,size_t count,uint32_t budget,uint32_t *status,bool first);
 
@@ -27,6 +33,16 @@ public:
   void upload(void *to,const void *from,size_t bytes){queue_.memcpy(to,from,bytes);}
   void read(void *to,const void *from,size_t bytes){queue_.memcpy(to,from,bytes).wait_and_throw();}
   void reset(uint32_t *value){queue_.fill(value,uint32_t(0),1);}
+  void clear_owners(uint32_t *owners,size_t count){queue_.fill(owners,UINT32_MAX,count);}
+  void clear_totals(bake_raster::Totals *totals){queue_.memset(totals,0,sizeof(*totals));}
+  void raster(bake_raster::View view,const bake_raster::Span *spans,uint32_t span_count,uint32_t count,
+              uint32_t first,bake_raster::Sample *output){
+    bake_raster::launch_raster(queue_,view,spans,span_count,count,first,output);
+  }
+  void compact(bake_raster::View view,const bake_raster::Sample *candidates,uint32_t count,uint32_t first,
+               uint32_t blocks,bake_raster::Block *ranges,bake_raster::Sample *output,bake_raster::Totals *totals){
+    bake_raster::launch_compact(queue_,view,candidates,count,first,blocks,ranges,output,totals);
+  }
 
   void trace(SurfaceView surface,const Frame *frames,const Vec3 *pattern,size_t samples,float maximum,
              uint32_t *states,size_t rays,uint32_t *remaining,bool first){
@@ -71,4 +87,9 @@ public:
 std::unique_ptr<Query> upload(const Surface &surface,std::span<const Vec3> pattern,float maximum,bool projection){
   return upload_device<SyclApi>(surface,pattern,maximum,projection);
 }
-} // namespace dome::detail::bake_rays
+} // namespace bake_rays
+
+std::unique_ptr<bake_raster::Raster> bake_raster::create(std::span<const float> axis,std::span<const uint8_t> writable){
+  return create_device<bake_rays::SyclApi>(axis,writable);
+}
+} // namespace dome::detail
