@@ -353,6 +353,25 @@ compile, and all three backends reject missing compute hardware. Direct
 retained alternate-coordinate export remains a separate requirement.
 [HDR Bake donor validation](validation/hdr-bake-source-gpu-20261128.json)
 
+The prepared-source Editable GLB compiler now samples original PBR role
+images on the selected GPU in both ordinary and HDR exports. The raster
+keeps the authored triangle, barycentrics, source coordinate set and
+sampler for each role. Roles with the same coordinate set share a batch of
+UVs. The worker resolves the editable layer and Bake contributions and
+copies finished texels into the existing chart padding. The original
+editable scene stays in the package.
+
+On Arc A770, 65 files match the preceding build byte for byte across the
+ordinary and physical-emission suites. A three-role fixture reproduces
+all five compiled maps and the work counts with a 5,734,400-byte working
+budget by staging one source image at a time. Native DomeD Wayland export
+matches the 512-pixel worker output and preserves the project when
+cancelled. Synthetic controller commands exercise the 256, 512 and 1024
+export choices and ordered Save. Eight focused Release tests and both
+headless sanitizer suites pass. The small end-to-end Arc suites take
+slightly longer after moving the image sampling to the device.
+[Editable GLB role sampling evidence](validation/source-paint-export-gpu-20261128.json)
+
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
 their hashes verified and their workspace paths preserved. The same sweep

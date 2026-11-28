@@ -1,0 +1,81 @@
+{
+  "date": "2026-11-28",
+  "product": "d9a2862adf2b4883ff1303797a488ffdf864dcb7",
+  "comparison": "fb90fe6a",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "operation": "Prepared-source Editable GLB original texture sampling in the Core PBR color, ORM, coverage and physical-emission compiler.",
+  "gpu": "Intel Arc A770, renderD129, Level Zero, hardware OpenGL for the independent graphics consumers and nested DomeD client",
+  "sampler": {
+    "max_samples_per_dispatch": 16384,
+    "roles": [
+      "base color",
+      "metallic-roughness",
+      "emission",
+      "occlusion"
+    ],
+    "coordinates": "Immutable source mesh triangle, its barycentrics and each role's resolved UV set. The selected device evaluates the original image affine, wrap and filter.",
+    "padding": "One material sample per owned texel. Padding copies the completed images or radiance from the existing owner.",
+    "tight_budget_bytes": 5734400,
+    "tight_budget_roles": 3,
+    "tight_budget_identical_images": 5,
+    "tight_budget_work_exact": true
+  },
+  "comparison_runs": {
+    "protocol": "A fresh process per variant with the same path, hardware EGL and no persistent SYCL cache. Each suite includes fixture import, original rendering, worker export, independent GLB consumer, reopen and exact second export. Physical runs include the GPU trace.",
+    "ordinary_pbr": {
+      "exact_files": 37,
+      "aggregate_sha256": "9d57fad4ae74589008926cea34539e8d0859c4aa61c537dd72aa1610c374fc65",
+      "previous": {
+        "wall_seconds": 7.59,
+        "peak_rss_kib": 357452
+      },
+      "current": {
+        "wall_seconds": 7.71,
+        "peak_rss_kib": 351068
+      }
+    },
+    "physical_pbr": {
+      "exact_files": 28,
+      "aggregate_sha256": "c939a778d7084a9e13927de845ae0d6582cec7e70c027d236c74d65eee9ea42d",
+      "previous": {
+        "wall_seconds": 5.14,
+        "peak_rss_kib": 320024
+      },
+      "current": {
+        "wall_seconds": 5.34,
+        "peak_rss_kib": 313668
+      }
+    }
+  },
+  "release_tests": [
+    "baked-emission-uv1-worker",
+    "source-paint-bake",
+    "source-paint-authoring",
+    "source-paint-physical-authoring",
+    "source-uv-bake",
+    "source-uv-adopt",
+    "xr-editable-export",
+    "vrm1-source-export"
+  ],
+  "nested_domed_wayland": {
+    "checks": 8,
+    "same_512_pixel_worker_package": true
+  },
+  "synthetic_controller": {
+    "checks": 70,
+    "native_document_input": true,
+    "tested_resolutions": [
+      256,
+      512,
+      1024
+    ]
+  },
+  "headless_asan_ubsan": {
+    "source-paint-bake": 192,
+    "source-paint-physical-authoring": 128
+  },
+  "open": [
+    "Paint overlay resolution, material factors and finite emission encoding still run on the worker.",
+    "Direct retained alternate-coordinate Standard GLB export and physical headset qualification remain open."
+  ]
+}
