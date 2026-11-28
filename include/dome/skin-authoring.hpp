@@ -3,7 +3,9 @@
 #include "scene.hpp"
 namespace dome {
 // Values2/3 remain reserved for earlier unadmitted source/handle experiments.
-enum class SkinAuthoringMode { Automatic=0, Transfer=1, Anatomical=4, SurfaceHeat=5 };
+enum class SkinAuthoringMode { Automatic=0, Transfer=1, Anatomical=4, SurfaceHeat=5, VolumeGeodesic=6 };
+inline constexpr float minimum_skin_cell_size = .00001f;
+inline constexpr float maximum_skin_cell_size = 10.f;
 struct AnatomicalSkinOptions {
   size_t maximum_work=500'000'000;
   size_t maximum_workspace=256u*1024u*1024u;
@@ -18,13 +20,15 @@ struct SkinAuthoringOptions {
   // Distances are world metres, independent of object/group scale.
   float seed_distance = .3f, seed_margin = .01f, falloff = 2;
   float transfer_distance = .1f;
-  // Legacy Automatic/Transfer bound. Anatomical/SurfaceHeat use the owning
+  // Legacy Automatic/Transfer bound. Anatomical and the screened or volume
+  // bind methods use the owning
   // anatomical resource block (same500M/256MiB/512MiB ceilings).
   size_t maximum_work = 50'000'000;
   // Locks refer to the target's existing exact joint identities. No names or
   // nearest bones are used to guess a correspondence between different rigs.
   std::vector<uint8_t> locks;
   AnatomicalSkinOptions anatomical;
+  float volume_cell_size = .01f; // World metres.
   void validate() const;
 };
 // Zero-capable logarithmic slider over0..10000 world metres (displayed as mm).
@@ -41,6 +45,10 @@ bool author_skin(Scene &, uint64_t target, const SkinAuthoringOptions &,
 // Complete authenticated humanoid sources also use geometric head/ocular
 // boundaries; generic native targets keep their own topology and source owners.
 bool author_surface_heat_skin(Scene &,std::span<const uint64_t>,
+    const SkinAuthoringOptions &,const std::function<bool()> &cancelled={});
+// Interior geodesic weights for closed manifold rest meshes with internal
+// deforming bone support. Each selected mesh has its own material domain.
+bool author_volume_skin(Scene &,std::span<const uint64_t>,
     const SkinAuthoringOptions &,const std::function<bool()> &cancelled={});
 // Source-informed anatomical surface/contact energy on a complete authenticated
 // current unskinned source instance and an authored native humanoid reference.

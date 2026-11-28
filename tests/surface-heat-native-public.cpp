@@ -107,7 +107,7 @@ int main(int argc,char**argv)try{
  check(doc.frame().state->menu_page==14,"Real joystick reaches the existing native bind page");
  driver.sector(1);driver.value(0);driver.confirm();
  check(doc.frame().state->skin_options.mode==SkinAuthoringMode::Automatic,"Actual controller explicitly stages original legacy Automatic mode");
- driver.sector(1);driver.value(1);driver.confirm();
+ driver.sector(1);driver.value(3.f/4);driver.confirm();
  check(doc.frame().state->skin_options.mode==SkinAuthoringMode::SurfaceHeat&&doc.copy_scene().encode()==active_before.encode()&&doc.frame().state->dirty==dirty_before,"Actual surface heat Method is staged without changing Scene/history");
  driver.sector(7);auto controller_save=out/"controller.dsculpt";doc.save_async(controller_save).get();
  check(doc.wait_asset(std::chrono::seconds(120))&&doc.frame().state->error.empty()&&doc.copy_scene().encode()==active_expected.encode()&&Scene::load(controller_save).encode()==active_expected.encode(),"Real joystick Bind executes the surface heat worker and accepted Save exactly");

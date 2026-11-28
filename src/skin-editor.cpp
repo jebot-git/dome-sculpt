@@ -29,18 +29,20 @@ void edit_skin_dialog(Document &doc) {
   hint.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);
   int y=row*3;
   Fl_Choice mode(label,y,width-label-40,row-4,"Method");y+=row;
-  mode.add("Legacy automatic bind");mode.add("Transfer skin weights");mode.add("Anatomical source bind (REST)");mode.add("Automatic (surface heat)");mode.value(detail::skin_method_choice(options.mode));
+  mode.add("Legacy automatic bind");mode.add("Transfer skin weights");mode.add("Anatomical source bind (REST)");mode.add("Automatic (surface heat)");mode.add("Volume geodesic");mode.value(detail::skin_method_choice(options.mode));
   Fl_Choice source(label,y,width-label-40,row-4,"Reference mesh");y+=row;
   Fl_Value_Input seed(label,y,width-label-40,row-4,"Seed radius (mm)");y+=row;
   Fl_Value_Input margin(label,y,width-label-40,row-4,"Seed margin (mm)");y+=row;
   Fl_Value_Input distance(label,y,width-label-40,row-4,"Transfer (mm)");y+=row;
   Fl_Value_Input falloff(label,y,width-label-40,row-4,"Distance falloff");y+=row;
+  Fl_Value_Input cell(label,y,width-label-40,row-4,"Volume cell size (mm)");y+=row;
   Fl_Value_Input cap(label,y,width-label-40,row-4,"Max influences");y+=row;
   Fl_Value_Input prune(label,y,width-label-40,row-4,"Prune threshold");y+=row;
   seed.bounds(.001,10000000);seed.step(.1);seed.value(options.seed_distance*1000);
   margin.bounds(0,10000000);margin.step(.1);margin.value(options.seed_margin*1000);
   distance.bounds(.001,10000000);distance.step(.1);distance.value(options.transfer_distance*1000);
   falloff.bounds(1,8);falloff.step(.1);falloff.value(options.falloff);
+  cell.bounds(minimum_skin_cell_size*1000.,maximum_skin_cell_size*1000.);cell.step(.01);cell.value(options.volume_cell_size*1000.);
   cap.bounds(1,32);cap.step(1);cap.value(options.limits.max_influences);
   prune.bounds(0,.99);prune.step(.0001);prune.value(options.limits.prune);
   Fl_Check_Button selected(20,y,width-50,row,"Bind explicitly selected meshes");y+=row;
@@ -69,6 +71,7 @@ void edit_skin_dialog(Document &doc) {
     uint64_t target;SkinAuthoringOptions *options;std::vector<uint64_t> ids;
     std::vector<std::string> names;
     std::array<Fl_Value_Input*,6> fields;Fl_Check_Button *keep;Fl_Check_Browser *locks;
+    Fl_Value_Input *cell;
     Fl_Check_Button *selected;std::array<Fl_Value_Input*,3> budgets;Fl_Box *hint;
     bool has_selection=false;bool accepted=false;
     void refresh() {
@@ -83,19 +86,22 @@ void edit_skin_dialog(Document &doc) {
       items.emplace_back();source->copy(items.data());
       auto found=std::find(ids.begin(),ids.end(),previous);source->value(found==ids.end()?0:int(found-ids.begin()));
       if(ids.empty())apply->deactivate();else apply->activate();
-      const bool anatomical=mode->value()==2,heat=mode->value()==3,bounded=anatomical||heat;
+      const auto method=detail::skin_method_mode(mode->value());
+      const bool anatomical=method==SkinAuthoringMode::Anatomical,heat=method==SkinAuthoringMode::SurfaceHeat;
+      const bool volume=method==SkinAuthoringMode::VolumeGeodesic,bounded=anatomical||detail::skin_binds_selection(method);
       for(auto *field:fields)field->deactivate();
-      if(!anatomical){fields[4]->activate();fields[5]->activate();if(heat)fields[0]->activate();else if(mode->value()==0){fields[0]->activate();fields[1]->activate();fields[3]->activate();}else fields[2]->activate();}
+      if(!anatomical){fields[4]->activate();fields[5]->activate();if(heat)fields[0]->activate();else if(volume||mode->value()==0){fields[0]->activate();fields[1]->activate();fields[3]->activate();}else fields[2]->activate();}
+      if(volume)cell->activate();else cell->deactivate();
       for(auto *field:budgets)if(bounded)field->activate();else field->deactivate();
       if(bounded&&has_selection)selected->activate();else selected->deactivate();
-      hint->label(anatomical?"Complete retained unskinned source group.\nAnatomical surface/contact weights in REST.\nFour influences with originals retained.":
+      hint->label(volume?"Bind closed meshes with internal deform bones.\nChoose a cell size fine enough for the thinnest part.":anatomical?"Complete retained unskinned source group.\nAnatomical surface/contact weights in REST.\nFour influences with originals retained.":
         scene->object(target).texture_sets?"Bind in the reference rest frame.\nA visible original VRM 1.0 rig also links poses and avatar export.":
         heat?"Automatic weights from visible bone support.\nKeep paint, morphs and pose.\nDifferent rest rigs need explicit joint mapping.":
         "Bind in the reference rest frame.\nKeep target paint, morphs and pose.\nDifferent rigs need joint mapping.");
       apply->label(anatomical?"Bind anatomy":"Bind / transfer");
     }
   } context{&window,&source,&mode,&apply,&draft.scene,target.id,&options,{},{},
-            {&seed,&margin,&distance,&falloff,&cap,&prune},&keep,&locks,&selected,{&work,&workspace,&total},&hint,!expected_selection.empty()};
+            {&seed,&margin,&distance,&falloff,&cap,&prune},&keep,&locks,&cell,&selected,{&work,&workspace,&total},&hint,!expected_selection.empty()};
   context.refresh();
   mode.callback([](Fl_Widget*,void *p){static_cast<Context*>(p)->refresh();},&context);
   cancel.callback([](Fl_Widget *w,void*){w->window()->hide();});
@@ -106,11 +112,12 @@ void edit_skin_dialog(Document &doc) {
       auto next=*c.options;next.reference=c.ids[c.source->value()];next.mode=detail::skin_method_mode(c.mode->value());
       next.seed_distance=float(c.fields[0]->value()/1000);next.seed_margin=float(c.fields[1]->value()/1000);
       next.transfer_distance=float(c.fields[2]->value()/1000);next.falloff=float(c.fields[3]->value());
+      if(next.mode==SkinAuthoringMode::VolumeGeodesic)next.volume_cell_size=float(c.cell->value()/1000.);
       double influences=c.fields[4]->value();
       if(!std::isfinite(influences)||influences<1||influences>32||std::floor(influences)!=influences)
         throw std::invalid_argument("Max influences must be an integer from1 to32");
       next.limits.max_influences=uint32_t(influences);next.limits.prune=float(c.fields[5]->value());
-      if(next.mode==SkinAuthoringMode::Anatomical||next.mode==SkinAuthoringMode::SurfaceHeat){
+      if(next.mode==SkinAuthoringMode::Anatomical||detail::skin_binds_selection(next.mode)){
         auto bounded=[](double v,size_t max,size_t unit){if(!std::isfinite(v)||v<1||v>double(max)||std::floor(v)!=v)throw std::invalid_argument("Enter a whole anatomical resource bound in the displayed range");return size_t(v)*unit;};
         next.anatomical.maximum_work=bounded(c.budgets[0]->value(),500,1'000'000);
         next.anatomical.maximum_workspace=bounded(c.budgets[1]->value(),256,1024*1024);
@@ -122,6 +129,6 @@ void edit_skin_dialog(Document &doc) {
   },&context);
   window.end();window.set_modal();dx::style(&window);window.show();cancel.take_focus();
   while(window.shown())Fl::wait();
-  if(context.accepted){if((options.mode==SkinAuthoringMode::Anatomical||options.mode==SkinAuthoringMode::SurfaceHeat)&&selected.value())doc.bind_skin_selected(std::move(options),draft.source,expected_selection);else doc.bind_skin(std::move(options),draft.source);}
+  if(context.accepted){if((options.mode==SkinAuthoringMode::Anatomical||detail::skin_binds_selection(options.mode))&&selected.value())doc.bind_skin_selected(std::move(options),draft.source,expected_selection);else doc.bind_skin(std::move(options),draft.source);}
 }
 } // namespace dome

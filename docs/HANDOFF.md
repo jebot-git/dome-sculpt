@@ -18,11 +18,15 @@ explicit build choices. Desktop and OpenXR refuse software OpenGL or missing
 compute hardware. Command-line export also requires the selected compute GPU.
 CPU numerical and sanitizer references build as opt-in headless tests.
 Production CPU configuration was rechecked at `5440467a` and refused for
-desktop, OpenXR and headless builds. The closed-volume binding reference
-passes its focused native, Wayland and synthetic OpenXR checks on a
-[development branch](https://github.com/jebot-git/dome-sculpt/blob/work/gpu-volume-binding-reference-20261128/docs/VOLUME-BINDING-GPU-REFERENCE.md).
-Its weight-field solve still runs on the host. Production admission requires
-the selected GPU to run the solve.
+desktop, OpenXR and headless builds. Volume Geodesic now propagates closed-mesh
+bone fields on the selected GPU. The Arc A770 results differ from the headless
+reference by at most `5.96e-8` in the two tested resolutions. Native FLTK and
+synthetic OpenXR save the same project byte for byte. The native worker and
+FLTK tests cover atomic Undo and Redo. CUDA and ROCm compile the shared kernel
+and refuse missing devices.
+Open avatar parts still use surface methods. Production-size assemblies,
+positive AMD and NVIDIA runs, and physical headset testing remain open.
+[GPU volume binding evidence](validation/gpu-volume-binding-20261128.json)
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.

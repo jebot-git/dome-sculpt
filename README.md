@@ -94,6 +94,12 @@ checkboxes. Apply the selection, then open **Bind or transfer skin**. Choose
 **Automatic (surface heat)** and check **Bind explicitly selected meshes** to
 bind the selection to the reference rig in one Undo step.
 
+Use **Volume geodesic** for a closed rest mesh with deforming bones inside it.
+Set **Volume cell size (mm)** to resolve the thinnest material that must carry
+influence. In OpenXR, select the same Method and adjust **Cell** in **Distance**.
+The selected compute GPU solves the interior field. Use Surface Heat or weight
+transfer for open parts.
+
 The sparse signed-distance field supports swept capsule strokes, pressure,
 soft unions/subtraction, smoothing and flattening. Transactions retain exact
 sample values for undo/redo. The mesher welds exact representable intersections and preserves valid small

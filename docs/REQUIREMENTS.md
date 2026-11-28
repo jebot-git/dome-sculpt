@@ -297,6 +297,15 @@ Wayland bind, Save and Undo/Redo reproduce the expected weights. The retained
 and native CC0 VRoid articulation cases pass with exact prior project output.
 [Visible seed evidence](validation/surface-heat-visible-seeds-20261128.json)
 
+Volume Geodesic binds consistently oriented closed meshes to internal
+deforming bones. It checks topology and seeds on the worker and propagates
+through the certified material on the selected GPU. The Arc A770 results
+preserve independent weights for disconnected solids and reproduce the native
+Save across FLTK Wayland and synthetic OpenXR. Open avatar parts still need
+surface binding or transfer. Positive CUDA and ROCm execution, production-size
+avatar assemblies and physical headset verification remain open.
+[GPU volume binding evidence](validation/gpu-volume-binding-20261128.json)
+
 Surface Heat now covers independent native paint frames, authored POSITION
 domains and prepared normal and corner-color recipes. Binding after key
 creation and rebinding after Mirror keep the original role coordinates,

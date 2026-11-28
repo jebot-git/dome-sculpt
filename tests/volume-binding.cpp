@@ -1,0 +1,268 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "volume-binding.hpp"
+#include "dome/document.hpp"
+#include "dome/source-placement.hpp"
+#include <nlohmann/json.hpp>
+#include <iostream>
+#include <set>
+#include <map>
+#include <algorithm>
+#include <chrono>
+#include <fstream>
+#ifdef DOME_TEST_VOLUME_GPU
+#include "volume-binding-device.hpp"
+#endif
+using namespace dome;
+namespace {
+int checks=0;
+void check(bool value,const char *message){if(!value)throw std::runtime_error(message);++checks;std::cout<<"PASS "<<message<<'\n';}
+template<class F>void rejects(F f,const char *message){bool failed=false;try{f();}catch(const std::exception&e){failed=true;std::cout<<"REFUSED "<<e.what()<<'\n';}check(failed,message);}
+using Cell=std::array<int,3>;
+Mesh cells(const std::set<Cell>&occupied,float h,bool seams=false) {
+  Mesh out;std::map<Cell,uint32_t> vertices;
+  auto vertex=[&](Cell p){
+    if(!seams){auto found=vertices.find(p);if(found!=vertices.end())return found->second;}
+    auto id=uint32_t(out.positions.size());out.positions.push_back({p[0]*h,p[1]*h,p[2]*h});out.normals.push_back({});out.uv.push_back({p[0]*h,p[1]*h});vertices[p]=id;return id;
+  };
+  for(auto c:occupied)for(int a=0;a<3;++a)for(int sign:{-1,1}){
+    auto neighbor=c;neighbor[a]+=sign;if(occupied.contains(neighbor))continue;
+    auto base=c;base[a]+=sign>0;int u=(a+1)%3,v=(a+2)%3;
+    auto p1=base,p2=base,p3=base;++p1[u];++p2[u];++p2[v];++p3[v];
+    std::array<Cell,4> points{base,p1,p2,p3};if(sign<0)std::swap(points[1],points[3]);
+    std::array<uint32_t,4> ids;for(int k=0;k<4;++k)ids[k]=vertex(points[k]);
+    auto normal=Vec3{};if(a==0)normal.x=sign;else if(a==1)normal.y=sign;else normal.z=sign;
+    for(auto id:ids)out.normals[id]+=normal;
+    out.indices.insert(out.indices.end(),{ids[0],ids[1],ids[2],ids[0],ids[2],ids[3]});
+  }
+  for(auto &n:out.normals)n=normalized(n);
+  out.validate();return out;
+}
+Skeleton pair(float right,float bottom,float length) {
+  Skeleton s;Bone a;a.name="Left";a.rest.translation={.01f,bottom,.01f};a.length=length;
+  auto b=a;b.name="Right";b.rest.translation.x=right;s.bones={a,b};s.validate();return s;
+}
+float weight(const VertexWeights&w,uint32_t bone){float v=0;for(auto i:w)if(i.joint==bone)v+=i.weight;return v;}
+detail::VolumeBindingOptions options(){detail::VolumeBindingOptions o;o.cell_size=.004f;o.binding.maximum_seed_distance=.1f;o.binding.seed_margin=.01f;return o;}
+std::set<Cell> arms(bool joined){std::set<Cell>s;for(int z=0;z<2;++z)for(int y=0;y<20;++y)for(int x=0;x<5;++x)if(x<2||x>=3||(joined&&y<2))s.insert({x,y,z});return s;}
+bool same_positions(const Mesh&a,const Mesh&b){if(a.positions.size()!=b.positions.size()||a.indices!=b.indices||a.uv!=b.uv)return false;for(size_t i=0;i<a.positions.size();++i)if(a.positions[i].x!=b.positions[i].x||a.positions[i].y!=b.positions[i].y||a.positions[i].z!=b.positions[i].z)return false;return true;}
+#ifdef DOME_TEST_VOLUME_GPU
+void device_cancellation() {
+  using namespace detail::volume_device;
+  constexpr uint32_t count=40;
+  std::array<uint32_t,count+1> starts{};
+  std::vector<Edge> edges;
+  for(uint32_t i=0;i<count;++i){
+    if(i)edges.push_back({i-1,1.f});
+    if(i+1<count)edges.push_back({i+1,1.f});
+    starts[i+1]=uint32_t(edges.size());
+  }
+  auto solver=upload({{},{},starts,edges,{}},1);
+  const std::array seeds{Seed{0,0.f}};
+  std::array<float,count> field;
+  field.fill(-1.f);
+  Propagation budget{count*64u};
+  unsigned polls=0;
+  bool cancelled=false;
+  try{solver->solve(seeds,field,budget,[&]{return ++polls==2;});}
+  catch(const std::runtime_error &error){cancelled=std::string_view(error.what()).find("cancelled")!=std::string_view::npos;}
+  check(cancelled&&budget.passes>0&&std::all_of(field.begin(),field.end(),[](float x){return x==-1.f;}),
+        "Cancelling after real GPU dispatch leaves the boundary output untouched");
+  budget={count*64u};
+  solver->solve(seeds,field,budget,{});
+  bool exact=true;
+  for(size_t i=0;i<field.size();++i)exact&=field[i]==float(i);
+  check(exact&&budget.passes>=count,"A cancelled device solver can retry the known path exactly");
+}
+#endif
+// Independent continuous shortest path in the extruded rectilinear U. Only
+// its two reflex corners can bend a shortest planar path. The Z product then
+// adds its squared separation; no grid/native label data enters this oracle.
+double u_distance(Vec3 p,const Bone &bone) {
+  using P=std::array<double,2>;const double h=double(.01f);
+  std::array<P,3> points{P{p.x,p.y},P{2*h,2*h},P{3*h,2*h}};
+  auto inside=[&](P q){return q[0]>=-1e-8&&q[0]<=5*h+1e-8&&q[1]>=-1e-8&&q[1]<=20*h+1e-8&&
+    (q[1]<=2*h+1e-8||q[0]<=2*h+1e-8||q[0]>=3*h-1e-8);};
+  auto visible=[&](P a,P b){std::vector<double> cuts{0,1};
+    for(int axis=0;axis<2;++axis)for(double boundary:{0.,2*h,3*h,5*h,20*h})if(b[axis]!=a[axis]){double t=(boundary-a[axis])/(b[axis]-a[axis]);if(t>0&&t<1)cuts.push_back(t);}
+    std::sort(cuts.begin(),cuts.end());for(size_t i=1;i<cuts.size();++i){double t=(cuts[i-1]+cuts[i])*.5;if(!inside({a[0]+t*(b[0]-a[0]),a[1]+t*(b[1]-a[1])}))return false;}return true;};
+  auto distance=[](P a,P b){return std::hypot(a[0]-b[0],a[1]-b[1]);};
+  std::array<double,3> best{0,INFINITY,INFINITY};std::array<bool,3> done{};double planar=INFINITY;
+  for(int pass=0;pass<3;++pass){size_t at=3;for(size_t i=0;i<3;++i)if(!done[i]&&(at==3||best[i]<best[at]))at=i;done[at]=true;
+    P target{bone.rest.translation.x,std::clamp(points[at][1],double(bone.rest.translation.y),double(bone.rest.translation.y)+bone.length)};
+    if(visible(points[at],target))planar=std::min(planar,best[at]+distance(points[at],target));
+    for(size_t i=0;i<3;++i)if(!done[i]&&visible(points[at],points[i]))best[i]=std::min(best[i],best[at]+distance(points[at],points[i]));
+  }
+  return std::hypot(planar,double(p.z)-bone.rest.translation.z);
+}
+
+void authoring(const std::filesystem::path &out) {
+  std::filesystem::create_directories(out);
+  auto mesh=cells(arms(false),.01f);
+  unwrap(mesh,128,2);
+  Scene scene;
+  const auto reference=scene.active().id;
+  scene.active().painted=std::make_shared<PaintedMesh>(mesh,128);
+  scene.active().mesh_active=true;
+  DeformationState fitted(mesh);
+  fitted.skeleton=pair(.04f,.03f,.14f);
+  scene.set_deformation(reference,fitted);
+  auto add=[&](std::string name,Mesh geometry){
+    auto id=scene.add(std::move(name),Volume{});
+    auto &object=scene.object(id);
+    object.mesh_active=true;
+    object.painted=std::make_shared<PaintedMesh>(std::move(geometry),128);
+    return id;
+  };
+  const auto first=add("Closed accessory",mesh), second=add("Reflected closed accessory",mesh);
+  auto &paint=*scene.object(first).painted;
+  paint.add_layer("Original pigment");
+  Brush dab;
+  dab.from=dab.to=mesh.positions.front();
+  dab.radius=.025f;
+  PaintSettings pigment;
+  pigment.color={.12f,.55f,.8f,1.f};
+  pigment.front_only=false;
+  paint.begin_stroke();
+  paint.stamp(dab,pigment);
+  check(paint.end_stroke()&&paint.has_paint_data(),"Closed volume fixture has an actual authored pigment stroke");
+  DeformationState shape(mesh);
+  shape.morphs=MorphSet(mesh);
+  auto positions=mesh.positions;
+  for(auto &position:positions)position.z+=.002f;
+  shape.morphs->set_target(mesh,"Existing adjustment",positions);
+  shape.morph_weights={.4f};
+  scene.set_deformation(first,shape);
+  auto reflected=mesh;
+  for(auto &p:reflected.positions)p.x=-p.x;
+  for(auto &n:reflected.normals)n.x=-n.x;
+  for(size_t i=0;i<reflected.indices.size();i+=3){
+    std::swap(reflected.indices[i+1],reflected.indices[i+2]);
+    if(!reflected.uv_seams.empty())std::swap(reflected.uv_seams[i],reflected.uv_seams[i+2]);
+  }
+  auto &other=scene.object(second);
+  other.painted=std::make_shared<PaintedMesh>(std::move(reflected),128);
+  auto affine=AffineTransform{}.matrix();affine[0]=-1;
+  other.affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(affine));
+  scene.select(first);
+
+  SkinAuthoringOptions config;
+  config.mode=SkinAuthoringMode::VolumeGeodesic;
+  config.reference=reference;
+  config.volume_cell_size=.004f;
+  const auto before=scene.encode();
+  scene.save(out/"unbound.dsculpt");
+  auto single=scene;
+  check(author_skin(single,first,config),"Public volume method binds an explicit closed target");
+  single.save(out/"bound.dsculpt");
+  const auto weights=single.object(first).deformation->skin->encode();
+  const std::array targets{first,second};
+  auto expected=scene;
+  check(author_volume_skin(expected,targets,config),"Public volume method binds selected targets together");
+  for(auto id:targets){
+    const auto &object=expected.object(id);
+    check(object.deformation->skin->encode()==weights&&object.painted==scene.object(id).painted&&object.rig_source,
+          "World-equivalent reflected target retains geometry and the independent volume weights");
+  }
+  auto invalid=scene;
+  auto open=mesh;open.indices.resize(open.indices.size()-3);
+  if(!open.uv_seams.empty())open.uv_seams.resize(open.indices.size());
+  invalid.object(second).painted=std::make_shared<PaintedMesh>(std::move(open),128);
+  const auto invalid_before=invalid.encode();
+  rejects([&]{author_volume_skin(invalid,targets,config);},"An open target refuses the mixed batch");
+  check(invalid.encode()==invalid_before,"A rejected target leaves the whole previous batch intact");
+  check(expected.object(first).deformation->morphs->encode()==shape.morphs->encode()&&
+        expected.object(first).deformation->morph_weights==shape.morph_weights,"Volume weights preserve the existing active morph");
+  size_t polls=0;
+  rejects([&]{author_volume_skin(scene,targets,config,[&]{return ++polls==256;});},"Volume worker preparation observes cancellation");
+  check(polls==256&&scene.encode()==before,"Cancellation preserves the complete original scene");
+
+  Document document;
+  document.replace(scene);
+  document.select_objects(targets);
+  expected.select(second);
+  document.bind_skin_selected(config);
+  const auto saved=out/"bound-selected.dsculpt";
+  document.save_async(saved).get();
+  check(document.wait_asset()&&document.copy_scene().encode()==expected.encode()&&Scene::load(saved).encode()==expected.encode(),
+        "The volume worker publishes both targets and reopens the ordered Save exactly");
+  auto original=scene;original.select(second);
+  check(document.undo()&&document.copy_scene().encode()==original.encode()&&!document.frame().state->can_undo&&
+        document.redo()&&document.copy_scene().encode()==expected.encode(),"Volume selection bind is one exact Undo and Redo");
+}
+}
+int main(int argc,char **argv)try{
+  if(argc==3&&std::string_view(argv[1])=="--authoring"){authoring(argv[2]);return 0;}
+  auto source=cells(arms(false),.01f);auto before=source;auto rig=pair(.04f,.03f,.14f);auto o=options();detail::VolumeBindingReport report;
+  auto bound=detail::volume_bind_native(source,rig,o,{},&report);
+  float leak=0;for(size_t i=0;i<source.positions.size();++i)leak=std::max(leak,weight(bound.vertices[i],source.positions[i].x<.025f?1:0));
+  std::cout<<"VOLUME grid="<<report.grid_points<<" interior="<<report.interior_points<<" components="<<report.volume_components<<" work="<<report.work<<" planned="<<report.peak_planned_bytes<<" wrong_limb="<<leak<<'\n';
+  check(report.volume_components==2&&leak==0,"Nearby disconnected thin solids have exact independent internal-bone influence");
+#ifdef DOME_TEST_VOLUME_GPU
+  check(report.gpu_passes>0&&report.gpu_relaxations==report.gpu_passes*(report.interior_points+source.positions.size()),
+        "The selected GPU propagated every completed field");
+  auto starved=o;
+  starved.maximum_gpu_relaxations=1;
+  auto marker=report;
+  bool refused=false;
+  try{detail::volume_bind_native(source,rig,starved,{},&marker);}
+  catch(const std::length_error &error){refused=std::string_view(error.what()).find("GPU propagation budget")!=std::string_view::npos;}
+  check(refused&&marker.work==report.work&&marker.gpu_passes==report.gpu_passes,
+        "A device propagation budget failure publishes no partial report or host result");
+  device_cancellation();
+#endif
+  auto old=automatic_bind(source,rig,o.binding);float old_leak=0;for(size_t i=0;i<source.positions.size();++i)old_leak=std::max(old_leak,weight(old.vertices[i],source.positions[i].x<.025f?1:0));
+  std::cout<<"SURFACE wrong_limb="<<old_leak<<'\n';check(old_leak>.1f,"Existing surface seed control detects cross-gap influence on the same physical input");
+  auto pose=std::vector<JointTransform>{rig.bones[0].rest,rig.bones[1].rest};pose[1].translation.x+=.25f;
+  auto moved=deform_mesh(source,bound,rig,pose);double error=0;
+  for(size_t i=0;i<source.positions.size();++i){auto expected=source.positions[i];if(expected.x>.025f)expected.x+=.25f;error=std::max(error,double(length(moved.positions[i]-expected)));}
+  check(error<1e-6,"Independent posed-limb oracle preserves one solid while translating only the other");
+  check(same_positions(source,before),"Volume binding leaves source topology, positions and UVs unchanged");
+  for(auto phase:{std::array<float,3>{.1f,.2f,.3f},std::array<float,3>{.9f,.8f,.7f}}){auto next=o;next.grid_phase=phase;auto w=detail::volume_bind_native(source,rig,next);check(w.encode()==bound.encode(),"Grid-phase changes preserve exact separate-solid skin ownership");}
+  auto fine=o;fine.cell_size=.0025f;check(detail::volume_bind_native(source,rig,fine).encode()==bound.encode(),"Refinement preserves independent thin-solid ownership");
+  auto seam=cells(arms(false),.01f,true);auto sw=detail::volume_bind_native(seam,rig,o);bool seam_ok=true;
+  for(size_t i=0;i<seam.positions.size();++i)seam_ok&=weight(sw.vertices[i],seam.positions[i].x<.025f?0:1)==1;
+  check(seam_ok,"Original seam-duplicated vertices retain distinct IDs and correct volume influences");
+  auto reversed=source;for(size_t c=0;c<reversed.indices.size();c+=3)std::swap(reversed.indices[c+1],reversed.indices[c+2]);
+  check(detail::volume_bind_native(reversed,rig,o).encode()==bound.encode(),"Globally reversed closed orientation retains odd-even volume semantics");
+  auto open=source;open.indices.resize(open.indices.size()-3);rejects([&]{detail::volume_bind_native(open,rig,o);},"Open geometry is refused without substituting surface weighting");
+  auto precision=cells({{0,0,0},{100,0,0}},.01f);
+  for(auto &p:precision.positions)if(p.x==.01f)p.x=std::ldexp(1.f,-30);
+  bool collapse=false;
+  try{detail::volume_bind_native(precision,rig,o);}
+  catch(const std::invalid_argument &error){collapse=std::string_view(error.what()).find("collapses distinct vertices")!=std::string_view::npos;}
+  check(collapse,"Recentering cannot weld distinct binary32 positions together");
+  auto coarse=o;coarse.cell_size=.015f;rejects([&]{detail::volume_bind_native(source,rig,coarse);},"Under-resolved thin solids are explicitly refused");
+  auto budget=o;budget.binding.maximum_work=20;rejects([&]{detail::volume_bind_native(source,rig,budget);},"Construction obeys the explicit work budget");
+  budget=o;budget.maximum_grid_points=20;rejects([&]{detail::volume_bind_native(source,rig,budget);},"Grid budget is enforced before allocating its cells");
+  budget=o;budget.maximum_bytes=4096;rejects([&]{detail::volume_bind_native(source,rig,budget);},"Memory budget is enforced before detached mesh/container copies");
+  unsigned polls=0;rejects([&]{detail::volume_bind_native(source,rig,o,[&]{return ++polls>12;});},"Actual construction cancellation returns no partial result");
+  check(same_positions(source,before),"All refusals retain the complete original input geometry");
+  auto nondeform=rig;nondeform.bones[1].deform=false;rejects([&]{detail::volume_bind_native(source,nondeform,o);},"A disconnected component cannot borrow a nondeforming bone seed");
+  auto u=cells(arms(true),.01f);auto uo=o;if(argc>=2)uo.cell_size=std::stof(argv[1]);uo.binding.maximum_work=500'000'000;
+  auto oracle_u=u;auto u_rig=rig;std::string mode=argc>=3?argv[2]:"default";
+  if(mode=="phase1")uo.grid_phase={.1f,.2f,.3f};
+  if(mode=="phase2")uo.grid_phase={.9f,.8f,.7f};
+  if(mode=="reverse")for(size_t c=0;c<u.indices.size();c+=3)std::swap(u.indices[c+1],u.indices[c+2]);
+  if(mode=="alternate")for(size_t c=0;c<u.indices.size();c+=6){auto a=u.indices[c],b=u.indices[c+1],d=u.indices[c+2],e=u.indices[c+5];u.indices[c]=a;u.indices[c+1]=b;u.indices[c+2]=e;u.indices[c+3]=b;u.indices[c+4]=d;u.indices[c+5]=e;}
+  if(mode=="rotate"){
+    for(auto&p:u.positions){auto old=p;p={-old.y,old.x,old.z};}
+    for(auto&n:u.normals){auto old=n;n={-old.y,old.x,old.z};}
+    for(auto&bone:u_rig.bones){auto t=bone.rest.translation;bone.rest.translation={-t.y,t.x,t.z};bone.rest_matrix=RigMatrix{0,1,0,0,-1,0,0,0,0,0,1,0,-t.y,t.x,t.z,1};}
+  }
+  std::cout<<"U_MODE "<<mode<<'\n';
+  detail::VolumeBindingReport ur;auto started=std::chrono::steady_clock::now();auto uw=detail::volume_bind_native(u,u_rig,uo,{},&ur);double seconds=std::chrono::duration<double>(std::chrono::steady_clock::now()-started).count();float tip_leak=0;double reference_leak=0,field_error=0;Vec3 worst{};double actual_worst=0,expected_worst=0;
+  double scale=std::max(double(rig.bones[0].length),double(rig.bones[1].length))*.02;
+  for(size_t i=0;i<u.positions.size();++i){auto p=oracle_u.positions[i];double a=u_distance(p,rig.bones[0]),b=u_distance(p,rig.bones[1]);double w0=1/(1+std::pow((a+scale)/(b+scale),o.binding.falloff));double e=std::abs(weight(uw.vertices[i],0)-w0);if(e>field_error){field_error=e;worst=p;actual_worst=weight(uw.vertices[i],0);expected_worst=w0;}if(p.y>.15f){tip_leak=std::max(tip_leak,weight(uw.vertices[i],p.x<.025f?1:0));reference_leak=std::max(reference_leak,p.x<.025f?1-w0:w0);}}
+  std::cout<<"U_CELL "<<uo.cell_size<<" grid="<<ur.grid_points<<" interior="<<ur.interior_points<<" work="<<ur.work<<" planned_bytes="<<ur.peak_planned_bytes<<" gpu_passes="<<ur.gpu_passes<<" gpu_relaxations="<<ur.gpu_relaxations<<" total_kernel_seconds="<<seconds<<'\n';
+  std::cout<<"U_TIP wrong_limb="<<tip_leak<<" continuous_reference="<<reference_leak<<" max_field_error="<<field_error<<" worst="<<worst.x<<','<<worst.y<<','<<worst.z<<" actual="<<actual_worst<<" expected="<<expected_worst<<'\n';
+  check(reference_leak<.03,"Independent continuous volume weighting meets the unchanged U-tip intent");
+  check(tip_leak<.03f,"Connected U limbs propagate through the material base instead of crossing the air gap");
+  check(field_error<.01,"Discrete weights remain within one percentage point of the independent continuous U field");
+  if(argc==4){
+    std::ofstream field(argv[3]);
+    field << uw.encode() << '\n';
+    field.close();
+    check(bool(field),"The measured U weights were saved for independent comparison");
+  }
+  std::cout<<"PASS "<<checks<<" private volume binding checks\n";return 0;
+}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

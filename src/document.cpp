@@ -711,7 +711,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   }
   state_.can_configure_skin=skin_target_ready_locked() && !skin_sources_locked(SkinAuthoringMode::Automatic).empty();
   state_.can_bind_skin=skin_target_ready_locked() && !state_.skin_sources.empty() &&
-    !(state_.skin_options.mode==SkinAuthoringMode::SurfaceHeat&&state_.selected_objects.size()>1&&!selected_skin_ready_locked(SkinAuthoringMode::SurfaceHeat));
+    !(detail::skin_binds_selection(state_.skin_options.mode)&&state_.selected_objects.size()>1&&!selected_skin_ready_locked(state_.skin_options.mode));
   state_.can_retopologize = !state_.polygon && !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy &&
       !control_before_ && !action_active_locked() && object_editable_locked(active.id) &&
       scene_.objects().size() < 256 && (active.mesh_active || !active.volume->voxels().empty());
@@ -2599,7 +2599,8 @@ void Document::finish_control_locked(bool accept) {
       else if(c.parameter==VrParameter::SkinDistances) {
         options.seed_distance=skin_distance_metres(c.value[0]);
         options.seed_margin=skin_distance_metres(c.value[1]);
-        options.transfer_distance=skin_distance_metres(c.value[2]);
+        if(options.mode==SkinAuthoringMode::VolumeGeodesic)options.volume_cell_size=detail::volume_skin_cell_metres(c.value[2]);
+        else options.transfer_distance=skin_distance_metres(c.value[2]);
       } else if(c.parameter==VrParameter::SkinFalloff) options.falloff=c.value[0];
       else if(c.parameter==VrParameter::SkinInfluences) options.limits.max_influences=uint32_t(std::lround(c.value[0]));
       else if(c.parameter==VrParameter::SkinPrune) options.limits.prune=c.value[0];
@@ -2813,13 +2814,17 @@ void Document::control_event_locked(VrControlEvent event) {
       c.value[0]=found==ids.end()?0:float(found-ids.begin());break;
     }
     case VrParameter::SkinMode: {
-      c.title="Method: Legacy / transfer / source / Automatic";
-      c.maximum=3;
+      c.title="Skin binding method";
+      c.maximum=detail::last_skin_method;
       c.value[0]=float(detail::skin_method_choice(state_.skin_options.mode));break;
     }
-    case VrParameter::SkinDistances:
-      c.title=state_.skin_options.mode==SkinAuthoringMode::SurfaceHeat?"Seed radius (world mm)":"Seed / margin / transfer (world mm)";c.components=state_.skin_options.mode==SkinAuthoringMode::SurfaceHeat?1:3;
-      c.value={skin_distance_slider(state_.skin_options.seed_distance),skin_distance_slider(state_.skin_options.seed_margin),skin_distance_slider(state_.skin_options.transfer_distance),0};break;
+    case VrParameter::SkinDistances: {
+      const auto &options=state_.skin_options;
+      const bool volume=options.mode==SkinAuthoringMode::VolumeGeodesic;
+      c.title=options.mode==SkinAuthoringMode::SurfaceHeat?"Seed radius (world mm)":volume?"Seed / margin / cell (world mm)":"Seed / margin / transfer (world mm)";
+      c.components=options.mode==SkinAuthoringMode::SurfaceHeat?1:3;
+      c.value={skin_distance_slider(options.seed_distance),skin_distance_slider(options.seed_margin),volume?detail::volume_skin_cell_slider(options.volume_cell_size):skin_distance_slider(options.transfer_distance),0};break;
+    }
     case VrParameter::SkinFalloff:
       c.title="Automatic bind distance falloff";c.minimum=1;c.maximum=8;c.value[0]=state_.skin_options.falloff;break;
     case VrParameter::SkinInfluences:
@@ -3335,7 +3340,7 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
   if(command==SpatialCommand::ClearBake)return !control_before_ && bake_target_ready_locked() && detail::texture_set_bake_present(active_texture_set(scene_.active()));
   if(command==SpatialCommand::BindSkin) return !control_before_ && skin_target_ready_locked() &&
     !skin_sources_locked(state_.skin_options.mode).empty() &&
-    !(state_.skin_options.mode==SkinAuthoringMode::SurfaceHeat&&state_.selected_objects.size()>1&&!selected_skin_ready_locked(SkinAuthoringMode::SurfaceHeat));
+    !(detail::skin_binds_selection(state_.skin_options.mode)&&state_.selected_objects.size()>1&&!selected_skin_ready_locked(state_.skin_options.mode));
   if(command==SpatialCommand::SkinUseLocks) return !control_before_ && skin_target_ready_locked() && state_.can_paint_weights;
   if (uv_solving_ && (command == SpatialCommand::Undo || command == SpatialCommand::Redo)) return false;
   if (command >= SpatialCommand::WeightToggle && command <= SpatialCommand::WeightLinked)
@@ -3585,7 +3590,7 @@ void Document::command_locked(SpatialCommand command) {
       auto options=state_.skin_options;
       if(state_.skin_use_locks && state_.can_paint_weights) options.locks=state_.weights.locks;
       else options.locks.clear();
-      const bool selected=options.mode==SkinAuthoringMode::SurfaceHeat&&state_.selected_objects.size()>1;
+      const bool selected=detail::skin_binds_selection(options.mode)&&state_.selected_objects.size()>1;
       queue_bind_skin_locked(std::move(options),{},selected,selected?state_.selected_objects:std::vector<uint64_t>{});
     }
     return;
