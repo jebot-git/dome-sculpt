@@ -350,6 +350,18 @@ variant carries its own base color, shade, normal and emission maps and the
 certified tangent stream.
 [Original material GPU sampling and export evidence](validation/retopo-original-material-gpu-20261128.json)
 
+Standard and Editable GLB also keep the MToon 1 variant on a standalone
+static patch with native color and material-relative emission paint. The
+selected GPU composites the writable paint and coverage over the material
+factors, including at 64 texels, when the patch has no Core source atlas.
+The export worker resolves the typed base, shared shade and emission over
+that composite and certifies their filtering across the emitted UV triangles.
+The variant carries its original typed normal map and the Editable package
+restores the original visible and hidden layers. This export path still needs
+separate support for physical emission, retained Bakes and materials outside
+the existing static tangent and sampler proof.
+[Painted standalone MToon export evidence](validation/retopo-painted-standalone-20261128.json)
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.

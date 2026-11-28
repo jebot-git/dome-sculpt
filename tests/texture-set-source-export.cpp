@@ -2538,18 +2538,25 @@ PortableRetopoImages check_portable_retopo_mtoon(const std::filesystem::path &pa
        primitive.mappings[0].variant==0&&primitive.mappings[0].material!=primitive.material,
        "GLB has a selectable authored MToon variant and an independent Core PBR material");
  const auto &core=*primitive.material,&toon=*primitive.mappings[0].material;
- check(core.normal_texture.texture&&toon.normal_texture.texture&&core.normal_texture.texture!=toon.normal_texture.texture&&
+ const auto &source_maps=patch.painted->source_maps();
+ const bool core_normal=source_maps&&source_maps->normal.image;
+ check(bool(core.normal_texture.texture)==core_normal&&toon.normal_texture.texture&&
+       core.normal_texture.texture!=toon.normal_texture.texture&&
        core.occlusion_texture.texture&&core.pbr_metallic_roughness.metallic_roughness_texture.texture,
-       "The two portable materials keep separate normal images and the Core PBR occlusion and metallic roles");
+       "The portable materials keep each authored normal image and the Core PBR occlusion and metallic roles");
  std::ifstream stream(path,std::ios::binary);
  const std::vector<uint8_t> bytes{std::istreambuf_iterator<char>(stream),{}};
  const auto json=nlohmann::json::parse(bytes.begin()+20,bytes.begin()+20+word(bytes,12));
  const auto &typed=json.at("materials").at(&toon-data->materials);
  const auto &extension=typed.at("extensions").at("VRMC_materials_mtoon");
  const auto &binding=*patch.material_bindings;
- check(extension.at("specVersion")=="1.0"&&extension.contains("matcapTexture")&&extension.contains("rimMultiplyTexture")&&
-       extension.contains("shadingShiftTexture")&&
-       typed.at("extensions").at("KHR_materials_emissive_strength").at("emissiveStrength")==binding.material.parameters.emission_strength,
+ const auto &extensions=typed.at("extensions");
+ const auto has=[&](MToonSlot slot){return bool(binding.roles[size_t(slot)].image);};
+ check(extension.at("specVersion")=="1.0"&&extension.contains("matcapTexture")==has(MToonSlot::Matcap)&&
+       extension.contains("rimMultiplyTexture")==has(MToonSlot::Rim)&&
+       extension.contains("shadingShiftTexture")==has(MToonSlot::Shift)&&
+       extensions.value("KHR_materials_emissive_strength",nlohmann::json::object()).value("emissiveStrength",1.f)==
+           binding.material.parameters.emission_strength,
        "Portable MToon carries the actual typed roles and original emissive strength");
  check((extension.at("shadeMultiplyTexture").at("index")==typed.at("pbrMetallicRoughness").at("baseColorTexture").at("index"))==
            (!ink&&binding.roles[0].image==binding.roles[1].image),"The portable Base and Shade roles preserve the applicable shared or resolved samples");
@@ -2612,7 +2619,8 @@ void verify_mixed_retopo_sampling(const Scene &scene,const PortableRetopoImages 
  const auto &params=binding.material.parameters;
  const std::array shade_factor{params.shade_color.x,params.shade_color.y,params.shade_color.z};
  const std::array emission_factor{params.emission.x,params.emission.y,params.emission.z};
- const auto &core=*patch.painted->source_maps();
+ const PaintSourceMaps empty;
+ const auto &core=patch.painted->source_maps()?*patch.painted->source_maps():empty;
  const auto preview=scene.preview_surfaces();
  const auto view=std::ranges::find(preview,patch.id,&ObjectSurface::id);
  check(view!=preview.end()&&view->textures,"The native renderer's actual derived paint and coverage maps are available");
@@ -2676,6 +2684,52 @@ void verify_mixed_retopo_sampling(const Scene &scene,const PortableRetopoImages 
  std::cout<<"MIXED_MTOON painted="<<painted_samples<<" base_error="<<max_base<<" shade_error="<<max_shade
           <<" emission_error="<<max_emission<<" base_size="<<exported.mtoon_base.width<<" emission_size="
           <<exported.mtoon_emission.width<<" strength="<<params.emission_strength<<'\n';
+}
+
+void standalone_retopo_mtoon(const Scene &guide) {
+ const auto before=guide.encode();
+ Document doc;
+ doc.replace(guide);
+ ready(doc);
+ const auto draft_ready=[&] {
+  check(doc.wait_retopology(),"The native retopology worker finishes the edit");
+  const auto frame=doc.frame();
+  check(frame.state&&frame.state->retopology&&frame.state->retopology->error.empty(),
+        "The native retopology worker accepts the edit");
+ };
+ doc.begin_retopology();
+ draft_ready();
+ for (auto vertex:std::array<Vec3,4>{{{-.28f,-.22f,0},{.28f,-.22f,0},{.28f,.23f,0},{-.28f,.23f,0}}}) {
+  check(doc.begin_desktop(),"Desktop brush places a point on the posed reference");
+  Brush brush;brush.from=brush.to=vertex;brush.radius=.012f;
+  doc.stamp_desktop(brush);
+  doc.end_desktop();
+  draft_ready();
+ }
+ doc.edit_retopology(RetopoAction::Face);
+ draft_ready();
+ doc.end_retopology(true);
+ doc.save_async("standalone-patch.dsculpt").get();
+ ready(doc);
+ const auto accepted=doc.copy_scene();
+ const auto &patch=accepted.active();
+ check(patch.retopology&&patch.retopology->source==guide.active().id&&patch.material_bindings->has_mtoon&&
+       !patch.painted->source_maps()&&!patch.painted->baked()&&patch.painted->has_paint_data()&&
+       patch.painted->layers().size()==2&&!patch.painted->layers().back().visible,
+       "The accepted standalone patch owns visible and hidden paint without a Core texture atlas");
+ doc.export_asset("standalone-standard.glb",AssetExportFormat::Glb).get();
+ doc.export_asset("standalone-editable.glb",AssetExportFormat::EditableGlb256).get();
+ for (const auto *name:{"standalone-standard.glb","standalone-editable.glb"}) {
+  const auto exported=check_portable_retopo_mtoon(name,patch,true);
+  check(exported.mtoon_normal.rgba==patch.material_bindings->roles[size_t(MToonSlot::Normal)].image->rgba,
+        "The standalone paint export preserves the typed normal map byte for byte");
+  verify_mixed_retopo_sampling(accepted,exported,true);
+ }
+ check(doc.copy_scene().encode()==accepted.encode()&&Scene::load("standalone-editable.glb").encode()==accepted.encode()&&
+       Scene::load("standalone-patch.dsculpt").encode()==accepted.encode(),
+       "Both exports preserve the live project and the editable round trip restores every layer");
+ check(doc.undo()&&doc.copy_scene().encode()==before&&doc.redo()&&doc.copy_scene().encode()==accepted.encode(),
+       "Undo and Redo retain the exact native guide and accepted standalone patch");
 }
 
 void resize_retopo_paint(Document &doc,const Scene &original) {
@@ -3337,6 +3391,14 @@ int main(int argc,char **argv)try {
   retopology_imported_mtoon(variant=="tinted",variant=="unprepared"||variant=="mixed-ldr",
                             variant.starts_with("mixed-")||variant=="resize",variant=="resize");
   std::cout<<"PASS "<<checks<<" imported MToon retopology checks\n";
+  return 0;
+ }
+ if(argc==4&&mode=="--standalone-mtoon") {
+  const auto guide=Scene::load(argv[3]);
+  std::filesystem::create_directories(argv[2]);
+  std::filesystem::current_path(argv[2]);
+  standalone_retopo_mtoon(guide);
+  std::cout<<"PASS "<<checks<<" standalone MToon retopology and export checks\n";
   return 0;
  }
  if(argc==4&&mode=="--retained-retopology"){

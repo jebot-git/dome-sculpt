@@ -10,7 +10,8 @@
 using namespace dome;
 int main(int argc,char **argv)try {
   const bool prepared=argc==3 && std::string_view(argv[2])=="prepared";
-  const bool mtoon=argc==3 && std::string_view(argv[2])=="mtoon";
+  const bool painted_mtoon=argc==3 && std::string_view(argv[2])=="painted-mtoon";
+  const bool mtoon=painted_mtoon || (argc==3 && std::string_view(argv[2])=="mtoon");
   if(argc!=2 && !prepared && !mtoon)return 2;
   Mesh m;m.positions={{-.6f,-.6f,0},{.6f,-.6f,0},{.6f,.6f,0},{-.6f,.6f,0}};
   m.normals.assign(4,{0,0,1});m.uv={{0,0},{1,0},{1,1},{0,1}};m.indices={0,1,2,0,2,3};
@@ -26,7 +27,7 @@ int main(int argc,char **argv)try {
         {"pbrMetallicRoughness",{{"baseColorTexture",info(0)},{"baseColorFactor",o.material.color}}},
         {"normalTexture",info(2)},{"emissiveTexture",info(3)},{"emissiveFactor",{.3,.12,.08}},
         {"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"},
-            {"shadeColorFactor",{.55,.61,.64}},{"shadeMultiplyTexture",info(1)}}}}}},4);
+            {"shadeColorFactor",{.55,.61,.64}},{"shadeMultiplyTexture",info(painted_mtoon?0:1)}}}}}},4);
     binding->native_reference={o.material.color,o.material.emissive,int(o.material.alpha),
                                o.material.alpha_cutoff,o.material.double_sided};
     for(size_t role=0;role<4;++role){
@@ -39,6 +40,22 @@ int main(int argc,char **argv)try {
       binding->roles[role].image=std::make_shared<const Image>(std::move(image));
       binding->roles[role].wrap_s=33648;
       binding->roles[role].mag_filter=role==size_t(MToonSlot::Shade)?9728:9729;
+    }
+    if(painted_mtoon){
+      binding->roles[size_t(MToonSlot::Shade)]=binding->roles[size_t(MToonSlot::Base)];
+      Brush b;b.from=b.to={0,0,0};b.radius=.3f;b.normal={0,0,1};b.strength=.58f;
+      PaintSettings p;p.color={.02f,.08f,.44f,1};
+      o.painted->begin_stroke();o.painted->stamp(b,p);
+      if(!o.painted->end_stroke())throw std::runtime_error("MToon base stroke made no change");
+      p.channel=PaintChannel::Emission;p.emission={.035f,.04f,.03f};
+      o.painted->begin_stroke();o.painted->stamp(b,p);
+      if(!o.painted->end_stroke())throw std::runtime_error("MToon emission stroke made no change");
+      o.painted->layer_properties("Visible color and emission",true,.63f);
+      o.painted->add_layer("Hidden ink");
+      p.channel=PaintChannel::Color;p.color={.88f,.08f,.11f,1};
+      o.painted->begin_stroke();o.painted->stamp(b,p);
+      if(!o.painted->end_stroke())throw std::runtime_error("Hidden MToon stroke made no change");
+      o.painted->layer_properties("Hidden ink",false,.74f);
     }
     o.material_bindings=std::move(binding);
   }else{

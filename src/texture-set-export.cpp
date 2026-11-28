@@ -786,12 +786,16 @@ public:
 };
 
 using NativeTileEntry=std::pair<const PaintTile *,size_t>;
+bool legacy_grid(TextureSetGridMode mode) {
+ return mode==TextureSetGridMode::NativeLdr||mode==TextureSetGridMode::RetainedLdr;
+}
+
 paint_compute::Input material_grid_input(const PaintedMesh &paint,const Material &material,
     const SparseExportGrid &grid,const TextureSetLimits &limits,TextureSetGridMode mode){
  using namespace paint_compute;
  static_assert(sizeof(PaintPixel)==sizeof(Pixel)&&sizeof(PaintTile)==Input::tile_bytes);
  const bool typed=mode==TextureSetGridMode::NativeMToonHdr;
- const bool legacy=mode==TextureSetGridMode::RetainedLdr;
+ const bool legacy=legacy_grid(mode);
  const auto &bake=paint.baked();
  const bool normal=(mode==TextureSetGridMode::NativeHdr||typed)&&bake&&!bake->maps.normal.rgba.empty();
  Input input;
@@ -850,7 +854,7 @@ std::shared_ptr<TextureMaps> composite_device_grid(const PaintedMesh &paint,cons
     const SparseExportGrid &grid,const TextureSetLimits &limits,TextureSetGridMode mode,std::array<bool,2> covered){
  using namespace paint_compute;
  const bool typed=mode==TextureSetGridMode::NativeMToonHdr;
- const bool legacy=mode==TextureSetGridMode::RetainedLdr;
+ const bool legacy=legacy_grid(mode);
  const auto &bake=paint.baked();
  const auto input=material_grid_input(paint,material,grid,limits,mode);
  const auto count=grid.padding.size();
@@ -892,7 +896,7 @@ void charge_native_grid(const PaintedMesh &paint,const SparseExportGrid &grid,si
  const auto &baked=paint.baked();
  const bool normal=mode==TextureSetGridMode::NativeHdr&&baked&&!baked->maps.normal.rgba.empty();
  const bool typed=mode==TextureSetGridMode::NativeMToonHdr;
- const bool legacy_emission=mode==TextureSetGridMode::RetainedLdr;
+ const bool legacy_emission=legacy_grid(mode);
  charge(work,count,legacy_emission||typed?7:normal?4:3,limits.maximum_work);
  for(size_t at=0;at<count;++at){
   if((at&4095)==0)stop(limits);
@@ -983,7 +987,7 @@ size_t native_material_grid_bytes(const PaintedMesh &paint,TextureSetGridMode mo
  const auto &baked=paint.baked();
  const bool normal=mode==TextureSetGridMode::NativeHdr&&baked&&!baked->maps.normal.rgba.empty();
  const auto channels=mode==TextureSetGridMode::NativeMToonHdr?20:
-     mode==TextureSetGridMode::RetainedLdr?20:normal?12:8;
+     legacy_grid(mode)?20:normal?12:8;
  return sizeof(TextureMaps)+size_t(r)*r*channels+size_t(r/PaintTile::size)*(r/PaintTile::size)*sizeof(uint16_t);
 }
 
@@ -992,7 +996,7 @@ size_t native_material_grid_scratch_bytes(const PaintedMesh &paint,TextureSetGri
  using namespace paint_compute;
  const auto r=paint.resolution();
  const auto slots=size_t(r/PaintTile::size)*(r/PaintTile::size)*paint.layers().size();
- const auto per_pixel=sizeof(ColorInfo)+(mode==TextureSetGridMode::RetainedLdr||mode==TextureSetGridMode::NativeMToonHdr);
+ const auto per_pixel=sizeof(ColorInfo)+(legacy_grid(mode)||mode==TextureSetGridMode::NativeMToonHdr);
  return sizeof(Input)+paint.layers().size()*sizeof(Layer)+size_t(r)*r*per_pixel+
      slots*(sizeof(NativeTileEntry)+sizeof(uint32_t)+sizeof(std::span<const std::byte>))+
      std::min(slots,Input::native_upload_tiles)*Input::tile_bytes;
@@ -1002,7 +1006,7 @@ void charge_native_material_grid_work(const PaintedMesh &paint,size_t &work,cons
     TextureSetGridMode mode) {
  const SparseExportGrid grid(paint,work,limits);
  charge_native_grid(paint,grid,work,limits,mode);
- if(mode==TextureSetGridMode::RetainedLdr)(void)legacy_coverage(paint,work,limits);
+ if(legacy_grid(mode))(void)legacy_coverage(paint,work,limits);
 }
 
 std::shared_ptr<const paint_compute::MaterialAtlas> compile_resident_bake_grid(const PaintedMesh &paint,
@@ -1017,8 +1021,9 @@ std::shared_ptr<const paint_compute::MaterialAtlas> compile_resident_bake_grid(c
 std::shared_ptr<TextureMaps> compile_native_material_grid(const PaintedMesh &paint,const Material &material,
     size_t &work,const TextureSetLimits &limits,TextureSetGridMode mode) {
  const bool typed=mode==TextureSetGridMode::NativeMToonHdr;
+ const bool native=mode==TextureSetGridMode::NativeHdr||mode==TextureSetGridMode::NativeLdr||typed;
  const auto &baked=paint.baked();
- if(!((mode==TextureSetGridMode::NativeHdr||typed)?native_hdr_grid(paint):retained_color_grid(paint))||
+ if(!(native?native_hdr_grid(paint):retained_color_grid(paint))||
     (typed&&(!baked||baked->maps.normal.rgba.empty())))
   throw std::invalid_argument("Material grid compilation needs actual colour and normal owners");
  const auto bytes=native_material_grid_bytes(paint,mode);
@@ -1028,7 +1033,7 @@ std::shared_ptr<TextureMaps> compile_native_material_grid(const PaintedMesh &pai
  charge_native_grid(paint,grid,work,limits,mode);
  const auto count=grid.padding.size();
  const bool normal=mode==TextureSetGridMode::NativeHdr&&baked&&!baked->maps.normal.rgba.empty();
- const bool legacy_emission=mode==TextureSetGridMode::RetainedLdr;
+ const bool legacy_emission=legacy_grid(mode);
  const auto covered=legacy_emission?legacy_coverage(paint,work,limits):std::array<bool,2>{};
  if(compute_backend()!="CPU")return composite_device_grid(paint,material,grid,limits,mode,covered);
  auto maps=std::make_shared<TextureMaps>();
@@ -1983,12 +1988,12 @@ std::shared_ptr<const Image> compose_retopo_mtoon_role(const TextureSetView &fie
  const auto &p=effective.parameters;
  const auto &binding=*field.material_bindings;
  const bool color=role==MToonSlot::Base,shade=role==MToonSlot::Shade,emission=role==MToonSlot::Emission;
- const auto &core_maps=*field.painted->source_maps();
- const auto &generic=emission?core_maps.emission:core_maps.color;
+ const auto &core=field.painted->source_maps();
+ const auto *generic=core?(emission?&core->emission:&core->color):nullptr;
  const auto &typed=binding.roles[size_t(role)];
  if(typed.image&&!clamp_linear_mtoon_source(typed,effective.textures[size_t(role)]))return {};
- if(!hdr&&generic.image&&(!clamp_linear_mtoon_source(generic,MToonTexture{})||generic.texcoord!=0||
-      generic.uv_transform!=std::array<float,6>{1,0,0,1,0,0}))return {};
+ if(!hdr&&generic&&generic->image&&(!clamp_linear_mtoon_source(*generic,MToonTexture{})||generic->texcoord!=0||
+      generic->uv_transform!=std::array<float,6>{1,0,0,1,0,0}))return {};
  const auto factor=color?p.base_color:shade?std::array{p.shade_color.x,p.shade_color.y,p.shade_color.z,1.f}:
      std::array{p.emission.x,p.emission.y,p.emission.z,1.f};
  const auto &native=field.material;
@@ -1996,22 +2001,24 @@ std::shared_ptr<const Image> compose_retopo_mtoon_role(const TextureSetView &fie
  const auto *resolved=hdr?nullptr:emission?&maps.emission:&maps.color;
  const auto *coverage=hdr?nullptr:emission?&maps.emission_coverage:&maps.color_coverage;
  const auto r=field.painted->resolution();
- const RetopoPaintInputs input{role,typed.image.get(),hdr?nullptr:generic.image.get(),resolved,coverage,hdr,r,factor,native_factor};
+ const RetopoPaintInputs input{role,typed.image.get(),hdr||!generic?nullptr:generic->image.get(),
+     resolved,coverage,hdr,r,factor,native_factor};
  std::array<uint32_t,2> size{hdr?r:resolved->width,hdr?r:resolved->height};
- bool mixed=false;
- bool smaller_source=false;
+ bool mixed=false,smaller_source=false;
  for(const auto *image:{input.typed,input.generic,input.coverage})if(image){
   mixed|=image->width!=size[0]||image->height!=size[1];
   smaller_source|=image->width<r||image->height<r;
   size={std::max(size[0],image->width),std::max(size[1],image->height)};
  }
  const auto &mesh=field.painted->mesh();
- const bool unit_uv=smaller_source&&std::ranges::all_of(mesh.uv,[](const auto &uv){
+ // The standalone patch is certified over every cell its UV triangles can
+ // sample. Atlas borders outside those triangles have no rendered value.
+ const bool unit_uv=(smaller_source||!core)&&std::ranges::all_of(mesh.uv,[](const auto &uv){
   return uv[0]>=0&&uv[0]<=1&&uv[1]>=0&&uv[1]<=1;
  });
  const auto *sampled=unit_uv?&mesh:nullptr;
- // Every proof cell is split on the union of input and output texel-center
- // knots. A denser grid is useful only when the original phases differ.
+ // Every proof cell is split on the union of input and output texel centers.
+ // Mixed phases can benefit from a denser output grid.
  auto candidate=proof;
  auto result=raster_retopo_mtoon_role(input,p,size,sampled,candidate,remaining);
  if(!result&&mixed&&std::ranges::max(size)<=8192/3){
@@ -2035,26 +2042,33 @@ std::optional<PortableMToonSetPaint> compile_retopo_mtoon_paint(const TextureSet
  const auto r=paint.resolution();
  const bool shade=color&&mtoon_shared_shade(binding);
  const bool render_hdr=EmissionExportAccess::requires_preview(paint,field.material,&binding);
- const auto &core=*paint.source_maps();
- uint32_t width=r,height=r;
- for(const auto *view:{&core.color,&core.metal_rough,&core.occlusion,&core.emission})if(view->image){
-  width=std::max(width,view->image->width);
-  height=std::max(height,view->image->height);
- }
- // Reserve the largest applicable compositor grid before getting its bytes.
- // Each individual role accounts for its output and temporary proof rows.
- const size_t compositor_pixels=size_t(width)*height;
- charge(work,compositor_pixels,48+12*paint.layers().size(),remaining.maximum_work);
- charge(bytes,compositor_pixels,48,remaining.maximum_bytes);
+ const auto &core=paint.source_maps();
  std::optional<PaintEmissionSampler> coefficients;
  if(emission&&render_hdr){
   coefficients.emplace(paint,remaining.cancelled);
   charge(work,coefficients->index_work(),1,remaining.maximum_work);
  }
- // Colour always uses the native derived bytes, including the original Core
- // backdrop that the shader removes before inserting the typed role.
- const auto maps=render_hdr?
-     EmissionExportAccess::preview(paint,field.material,remaining.cancelled):paint.composite(field.material,remaining.cancelled);
+ // Compose the genuine writable grid even when the backdrop consists only
+ // of the native material factors. The typed textures have their own filter
+ // grid and enter the subsequent role proof.
+ std::shared_ptr<const TextureMaps> maps;
+ if(!core&&!render_hdr){
+  constexpr auto mode=TextureSetGridMode::NativeLdr;
+  charge(bytes,1,native_material_grid_bytes(paint,mode),remaining.maximum_bytes);
+  if(native_material_grid_scratch_bytes(paint,mode)>remaining.maximum_bytes-bytes)return {};
+  maps=compile_native_material_grid(paint,field.material,work,remaining,mode);
+ }else{
+  uint32_t width=r,height=r;
+  if(core)for(const auto *view:{&core->color,&core->metal_rough,&core->occlusion,&core->emission})if(view->image){
+   width=std::max(width,view->image->width);
+   height=std::max(height,view->image->height);
+  }
+  const size_t compositor_pixels=size_t(width)*height;
+  charge(work,compositor_pixels,48+12*paint.layers().size(),remaining.maximum_work);
+  charge(bytes,compositor_pixels,48,remaining.maximum_bytes);
+  maps=render_hdr?EmissionExportAccess::preview(paint,field.material,remaining.cancelled):
+      paint.composite(field.material,remaining.cancelled);
+ }
  remaining.maximum_work-=work;
  auto budget=remaining;
  budget.maximum_bytes-=bytes;
@@ -2132,12 +2146,12 @@ std::shared_ptr<const RetopoMToonExport> RetopoMToonExport::capture(const Sculpt
  if(!object.retopology||object.texture_sets||!object.mesh_active||object.deformation||
     !native_texture_set_mtoon(paint.get(),object.appearance.get(),binding.get())||
     binding->material.version()!=MToonVersion::V1||paint->in_stroke()||
-    (paint->has_paint_data()&&!paint->source_maps())||
     paint->baked()||paint->has_physical_emission()||binding->physical_emission)
   return {};
  const auto &params=binding->material.parameters;
  if(params.rotation_speed!=0||params.scroll!=std::array<float,2>{})return {};
  const auto &core=paint->source_maps();
+ if(!core&&paint->has_paint_data()&&!native_hdr_grid(*paint))return {};
  const auto &normal=binding->material.textures[size_t(MToonSlot::Normal)];
  // Both materials read the same explicit tangent attribute in a portable
  // primitive. The independently projected maps must use the same UV basis.

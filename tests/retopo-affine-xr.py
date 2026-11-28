@@ -110,6 +110,10 @@ for mode in ('accept','focus','unconfirmed'):
               all(old['image'] != new['image'] and new['image'] is not None and new['wrap'] == [33071,33071]
                   for old,new in zip(old_binding['roles'][:4],new_binding['roles'][:4])),
               mode+' captures the original MToon color, shade, normal and emission as independent patch maps')
+        painted=any(layer['visible'] and layer['tiles'] for layer in guide_paint['layers'])
+        if painted:
+            check(all(layer['tiles'] for layer in replacement['layers']),
+                  mode+' keeps the visible and hidden paint on the standalone MToon patch')
         if mode=='accept':
             glb=out/'mtoon-portable.glb'
             subprocess.run([str(binary),'--export-project',str(out/'accept.dsculpt'),str(glb)],
@@ -124,6 +128,12 @@ for mode in ('accept','focus','unconfirmed'):
                   'emissiveTexture' in material and 'baseColorTexture' in material['pbrMetallicRoughness'] and
                   'shadeMultiplyTexture' in material['extensions']['VRMC_materials_mtoon'],
                   'Standard GLB includes the authored MToon variant and its four sampled roles')
+            if painted:
+                bounds=material['extras']['domeSculptMToonPaint']
+                check(bounds['errorDomain']=='mesh-uv-triangles' and
+                      all(bounds[key]<=.008 for key in ('maximumLinearColorError','maximumLinearShadeError',
+                                                      'maximumLinearEmissionError')),
+                      'Standard GLB certifies color, shared shade and emission from the visible paint layers')
     patch=objects[1]['retopology'];topology=json.loads(patch['topology'])
     positions=sorted(v[1] for v in topology['vertices'])
     want=sorted([[-.2,-.2,0],[.2,-.2,0],[0,.2,0]])
