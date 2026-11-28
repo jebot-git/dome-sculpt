@@ -3,14 +3,18 @@
 #include "source-bake-normal.hpp"
 #include "bake-ray-query.hpp"
 #include "bake-paint-coordinates.hpp"
+#include "emission-bake-source.hpp"
+#include "source-uv-sampler.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake.hpp"
+#include "dome/brush.hpp"
 #include "dome/mesh-processing.hpp"
 #include "dome/normal-sampling.hpp"
 #include "dome/tangents.hpp"
 #include "dome/source-maps.hpp"
 #include "paint-overlay-sample.hpp"
 #include <algorithm>
+#include <bit>
 #include <cmath>
 #include <deque>
 #include <limits>
@@ -90,11 +94,13 @@ Channels material(const BakeMaterial &m, const Mesh &mesh, size_t triangle,
   if (!m.maps) return result;
   if(m.maps->source_only){
     const auto &raw=*m.maps->source_maps;
-    auto color=sample_surface_texture(mesh,raw,raw.color,triangle,bary,true),
-         orm=sample_surface_texture(mesh,raw,raw.metal_rough,triangle,bary,false),
-         emission=sample_surface_texture(mesh,raw,raw.emission,triangle,bary,true);
+    const auto color=sample_surface_texture(mesh,raw,raw.color,triangle,bary,true),
+               orm=sample_surface_texture(mesh,raw,raw.metal_rough,triangle,bary,false);
     for(int c=0;c<4;++c)result.color[c]*=color[c];
-    for(int c=0;c<3;++c)result.emission[c]*=emission[c];
+    if(!m.emission_batch){
+      const auto emission=sample_surface_texture(mesh,raw,raw.emission,triangle,bary,true);
+      for(int c=0;c<3;++c)result.emission[c]*=emission[c];
+    }
     result.roughness*=orm[1];result.metallic*=orm[2];
     if(raw.occlusion.image)result.ao=1-raw.occlusion_strength*(1-sample_surface_texture(mesh,raw,raw.occlusion,triangle,bary,false)[0]);
     if(m.maps->overlay){
@@ -107,10 +113,12 @@ Channels material(const BakeMaterial &m, const Mesh &mesh, size_t triangle,
     }
     return result;
   }
-  auto color=sample(m.maps->color,uv,m.repeat_uv,true), orm=sample(m.maps->metal_rough,uv,m.repeat_uv,false),
-       emission=sample(m.maps->emission,uv,m.repeat_uv,true);
+  const auto color=sample(m.maps->color,uv,m.repeat_uv,true), orm=sample(m.maps->metal_rough,uv,m.repeat_uv,false);
   for (int i=0;i<4;++i) result.color[i]=color[i]*(m.maps_are_composited?1:result.color[i]);
-  for (int i=0;i<3;++i) result.emission[i]=emission[i]*(m.maps_are_composited?1:result.emission[i]);
+  if(!m.emission_batch){
+    const auto emission=sample(m.maps->emission,uv,m.repeat_uv,true);
+    for (int i=0;i<3;++i) result.emission[i]=emission[i]*(m.maps_are_composited?1:result.emission[i]);
+  }
   result.roughness=orm[1]*(m.maps_are_composited?1:result.roughness);
   result.metallic=orm[2]*(m.maps_are_composited?1:result.metallic); result.ao=orm[0]; return result;
 }
@@ -190,6 +198,12 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o,
     const auto &m=source.materials[field];
     const bool owns_field=!retained.empty()&&bool(retained[field].sample);
     m.material.validate();
+    if(m.emission_batch){
+      const auto &batch=*m.emission_batch;
+      if(!m.resolved_emission||!batch.source.image||!batch.coordinates||!batch.resolve)
+        throw std::invalid_argument("GPU emission Bake requires a complete immutable source");
+      batch.source.validate(8);
+    }
     if(!m.resolved_emission&&(!owns_field||!retained[field].physical_emission)&&
        (detail::hdr_emission(m.material.emissive)||(!owns_field&&m.maps&&m.maps->overlay&&m.maps->overlay->native_geometry())))
       throw std::invalid_argument("Physical emission Bake requires its actual float sampling/output adapter");
@@ -394,6 +408,58 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   size_t pixels=size_t(o.resolution)*o.resolution;
   BakeResult result; result.coverage.resize(pixels);
   std::vector<std::array<float,3>> emission;if(float_emission)emission.resize(pixels);
+  using Sampler=detail::SourceUvSampler;
+  struct EmissionHit {
+    uint32_t material,triangle,texel;
+    std::array<float,3> bary;
+  };
+  const bool gpu_emission=compute_backend()!="CPU"&&std::ranges::any_of(source.materials,
+      [](const auto &m){return bool(m.emission_batch);});
+  const size_t emission_capacity=gpu_emission?std::min(Sampler::max_batch,pixels):0;
+  std::vector<EmissionHit> pending;
+  pending.reserve(emission_capacity);
+  std::vector<Sampler::Coordinate> emission_uv(emission_capacity);
+  std::vector<uint32_t> emission_words(4*emission_capacity);
+  uint32_t resident_material=UINT32_MAX;
+  std::unique_ptr<Sampler> resident_sampler;
+  auto flush_emission=[&]{
+    if(pending.empty())return;
+    cancel(o);
+    // Matching-topology and single-material bakes commonly arrive grouped.
+    if(!std::ranges::is_sorted(pending,{},&EmissionHit::material))
+      std::ranges::sort(pending,{},&EmissionHit::material);
+    for(size_t first=0;first<pending.size();){
+      const uint32_t slot=pending[first].material;
+      const auto &batch=*source.materials[slot].emission_batch;
+      size_t end=first;
+      while(end<pending.size()&&pending[end].material==slot){
+        if((end&1023)==0)cancel(o);
+        const auto &hit=pending[end];
+        const auto uv=batch.coordinates(hit.triangle,hit.bary);
+        emission_uv[end-first]={uv[0],uv[1]};
+        ++end;
+      }
+      if(slot!=resident_material){
+        // Hold one image upload at a time even when one target crosses
+        // several material sets. Neighboring batches may reuse it.
+        resident_sampler.reset();
+        resident_sampler=detail::upload_source_uv_sampler(batch.source,true,Sampler::Output::LinearRgba,
+            emission_capacity,Sampler::Transform::SourceAffine);
+        resident_material=slot;
+      }
+      const size_t count=end-first;
+      resident_sampler->read(std::span(emission_uv).first(count),std::span(emission_words).first(4*count));
+      cancel(o);
+      for(size_t i=0;i<count;++i){
+        const auto &hit=pending[first+i];
+        const auto *values=emission_words.data()+4*i;
+        emission[hit.texel]=batch.resolve(hit.triangle,hit.bary,
+            {std::bit_cast<float>(values[0]),std::bit_cast<float>(values[1]),std::bit_cast<float>(values[2])});
+      }
+      first=end;
+    }
+    pending.clear();
+  };
   if(o.encode_target_normal&&dual_normal)result.maps.mtoon_normal={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
   if (!o.writable.empty()) for (size_t i=0;i<pixels;++i) if (!o.writable[i]) result.coverage[i]=4;
   for (auto *image:{&result.maps.color,&result.maps.metal_rough,&result.maps.emission,&result.normal,&result.ambient_occlusion})
@@ -486,9 +552,14 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       const auto paint_uv=detail::bake_paint_coordinates(source_normals.paint_domain().get(),
           hit->triangle,hit->barycentric,high_uv);
       auto channels=material(m,source.mesh,hit->triangle,hit->barycentric,paint_uv); auto high_normal=normalized(hit->normal);
-      if(retained&&retained->emission)channels.emission=*retained->emission;
-      else if(m.resolved_emission)channels.emission=m.resolved_emission(hit->triangle,hit->barycentric);
-      if(float_emission)emission[at]=channels.emission;
+      if(float_emission){
+        if(retained&&retained->emission)emission[at]=*retained->emission;
+        else if(gpu_emission&&m.emission_batch){
+          pending.push_back({material_id,hit->triangle,uint32_t(at),hit->barycentric});
+          if(pending.size()==emission_capacity)flush_emission();
+        }else if(m.resolved_emission)emission[at]=m.resolved_emission(hit->triangle,hit->barycentric);
+        else emission[at]=channels.emission;
+      }
       auto pbr_color=m.maps&&m.maps->overlay?material(m,source.mesh,hit->triangle,hit->barycentric,paint_uv,true).color:channels.color;
       const bool resolved_source=m.maps&&!m.maps->pbr_color.rgba.empty();
       if(o.separate_pbr_color&&resolved_source)pbr_color=sample(m.maps->pbr_color,paint_uv,false,true);
@@ -593,6 +664,8 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   if (result.overlapping&&o.fail_on_overlap) throw std::runtime_error("Overlapping low UV coverage: "+std::to_string(result.overlapping)+" texels");
   if (result.missed&&o.fail_on_miss) throw std::runtime_error("Projection missed "+std::to_string(result.missed)+" low UV texels");
   if (!result.projected) throw std::runtime_error("No low UV texels projected onto the high source");
+  flush_emission();
+  resident_sampler.reset();
   if(o.progress)o.progress(.9f);
   cancel(o); if (o.padding) pad(result,o,emission); cancel(o);
   if(float_emission){

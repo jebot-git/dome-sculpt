@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "emission-bake-source.hpp"
+#include "mtoon-uv.hpp"
 #include "affine-surface.hpp"
 #include "bake-paint-coordinates.hpp"
 #include "baked-normal-field.hpp"
@@ -86,19 +87,22 @@ struct Source {
     for(size_t k=0;k<3;++k){const auto uv=values->at(mesh->indices[size_t(triangle)*3+k]);for(size_t c=0;c<2;++c)result[c]+=double(uv[c])*bary[k];}
     return {float(result[0]),float(result[1])};
   }
-  std::array<float,3> sample(uint32_t triangle,std::array<float,3> bary)const{
-    stop();auto original=background;
-    if(role.image&&!physical_background){
-      // PBR roles already name transported current carriers. Typed slots keep
-      // their original logical ordinal, including separately retained artist UV1.
-      auto uv=coordinates(triangle,bary,toon?mtoon_coordinate(toon->textures[size_t(MToonSlot::Emission)]):role.texcoord,bool(toon));
-      if(toon)uv=mtoon_uv(*toon,MToonSlot::Emission,uv,0);
-      // coordinates() has authenticated and resolved the actual source set.
-      // The ordinary image sampler accepts only a resolved coordinate pair;
-      // retain its affine/filter/image, without reinterpreting UV1 as UV0.
-      auto resolved=role;resolved.texcoord=0;
-      const auto value=sample_source_texture(resolved,uv[0],uv[1],true);
-      for(size_t k=0;k<3;++k){const double radiance=double(original[k])*value[k];if(radiance>std::numeric_limits<float>::max())throw std::overflow_error("Emission Bake source multiplication overflows FLOAT");original[k]=float(radiance);}
+  std::array<float,2> image_coordinates(uint32_t triangle,std::array<float,3> bary)const {
+    // PBR roles name transported current carriers; typed slots retain the
+    // logical ordinal and any separately captured artist UV1.
+    constexpr auto slot=MToonSlot::Emission;
+    const auto uv=coordinates(triangle,bary,toon?mtoon_coordinate(toon->textures[size_t(slot)]):role.texcoord,bool(toon));
+    return toon?mtoon_uv_validated(*toon,slot,uv,0,1):uv;
+  }
+  std::array<float,3> resolve(uint32_t triangle,std::array<float,3> bary,
+      std::array<float,3> image_value)const {
+    stop();
+    auto original=background;
+    for(size_t k=0;k<3;++k){
+      const double radiance=double(original[k])*image_value[k];
+      if(radiance>std::numeric_limits<float>::max())
+        throw std::overflow_error("Emission Bake source multiplication overflows FLOAT");
+      original[k]=float(radiance);
     }
     BakedEmissionSample replacement;
     if(packet){
@@ -108,6 +112,15 @@ struct Source {
       replacement.coverage=values[3][3];
     }
     return replacement.resolve(original,legacy_strength);
+  }
+  std::array<float,3> sample(uint32_t triangle,std::array<float,3> bary)const {
+    stop();
+    if(!role.image||physical_background)return resolve(triangle,bary,{1,1,1});
+    const auto uv=image_coordinates(triangle,bary);
+    auto resolved=role;
+    resolved.texcoord=0;
+    const auto value=sample_source_texture(resolved,uv[0],uv[1],true);
+    return resolve(triangle,bary,{value[0],value[1],value[2]});
   }
 };
 bool imported_baked_pbr(const SculptObject &object) noexcept {
@@ -726,7 +739,8 @@ std::shared_ptr<const TextureMaps> source_baked_preview(const SculptObject &obje
 }
 std::function<std::array<float,3>(uint32_t,std::array<float,3>)>
 emission_bake_source(const SculptObject &object,const std::function<bool()> &cancelled,
-    const SourceBakeNormalResolver *captured_normals){
+    const SourceBakeNormalResolver *captured_normals,std::shared_ptr<const EmissionBakeBatch> *batch){
+  if(batch)batch->reset();
   if(cancelled&&cancelled())throw std::runtime_error("Emission Bake cancelled");
   const auto &binding=object.material_bindings;
   std::optional<MToonMaterial> typed;
@@ -784,6 +798,17 @@ emission_bake_source(const SculptObject &object,const std::function<bool()> &can
   // Only const ownership escapes; no caller's mutable object/material is read
   // from the worker after this capture or from a rendering callback.
   std::shared_ptr<const Source> immutable=std::move(source);
+  if(batch&&immutable->role.image&&!immutable->physical_background){
+    auto work=std::make_shared<EmissionBakeBatch>();
+    work->source=immutable->role;
+    work->coordinates=[immutable](uint32_t triangle,std::array<float,3> bary){
+      return immutable->image_coordinates(triangle,bary);
+    };
+    work->resolve=[immutable](uint32_t triangle,std::array<float,3> bary,std::array<float,3> image){
+      return immutable->resolve(triangle,bary,image);
+    };
+    *batch=std::move(work);
+  }
   return [immutable](uint32_t triangle,std::array<float,3> bary){return immutable->sample(triangle,bary);};
 }
 } // namespace dome::detail

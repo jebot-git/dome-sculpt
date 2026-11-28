@@ -57,6 +57,19 @@ void check_mapped_sampler() {
    }
   }
  }
+ source.uv_transform={.813f,-1.375f,.625f,1.1673f,-.31f,.45f};
+ source.wrap_s=33648;
+ source.wrap_t=10497;
+ source.mag_filter=9729;
+ auto transformed=detail::upload_source_uv_sampler(source,true,Sampler::Output::LinearRgba,count,
+   Sampler::Transform::SourceAffine);
+ transformed->read(coordinates,colors);
+ bool exact=true;
+ for(size_t at=0;at<count;++at){
+  const auto expected=sample_source_texture(source,coordinates[at].u,coordinates[at].v,true);
+  for(size_t c=0;c<4;++c)exact&=colors[4*at+c]==std::bit_cast<uint32_t>(expected[c]);
+ }
+ check(exact,"Coupled source affine samples match ordered binary64 reference at arbitrary UVs");
 }
 std::shared_ptr<PaintSourceMaps> maps(){auto m=std::make_shared<PaintSourceMaps>();m->color.image=gradient();m->metal_rough.image=flat({64,96,128,255});m->emission.image=flat({32,64,128,255});m->normal.image=flat({255,128,128,255});m->occlusion.image=flat({96,0,0,255});for(auto view:{&m->color,&m->metal_rough,&m->emission,&m->normal,&m->occlusion}){view->min_filter=view->mag_filter=9728;view->wrap_s=view->wrap_t=33071;}m->normal_scale=.75f;m->occlusion_strength=.6f;return m;}
 SourceUvBakeInput input(std::shared_ptr<const PaintedMesh>paint){SourceUvBakeInput i;i.paint=paint;i.target=paint->mesh();for(auto &q:i.target.uv)q={1-q[1],q[0]};for(uint32_t n=0;n<i.target.positions.size();++n)i.source_vertices.push_back(n);return i;}

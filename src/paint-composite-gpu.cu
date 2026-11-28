@@ -30,9 +30,9 @@
 #include "paint-source-coordinate-kernel.hpp"
 #include "portable-normal-raster-kernel.hpp"
 #include "portable-normal-certificate-kernel.hpp"
-#include "source-uv-sampler-kernel.hpp"
 #include "dome/paint.hpp"
 #include "dome/source-maps.hpp"
+#include "source-uv-sampler-kernel.hpp"
 namespace dome {namespace {
 template<class E>void checked(E value){if(value!=DS_SUCCESS)throw std::runtime_error(DS_ERROR_TEXT(value));}
 __global__ void map_source_coordinates(paint_compute::SourceCoordinateBatch batch,uint32_t width,
@@ -81,11 +81,10 @@ class GpuSourceUvSampler final : public SourceUvSampler {
   MappedSourceImage source_;
 
 public:
-  GpuSourceUvSampler(const PaintSourceTexture &source, bool srgb, Output format, size_t capacity)
+  GpuSourceUvSampler(const PaintSourceTexture &source, bool srgb, Output format, size_t capacity,Transform transform)
       : SourceUvSampler(capacity, format), image_(source.image->rgba.size()), coordinates_(capacity),
         colors_(capacity * words(format)),
-        source_{image_.data, source.image->width, source.image->height,
-                source.wrap_s, source.wrap_t, source.mag_filter == 9728, srgb, format} {
+        source_(mapped_source_image(source,image_.data,srgb,format,transform)) {
     const auto &table = paint_compute::quantization();
     checked(DS_COPY(image_.data, source.image->rgba.data(), source.image->rgba.size(), DS_TO_DEVICE));
     checked(DS_COPY(table_.data, &table, sizeof(table), DS_TO_DEVICE));
@@ -103,8 +102,9 @@ private:
 }
 
 std::unique_ptr<SourceUvSampler> upload_source_uv_sampler(
-    const PaintSourceTexture &source, bool srgb, SourceUvSampler::Output format, size_t capacity) {
-  return std::make_unique<GpuSourceUvSampler>(source, srgb, format, capacity);
+    const PaintSourceTexture &source, bool srgb, SourceUvSampler::Output format, size_t capacity,
+    SourceUvSampler::Transform transform) {
+  return std::make_unique<GpuSourceUvSampler>(source, srgb, format, capacity, transform);
 }
 }
 namespace detail::portable_normal {

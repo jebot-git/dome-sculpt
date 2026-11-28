@@ -14,10 +14,11 @@ class ReferenceSourceUvSampler final : public SourceUvSampler {
   bool srgb_;
   Output format_;
 public:
-  ReferenceSourceUvSampler(const PaintSourceTexture &source, bool srgb, Output format, size_t capacity)
+  ReferenceSourceUvSampler(const PaintSourceTexture &source, bool srgb, Output format, size_t capacity,
+                           Transform transform)
       : SourceUvSampler(capacity, format), source_(source), srgb_(srgb), format_(format) {
     source_.texcoord = 0;
-    source_.uv_transform = {1, 0, 0, 1, 0, 0};
+    if(transform==Transform::ResolvedCoordinates)source_.uv_transform = {1, 0, 0, 1, 0, 0};
   }
 private:
   void dispatch(std::span<const Coordinate> pending, std::span<uint32_t> result) override {
@@ -41,8 +42,9 @@ private:
 };
 }
 std::unique_ptr<SourceUvSampler> upload_source_uv_sampler(
-    const PaintSourceTexture &source, bool srgb, SourceUvSampler::Output format, size_t capacity) {
-  return std::make_unique<ReferenceSourceUvSampler>(source, srgb, format, capacity);
+    const PaintSourceTexture &source, bool srgb, SourceUvSampler::Output format, size_t capacity,
+    SourceUvSampler::Transform transform) {
+  return std::make_unique<ReferenceSourceUvSampler>(source, srgb, format, capacity, transform);
 }
 }
 namespace dome::detail::portable_normal {

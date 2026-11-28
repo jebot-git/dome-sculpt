@@ -2,6 +2,7 @@
 #pragma once
 #include "scene.hpp"
 namespace dome {
+namespace detail { struct EmissionBakeBatch; }
 struct BakeMaterial {
   Material material;
   std::shared_ptr<const TextureMaps> maps;
@@ -14,6 +15,8 @@ struct BakeMaterial {
   // authoring captures immutable native/typed sources; it never supplies a
   // display RGB8 approximation. Nonempty selects resolved FLOAT Bake output.
   std::function<std::array<float,3>(uint32_t,std::array<float,3>)> resolved_emission;
+  // Worker-owned GPU image sampling for the same immutable source.
+  std::shared_ptr<const detail::EmissionBakeBatch> emission_batch;
 };
 struct BakeSource {
   Mesh mesh;

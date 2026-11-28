@@ -141,7 +141,7 @@ std::vector<detail::RetainedSourceBakeField> capture_texture_set_bake_source(
       source.material=field.material;
       source.material_bindings=field.material_bindings;
       source.appearance=field.appearance;
-      material.resolved_emission=detail::emission_bake_source(source,cancelled);
+      material.resolved_emission=detail::emission_bake_source(source,cancelled,nullptr,&material.emission_batch);
       material.maps=material.resolved_emission
         ? detail::EmissionExportAccess::preview(*field.painted,field.material,cancelled)
         : field.painted->preview(field.material,cancelled);
@@ -387,7 +387,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   if(source.texture_sets)source_fields=capture_texture_set_bake_source(high,source,relative,placement,retained_pose);
   else{
     high.materials[0].material=source.material;
-    high.materials[0].resolved_emission=detail::emission_bake_source(source,cancelled,&source_normals);
+    auto &material=high.materials[0];
+    material.resolved_emission=detail::emission_bake_source(source,cancelled,&source_normals,&material.emission_batch);
   }
   std::vector<Tangent> placed_corners;
   if(placement&&!source_normals&&std::any_of(high.materials.begin(),high.materials.end(),[](const auto &field){

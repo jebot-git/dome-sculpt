@@ -49,6 +49,29 @@ int main(int argc,char**argv)try{
  // Logical artist UV1 mirrors U: (.2,.5), independent of PBR carrier1.
  const float typed_error=error(typed_actual,{1.8f,0,.4f});
  std::cout<<"EMISSION_DOMAIN typed logicalUV1 maximum_error="<<typed_error<<std::endl;
+ BakeSource mixed;
+ mixed.mesh=paint->mesh();
+ mixed.triangle_materials={0,1};
+ mixed.materials.resize(2);
+ for(size_t i=0;i<mixed.materials.size();++i){
+  const auto &donor=i==0?o:typed_source;
+  auto &material=mixed.materials[i];
+  material.maps=detail::raw_bake_source(donor);
+  material.material=donor.material;
+  material.resolved_emission=detail::emission_bake_source(donor,{},nullptr,&material.emission_batch);
+  check(bool(material.emission_batch),"PBR and typed materials capture their actual emission image and UV owner");
+ }
+ BakeOptions mixed_options;
+ mixed_options.resolution=256;
+ mixed_options.padding=4;
+ mixed_options.ao_samples=0;
+ auto reference=mixed;
+ for(auto &material:reference.materials)material.emission_batch.reset();
+ const auto scalar_field=bake_mesh(raw,reference,mixed_options);
+ const auto batched_field=bake_mesh(raw,mixed,mixed_options);
+ check(scalar_field.emission_field->encode()==batched_field.emission_field->encode()&&
+       scalar_field.coverage==batched_field.coverage,
+       "Batches across mixed PBR and typed materials preserve exact FLOAT radiance and padding");
  for(size_t kind=0;kind<3;++kind){SourcePaintOptions limited;if(kind==0)limited.max_coordinate_bytes=1;else if(kind==1)limited.max_working_bytes=1;else limited.max_work=1;
   check(refuses([&]{prepare_source_paint(original,atlas,ids,authored,limited);})&&scene.encode()==before,"Prospective independent-source coordinate/working/work quota changed source");}
  size_t capture_polls=0;bool cancel=false;auto cancellable=detail::emission_bake_source(o,[&]{++capture_polls;return cancel;});cancel=true;

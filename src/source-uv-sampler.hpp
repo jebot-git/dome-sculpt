@@ -16,6 +16,7 @@ class SourceUvSampler {
 public:
   struct Coordinate { float u, v; };
   enum class Output : uint8_t { Red, Green, Blue, Alpha, LinearRgba, EncodedRgba };
+  enum class Transform { ResolvedCoordinates, SourceAffine };
   static constexpr size_t words(Output output) { return output == Output::LinearRgba ? 4 : 1; }
   static constexpr size_t max_batch = 16384;
   static constexpr size_t table_bytes = 2 * 256 * sizeof(float) + 256 * sizeof(uint32_t);
@@ -46,6 +47,7 @@ private:
   size_t words_per_sample_;
 };
 std::unique_ptr<SourceUvSampler> upload_source_uv_sampler(
-    const PaintSourceTexture &, bool srgb, SourceUvSampler::Output, size_t capacity);
+    const PaintSourceTexture &, bool srgb, SourceUvSampler::Output, size_t capacity,
+    SourceUvSampler::Transform = SourceUvSampler::Transform::ResolvedCoordinates);
 }
 }
