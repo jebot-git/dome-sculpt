@@ -1,0 +1,143 @@
+{
+  "date": "2026-11-28",
+  "product": "e9c683c590a67c86f31445c6c87f82d23de658e9",
+  "preceding": "fbbc780e04a4f0b8fa2ef1e17955e43b80c576e8",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Ambient occlusion rays for native Bake use the selected compute GPU and the existing source BVH.",
+  "oneapi_arc_release": {
+    "application_sha256": "e2b76ad13435b6589107d22e798d69f15c8ccf557d3fd40d7c648cec3697b2c5",
+    "focused": {
+      "passed": 15,
+      "junit_sha256": "42833329dc1a35f2a2853c9fc83d3535ea1bfb965cf9d1d271624a9549c2b836"
+    },
+    "complete_ctest_log_sha256": "e8635e30d1efc757633caf5c0414266337a99fd3ac863c5e66e23b41a493a928",
+    "no_device_refusal": "FAIL No device of requested type 'info::device_type::gpu' available.",
+    "kernel_bounds": {
+      "rays_per_batch": 65536,
+      "texels_per_batch": 8192,
+      "nodes_per_ray_per_invocation": 512
+    },
+    "perforated_ceiling_native_bake": {
+      "128": {
+        "projected_texels": 16384,
+        "ambient_rays": 1048576,
+        "total_rays": 1064960,
+        "ambient_byte_levels": 53,
+        "minimum_ambient_byte": 48,
+        "maximum_ambient_byte": 255,
+        "identical_project_sha256": "606a44657c9c108675ad27fa5406d3c71a63b89328cec89e25c37564de595995",
+        "seconds_with_cold_device_program": {
+          "preceding": [
+            0.470438
+          ],
+          "candidate": [
+            2.57049
+          ]
+        },
+        "median_seconds": {
+          "preceding": 0.470438,
+          "candidate": 2.57049
+        }
+      },
+      "512": {
+        "projected_texels": 262144,
+        "ambient_rays": 16777216,
+        "total_rays": 17039360,
+        "ambient_byte_levels": 53,
+        "minimum_ambient_byte": 52,
+        "maximum_ambient_byte": 255,
+        "identical_project_sha256": "1062add51b001620d6b2655bcf682c4e942dfceb7988d89ca197519b55d59b00",
+        "seconds_with_cold_device_program": {
+          "preceding": [
+            7.07712,
+            7.10466,
+            7.14954
+          ],
+          "candidate": [
+            5.50753,
+            5.3945,
+            5.56607
+          ]
+        },
+        "median_seconds": {
+          "preceding": 7.10466,
+          "candidate": 5.50753
+        }
+      }
+    }
+  },
+  "nested_wayland": {
+    "checks": 15,
+    "report_sha256": "3206993dcd5a5c556e4a8584dc324197fcbb72c60819d1efa07f2d98534a9aa7",
+    "oneapi_trace_sha256": "869d0934b3df162db15036a702d2f8c16de9f1c00c5a95818232b02d6fb68a89",
+    "successful_ambient_kernel_launches": {
+      "trace": 1,
+      "reduce": 1
+    },
+    "dma_buf_render_node": "/dev/dri/renderD129",
+    "exact_active_set_save_clear_and_undo": true
+  },
+  "synthetic_openxr": {
+    "bake-cage-xr": {
+      "checks": 21,
+      "report_sha256": "7e8949de5105428d14cf8e2622a4a7e9dc383648aea4783a7307d96be63d48ff",
+      "accepted_project_sha256": "ad45bc1cb2727b0bd42ba47a86ad3b44bf06c347406a43efbb240e781055ba89",
+      "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_submissions": 86,
+      "images_acquired_waited_and_released": 172
+    },
+    "bake-recipes-xr": {
+      "checks": 22,
+      "report_sha256": "f48e8a4a93ca396c1595859d68ea0c7b859f811f300db398dbcbc98c32e823b9",
+      "accepted_project_sha256": "c497a7a385907bb3cbe0d7901b0a6aaba2b2a342fe45a1bdb4fd78fc24581b8d",
+      "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_submissions": 86,
+      "images_acquired_waited_and_released": 172
+    },
+    "texture-set-active-bake-openxr": {
+      "checks": 19,
+      "report_sha256": "adabf84b795df8d36f9ed533335dab271845709f2d8d68cbd0741d595311b18b",
+      "accepted_project_sha256": "4391b246e47412949b07eebd2e969ddec55ae4e35552259cf0a172f1846412ef",
+      "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_submissions": 86,
+      "images_acquired_waited_and_released": 172
+    },
+    "mtoon-texture-set-bake-openxr": {
+      "checks": 19,
+      "report_sha256": "adabf84b795df8d36f9ed533335dab271845709f2d8d68cbd0741d595311b18b",
+      "accepted_project_sha256": "3840bb393dceb07f022228961663763fb333d2aac9dfb5876104b85ca0e1494a",
+      "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_submissions": 86,
+      "images_acquired_waited_and_released": 172
+    }
+  },
+  "headless_reference": {
+    "focused": {
+      "passed": 4,
+      "junit_sha256": "38daef251eb229bd65750270d207db68d0124aa8a6020c088c12b126b21235e5"
+    },
+    "scoped_asan_ubsan": {
+      "sources": [
+        "src/bake.cpp",
+        "src/mesh-processing.cpp",
+        "tests/bake.cpp"
+      ],
+      "log_sha256": "5f97a076663509509f84d1b1542ed3a9645be92af3b1f9ba81a2934e8690af3b"
+    }
+  },
+  "cuda_and_rocm": {
+    "cuda": {
+      "compiled_kernel_sha256": "a13d06535d9f4f45882f7c2cad1c5ec8913aa2ac250254f5aafbce89b3c8c54c",
+      "no_device_refusal": "CUDA driver version is insufficient for CUDA runtime version"
+    },
+    "rocm": {
+      "compiled_kernel_sha256": "f34cddecf0cfd0d769528a6283820c48bb3a2de62f52ee64d01ba364942e4d2a",
+      "no_device_refusal": "no ROCm-capable device is detected"
+    }
+  },
+  "limits": [
+    "Projection hit selection and rounding recovery, source material evaluation and native output publication still use their existing host paths.",
+    "The benchmark covers one synthetic donor and includes cold device startup. Small Bake jobs can have higher latency.",
+    "CUDA and ROCm compile and link the new kernel and refuse missing devices. Positive vendor hardware runs and physical headset testing remain open."
+  ]
+}

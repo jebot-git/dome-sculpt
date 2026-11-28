@@ -80,8 +80,11 @@ blocked-ray count per projected texel. Long traversals resume on the device
 between cancellation checks. The bake retains the original inclusive ray
 distance, material occlusion, coverage and ray budget. Intel Arc uses integer
 binary64 for the watertight test. Native Wayland and synthetic OpenXR qualify
-Bake and Save on Arc. Surface projection and its edge recovery still use the
-native host query.
+Bake and Save on Arc. Three paired 512² runs saved identical projects and
+reduced median Bake time from 7.10 to 5.51 seconds. The cold 128² fixture
+took 2.57 seconds with device startup and 0.47 seconds on the preceding
+revision. Surface projection and its edge recovery still use the native
+host query.
 [GPU ambient occlusion evidence](validation/bake-ambient-gpu-20261128.json)
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
