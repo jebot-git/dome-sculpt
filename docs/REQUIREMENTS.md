@@ -181,13 +181,15 @@ after a portable re-import. General portable painted color and animated
 emission transport remain open.
 [Prepared MToon emission evidence](validation/prepared-mtoon-hdr-20261128.json)
 
-Static prepared MToon1 HDR Bake supports a shared glTF base color role and
-independent shade. It emits the baked color, authored normal, ORM and
-emission atlas in Standard GLB, with exact native Save, Undo/Redo and
-recovery. The projection resolver preserves both original normal roles on
-misses. Shared-shade compilation, separately projected normal planes,
+Static prepared MToon1 HDR Bake supports a shared glTF base color role with
+independent or linked shade. It emits the baked color, authored normal, ORM
+and emission atlas in Standard GLB, with exact native Save, Undo/Redo and
+recovery. The GPU compiles linked shade to its own atlas. Shade beyond the
+portable range retains its native authoring data. The projection resolver
+preserves both original normal roles on misses. Separately projected normal planes,
 broader deformation and physical headset workflows remain open.
 [Prepared MToon1 Bake evidence](validation/prepared-mtoon-bake-20261128.json)
+[Linked MToon shade evidence](validation/prepared-mtoon-shared-shade-20261128.json)
 
 ## Current validation — 2026-11-27
 

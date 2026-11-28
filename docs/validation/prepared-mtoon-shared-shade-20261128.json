@@ -1,0 +1,112 @@
+{
+  "date": "2026-11-28",
+  "product": "cd0679a99a84c993ee89ce344ce8e1781eda6f8b",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "GPU-composited shared-shade atlas in Standard GLB for a static prepared imported MToon1 HDR Bake.",
+  "baseline_refused_same_baked_project": true,
+  "fixture": {
+    "size": 64,
+    "authored_base_has_zero_channel": true,
+    "source_partial_projection": true,
+    "native_sha256": "58bdcae8afbb17e91d3a4e8e6aad3537706934641389b03b1abdaef64d673414",
+    "exact_save_undo_redo_and_reexport": true,
+    "overbright_guard_preserves_existing_glb_and_following_save": true,
+    "maximum_portable_pixel_difference_bytes": 5,
+    "wrong_shade_reimport_pixel_difference_bytes": 44
+  },
+  "arc": {
+    "device": "Intel Arc A770 with oneAPI Level Zero and hardware EGL",
+    "checks": 694,
+    "bake_export_kernels": [
+      "launch_mapped_field",
+      "launch_material_sources",
+      "launch_material"
+    ]
+  },
+  "release_ctest": [
+    "baked-emission-native",
+    "emission-raster-finite-compute",
+    "source-material-raster-compute",
+    "emission-raster-mapped-compute",
+    "emission-raster-mapped-missing-gpu",
+    "emission-raster-texture-set-compute",
+    "baked-emission-workflow",
+    "baked-emission-source",
+    "baked-emission-uv1-worker",
+    "emission-export",
+    "emission-export-worker",
+    "source-paint-export",
+    "source-paint-bake",
+    "source-paint-authoring",
+    "source-paint-physical-authoring",
+    "surface-program-switch",
+    "mtoon-render",
+    "mtoon-texture-sets",
+    "mtoon-painted-texture-sets",
+    "mtoon-resized-texture-set",
+    "mtoon-baked-texture-sets",
+    "vrm1-source-export",
+    "raw-hdr-authoring",
+    "xr-editable-export",
+    "source-role-missing-uv1"
+  ],
+  "release_junit_sha256": "5c91e541ab5a85baf455c046de79a98034f94e5faf92a6ec75d7a25901f969a4",
+  "other_gpu_profiles": {
+    "cuda": "changed device kernel compiled",
+    "rocm": "changed device kernel compiled"
+  },
+  "asan_ubsan": {
+    "mode": "opt-in headless reference",
+    "checks": 694,
+    "export_matches_arc": true
+  },
+  "native_wayland": {
+    "checks": 7,
+    "artifact_sha256": "fbb0ea9d68f5013fb682b8e60d3c8dc974fed4faae0b5dc2c3e2474acd45ae51"
+  },
+  "openxr": {
+    "checks": 10,
+    "synthetic_tracking": true,
+    "artifact_sha256": "fbb0ea9d68f5013fb682b8e60d3c8dc974fed4faae0b5dc2c3e2474acd45ae51",
+    "native_sha256": "58bdcae8afbb17e91d3a4e8e6aad3537706934641389b03b1abdaef64d673414",
+    "focus_loss_cancelled_export": true
+  },
+  "release_cli_missing_gpu_preserves_existing_export": true,
+  "khronos": {
+    "prepared-mtoon-shared-shade-bake.glb": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 215700,
+      "sha256": "fbb0ea9d68f5013fb682b8e60d3c8dc974fed4faae0b5dc2c3e2474acd45ae51",
+      "errors": 0,
+      "warnings": 0
+    },
+    "prepared-mtoon-shared-shade-bake-portable.glb": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 214704,
+      "sha256": "7f267c88b2ed55fbe55fb63cf2c673e49393e59385458f10484fb55f95e0410e",
+      "errors": 0,
+      "warnings": 0
+    }
+  },
+  "official_mtoon_schema_validated": 2,
+  "prior_glbs_byte_identical": {
+    "prepared-mtoon-baked.glb": "930e295138979556aadc7505cec4397f62c781c538812cc5c849c5c1bf64a5a7",
+    "prepared-mtoon-hdr.glb": "55b80b4d2158b808a0db172236e4bbe6b938aea88cbf8790402abedf892e6062",
+    "prepared-mtoon-hdr-uv0.glb": "5821ff66098c95168efba401eada214444e2fdfa25ffe234113f6319a75abc88",
+    "baked-source-hdr.glb": "7a8d9dd3f41218ef527fe2fed9346a0607ca554d28ea1b10b2e328f939c95729",
+    "baked-generated-tangents-hdr.glb": "40b51a7c7cfe9259bd9f0c6ad8c66cfa95b9090b7661495dca255255d2ae4f70",
+    "baked-native-tangents-hdr.glb": "5c8f728a32c527c18eec64ad30f8aab5664e1dae3ae7158ea75c89696e826273",
+    "baked-mask-visible.glb": "7829e58d94294a184e1d04ef606a6511b10c12dd8c50bb343648c114401e61cf",
+    "baked-mask-hidden.glb": "b83e6cd6a27af1a137093069194dcf0a009b09e6618fd57efa66f5b9d442c218",
+    "baked-mask-mixed.glb": "679d0e26b8bcd883e9d3b3b34038fba217614469e96874d9130bdcea5b88d882",
+    "varying-source-hdr.glb": "497b70223ba5aeb39e6556950e824b471cc39714ff83de0966c42081cfaf9cc6",
+    "single-surface-hdr.glb": "54fe8dccaaf6fc0ba69ace992aade6199eaea18b60dc5aa19d6bd6a444527971",
+    "mixed-source.glb": "ff769fff8afebfb62309e67abf0bc5efc1843dc13151d909bb2d981ebe9c84fa",
+    "mixed-source-hidden.glb": "484678692c4aad88173eb79876d79241c09895fa3faf1a52c04020612a689f5d",
+    "uniform-mask-cross.glb": "98e526883365742fef5b60880641cb918d3f4b761424f88089ab9c3a948b1b9a"
+  },
+  "open": [
+    "Shade out of standard texture range, separately projected donor normal planes and animated UVs.",
+    "Physical-headset, CUDA and ROCm device qualification."
+  ]
+}

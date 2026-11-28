@@ -55,15 +55,20 @@ an additional retained UV set for the compiled emissive texture.
 
 Prepared static MToon1 HDR Bake uses the same package with a compiled
 base color, authored MToon normal, ORM and emission on the writable atlas.
-It requires the original shared glTF base role and independent shade
-sampling. The export encodes the combined normal in the emitted tangent
-frame while preserving separate shade and rim sampling. The selected GPU
-composites material and emission textures. Projection ray queries and normal
-encoding run on the host in this workflow. The native package
-keeps the independent original Core PBR and MToon normal frames, Bake
+It requires the original shared glTF base role. An independent shade
+role keeps its original sampler. When base and shade originally share
+a sampler, the selected GPU resolves a separate shade image on the writable
+atlas. The image includes the original shade factor and the ordered paint
+contribution, including the native rule for a zero base channel. The writer
+uses a neutral shade factor and reports an export error when a shade sample
+exceeds the standard texture range. The export encodes the combined normal
+in the emitted tangent frame and keeps the rim sampler. The selected GPU
+also composites the core material and emission textures. Projection ray
+queries and normal encoding run on the host. The native package keeps the
+independent original Core PBR and MToon normal frames, Bake
 coverage and absolute FLOAT donor radiance. An ordinary donor keeps its
-radiance regardless of the receiving material's emission gain. Shared
-shade, dual projected normal fields and animated UVs remain open.
+radiance regardless of the receiving material's emission gain. Dual
+projected normal fields and animated UVs remain open.
 
 ## First GLB implementation
 

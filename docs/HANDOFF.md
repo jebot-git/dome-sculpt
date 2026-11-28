@@ -560,9 +560,21 @@ the authored MToon normal and retains independent shade and rim sampling.
 The portable re-import matches the authored Arc A770 viewport within one
 output byte. All 25 focused Arc Release tests pass. Native DomeD Wayland,
 synthetic OpenXR and the release CLI export the same GLB byte for byte.
-Shared shade, separately projected donor normal planes and physical headset
-acceptance remain open.
+Separately projected donor normal planes and physical headset acceptance
+remain open.
 [Prepared MToon1 Bake evidence](validation/prepared-mtoon-bake-20261128.json)
+
+Prepared MToon1 Bake also exports linked base and shade. The GPU samples the
+original shared texture once and combines the shade contribution with the
+same ordered paint coverage as the base. The exported shade uses its own
+atlas and a neutral factor. When the resulting shade exceeds the standard
+texture range, the file worker preserves the previous GLB and the next native
+Save still includes the complete Bake. The Arc A770 re-import differs by at
+most five channel values out of 255. Substituting the baked base texture for
+shade increases the measured difference to 44. All 25 focused Release cases
+pass. The headless sanitizer reference and the native Wayland export produce
+the same GLB bytes as Arc.
+[Linked MToon shade evidence](validation/prepared-mtoon-shared-shade-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
