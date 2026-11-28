@@ -1,0 +1,454 @@
+{
+  "date": "2026-11-28",
+  "product": "30a92741c92586d6acf028dab0e3b031ec0be67e",
+  "preceding": "050768c16f32c034e7aee7529efa15f28844c793",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Standalone static MToon 1 retopology exports a certified HDR material with independent power-of-two emission and paint resolutions. The selected GPU samples both grids at the phase-aligned output centers.",
+  "arc_a770_release": {
+    "application_sha256": "75f3a21451697fd526b647b32484d82824871a55f6620aa1af1f572c216b2ec0",
+    "fltk_prefix": "/opt/fltk-vr/toolkit",
+    "bitmap_runtime_prefix": "/opt/fltk-vr/bdf-runtime",
+    "ctest": {
+      "cases": [
+        "retopology-prepared-affine-ui-fixture",
+        "retopology-mtoon-affine-ui-fixture",
+        "retopology-affine-ui-fixture",
+        "retopology-mixed-float-mtoon-affine-ui-fixture",
+        "retopology-painted-mtoon-affine-ui-fixture",
+        "retopology-float-mtoon-affine-ui-fixture",
+        "retopology-baked-mtoon-affine-ui-fixture",
+        "retopology-mixed-float-mtoon-affine-openxr",
+        "retopology-reapply-plain",
+        "bake",
+        "retopology-prepared-affine-openxr",
+        "retopology-imported-mtoon-resize",
+        "retopology-painted-mtoon-affine-openxr",
+        "retopology-mtoon-affine-openxr",
+        "retopology-baked-mtoon-affine-openxr",
+        "retopo",
+        "retopology-float-mtoon-affine-openxr",
+        "retopology-affine",
+        "retopology-affine-openxr",
+        "emission-raster-mapped-compute",
+        "retopology-authoring",
+        "emission-raster-finite-compute",
+        "retopology-worker-faults",
+        "retopology-history-openxr-apply",
+        "retopology-surface-heat-plain",
+        "retopology-surface-heat-affine",
+        "retopology-prepared-color-affine",
+        "retopology-held-admission",
+        "retopology-save-handoff",
+        "retopology-reapply-affine",
+        "retopology-history-openxr-cancel",
+        "texture-set-retained-retopology-affine",
+        "retopology-prepared-color-normal-uv-plain",
+        "retopology-imported-bake-resize",
+        "retopology-prepared-color-normal-uv-affine",
+        "retopology-prepared-detached-affine",
+        "retopology-imported-mtoon-painted",
+        "texture-set-mtoon-independent-paint",
+        "emission-raster-texture-set-compute",
+        "retopology-imported-mtoon-mixed-hdr",
+        "retopology-imported-mtoon-mixed-ldr",
+        "retopology-mixed-float-mtoon-native",
+        "retopology-prepared-color-normal-plain",
+        "retopology-prepared-color-normal-affine",
+        "retopology-prepared-color-normal-first",
+        "retopology-float-mtoon-native",
+        "texture-set-retained-retopology-plain",
+        "texture-set-mtoon-varying-alpha",
+        "retopology-prepared-color-plain",
+        "retopology-first-material-posed-affine",
+        "retopology-worker-reporter-recovery",
+        "retopology-first-material-affine",
+        "retopology-imported-mtoon-tinted",
+        "retopology-mtoon-affine",
+        "retopology-mtoon-bounded",
+        "retopology-mtoon-plain",
+        "retopology-mtoon-detached",
+        "retopo-edges",
+        "application-missing-gpu",
+        "retopology-first-material-posed-plain",
+        "retopology-first-material-plain",
+        "retopology-prepared-affine",
+        "retopology-prepared-plain",
+        "retopology-worker-accepted-publication",
+        "retopology-prepared-detached",
+        "retopology-affine-wire",
+        "retopology-mtoon-v0",
+        "texture-set-mtoon-derivative-tangent",
+        "retopology-first-prepared-posed-affine",
+        "retopology-baked-mtoon-native",
+        "retopology-imported-mtoon-unprepared",
+        "retopology-first-prepared-posed-plain",
+        "retopology-painted-mtoon-native",
+        "retopology-mixed-material",
+        "retopo-cancellation-boundaries",
+        "retopology-imported-pbr",
+        "compute-missing-gpu",
+        "retopology-imported-prior-bake",
+        "emission-raster-mapped-missing-gpu"
+      ],
+      "log_sha256": "1a5427b876ef899d714f52d3dedcd70b7d6a76ea0aaa557091e888c1ab6613a8"
+    },
+    "packed_radiance_oracle": {
+      "samples": 2018,
+      "trace_sha256": "4f71eac7a52779b72898ab5db2b5c5981cf77d8767f195eddf05c72bfd92a81b"
+    },
+    "byte_identical_baseline_files": {
+      ".dsculpt": 41,
+      ".glb": 53
+    },
+    "native": {
+      "checks": 91,
+      "gpu_trace_sha256": "d61b14589ac02a2ad0ae80e50f6956d692846b96ee102ac977da6440ae01c146",
+      "painted_uv_samples_per_export": 12587,
+      "maximum_measured_linear_error": {
+        "base": 0.00263318,
+        "shade": 0.00654316
+      },
+      "radiance_checks": {
+        "standard": {
+          "core_error": 0.00639367,
+          "mtoon_error": 0.00675619,
+          "maximum_view_difference": 0.139244,
+          "mtoon_proof_bound": 0.00724009
+        },
+        "editable": {
+          "core_error": 0.00620449,
+          "mtoon_error": 0.00675619,
+          "maximum_view_difference": 0.139288,
+          "mtoon_proof_bound": 0.00724009
+        },
+        "after-paint-resize": {
+          "core_error": 0.00690341,
+          "mtoon_error": 0.00710058,
+          "maximum_view_difference": 0.13965,
+          "mtoon_proof_bound": 0.00728399
+        }
+      },
+      "headless_same_input_files_bit_identical": [
+        "hidden-physical-standard.glb",
+        "resized-physical-editable.glb",
+        "standalone-editable.glb",
+        "standalone-patch.dsculpt",
+        "standalone-standard.glb"
+      ],
+      "headless_same_input_log_sha256": "59f05801e84f1cd3e5f24e0162509adbddb0f516ca257cd8938affa73a2672ae"
+    },
+    "wayland": {
+      "checks": 10,
+      "app_gpu_trace_sha256": "bc9a4e1ece60c9c9854aae9ed8799f770275a03b0aeced8a1f601630056d33ef",
+      "report_sha256": "af51d60fdae60f596a01732b880ceb7058aca3ce08c8e9baee4f7f2454a591b8",
+      "accepted_project_sha256": "7bf19b9ef6e6f64dff108b61fece97b63d60f3676691bd16c08b164beba23278"
+    },
+    "synthetic_openxr": {
+      "checks": 43,
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "report_sha256": "1ca5f4d99dcb0dfbed495c29b19a5ca08f7d9e5e929789b4936f03a8fcdd5701",
+      "accepted_project_sha256": "e0a9de425f97774a41faf619276e3d7d44cc72f6d2902618b12a48042ffe180a"
+    }
+  },
+  "glb_validation": {
+    "standalone-standard.glb": {
+      "glb_sha256": "8d2b54348e92fb35440ec981af052f5b857b6a648f45396999057ed1804953d6",
+      "validator": "2.0.0-dev.3.10",
+      "errors": 0,
+      "warnings": 0,
+      "log_sha256": "538fce9d2850bfff8bb7dd1e260c719431014d8452494d30c63dd1ca9218dce8",
+      "mtoon_continuous_bounds": {
+        "retopo_radiance": {
+          "betweenTexelErrorBound": 0.007240092373195143,
+          "erasedNonzeroSamples": 0,
+          "errorDomain": "mesh-uv-triangles",
+          "errorScope": "clamp-linear-level-zero",
+          "evaluation": "finite-current-authored-mtoon-retopology",
+          "lossless": false,
+          "maximumAbsoluteError": 0.007235169410705566,
+          "maximumRelativeError": 0.01382177336440256,
+          "units": "native-linear-radiance",
+          "unlitIgnoresEmission": false,
+          "version": 1
+        },
+        "material": {
+          "emissiveStrength": 1.6340101957321167,
+          "errorDomain": "mesh-uv-triangles",
+          "maximumAlphaError": 2e-06,
+          "maximumLinearColorError": 0.0027341896308094005,
+          "maximumLinearEmissionError": 0.007240092373195143,
+          "maximumLinearShadeError": 0.006782523255211613,
+          "maximumShadeInterpolationError": 0.0008110129380556043,
+          "maximumSourceFilterError": 7.463920598249603e-06,
+          "sampling": "clamp-linear-level-zero",
+          "version": 1
+        },
+        "emission_grid": 256,
+        "texture_offset": [
+          0.001953125,
+          0.001953125
+        ]
+      }
+    },
+    "standalone-editable.glb": {
+      "glb_sha256": "366f57fe684804dd76322a18e38155b82b7a9b3254046677500ac895fd53b2bb",
+      "validator": "2.0.0-dev.3.10",
+      "errors": 0,
+      "warnings": 0,
+      "log_sha256": "97ef73680da19034eff8e31edf94df7e2448593d2042623e5515a86824a9805d",
+      "mtoon_continuous_bounds": {
+        "retopo_radiance": {
+          "betweenTexelErrorBound": 0.007240092373195143,
+          "erasedNonzeroSamples": 0,
+          "errorDomain": "mesh-uv-triangles",
+          "errorScope": "clamp-linear-level-zero",
+          "evaluation": "finite-current-authored-mtoon-retopology",
+          "lossless": false,
+          "maximumAbsoluteError": 0.007235169410705566,
+          "maximumRelativeError": 0.01382177336440256,
+          "units": "native-linear-radiance",
+          "unlitIgnoresEmission": false,
+          "version": 1
+        },
+        "material": {
+          "emissiveStrength": 1.6340101957321167,
+          "errorDomain": "mesh-uv-triangles",
+          "maximumAlphaError": 2e-06,
+          "maximumLinearColorError": 0.0027341896308094005,
+          "maximumLinearEmissionError": 0.007240092373195143,
+          "maximumLinearShadeError": 0.006782523255211613,
+          "maximumShadeInterpolationError": 0.0008110129380556043,
+          "maximumSourceFilterError": 7.463920598249603e-06,
+          "sampling": "clamp-linear-level-zero",
+          "version": 1
+        },
+        "emission_grid": 256,
+        "texture_offset": [
+          0.001953125,
+          0.001953125
+        ]
+      }
+    },
+    "resized-physical-editable.glb": {
+      "glb_sha256": "fd0416dede06bc4f188e207d1e154f81672a2ef4d9855c116002bf0751910fd3",
+      "validator": "2.0.0-dev.3.10",
+      "errors": 0,
+      "warnings": 0,
+      "log_sha256": "61068fb55cd54319e747afe73aa8755cd7237eccc24afe424bb29dddd9c2ba09",
+      "mtoon_continuous_bounds": {
+        "retopo_radiance": {
+          "betweenTexelErrorBound": 0.007283990233485865,
+          "erasedNonzeroSamples": 0,
+          "errorDomain": "mesh-uv-triangles",
+          "errorScope": "clamp-linear-level-zero",
+          "evaluation": "finite-current-authored-mtoon-retopology",
+          "lossless": false,
+          "maximumAbsoluteError": 0.007279515266418457,
+          "maximumRelativeError": 0.01374746551840837,
+          "units": "native-linear-radiance",
+          "unlitIgnoresEmission": false,
+          "version": 1
+        },
+        "material": {
+          "emissiveStrength": 1.6344759464263916,
+          "errorDomain": "mesh-uv-triangles",
+          "maximumAlphaError": 2e-06,
+          "maximumLinearColorError": 0.002648246955459942,
+          "maximumLinearEmissionError": 0.007283990233485865,
+          "maximumLinearShadeError": 0.0037784043087462616,
+          "maximumShadeInterpolationError": 0.0015903964018432045,
+          "maximumSourceFilterError": 7.2981269878979754e-06,
+          "sampling": "clamp-linear-level-zero",
+          "version": 1
+        },
+        "emission_grid": 512,
+        "texture_offset": [
+          0.0009765625,
+          0.0009765625
+        ]
+      }
+    },
+    "hidden-physical-standard.glb": {
+      "glb_sha256": "5907a84efe9f9eed60174701bc3b5a5c71013d45b39dd81f0e6a692d2f6c591b",
+      "validator": "2.0.0-dev.3.10",
+      "errors": 0,
+      "warnings": 0,
+      "log_sha256": "5c86cd5ecc05f495e1789c2f6256803713aee8155205f259798298a126ff3410",
+      "mtoon_continuous_bounds": {
+        "hidden_float_preserves_authored_strength": true
+      }
+    },
+    "mtoon-portable.glb": {
+      "glb_sha256": "3c206e9273d0ac4b637822921ee8d74b4a326cfd4d0f7faf1949e0ac844b2c4e",
+      "validator": "2.0.0-dev.3.10",
+      "errors": 0,
+      "warnings": 0,
+      "log_sha256": "05a6a74d79a04ba3ed818bd149d23f4c7407f8c16e8e04c87398be0fb8dff675",
+      "mtoon_continuous_bounds": {
+        "retopo_radiance": {
+          "betweenTexelErrorBound": 0.00782108673330002,
+          "erasedNonzeroSamples": 0,
+          "errorDomain": "mesh-uv-triangles",
+          "errorScope": "clamp-linear-level-zero",
+          "evaluation": "finite-current-authored-mtoon-retopology",
+          "lossless": false,
+          "maximumAbsoluteError": 0.007816561532405064,
+          "maximumRelativeError": 0.01391041809316026,
+          "units": "native-linear-radiance",
+          "unlitIgnoresEmission": false,
+          "version": 1
+        },
+        "material": {
+          "emissiveStrength": 1.7638434171676636,
+          "errorDomain": "mesh-uv-triangles",
+          "maximumAlphaError": 2e-06,
+          "maximumLinearColorError": 0.003730482896280638,
+          "maximumLinearEmissionError": 0.00782108673330002,
+          "maximumLinearShadeError": 0.005004260350617349,
+          "maximumShadeInterpolationError": 0.0005612020466534461,
+          "maximumSourceFilterError": 7.165363774319619e-06,
+          "sampling": "clamp-linear-level-zero",
+          "version": 1
+        },
+        "emission_grid": 256,
+        "texture_offset": [
+          0.001953125,
+          0.001953125
+        ]
+      }
+    },
+    "wayland-patch.glb": {
+      "glb_sha256": "210c9e9e5b0b45059610ec4e9a850e81f0f7445a47e8d05bb8c51e570d16e8ac",
+      "validator": "2.0.0-dev.3.10",
+      "errors": 0,
+      "warnings": 0,
+      "log_sha256": "108ba55c202d6be22c3432591161bb89d29ac21432957d04129dc8ee402b4f21",
+      "mtoon_continuous_bounds": {
+        "retopo_radiance": {
+          "betweenTexelErrorBound": 0.007277339788176155,
+          "erasedNonzeroSamples": 0,
+          "errorDomain": "mesh-uv-triangles",
+          "errorScope": "clamp-linear-level-zero",
+          "evaluation": "finite-current-authored-mtoon-retopology",
+          "lossless": false,
+          "maximumAbsoluteError": 0.007271766662597656,
+          "maximumRelativeError": 0.01387319603731828,
+          "units": "native-linear-radiance",
+          "unlitIgnoresEmission": false,
+          "version": 1
+        },
+        "material": {
+          "emissiveStrength": 1.6340101957321167,
+          "errorDomain": "mesh-uv-triangles",
+          "maximumAlphaError": 2e-06,
+          "maximumLinearColorError": 0.002651642391417739,
+          "maximumLinearEmissionError": 0.007277339788176155,
+          "maximumLinearShadeError": 0.007843554236938553,
+          "maximumShadeInterpolationError": 0.0008868494883016836,
+          "maximumSourceFilterError": 8.43694270743116e-06,
+          "sampling": "clamp-linear-level-zero",
+          "version": 1
+        },
+        "emission_grid": 256,
+        "texture_offset": [
+          0.001953125,
+          0.001953125
+        ]
+      }
+    }
+  },
+  "official_mtoon_schema": {
+    "materials_checked": 6,
+    "errors": 0,
+    "resolver_controls": 2,
+    "report_sha256": "0da267bb0ade0635a2972149136b694518097e19f04001734c704b4af112a024",
+    "pinned_schema_sha256": {
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/VRMC_materials_mtoon.schema.json": "39e69f102c7ae3bdaa35ff8f2bcbc022a5a4c052fe97009198566105c667e941",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/mtoon.shadingShiftTexture.schema.json": "248280f5bbb0d0677125237d6837d8157f88632a3a3c1aef1f7ee923e23c152c",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/accessor.schema.json": "836d6678a985f3ffda0ab0c88ba6c0b83a8a5a484880c8da22d512525be3f418",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/accessor.sparse.indices.schema.json": "8ad0c36c2f36f4273f57fc14f9bdf81e2181004ba190d9f76f9a90aa2f2de000",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/accessor.sparse.schema.json": "41741576fb4b34d87f69166ed7e102ebe790ab96c5ae0cb6f8e891f2f59ac209",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/accessor.sparse.values.schema.json": "a796ba3bbf03d67fda7d4231cf26889ed56a94752ee55ab76e4db43261267ac3",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/animation.channel.schema.json": "7fb2fe35740e1dd8eb991712e2931e0a7d679d827066990d874ffb90d8c5fd62",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/animation.channel.target.schema.json": "ebbfe3c6d433b90f48c3d83c098082f72a78ed996b50a63be303587d2f8a32be",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/animation.sampler.schema.json": "3cdf57b0f146e76fa43eeba0336b296c89f5d09d707245f6982d173e5815fd45",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/animation.schema.json": "090c3906436d531c596044693b133e41d0bb28dccd5f065fc94635f43cb252ff",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/asset.schema.json": "99e271cd33fb36267db66b57f88317f3e6afd45f3ca12f10dffaaefd2051d0d2",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/buffer.schema.json": "407102821410d22b48bbc89dc8d76e02d6c26050e278664a84a260123fc94803",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/bufferView.schema.json": "9cd1b6af63de10e803f8dabf0bf6a903adef548998fa489eeb8b88978e020c8e",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/camera.orthographic.schema.json": "4739ae63fe8b16707526a64a4a33236fb212e8787fe2f2cd0dffc660a6ddef8e",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/camera.perspective.schema.json": "7b05b703d87be68ddf6c81904645442410c44f8b6b1960bd6cdd78ba0eb0b14e",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/camera.schema.json": "2de68eb1517b0df657c850840d6c485fc59bbb244a317f25ac13824fa619b03d",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/extensions.schema.json": "57c27d85fe1a7e4e13cc750ff1e35313cd5da83cc676d1526d626096e3b61d53",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/extras.schema.json": "97a8d6a5780c7c5d135933009261333c10bb7bfee0545c4e4b326d2d5c2d9fe5",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/glTF.schema.json": "659a1196f8b40b95f6524bbb85d4f0e580e4bd2d0525ddf4d6c70860fd6de7d3",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/glTFChildOfRootProperty.schema.json": "80952f5b6d0c2da226a2d009f67364f87a913b92adcf37be8e17445d40b4dfcd",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/glTFProperty.schema.json": "fe4a6164cdd8be0fd40324f1391a381564b93a82ba8730182cf3e7195a06ebfb",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/glTFid.schema.json": "83037eabbf44c5e07e28f3b8d3822c9c8359b9cd80710a32ddd482a7c4a6ede4",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/image.schema.json": "4d7e8d67858ee9cbc69c4edb67030e5dcb62116b27d5920a3f079b078b9bd60f",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/material.normalTextureInfo.schema.json": "6872e45b94f7b32f531b4f82ce794f7271329f72cd6050674f7222bc8838f89c",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/material.occlusionTextureInfo.schema.json": "089059e95f2341eb6692278b0cfb12401f2ce399c20ee2dae4179746d2846557",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/material.pbrMetallicRoughness.schema.json": "a88b6e5585bbe5a5365d18c34e0e1f4949e61588f03f3782f8802f55ffa4cbae",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/material.schema.json": "a9e9f7d7ef2be8e40ca309c26a9d4bdf6d6cdedc78ff5943dcd4b3221089d72c",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/mesh.primitive.schema.json": "7b0a44f930f17590fbe4abc2f0089a5537a87520fc9d8df44d94f75dffc483e9",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/mesh.schema.json": "d173e14adc7c02fabc92894a2afbc91f467cc6c37a1dcc84763161235f20472b",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/node.schema.json": "1a88ac975a6eb05adf51484ce3104b687f260cd75157223826bfcf9fc05ce52c",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/sampler.schema.json": "2d3d291ef504c851e8ea84e10e28dd844095355da13f70b406cbee1ea7a68667",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/scene.schema.json": "33dbc49a173c2f600343b19e7667106ba8ace2787047c7598f9e4c98e03a6521",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/skin.schema.json": "1ecd6daca82bacbd280bc9abcf812fcd97108b6dce50c22dd52dbc6066756bc1",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/texture.schema.json": "15864aad7b07caddc57858d55af4dfcb92c8fecea7d376086e3c456d2f9b5cb5",
+      "artifacts/vrm1-core-pbr-expression-schemas-20261126/specification/VRMC_materials_mtoon-1.0/schema/textureInfo.schema.json": "d112fbf4c366bee9309dfb476f73cbf057a199425baf7cdcb66e2382b2346431"
+    }
+  },
+  "headless_cpu_reference": {
+    "cases": [
+      "retopology-mixed-float-mtoon-affine-ui-fixture",
+      "retopology-float-mtoon-affine-ui-fixture",
+      "retopology-painted-mtoon-affine-ui-fixture",
+      "retopology-baked-mtoon-affine-ui-fixture",
+      "retopology-mixed-float-mtoon-native",
+      "texture-set-mtoon-independent-paint",
+      "retopology-imported-mtoon-resize",
+      "retopology-imported-mtoon-mixed-hdr",
+      "retopology-imported-bake-resize",
+      "texture-set-mtoon-varying-alpha",
+      "retopology-imported-mtoon-mixed-ldr",
+      "retopology-float-mtoon-native",
+      "retopology-imported-mtoon-painted",
+      "retopology-imported-mtoon-tinted",
+      "retopology-mtoon-bounded",
+      "retopology-imported-mtoon-unprepared",
+      "retopology-mtoon-affine",
+      "retopology-mtoon-detached",
+      "retopology-mtoon-plain",
+      "retopology-baked-mtoon-native",
+      "texture-set-mtoon-derivative-tangent",
+      "retopology-painted-mtoon-native",
+      "retopology-imported-pbr",
+      "retopology-imported-prior-bake",
+      "cpu-reference-install-refused",
+      "retopology-mtoon-v0"
+    ],
+    "log_sha256": "6b3d7a98b5a3d7e98d19633a34ed63b0cd0a7d50c545e79dc2accbea4711d476"
+  },
+  "scoped_arc_asan_ubsan": {
+    "checks": 91,
+    "scope": "Changed export and emission-raster host translation units plus the standalone native test on Arc. Leak detection disabled for the vendor runtime.",
+    "log_sha256": "59f05801e84f1cd3e5f24e0162509adbddb0f516ca257cd8938affa73a2672ae"
+  },
+  "other_gpu_backends": {
+    "cuda": {
+      "host_and_gpu_units_compiled": true,
+      "log_sha256": "9a84dffb02fd538f55ddfb4c53d4b78ef050f72d2a3766d6773fd406867fecc8"
+    },
+    "rocm": {
+      "host_and_gpu_units_compiled": true,
+      "log_sha256": "2b86c6cf69e32b29c135ef9d7422a5aa19188675a21c5422e41f48b5dfd579b6"
+    }
+  },
+  "limits": [
+    "The GPU returns radiance, backdrop and coverage in batches. The export worker encodes PNG and checks the continuous radiance bound.",
+    "The mixed-resolution physical variant uses power-of-two, static clamp-linear UV0 grids. Separate Core source atlases, mixed-resolution normal Bakes and other sampler domains need further adapters.",
+    "Positive AMD and NVIDIA execution and physical headset qualification remain open."
+  ]
+}
