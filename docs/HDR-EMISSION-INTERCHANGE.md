@@ -84,9 +84,12 @@ dispatch interpolates the raw Mikk frames, encodes the new normal maps and
 checks the 0.02-radian error limit. It can also filter independent FLOAT
 emission from its original dense or packed field and preserves subnormal
 values and the full finite baked radiance range. Apply rejects a result if
-its nonzero energy cannot be represented with the rounded coverage. Atlas
-correspondence, Mikk tangent generation, editable layer transfer and native
-field storage run on the host. Independently selectable portable material variants,
+its nonzero energy cannot be represented with the rounded coverage. The
+selected device also filters editable paint from the authored coverage and
+FLOAT data. The worker stages each distinct source texel once per batch and
+reconstructs native sparse tiles from the results. Atlas correspondence, Mikk
+tangent generation and native field storage run on the host.
+Independently selectable portable material variants,
 topology-changing transfer and animated UVs remain open.
 
 ## First GLB implementation
