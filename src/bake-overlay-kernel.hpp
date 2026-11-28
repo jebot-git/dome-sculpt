@@ -13,6 +13,7 @@ namespace dome::detail::bake_material {
 struct OverlayView {
   emission_raster::DeviceInput input;
   emission_raster::MaterialView material;
+  CoveredNormalMap normal;
   bool separate_pbr=false,has_emission=false;
 };
 
@@ -20,16 +21,12 @@ DOME_BAKE_OVERLAY_FN void apply_overlay(const OverlayView &view,const Coordinate
   using namespace paint_compute;
   using namespace emission_raster;
   if(value.invalid)return;
-  const auto [u,v]=coordinates.paint_uv;
-  if(!(u>=-FLT_MAX&&u<=FLT_MAX&&v>=-FLT_MAX&&v<=FLT_MAX)){
+  if(!finite_uv(coordinates.paint_uv)||(view.normal.rgba&&!finite_uv(coordinates.high_uv))){
     value.invalid=1;
     return;
   }
-  const auto axis=[&](float uv){
-    const float unit=uv<0?0:uv>1?1:uv;
-    return legacy_axis(sub(mul(unit,float(view.input.resolution)),.5f),view.input.resolution,false);
-  };
-  const auto column=axis(u),row=axis(v);
+  const auto column=clamped_axis(coordinates.paint_uv[0],view.input.resolution);
+  const auto row=clamped_axis(coordinates.paint_uv[1],view.input.resolution);
   const auto composite=[](float base,float coverage,float premultiplied){
     return add(mul(base,sub(1,coverage)),premultiplied);
   };
@@ -48,6 +45,7 @@ DOME_BAKE_OVERLAY_FN void apply_overlay(const OverlayView &view,const Coordinate
     for(unsigned c=0;c<3;++c)
       value.emission[c]=composite(value.emission[c],material_float(glow[6]),material_float(glow[c]));
   }
+  if(view.normal.rgba)sample_covered_normal(view.normal,coordinates.high_uv,*view.input.quantization,value.baked_normal);
 }
 } // namespace dome::detail::bake_material
 #undef DOME_BAKE_OVERLAY_FN

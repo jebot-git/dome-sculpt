@@ -11,6 +11,8 @@ struct SourceTextureProducts {
   paint_compute::SourceTransform transform;
 };
 SourceTextureProducts source_texture_products(const PaintSourceTexture &,uint32_t width,uint32_t height);
+Vec3 source_sampled_normal(const Mesh &,const PaintSourceMaps &,size_t triangle,std::array<float,3> bary,
+                           float strength,const float *encoded);
 // Validated immutable source sampled at output texel centers. Axis-aligned
 // transforms reuse the same wrapped taps down each column and across each row.
 class SourceTextureGrid {

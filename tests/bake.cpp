@@ -273,12 +273,14 @@ void original_material_device_sampling(){
       std::initializer_list<std::array<float,2>>{{-.2f,2.5f},{-1.2f,.1f},{2.8f,-.9f},{-.4f,-.3f}});
   maps->extra_uv_sets[2]=std::make_shared<const std::vector<std::array<float,2>>>(
       std::initializer_list<std::array<float,2>>{{.4f,-.1f},{2.3f,2.1f},{-4.8f,.9f},{2.4f,.3f}});
-  maps->color.image=maps->metal_rough.image=maps->emission.image=maps->occlusion.image=image;
+  maps->color.image=maps->metal_rough.image=maps->emission.image=maps->occlusion.image=maps->normal.image=image;
   maps->color.texcoord=1;maps->color.wrap_s=33648;maps->color.uv_transform={.713f,-.231f,.147f,.866f,-.81f,.37f};
   maps->metal_rough.texcoord=2;maps->metal_rough.wrap_t=33071;
   maps->emission.texcoord=1;maps->emission.mag_filter=9728;maps->emission.wrap_t=33648;
   maps->occlusion.texcoord=2;maps->occlusion_strength=.47f;
   maps->occlusion.uv_transform={-.926f,.211f,.08f,.773f,-.5f,1.34f};
+  maps->normal.texcoord=2;maps->normal.wrap_s=33648;maps->normal.wrap_t=33071;
+  maps->normal.uv_transform={-.43f,.81f,.23f,.67f,-.19f,1.46f};
   maps->validate_surface(mesh);
   BakeMaterial material;
   material.material.color={.31f,.67f,.83f,.72f};
@@ -287,7 +289,7 @@ void original_material_device_sampling(){
   auto texture=std::make_shared<TextureMaps>();
   texture->source_only=true;texture->source_maps=maps;
   material.maps=texture;
-  const device::MaterialInput input(material,false,nullptr);
+  const device::MaterialInput input(material,false,nullptr,true);
   std::vector<device::Coordinates> coordinates;
   std::vector<std::array<float,3>> weights;
   for(unsigned y=0;y<37;++y)for(unsigned x=0;x<=y;++x){
@@ -303,14 +305,38 @@ void original_material_device_sampling(){
     const auto orm=sample_surface_texture(mesh,*maps,maps->metal_rough,0,weights[i],false);
     const auto emission=sample_surface_texture(mesh,*maps,maps->emission,0,weights[i],true);
     const auto ao=sample_surface_texture(mesh,*maps,maps->occlusion,0,weights[i],false);
+    const auto normal=sample_surface_texture(mesh,*maps,maps->normal,0,weights[i],false);
     const auto &actual=values[i];
     bool exact=actual.roughness==orm[1]*material.material.roughness&&actual.metallic==orm[2]*material.material.metallic&&
         actual.occlusion==1-maps->occlusion_strength*(1-ao[0]);
     for(unsigned c=0;c<4;++c)exact&=actual.color[c]==color[c]*material.material.color[c];
-    for(unsigned c=0;c<3;++c)exact&=actual.emission[c]==emission[c]*material.material.emissive[c];
+    for(unsigned c=0;c<3;++c){
+      exact&=actual.emission[c]==emission[c]*material.material.emissive[c];
+      exact&=actual.normal[c]==normal[c];
+    }
     if(!exact)throw std::runtime_error("Device material lost exact extra-UV, affine, sampler or factor semantics");
   }
-  check(true,"GPU material values exactly preserve UV1 and UV2, affine filtering, opacity and separate occlusion");
+  check(true,"GPU original normal and material samples exactly preserve UV1 and UV2, affine filtering and separate occlusion");
+}
+
+std::array<float,4> covered_normal_oracle(const detail::PaintOverlayPacket &packet,float u,float v){
+  std::array<float,4> result{};
+  if(!packet.baked())return result;
+  const auto &baked=*packet.baked();
+  const int res=int(packet.resolution());
+  const float x=std::clamp(u,0.f,1.f)*res-.5f,y=std::clamp(v,0.f,1.f)*res-.5f;
+  const int ix=int(std::floor(x)),iy=int(std::floor(y));
+  const float fx=x-ix,fy=y-iy;
+  for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){
+    const auto texel=size_t(std::clamp(iy+dy,0,res-1))*res+std::clamp(ix+dx,0,res-1);
+    const auto owner=packet.padding()->at(texel);
+    if(owner<0)continue;
+    const float weight=(dx?fx:1-fx)*(dy?fy:1-fy)*(baked.coverage.at(owner)/255.f);
+    const auto *normal=baked.maps.normal.rgba.data()+4*size_t(owner);
+    for(unsigned c=0;c<3;++c)result[c]+=(normal[c]/255.f*2-1)*weight;
+    result[3]+=weight;
+  }
+  return result;
 }
 
 void sparse_material_device_sampling(){
@@ -351,8 +377,13 @@ void sparse_material_device_sampling(){
   baked.maps.color=image({40,90,210,170});
   baked.maps.metal_rough=image({190,40,230,255});
   baked.maps.emission=image({20,40,70,255});
+  baked.maps.normal=image({128,128,230,255});
   baked.coverage.resize(resolution*resolution);
-  for(size_t at=0;at<baked.coverage.size();++at)baked.coverage[at]=uint8_t(at*13+at/resolution*19);
+  for(size_t at=0;at<baked.coverage.size();++at){
+    baked.coverage[at]=uint8_t(at*13+at/resolution*19);
+    baked.maps.normal.rgba[at*4]=uint8_t(at*17);
+    baked.maps.normal.rgba[at*4+1]=uint8_t(at*19+at/resolution*11);
+  }
 
   const auto unbaked=paint->snapshot();
   for(unsigned variant=0;variant<4;++variant){
@@ -385,10 +416,12 @@ void sparse_material_device_sampling(){
     device::MaterialInput input(material,true,nullptr);
     input.parameters.separate_pbr=true;
     input.parameters.include_overlay_emission=true;
+    input.parameters.include_baked_normal=bool(variant);
     std::vector<device::Coordinates> coordinates;
     for(unsigned i=0;i<889;++i){
       const std::array uv{float(i*73%883)/713-.17f,float(i*131%887)/727-.11f};
-      coordinates.push_back(input.coordinates(mesh,0,{1,0,0},uv,{}));
+      const std::array canonical_uv{1.f-uv[1],uv[0]};
+      coordinates.push_back(input.coordinates(mesh,0,{1,0,0},uv,canonical_uv));
     }
     auto sampler=device::upload(input.images,input.parameters,overlay.get());
     std::vector<device::Values> values(coordinates.size());
@@ -398,6 +431,7 @@ void sparse_material_device_sampling(){
       const auto [u,v]=coordinates[i].paint_uv;
       const auto common=detail::sample_overlay_values(*overlay,u,v,false);
       const auto pbr=detail::sample_overlay_values(*overlay,u,v,true);
+      const auto normal=covered_normal_oracle(*overlay,coordinates[i].high_uv[0],coordinates[i].high_uv[1]);
       const auto &actual=values[i];
       bool exact=actual.roughness==composite(material.material.roughness,common[3][2],common[1][1])&&
           actual.metallic==composite(material.material.metallic,common[3][1],common[1][2])&&
@@ -405,6 +439,7 @@ void sparse_material_device_sampling(){
       for(unsigned c=0;c<4;++c){
         exact&=actual.color[c]==composite(material.material.color[c],common[3][0],common[0][c]);
         exact&=actual.pbr[c]==composite(material.material.color[c],pbr[3][0],pbr[0][c]);
+        exact&=actual.baked_normal[c]==normal[c];
       }
       for(unsigned c=0;c<3;++c)
         exact&=actual.emission[c]==composite(material.material.emissive[c],common[3][3],common[2][c]);
@@ -414,7 +449,7 @@ void sparse_material_device_sampling(){
     check(rejects([&]{sampler->read(coordinates,values,[]{return true;});})&&paint->encode()==original,
           "Cancellation preserves exact native paint owners after GPU sampling");
   }
-  check(true,"GPU sparse material matches native FLOAT filtering for masks, padding, prepared color, independent AO and emission");
+  check(true,"GPU sparse material and canonical normal match independent filtering through masks, padding and FLOAT coverage");
 }
 #endif
 } // namespace

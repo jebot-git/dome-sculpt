@@ -48,6 +48,12 @@ independent baked AO. Explicit FLOAT radiance resolvers keep their existing
 authorship.
 [GPU sparse Bake evidence](validation/bake-overlay-gpu-20261128.json)
 
+Original and canonical baked normal-map samples use the selected GPU.
+The original sampler retains independent coordinates and affine addressing.
+Canonical detail reads the current UV0, the baked coverage and its padding
+owners. Raw tangent-frame evaluation and explicit prepared normal resolvers
+remain on the worker.
+
 Eligible 512–2048 current-grid RGB8 Bake materials now composite color, ORM
 and legacy emission on the selected GPU. Their ordered paint, coverage,
 native normal-map output, and GLB export match the preceding implementation.

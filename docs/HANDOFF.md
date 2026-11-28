@@ -139,9 +139,17 @@ ORM and legacy emission over the sampled source maps. This covers paint-only
 materials without original role images. Arc matched 3,556 samples against the
 native FLOAT reference. The five-layer 1024² fixture remained byte-identical.
 On that fixture, the warm Bake fell from 0.68 to 0.46 seconds and the first
-Bake rose from 7.23 to 9.76 seconds. The worker retains raw normal-frame
-evaluation, explicit FLOAT radiance resolvers and ordered publication.
+Bake rose from 7.23 to 9.76 seconds. The worker retains explicit FLOAT radiance
+resolvers and ordered publication.
 [GPU sparse Bake evidence](validation/bake-overlay-gpu-20261128.json)
+
+Bake also filters original tangent-normal images and canonical RGB8 baked
+normal detail on the selected GPU. Original maps use their authored UV set,
+affine transform, wrapping and filter. Canonical detail uses current UV0,
+independent baked coverage and the immutable padding owner. The worker
+uses the resulting samples with the original or supplied tangent basis and
+the canonical Mikk frame. Explicit prepared and retained normal resolvers
+still own their frame evaluation.
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing

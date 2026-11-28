@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "bake-material-device.hpp"
+#include "bake-texture-filter-kernel.hpp"
 #include "source-uv-sampler-kernel.hpp"
-#include <cfloat>
 
 #if defined(__CUDACC__) || defined(__HIPCC__)
 #define DOME_BAKE_MATERIAL_INLINE __host__ __device__ inline
@@ -20,22 +20,11 @@ struct View {
   Parameters parameters;
 };
 
-DOME_BAKE_MATERIAL_INLINE SourceTextureAxis legacy_axis(float pixel,uint32_t size,bool repeat){
-  const int32_t truncated=int32_t(pixel);
-  const int32_t first=truncated-(float(truncated)>pixel);
-  const int32_t extent=int32_t(size);
-  auto address=[&](int32_t i){
-    if(repeat){const int32_t index=i%extent;return index<0?index+extent:index;}
-    return i<0?0:i>=extent?extent-1:i;
-  };
-  return {address(first),address(first+1),pixel-first};
-}
-
 DOME_BAKE_MATERIAL_INLINE bool sample_image(const ImageView &view,const float (&uv)[2],
     const paint_compute::Quantization &table,float (&color)[4]){
   using namespace paint_compute;
   const auto &image=view.image;
-  if(!(uv[0]>=-FLT_MAX&&uv[0]<=FLT_MAX&&uv[1]>=-FLT_MAX&&uv[1]<=FLT_MAX))return false;
+  if(!finite_uv(uv))return false;
   if(view.original){
     sample_mapped_source_channels(image,{uv[0],uv[1]},table,color);
     return true;

@@ -311,7 +311,7 @@ std::array<float,4> sample_surface_texture(const Mesh &mesh,const PaintSourceMap
 }
 namespace {
 Vec3 derivative_texture_normal(const Mesh &mesh,const PaintSourceMaps &maps,size_t triangle,
-    std::array<float,3> bary,Vec3 n,const AffineTransform *placement,float strength) {
+    std::array<float,3> bary,Vec3 n,const AffineTransform *placement,float strength,const float *encoded=nullptr) {
   if(!std::isfinite(strength)||strength<0||strength>4)throw std::invalid_argument("Invalid source normal strength");
   n=normalized(n);
   if(!maps.normal.image||(!placement&&maps.normal_scale==0)||strength==0)return n;
@@ -339,7 +339,11 @@ Vec3 derivative_texture_normal(const Mesh &mesh,const PaintSourceMaps &maps,size
        raw_b=direction(e2.x*x1-e1.x*x2,e2.y*x1-e1.y*x2,e2.z*x1-e1.z*x2);
   t=t-n*dot(n,t);if(length(t)<1e-8f)return n;t=normalized(t);
   auto b=cross(n,t)*(dot(cross(n,t),raw_b)<0?-1.f:1.f);
-  auto encoded=sample_surface_texture(mesh,maps,maps.normal,triangle,bary,false);
+  std::array<float,4> sample;
+  if(!encoded){
+    sample=sample_surface_texture(mesh,maps,maps.normal,triangle,bary,false);
+    encoded=sample.data();
+  }
   double factor=double(maps.normal_scale)*strength;
   double dx=(encoded[0]*2-1)*factor,dy=(encoded[1]*2-1)*factor,dz=encoded[2]*2-1;
   double magnitude=std::hypot(dx,dy,dz);if(magnitude<1e-20)return n;
@@ -350,9 +354,13 @@ Vec3 derivative_texture_normal(const Mesh &mesh,const PaintSourceMaps &maps,size
 }
 Vec3 source_texture_normal(const Mesh &mesh,const PaintSourceMaps &maps,size_t triangle,
                            std::array<float,3> bary,float strength) {
+  return detail::source_sampled_normal(mesh,maps,triangle,bary,strength,nullptr);
+}
+Vec3 detail::source_sampled_normal(const Mesh &mesh,const PaintSourceMaps &maps,size_t triangle,
+                                  std::array<float,3> bary,float strength,const float *encoded) {
   Vec3 n{};
   for(size_t c=0;c<3;++c)n+=normalized(mesh.normals.at(mesh.indices.at(triangle*3+c)))*bary[c];
-  return derivative_texture_normal(mesh,maps,triangle,bary,n,nullptr,strength);
+  return derivative_texture_normal(mesh,maps,triangle,bary,n,nullptr,strength,encoded);
 }
 Vec3 source_texture_normal_placed(const Mesh &mesh,const PaintSourceMaps &maps,size_t triangle,
     std::array<float,3> bary,Vec3 normal,const AffineTransform &placement,float strength) {

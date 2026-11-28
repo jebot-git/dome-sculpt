@@ -87,6 +87,12 @@ template<class Api> class DeviceSampler final:public Sampler {
     maps.bake_color=upload(material.bake_color);
     maps.bake_orm=upload(material.bake_orm);
     maps.bake_coverage=upload(material.bake_coverage);
+    if(parameters.include_baked_normal){
+      if(!packet.baked()||packet.baked()->maps.normal.rgba.empty())
+        throw std::logic_error("Covered Bake normal lacks its baked source");
+      overlay_.normal={upload(std::span(packet.baked()->maps.normal.rgba)),maps.bake_coverage,
+                       device.padding,device.resolution};
+    }
     if(parameters.separate_pbr&&packet.baked()&&
        packet.baked()->color_interpretation==BakedColorInterpretation::ResolvedPbr)
       maps.bake_pbr=upload(std::span(packet.baked()->maps.pbr_color.rgba));

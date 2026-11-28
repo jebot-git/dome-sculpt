@@ -6,21 +6,28 @@
 #include "paint-overlay-packet.hpp"
 
 namespace dome::detail::bake_material {
+inline const Image *covered_normal_image(const BakeMaterial &material){
+  if(material.normal_strength<=0||!material.maps||!material.maps->source_only||
+     !material.maps->overlay||!material.maps->baked_base)return nullptr;
+  const auto &image=material.maps->baked_base->maps.normal;
+  return image.rgba.empty()?nullptr:&image;
+}
+
 struct MaterialInput {
   Parameters parameters{};
   ImageInput images[RoleCount]{};
   const PaintSourceMaps *source=nullptr;
   const PaintOverlayPacket *overlay=nullptr;
 
-  MaterialInput(const BakeMaterial &material,bool separate_pbr,const Image *normal) {
+  MaterialInput(const BakeMaterial &material,bool separate_pbr,const Image *normal,bool sample_normals=false) {
     const auto &factor=material.material;
     std::copy_n(factor.color.begin(),4,parameters.color);
     std::copy_n(factor.emissive.begin(),3,parameters.emission);
     parameters.roughness=factor.roughness;
     parameters.metallic=factor.metallic;
     parameters.composited=material.maps_are_composited;
+    if(material.maps)source=material.maps->source_maps.get();
     if(material.maps&&material.maps->source_only) {
-      source=material.maps->source_maps.get();
       if(material.maps->overlay&&!material.maps->overlay->empty())overlay=material.maps->overlay.get();
       parameters.original=true;
       parameters.separate_pbr=separate_pbr;
@@ -41,6 +48,9 @@ struct MaterialInput {
       if(separate_pbr&&!maps.pbr_color.rgba.empty())images[PbrColor]={&maps.pbr_color};
     }
     if(normal)images[TangentNormal]={normal,nullptr,material.repeat_uv};
+    else if(sample_normals&&source&&source->normal.image&&source->normal_scale>0&&material.normal_strength>0)
+      images[TangentNormal]={source->normal.image.get(),&source->normal};
+    parameters.include_baked_normal=sample_normals&&covered_normal_image(material);
   }
 
   bool needs_sampling() const {
@@ -51,6 +61,7 @@ struct MaterialInput {
                           std::array<float,2> paint_uv,std::array<float,2> high_uv) const {
     Coordinates result{};
     std::copy_n(paint_uv.begin(),2,result.paint_uv);
+    if(parameters.include_baked_normal)std::copy_n(high_uv.begin(),2,result.high_uv);
     std::array<std::array<float,2>,8> source_uv;
     unsigned ready=0;
     for(unsigned i=0;i<RoleCount;++i){

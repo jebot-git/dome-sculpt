@@ -1,4 +1,7 @@
 #include "paint-overlay-packet.hpp"
+#include "bake-texture-filter-kernel.hpp"
+#include "source-texture-grid.hpp"
+#include "paint-composite-backend.hpp"
 #include "emission-authority.hpp"
 #include "source-bake-normal.hpp"
 #include "bake-ray-device.hpp"
@@ -396,10 +399,8 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       ? std::span<const Tangent>(generated_low_frames) : target_metric_corners;
   std::vector<Tangent> generated_high_frames;
   auto high_frames=source_placement.tangent_corners;
-  const bool raw_baked_normals=!source_normals&&std::any_of(source.materials.begin(),source.materials.end(),[](const auto &m){
-    return m.maps&&m.maps->source_only&&m.maps->overlay&&m.maps->baked_base&&
-        !m.maps->baked_base->maps.normal.rgba.empty()&&m.normal_strength>0;
-  });
+  const bool raw_baked_normals=!source_normals&&std::ranges::any_of(source.materials,
+      detail::bake_material::covered_normal_image);
   const auto retained_field=[&](size_t index){return !source_fields.empty()&&bool(source_fields[index].sample);};
   const auto needs_map=[&](size_t index){
     const auto &material=source.materials[index];
@@ -574,12 +575,14 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     else if(m.maps && m.maps->source_maps && m.normal_strength>0){
       const auto &raw=*m.maps->source_maps;
       if(source.tangents.empty() || !raw.normal.image || raw.normal_scale==0)
-        high_normal=source_texture_normal(source.mesh,raw,hit->triangle,hit->barycentric,m.normal_strength);
+        high_normal=detail::source_sampled_normal(source.mesh,raw,hit->triangle,hit->barycentric,m.normal_strength,
+                                                sampled?sampled->normal:nullptr);
       else {
         // Explicit imported frames remain authoritative; affine UV applies to
         // the lookup, while the supplied XYZ/handedness defines its basis.
         auto supplied=basis(source.mesh,hit->triangle,high_normal,hit->barycentric,source.tangents);
-        auto encoded=sample_surface_texture(source.mesh,raw,raw.normal,hit->triangle,hit->barycentric,false);
+        const auto encoded=sampled?std::array<float,4>{sampled->normal[0],sampled->normal[1],sampled->normal[2],0.f}:
+            sample_surface_texture(source.mesh,raw,raw.normal,hit->triangle,hit->barycentric,false);
         double scale=double(raw.normal_scale)*m.normal_strength;
         double x=(encoded[0]*2-1)*scale,y=(encoded[1]*2-1)*scale,z=encoded[2]*2-1;
         double size=std::hypot(x,y,z);
@@ -587,27 +590,20 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
           {float(x/size),float(y/size),float(z/size)});
       }
     }
-    if(m.maps&&m.maps->source_only&&m.maps->overlay&&m.maps->baked_base&&
-       !m.maps->baked_base->maps.normal.rgba.empty()&&m.normal_strength>0){
-      // Filter decoded legacy RGB8 vectors premultiplied by the independent
-      // common coverage, through the same immutable padding owner as all
-      // other paint planes. The original normal keeps its role UV basis;
-      // canonical baked detail keeps current UV0 Mikk corner frames.
-      const auto &packet=*m.maps->overlay;const auto &baked=*m.maps->baked_base;
-      const auto r=packet.resolution();const float x=std::clamp(high_uv[0],0.f,1.f)*r-.5f,
-        y=std::clamp(high_uv[1],0.f,1.f)*r-.5f;
-      const int ix=int(std::floor(x)),iy=int(std::floor(y));const float fx=x-ix,fy=y-iy;
-      Vec3 sum;float coverage=0;
-      for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){
-        const auto owner=packet.padding()->at(size_t(std::clamp(iy+dy,0,int(r)-1))*r+size_t(std::clamp(ix+dx,0,int(r)-1)));
-        if(owner<0)continue;const size_t at=size_t(owner);
-        const float w=(dx?fx:1-fx)*(dy?fy:1-fy)*(baked.coverage.at(at)/255.f);
-        coverage+=w;const auto *q=baked.maps.normal.rgba.data()+at*4;
-        sum+=Vec3{q[0]/255.f*2-1,q[1]/255.f*2-1,q[2]/255.f*2-1}*w;
+    if(const auto *normal=shade_device::covered_normal_image(m)){
+      float reference[4]{};
+      const float *filtered=sampled?sampled->baked_normal:reference;
+      if(!sampled){
+        const auto &packet=*m.maps->overlay;
+        const auto &baked=*m.maps->baked_base;
+        const float normal_uv[]{high_uv[0],high_uv[1]};
+        shade_device::sample_covered_normal({normal->rgba.data(),baked.coverage.data(),packet.padding()->data(),
+            packet.resolution()},normal_uv,paint_compute::quantization(),reference);
       }
+      const float coverage=filtered[3];
       if(coverage>0){
         const auto canonical=tangent_frame(source.mesh,high_frames,hit->triangle,hit->barycentric);
-        const auto baked_world=canonical.to_world(sum/coverage);
+        const auto baked_world=canonical.to_world(Vec3{filtered[0],filtered[1],filtered[2]}/coverage);
         high_normal=normalized(high_normal*(1-coverage)+baked_world*coverage);
       }
     }
@@ -679,8 +675,10 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   std::vector<uint8_t> device_material(source.materials.size());
   bool have_device_materials=false;
   for(size_t i=0;i<source.materials.size();++i){
-    const auto &input=material_inputs.emplace_back(source.materials[i],o.separate_pbr_color,
-        !source_normals&&needs_map(i)?normal_image(source.materials[i]):nullptr);
+    const bool sample_normals=!source_normals&&!retained_field(i);
+    const auto &material=source.materials[i];
+    const auto &input=material_inputs.emplace_back(material,o.separate_pbr_color,
+        sample_normals&&needs_map(i)?normal_image(material):nullptr,sample_normals);
     device_material[i]=input.needs_sampling();
     have_device_materials|=device_material[i];
   }

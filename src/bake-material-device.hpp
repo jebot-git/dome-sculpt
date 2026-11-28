@@ -21,15 +21,16 @@ struct ImageInput {
 struct Parameters {
   float color[4],emission[3];
   float roughness,metallic,occlusion_strength;
-  bool composited,original,separate_pbr,include_overlay_emission;
+  bool composited,original,separate_pbr,include_overlay_emission,include_baked_normal;
 };
 struct Coordinates {
   float uv[RoleCount][2];
-  float paint_uv[2];
+  float paint_uv[2],high_uv[2];
 };
 struct Values {
   float color[4],emission[3],roughness,metallic,occlusion;
   float pbr[4],normal[3];
+  float baked_normal[4];
   uint32_t invalid;
 };
 
