@@ -1,0 +1,80 @@
+{
+  "date": "2026-11-28",
+  "product": "a081092d047dcee106e96f166e689376a21eb77b",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Standard GLB with separate physical emission and supported prepared-source painted objects.",
+  "baseline": "The same mixed fixture fails on Arc before the fix. The ordinary painted object exports on its own.",
+  "arc": {
+    "device": "Intel Arc A770 with oneAPI Level Zero and hardware EGL",
+    "checks": 533
+  },
+  "release_ctest": [
+    "baked-emission-native",
+    "emission-raster-finite-compute",
+    "source-material-raster-compute",
+    "emission-raster-mapped-compute",
+    "emission-raster-mapped-missing-gpu",
+    "emission-raster-texture-set-compute",
+    "emission-export",
+    "emission-export-worker",
+    "source-paint-export",
+    "source-paint-bake",
+    "source-paint-authoring",
+    "source-paint-physical-authoring",
+    "vrm1-source-export",
+    "raw-hdr-authoring",
+    "xr-editable-export"
+  ],
+  "asan_ubsan": {
+    "mode": "opt-in headless CPU reference",
+    "checks": 533
+  },
+  "gpu_policy": {
+    "cpu_application_configuration_refused": true,
+    "released_cli_refuses_missing_gpu_and_preserves_existing_output": true
+  },
+  "fixtures": {
+    "mixed-source": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 338508,
+      "sha256": "ff769fff8afebfb62309e67abf0bc5efc1843dc13151d909bb2d981ebe9c84fa",
+      "errors": 0,
+      "warnings": 0,
+      "arc_difference_bytes": 0,
+      "exact_native_round_trip": true,
+      "emitted_float_fields": 1
+    },
+    "mixed-source-hidden": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 314228,
+      "sha256": "484678692c4aad88173eb79876d79241c09895fa3faf1a52c04020612a689f5d",
+      "errors": 0,
+      "warnings": 0,
+      "arc_difference_bytes": 0,
+      "exact_native_round_trip": true,
+      "emitted_float_fields": 0
+    }
+  },
+  "prior_glbs_byte_identical": {
+    "spatial-color.glb": "e68f51a66633e6f97b50b960578072e9968b38851e87419a4027ff42e54824a0",
+    "spatial-orm.glb": "9b48b8c432f9c434719b7399d0be6f33958908b6c6ec7eb772dbfdf3f4eb9cd8",
+    "spatial-cover.glb": "4d01f02d33a75905bf9cb660bf8f13d30082955de757d6eea742348503eb9f34",
+    "uniform-coat.glb": "46fa973d49b84e51227102181a397a220b179df61a1b56bae704f60a2d91e759",
+    "uniform-mask-cross.glb": "98e526883365742fef5b60880641cb918d3f4b761424f88089ab9c3a948b1b9a"
+  },
+  "native_wayland": {
+    "checks": 7,
+    "artifact_sha256": "ff769fff8afebfb62309e67abf0bc5efc1843dc13151d909bb2d981ebe9c84fa"
+  },
+  "openxr": {
+    "checks": 10,
+    "synthetic_tracking": true,
+    "artifact_sha256": "ff769fff8afebfb62309e67abf0bc5efc1843dc13151d909bb2d981ebe9c84fa",
+    "before_and_after_native_sha256": "a5b2165c7c700da3f2bc4f6b373fc7fd2c607b0acffd3319123adfd96c63a8f0"
+  },
+  "open": [
+    "Prepared-source physical emission on the same independently sampled object in Standard GLB.",
+    "General independently varying paint and source textures.",
+    "Physical headset and CUDA or ROCm device qualification."
+  ]
+}

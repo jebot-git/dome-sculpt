@@ -482,6 +482,23 @@ each pass 517 checks. Native DomeD Wayland and synthetic OpenXR produce
 the same GLB as the file worker and the native project saves byte-exactly.
 [Uniform mask cutoff evidence](validation/uniform-mask-cutoff-20261128.json)
 
+Standard GLB now compiles supported prepared-source paint in scenes with a
+separate HDR light. The visible-light fixture retains its exact FLOAT32
+field alongside the standard emissive fallback. The hidden-light fixture
+retains the light in the native project. The ordinary painted object keeps
+its writable atlas, original normal and metallic-roughness sampling, and
+morphs. The corresponding pixels match the ordinary GLB exactly. Both
+fixtures reconstruct the entire native scene and re-export byte-identically.
+
+All 15 focused Release tests pass. The Arc and opt-in headless sanitizer
+suites each pass 533 checks. Both fixtures pass Khronos validation with zero
+errors and warnings. Native DomeD Wayland and synthetic OpenXR produce the
+same visible-light GLB as the file worker. A CPU application configuration
+and a release CLI export with the GPU unavailable both fail explicitly.
+Physical emission on the same independently sampled object still needs
+its own Standard GLB compiler.
+[Mixed Standard GLB evidence](validation/mixed-source-hdr-20261128.json)
+
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
 their hashes verified and their workspace paths preserved. The same sweep

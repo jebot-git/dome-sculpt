@@ -142,6 +142,13 @@ varies, a proved all-pass or all-discard mask preserves exact visibility.
 Both paths keep the original alpha texture bytes and sampling.
 [Uniform mask cutoff evidence](validation/uniform-mask-cutoff-20261128.json)
 
+Standard GLB applies the same prepared-source paint compiler in scenes with
+a separate physical light. It retains visible HDR fields as FLOAT32 and
+recovers the full native project, including hidden physical owners. Physical
+emission on a prepared-source object with its own independent sampling
+still needs a Standard GLB compiler.
+[Mixed Standard GLB evidence](validation/mixed-source-hdr-20261128.json)
+
 ## Current validation — 2026-11-27
 
 The [current handoff](HANDOFF.md) records the exact combined Release, Arc,
