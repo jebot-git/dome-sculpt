@@ -1,0 +1,155 @@
+{
+  "date": "2026-11-28",
+  "product": "0dda339b737cbab8941369a150b1c850eb6b561f",
+  "preceding": "2e32fe8b362e29f484e42dc0123229a1c00c5318",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Source and baked-grid material sampling on the selected GPU for native Bake, preserving original role coordinates and authored factors.",
+  "oneapi_arc_release": {
+    "application_sha256": "93c1a50e5117b1f1c974d3efb765b87fe4ce3c4f9e9c36f13b3a96bc22589a35",
+    "focused": {
+      "passed": 15,
+      "junit_sha256": "0b3afb4189d2d08132916b6b3f39cb45e67c5533684e29b3cb4973b7629ed91d",
+      "full_log_sha256": "5e3f5f16c8464655622e733e2f80c3100912434a493739e7a39b6104aea7b9a6"
+    },
+    "material_authoring": {
+      "passed": 6,
+      "junit_sha256": "ef05621819b95ab80fd7037b6db0b9afb9a110c53e1e540fb26ba0f983d7a84f",
+      "full_log_sha256": "be1301bc51111d530836d9e7e988eaee464c250d71414948cdfa482f02462a5d"
+    },
+    "dense_2048_retained_bake": {
+      "passed": 1,
+      "junit_sha256": "2a151c2f30f65f83d5fe47deed657dedb084720f9b36a79a69418ba268a67a64",
+      "full_log_sha256": "b9e037340f09fde4c9007a6c22419c296b4a4a5eb089ef333081c1288bf86fe9",
+      "workflow_checks": 13
+    },
+    "shared_sampler_and_retained_source": {
+      "passed": 5,
+      "junit_sha256": "1aa6288a0b48843b105084ec6b18ea5a9f495dbbe973a605e5e2d28b02e063b4",
+      "full_log_sha256": "aa8cf14d75ded4861e0a2d3ea006d7349ec1f960328ea25109107f36b320cfe4"
+    },
+    "no_device_refusal": "No device of requested type 'info::device_type::gpu' available.",
+    "baked_map_oracle": {
+      "bit_exact_sample_records": 16384,
+      "factor_policies": 2,
+      "invalid_uv_refused": true,
+      "log_sha256": "b9e494f53bbffd1140d63a1ef33639a128c6649c59684dc972d827dcf8e62677"
+    },
+    "original_maps": {
+      "sample_records": 703,
+      "independent_uv_sets": [
+        1,
+        2
+      ],
+      "affine_filtering": true,
+      "opacity_and_separate_occlusion": true
+    },
+    "benchmarks": {
+      "512_original_material_cold": {
+        "exact_native_archive_sha256": "b694ab90cd8c9d96a0b3f794bb4eb309f8b19b03ca2f29b88567786b883b9757",
+        "projected_texels": 262144,
+        "total_rays": 262144,
+        "seconds": {
+          "preceding": [
+            6.42684
+          ],
+          "candidate": [
+            7.70804
+          ]
+        },
+        "log_sha256": "1da1ecb9e4ab4fb53973cab55d670a503271c786bd1bdad8b5468218f4208a99"
+      },
+      "1024_original_material_cold_then_warm": {
+        "exact_native_archive_sha256": "f2f0632af1a7e31c83ffcb3b1d44d74426e3df4339ed2009a50f8b8503e93501",
+        "projected_texels": 1048576,
+        "total_rays": 1048576,
+        "seconds": {
+          "candidate": [
+            7.1137,
+            0.427201,
+            0.41805
+          ],
+          "preceding": [
+            6.08559,
+            0.729693,
+            0.731896
+          ]
+        },
+        "log_sha256": "436a2e1c6de78cbb4df3d0b580afc3ffc89261c7d20a85b121944eb929eca4ab",
+        "warm_median_seconds": {
+          "candidate": 0.4226255,
+          "preceding": 0.7307945
+        }
+      }
+    }
+  },
+  "nested_wayland": {
+    "checks": 15,
+    "report_sha256": "3206993dcd5a5c556e4a8584dc324197fcbb72c60819d1efa07f2d98534a9aa7",
+    "dma_buf_render_node": "/dev/dri/renderD129",
+    "trace_sha256": "84c865916b8670c7f8581fd38b9ee9ba9c31ceb61451a5f1569cf4f2cca0ccbd",
+    "successful_material_sampling_kernel_launches": 1,
+    "exact_active_set_save_clear_and_undo": true
+  },
+  "synthetic_openxr": {
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "suites": {
+      "bake-cage-xr": {
+        "checks": 21,
+        "report_sha256": "7e8949de5105428d14cf8e2622a4a7e9dc383648aea4783a7307d96be63d48ff",
+        "native_project_sha256": "ad45bc1cb2727b0bd42ba47a86ad3b44bf06c347406a43efbb240e781055ba89",
+        "stereo_submissions": 86,
+        "images_acquired_waited_and_released": 172
+      },
+      "bake-recipes-xr": {
+        "checks": 22,
+        "report_sha256": "f48e8a4a93ca396c1595859d68ea0c7b859f811f300db398dbcbc98c32e823b9",
+        "native_project_sha256": "c497a7a385907bb3cbe0d7901b0a6aaba2b2a342fe45a1bdb4fd78fc24581b8d",
+        "stereo_submissions": 86,
+        "images_acquired_waited_and_released": 172
+      },
+      "texture-set-active-bake-openxr": {
+        "checks": 19,
+        "report_sha256": "adabf84b795df8d36f9ed533335dab271845709f2d8d68cbd0741d595311b18b",
+        "native_project_sha256": "4391b246e47412949b07eebd2e969ddec55ae4e35552259cf0a172f1846412ef",
+        "stereo_submissions": 86,
+        "images_acquired_waited_and_released": 172
+      },
+      "mtoon-texture-set-bake-openxr": {
+        "checks": 19,
+        "report_sha256": "adabf84b795df8d36f9ed533335dab271845709f2d8d68cbd0741d595311b18b",
+        "native_project_sha256": "3840bb393dceb07f022228961663763fb333d2aac9dfb5876104b85ca0e1494a",
+        "stereo_submissions": 86,
+        "images_acquired_waited_and_released": 172
+      }
+    }
+  },
+  "headless_reference": {
+    "focused": {
+      "passed": 4,
+      "junit_sha256": "4a517a4ab6f9412f5d6e68c72ba7df69b2b8f0395970aae3d1be2b925ee218bd"
+    },
+    "scoped_asan_ubsan": {
+      "sources": [
+        "src/bake.cpp",
+        "src/mesh-processing.cpp",
+        "tests/bake.cpp"
+      ],
+      "log_sha256": "28c18567cf614f71b7bec803c142703eea04ae5aa071ebe178f179667d87e85c"
+    }
+  },
+  "cuda_and_rocm": {
+    "cuda": {
+      "compiled_kernel_sha256": "2a536dafb0ff503caee08314c338e754d775562ac2d8f1bf9e61880c7a7df48d",
+      "no_device_refusal": "CUDA driver version is insufficient for CUDA runtime version"
+    },
+    "rocm": {
+      "compiled_kernel_sha256": "f79f92bee547ea8fff3869544a5a12cedf02b8abe1b528aa39e98486651e547e",
+      "no_device_refusal": "no ROCm-capable device is detected"
+    }
+  },
+  "limits": [
+    "One material image set resides in the sampler. The host supplies coordinates and still handles sparse native overlays, retained raw normal-frame evaluation, and authored FLOAT emission authority.",
+    "Benchmarks cover one synthetic original-texture donor with no ambient rays. The warm 1024 Bake is faster and the cold run includes compilation of the material program.",
+    "CUDA and ROCm compile and link the kernels and refuse missing hardware. Positive vendor execution and physical headset testing remain open."
+  ]
+}
