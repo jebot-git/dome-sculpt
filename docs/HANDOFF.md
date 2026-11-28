@@ -188,6 +188,16 @@ command-line export refused to start with GPU devices masked. DomeD Wayland
 and synthetic OpenXR exercised the updated Bake path on Arc.
 [Retained Bake atlas evidence](validation/retained-bake-atlas-gpu-20261128.json)
 
+Eligible retained polygon PBR donor color, ORM and legacy emission now
+stay on the selected GPU from composition through sampling. Bake keeps
+those allocations within one donor-wide texture-set workspace allowance.
+Arc removed 5 MiB of device-to-host copies and 8 MiB of host-to-device
+copies in the two-field 512² HDR donor fixture. The 1024² result matched
+the preceding save byte for byte. Runtime tracing found zero copies to or
+from either resident atlas. Median repeat Bake time was 0.67 seconds,
+compared with 0.64 seconds on the preceding build in that trial.
+[Resident donor atlas evidence](validation/retained-bake-atlas-residency-20261128.json)
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.

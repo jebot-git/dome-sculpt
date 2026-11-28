@@ -77,6 +77,14 @@ the worker before the device samples it. Other retained material models
 still use their existing atlas preparation.
 [Retained Bake atlas evidence](validation/retained-bake-atlas-gpu-20261128.json)
 
+Bake now samples eligible retained PBR donor color, ORM and legacy emission
+directly from the allocations written by the device compositor. The donor
+shares the existing 256 MiB texture-set allowance for those allocations.
+Later fields beyond that allowance still use GPU compositing and sampling
+through host staging. Bake samples independent normal and FLOAT emission
+inputs in their authored coordinate domains.
+[Resident donor atlas evidence](validation/retained-bake-atlas-residency-20261128.json)
+
 Eligible 512–2048 current-grid RGB8 Bake materials now composite color, ORM
 and legacy emission on the selected GPU. Their ordered paint, coverage,
 native normal-map output, and GLB export match the preceding implementation.
