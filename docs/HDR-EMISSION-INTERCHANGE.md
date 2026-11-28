@@ -29,10 +29,12 @@ A prepared Core PBR Bake can use this package with version 2 FLOAT fields.
 The GPU composes baked color, metallic, roughness and occlusion with
 original textures and editable paint. The compiler samples the combined
 source and baked normal in the rest pose and encodes it in the same tangent
-frame the GLB emits. The native project retains the original source,
-bake recipe, exact FLOAT coefficients, normal layers and deformation.
-Prepared typed MToon, baked normals without an emitted tangent frame and
-cutouts with unproved varying alpha still need their own adapters.
+frame the GLB emits. If the mesh has no tangents, the exporter generates
+MikkTSpace tangents and tangent morph deltas on the writable atlas before
+it emits any texture coordinates. The native project retains the original
+source, bake recipe, exact FLOAT coefficients, normal layers and deformation.
+Prepared typed MToon and cutouts with unproved varying alpha still need
+their own adapters.
 
 ## First GLB implementation
 

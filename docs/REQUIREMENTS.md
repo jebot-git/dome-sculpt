@@ -160,8 +160,13 @@ fallback is bounded by the atlas resolution.
 Prepared Core PBR HDR bakes compile color and ORM with GPU compositing
 and emit a rest-pose normal map in their retained tangent frame. The
 native package preserves the donor, exact FLOAT Bake and editable layers.
-Typed MToon and baked normals without a retained tangent frame remain open.
 [Prepared source Bake HDR evidence](validation/baked-source-hdr-20261128.json)
+
+For prepared HDR bakes without tangents, the exporter generates an outbound
+MikkTSpace frame and tangent morph deltas from the writable atlas. Imported
+normal and POSITION targets remain intact. Prepared typed MToon and
+unproved MASK alpha remain open.
+[Generated Bake tangent evidence](validation/baked-generated-tangents-20261128.json)
 
 ## Current validation — 2026-11-27
 

@@ -523,9 +523,17 @@ the same writable atlas. The GPU resolves the FLOAT rows and composites
 the other baked material maps. Rest-pose normal encoding uses the original
 emitted tangent frame. The native package preserves its exact donor,
 recipe, morph and layers. The independent consumer matches the native
-preview within one output byte on Arc. Prepared typed MToon, baked normals
-without a retained tangent frame and unproved MASK alpha remain open.
+preview within one output byte on Arc.
 [Prepared source Bake HDR evidence](validation/baked-source-hdr-20261128.json)
+
+Prepared HDR Bake export also generates an outbound MikkTSpace frame on
+the writable atlas when the source has no tangents. Imported normals and
+normal morph deltas remain intact. A prepared native mesh without an
+attribute frame uses its actual rest geometry and shape targets. Both
+cases emit tangent morph deltas and recover the editable project exactly.
+The independent renderer matches both fixtures within one byte on Arc.
+Prepared typed MToon and unproved MASK alpha remain open.
+[Generated Bake tangent evidence](validation/baked-generated-tangents-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
