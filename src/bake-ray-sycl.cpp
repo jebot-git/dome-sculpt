@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include <sycl/sycl.hpp>
 #include "bake-material-device-job.hpp"
+#include "bake-padding-device-job.hpp"
 #include "bake-raster-device-job.hpp"
 #include "bake-ray-device-query.hpp"
 #include "paint-composite-kernel.hpp"
@@ -8,6 +9,11 @@
 #include "surface-ray-softfloat.hpp"
 
 namespace dome::detail {
+namespace bake_padding {
+void launch_seed(sycl::queue &,Frontier,const uint8_t *,uint32_t,uint32_t);
+void launch_expand(sycl::queue &,Frontier,uint32_t,uint32_t,uint32_t);
+void launch_gather(sycl::queue &,Frontier,uint32_t,uint32_t,Pixel *);
+}
 namespace bake_material {
 void launch_material(sycl::queue &,View,const Uv *,const paint_compute::Quantization *,SampleOutput,size_t);
 void launch_overlay(sycl::queue &,OverlayView,const Uv *,SampleOutput,size_t);
@@ -49,6 +55,15 @@ public:
   void reset(uint32_t *value){queue_.fill(value,uint32_t(0),1);}
   void clear_owners(uint32_t *owners,size_t count){queue_.fill(owners,UINT32_MAX,count);}
   void clear_totals(bake_raster::Totals *totals){queue_.memset(totals,0,sizeof(*totals));}
+  void seed_padding(bake_padding::Frontier view,const uint8_t *coverage,uint32_t first,uint32_t count){
+    bake_padding::launch_seed(queue_,view,coverage,first,count);
+  }
+  void expand_padding(bake_padding::Frontier view,uint32_t first,uint32_t count,uint32_t distance){
+    bake_padding::launch_expand(queue_,view,first,count,distance);
+  }
+  void gather_padding(bake_padding::Frontier view,uint32_t first,uint32_t count,bake_padding::Pixel *output){
+    bake_padding::launch_gather(queue_,view,first,count,output);
+  }
   void raster(bake_raster::View view,const bake_raster::Span *spans,uint32_t span_count,uint32_t count,
               uint32_t first,bake_raster::Sample *output){
     bake_raster::launch_raster(queue_,view,spans,span_count,count,first,output);
@@ -117,6 +132,10 @@ std::unique_ptr<Query> upload(const Surface &surface,std::span<const Vec3> patte
 
 std::unique_ptr<bake_raster::Raster> bake_raster::create(std::span<const float> axis,std::span<const uint8_t> writable){
   return create_device<bake_rays::SyclApi>(axis,writable);
+}
+void bake_padding::resolve(uint32_t resolution,uint32_t radius,std::span<const uint8_t> coverage,
+                           const Apply &apply,const std::function<bool()> &cancelled){
+  resolve_device<bake_rays::SyclApi>(resolution,radius,coverage,apply,cancelled);
 }
 std::unique_ptr<bake_material::Sampler> bake_material::upload(const ImageInput (&roles)[RoleCount],Parameters parameters,TransferLayout transfer,
     const PaintOverlayPacket *overlay,const std::function<bool()> &cancelled,const paint_compute::MaterialAtlas *atlas,

@@ -2,6 +2,7 @@
 #include "dome/bake.hpp"
 #ifdef DOME_TEST_BAKE_RAY_DEVICE
 #include "bake-material-input.hpp"
+#include "bake-padding-device.hpp"
 #include "bake-raster-device.hpp"
 #include "bake-ray-device.hpp"
 #include "bake-ray-query.hpp"
@@ -580,6 +581,53 @@ void sampler_cache_pressure() {
     throw std::runtime_error("Mesh baking cancelled");
   },no_other_cache);})&&cancelled==1&&alive[1],"Cancellation leaves the admitted sampler alone and never retries");
 }
+
+void padding_device_ownership(){
+  namespace padding=detail::bake_padding;
+  size_t compared=0;
+  for(const auto [n,radius]:{std::pair{8u,1u},std::pair{37u,8u},std::pair{129u,32u},std::pair{512u,64u}}){
+    std::vector<uint8_t> coverage(size_t(n)*n);
+    for(uint32_t y=0;y<n;++y)for(uint32_t x=0;x<n;++x){
+      const auto noise=(x*264539845u)^(y*123456791u);
+      auto &pixel=coverage[y*n+x];
+      if(x==n/3||y==n/2||(!x&&!y)||(x==n-1&&y==n-1))pixel=1;
+      else if((x==n/4&&y%31>2)||(noise%29)==3)pixel=4;
+      else if(noise%31==5)pixel=3;
+    }
+    struct Node {uint32_t at,source,distance;};
+    std::vector<Node> queue;
+    std::vector<uint32_t> expected(coverage.size(),UINT32_MAX),actual(expected);
+    for(uint32_t at=0;at<coverage.size();++at)if(coverage[at]==1)queue.push_back({at,at,0});
+    for(size_t i=0;i<queue.size();++i){
+      const auto [at,source,depth]=queue[i];
+      if(depth==radius)continue;
+      const int x=int(at%n),y=int(at/n);
+      for(int dy=-1;dy<=1;++dy)for(int dx=-1;dx<=1;++dx){
+        if((!dx&&!dy)||x+dx<0||y+dy<0||x+dx>=int(n)||y+dy>=int(n))continue;
+        const auto target=uint32_t((y+dy)*int(n)+x+dx);
+        if(coverage[target]||expected[target]!=UINT32_MAX)continue;
+        expected[target]=source;
+        queue.push_back({target,source,depth+1});
+      }
+    }
+    padding::resolve(n,radius,coverage,[&](auto pairs){
+      for(const auto [target,source]:pairs){
+        if(target>=coverage.size()||source>=coverage.size()||actual[target]!=UINT32_MAX||coverage[source]!=1)
+          throw std::runtime_error("GPU padding returned an invalid or duplicate pair");
+        actual[target]=source;
+        ++compared;
+      }
+    },{});
+    if(actual!=expected)throw std::runtime_error("GPU padding disagrees with FIFO owners at resolution "+std::to_string(n));
+  }
+  check(compared>65536,"GPU padding matches the native FIFO across distance, ties, obstacles, boundaries and readback chunks");
+  constexpr uint32_t n=257;
+  std::vector<uint8_t> coverage(size_t(n)*n);
+  coverage.front()=1;
+  unsigned polls=0,published=0;
+  check(rejects([&]{padding::resolve(n,64,coverage,[&](auto){++published;},[&]{return ++polls==3;});})
+        &&published==0,"Cancelling the device padding frontier publishes no owner pairs");
+}
 #endif
 } // namespace
 int main()try {
@@ -593,6 +641,7 @@ int main()try {
   sparse_material_device_sampling();
   bake_radiance_device_sampling();
   sampler_cache_pressure();
+  padding_device_ownership();
 #endif
   auto low=quad();BakeSource source;source.mesh=quad();
   BakeOptions options;options.resolution=32;options.padding=0;options.ao_samples=0;

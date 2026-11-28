@@ -7,6 +7,7 @@
 #define DOME_GPU(name) cuda##name
 #endif
 #include "bake-material-device-job.hpp"
+#include "bake-padding-device-job.hpp"
 #include "bake-cage-ray-kernel.hpp"
 #include "bake-raster-device-job.hpp"
 #include "bake-ray-device-query.hpp"
@@ -104,6 +105,25 @@ __global__ void bake_overlay_samples(bake_material::OverlayView view,const bake_
   if(i<count)bake_material::overlay_sample(view,coordinates,output,i);
 }
 
+struct EnqueuePadding {
+  __device__ void operator()(uint32_t *size,uint32_t *queue,uint32_t pixel) const {
+    queue[atomicAdd(size,1u)]=pixel;
+  }
+};
+__global__ void seed_bake_padding(bake_padding::Frontier view,const uint8_t *coverage,uint32_t first,uint32_t count){
+  const uint32_t i=blockIdx.x*blockDim.x+threadIdx.x;
+  if(i<count)bake_padding::seed(view,coverage,first+i,EnqueuePadding{});
+}
+__global__ void expand_bake_padding(bake_padding::Frontier view,uint32_t first,uint32_t count,uint32_t distance){
+  const uint32_t i=blockIdx.x*blockDim.x+threadIdx.x;
+  if(i<count)bake_padding::expand(view,first+i,distance,[](uint32_t *key){return atomicAdd(key,0u);},
+      [](uint32_t *key,uint32_t value){return atomicMin(key,value);},EnqueuePadding{});
+}
+__global__ void gather_bake_padding(bake_padding::Frontier view,uint32_t first,uint32_t count,bake_padding::Pixel *output){
+  const uint32_t i=blockIdx.x*blockDim.x+threadIdx.x;
+  if(i<count)output[i]=bake_padding::pair_at(view,first+i);
+}
+
 class GpuApi {
   DOME_GPU(Stream_t) stream_{};
 public:
@@ -139,6 +159,21 @@ public:
   }
   void clear_totals(bake_raster::Totals *totals){
     checked(DOME_GPU(MemsetAsync)(totals,0,sizeof(*totals),stream_));
+  }
+  void seed_padding(bake_padding::Frontier view,const uint8_t *coverage,uint32_t first,uint32_t count){
+    constexpr unsigned lanes=128;
+    seed_bake_padding<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(view,coverage,first,count);
+    checked(DOME_GPU(GetLastError)());
+  }
+  void expand_padding(bake_padding::Frontier view,uint32_t first,uint32_t count,uint32_t distance){
+    constexpr unsigned lanes=128;
+    expand_bake_padding<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(view,first,count,distance);
+    checked(DOME_GPU(GetLastError)());
+  }
+  void gather_padding(bake_padding::Frontier view,uint32_t first,uint32_t count,bake_padding::Pixel *output){
+    constexpr unsigned lanes=128;
+    gather_bake_padding<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(view,first,count,output);
+    checked(DOME_GPU(GetLastError)());
   }
   void raster(bake_raster::View view,const bake_raster::Span *spans,uint32_t span_count,uint32_t count,
               uint32_t first,bake_raster::Sample *output){
@@ -202,6 +237,10 @@ std::unique_ptr<Query> upload(const Surface &surface,std::span<const Vec3> patte
 
 std::unique_ptr<bake_raster::Raster> bake_raster::create(std::span<const float> axis,std::span<const uint8_t> writable){
   return create_device<bake_rays::GpuApi>(axis,writable);
+}
+void bake_padding::resolve(uint32_t resolution,uint32_t radius,std::span<const uint8_t> coverage,
+                           const Apply &apply,const std::function<bool()> &cancelled){
+  resolve_device<bake_rays::GpuApi>(resolution,radius,coverage,apply,cancelled);
 }
 std::unique_ptr<bake_material::Sampler> bake_material::upload(const ImageInput (&roles)[RoleCount],Parameters parameters,TransferLayout transfer,
     const PaintOverlayPacket *overlay,const std::function<bool()> &cancelled,const paint_compute::MaterialAtlas *atlas,

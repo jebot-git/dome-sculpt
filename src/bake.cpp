@@ -6,6 +6,7 @@
 #include "source-bake-normal.hpp"
 #include "bake-ray-device.hpp"
 #include "bake-raster-device.hpp"
+#include "bake-padding-device.hpp"
 #include "bake-material-input.hpp"
 #include "bake-sampler-cache.hpp"
 #include "bake-ray-query.hpp"
@@ -334,7 +335,19 @@ double projection_rounding_radius(const Mesh &low,size_t triangle,
   return 2*std::hypot(spacing[0],spacing[1],spacing[2]);
 }
 
+void pad_texel(BakeResult &result,const BakeOptions &o,std::vector<std::array<float,3>> &emission,
+               uint32_t at,uint32_t target){
+  for(auto *image:{&result.maps.color,&result.maps.metal_rough,&result.maps.emission,&result.normal,&result.ambient_occlusion})
+    if(!image->rgba.empty())std::copy_n(image->rgba.data()+size_t(at)*4,4,image->rgba.data()+size_t(target)*4);
+  if(!emission.empty())emission[target]=emission[at];
+  if(o.separate_pbr_color)std::copy_n(result.maps.pbr_color.rgba.data()+size_t(at)*4,4,result.maps.pbr_color.rgba.data()+size_t(target)*4);
+  if(!result.maps.mtoon_normal.rgba.empty())std::copy_n(result.maps.mtoon_normal.rgba.data()+size_t(at)*4,4,result.maps.mtoon_normal.rgba.data()+size_t(target)*4);
+  result.coverage[target]=2;
+  ++result.padded;
+}
+
 void pad(BakeResult &result,const BakeOptions &o,std::vector<std::array<float,3>> &emission) {
+#ifdef DOME_BAKE_RAY_REFERENCE
   auto n=o.resolution; std::deque<std::pair<uint32_t,uint32_t>> queue;
   for (uint32_t i=0;i<result.coverage.size();++i) if (result.coverage[i]==1) queue.push_back({i,0});
   uint64_t visited=0;
@@ -347,14 +360,21 @@ void pad(BakeResult &result,const BakeOptions &o,std::vector<std::array<float,3>
       if ((!dx&&!dy)||x+dx<0||x+dx>=int(n)||y+dy<0||y+dy>=int(n)) continue;
       auto target=uint32_t((y+dy)*int(n)+x+dx);
       if (result.coverage[target]) continue; // Never cover a miss or another island.
-      for (auto *image:{&result.maps.color,&result.maps.metal_rough,&result.maps.emission,&result.normal,&result.ambient_occlusion})
-        if(!image->rgba.empty())std::copy_n(image->rgba.data()+size_t(at)*4,4,image->rgba.data()+size_t(target)*4);
-      if(!emission.empty())emission[target]=emission[at];
-      if(o.separate_pbr_color)std::copy_n(result.maps.pbr_color.rgba.data()+size_t(at)*4,4,result.maps.pbr_color.rgba.data()+size_t(target)*4);
-      if(!result.maps.mtoon_normal.rgba.empty())std::copy_n(result.maps.mtoon_normal.rgba.data()+size_t(at)*4,4,result.maps.mtoon_normal.rgba.data()+size_t(target)*4);
-      result.coverage[target]=2; ++result.padded; queue.push_back({target,distance+1});
+      pad_texel(result,o,emission,at,target);
+      queue.push_back({target,distance+1});
     }
   }
+#else
+  if(result.projected==result.coverage.size())return;
+  detail::bake_padding::resolve(o.resolution,o.padding,result.coverage,[&](auto pairs){
+    for(const auto [target,source]:pairs){
+      if(target>=result.coverage.size()||source>=result.coverage.size()||
+         result.coverage[target]||result.coverage[source]!=1)
+        throw std::runtime_error("Invalid Bake padding owner");
+      pad_texel(result,o,emission,source,target);
+    }
+  },o.cancelled);
+#endif
 }
 } // namespace
 static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const BakeOptions &o,
