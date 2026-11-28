@@ -108,6 +108,14 @@ existing full-precision check. The worker retains the original traversal
 and charges the same work through the first failing probe.
 [Retained normal certificate evidence](validation/retained-normal-certificate-gpu-20261128.json)
 
+Prepared-source HDR Editable GLB now resolves original emissive textures and
+layered FLOAT emission together on the selected GPU. Original UV sampling and
+the writable atlas retain their independent coordinates and filters. The
+worker reads final RGB radiance in budgeted batches for portable encoding.
+The remaining Core PBR overlay channels and physical headset qualification
+still require work.
+[Mapped source HDR evidence](validation/mapped-source-emission-gpu-20261128.json)
+
 ## Current validation — 2026-11-27
 
 The [current handoff](HANDOFF.md) records the exact combined Release, Arc,

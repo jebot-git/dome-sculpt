@@ -1,0 +1,135 @@
+{
+  "date": "2026-11-28",
+  "product": "174e6ab62a4c3df4ed412ac87b601627493f49c7",
+  "comparison": "bae5b06ba8789d6939fe34d2ab27bc834057aefe",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Selected-device prepared-source HDR layer compositing, independent emissive-image sampling and FLOAT radiance resolve in Editable GLB.",
+  "gpu": {
+    "device": "Intel Arc A770, oneAPI Level Zero, hardware EGL",
+    "exact_rgb_samples": 81920,
+    "fixtures": [
+      "Equal, reduced and increased atlas resolutions",
+      "Legacy RGB8, dense FLOAT and packed FLOAT Bake",
+      "Affine donor with nearest and linear filtering, repeat and mirrored repeat",
+      "Constant background, layer masks, cancellation/retry and strict radiance range"
+    ],
+    "byte_identical_fixture_files": {
+      "input0.glb": "1ad7e86a80cb40daf8c5053e7e669d8c10412a11abb7244e57b6206db0d90082",
+      "physical0.glb": "b789241a6dcd49c5727dab37c9efdd0e05df5c6666cc19b20a552f7f9c036752",
+      "recovered0.dsculpt": "4daaadf85dddfcf920893515d18b8cb184fc1214baa1c65c83496768cee3b58b",
+      "second0.glb": "b789241a6dcd49c5727dab37c9efdd0e05df5c6666cc19b20a552f7f9c036752",
+      "input1.glb": "4222d7a6129c4f07325c8924323f5f941f6b11ccc286da3865af1e5376563cde",
+      "physical1.glb": "b89cb6e7e023331552c42e0ab91e52e9de58880bd9312e9369483fba65bc2566",
+      "recovered1.dsculpt": "28d7b756b181df8a2c57e0f0de3003f6deb1e43368095c3cecad38a96c6bf109",
+      "second1.glb": "b89cb6e7e023331552c42e0ab91e52e9de58880bd9312e9369483fba65bc2566",
+      "input2.glb": "43da0935941e1cedfa505859c87529a9fc77185baeda8e961c40746aa9ab6630",
+      "physical2.glb": "9f461745dd1e556320dd51b7aa1d9eaaabc28a5d34a70136b443a63911724892",
+      "recovered2.dsculpt": "baba8b1ffd41264e33e40f1f6cd65cc3ecd19e7178f4050b563fe22e2813680c",
+      "second2.glb": "9f461745dd1e556320dd51b7aa1d9eaaabc28a5d34a70136b443a63911724892",
+      "input3.glb": "a7a49b922a2e2162cdd653ec40ce8992b5327cbe82ab0e69f02e93d07b4ce9af",
+      "physical3.glb": "4a142291ca4b5cf75281facfba3a0aa8ff53d177e778e5d997cbed6a4eb9b329",
+      "recovered3.dsculpt": "907c6960d7251cf40e9d9b58457f888e31b8a85bcb2cb06767ae8ed2aca074a7",
+      "second3.glb": "4a142291ca4b5cf75281facfba3a0aa8ff53d177e778e5d997cbed6a4eb9b329",
+      "input4.glb": "1ad7e86a80cb40daf8c5053e7e669d8c10412a11abb7244e57b6206db0d90082",
+      "physical4.glb": "40fc41036c7c3371519adf5c783e8c184ccffcf1d07ea040789b9d9926a917dc",
+      "recovered4.dsculpt": "0f1d9f552678b7f1e21b5826b94e4e717972eccc19f36128332913558aea9b5f",
+      "second4.glb": "40fc41036c7c3371519adf5c783e8c184ccffcf1d07ea040789b9d9926a917dc",
+      "input5.glb": "599562df2339151c950c4f3ffcc08f642d15d529b93dd351045461997cc48013",
+      "physical5.glb": "446ed1d79eb08f8b40cea0aefea45236c0e5da37ec87651a3c9745fa7600a036",
+      "recovered5.dsculpt": "d0eb9a92f97b14869c2ea9bf61b8bcffa6619093d2de913c43931acdee7a858d",
+      "second5.glb": "446ed1d79eb08f8b40cea0aefea45236c0e5da37ec87651a3c9745fa7600a036",
+      "input6.glb": "6df7da9f89c56a4cef168f36139d9a58548a86485b9eab420a4bfff40f7d94c1",
+      "physical6.glb": "88fc099dd8af1f99c37473c87ebaace1596748b9924b64a83c9a80a41ea69788",
+      "recovered6.dsculpt": "fe89a255474f32d4cd1df805a95537bfd4cfe9cea28e3fbaa973c0219d28c231",
+      "second6.glb": "88fc099dd8af1f99c37473c87ebaace1596748b9924b64a83c9a80a41ea69788"
+    }
+  },
+  "release_ctest": [
+    "emission-raster-finite-compute",
+    "emission-raster-mapped-compute",
+    "emission-raster-mapped-missing-gpu",
+    "emission-raster-texture-set-compute",
+    "source-paint-export",
+    "source-paint-bake",
+    "source-paint-authoring",
+    "source-paint-physical-authoring",
+    "vrm1-source-export",
+    "raw-hdr-authoring",
+    "xr-editable-export"
+  ],
+  "asan_ubsan": {
+    "suite": "source-paint-physical-authoring",
+    "checks": 128,
+    "mode": "headless CPU reference"
+  },
+  "native_wayland": {
+    "checks": 8,
+    "artifact_sha256": "5aefd9ab69bbafbd895ce159bc7dcbae63daa47b5dff938f57b62a0abc2e4736"
+  },
+  "openxr": {
+    "checks": 10,
+    "synthetic_tracking": true,
+    "artifact_sha256": "5aefd9ab69bbafbd895ce159bc7dcbae63daa47b5dff938f57b62a0abc2e4736",
+    "before_and_after_native_sha256": "907c6960d7251cf40e9d9b58457f888e31b8a85bcb2cb06767ae8ed2aca074a7"
+  },
+  "device_admission": {
+    "oneapi": "Present device executes kernel. CPU selector refused.",
+    "cuda": "Kernel compiled. No usable CUDA driver.",
+    "rocm": "Kernel compiled. No ROCm-capable device."
+  },
+  "timing": {
+    "workload": "Real 512-pixel UV1 HDR Document export on the Arc A770. Three alternating fresh processes per build with disk SYCL cache disabled. Each process opens once and exports four times.",
+    "before": {
+      "runs_ms": [
+        [
+          2861.21,
+          629.85,
+          722.295,
+          713.567
+        ],
+        [
+          2860.16,
+          653.959,
+          690.355,
+          660.081
+        ],
+        [
+          2734.73,
+          623.312,
+          665.06,
+          684.455
+        ]
+      ],
+      "median_first_ms": 2860.16,
+      "median_warm_ms": 665.06
+    },
+    "after": {
+      "runs_ms": [
+        [
+          8895.91,
+          575.178,
+          585.639,
+          595.433
+        ],
+        [
+          8733.98,
+          574.257,
+          627.191,
+          543.874
+        ],
+        [
+          8913.13,
+          533.007,
+          606.453,
+          621.16
+        ]
+      ],
+      "median_first_ms": 8895.91,
+      "median_warm_ms": 585.64
+    }
+  },
+  "open": [
+    "Ordinary COLOR/ORM/coverage overlay arithmetic still runs on the file worker.",
+    "Physical headset and positive AMD and NVIDIA hardware validation remain open."
+  ]
+}

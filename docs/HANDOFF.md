@@ -391,6 +391,26 @@ source with a nonzero added color. The refusal controls preserve the
 previous file and execute the following native Save.
 [Standard GLB source paint evidence](validation/strict-source-paint-glb-20261128.json)
 
+Prepared-source HDR Editable GLB now samples the original emissive role,
+composites authored emission and Bake, and resolves final RGB radiance without
+an intermediate download. The device filters after composing the writable
+texels. The source texture keeps its own UV set, affine transform, wrapping
+and nearest or linear filter. Each batch returns up to 16,384 RGB FLOAT
+samples. The file worker still chooses the emissive strength and encodes the
+portable image while keeping the exact native project in the package.
+
+Intel Arc matches 81,920 independent RGB FLOAT reference samples exactly.
+All 28 native and GLB fixture files match the preceding Release build byte for
+byte. Eleven focused Release tests and the 128-check headless ASan/UBSan
+reference pass. Native DomeD Wayland and the OpenXR loader with synthetic
+tracking export the same 512-pixel UV1 HDR project as the worker and preserve
+the native project. On that project, median repeat-export time fell from
+665 to 586 milliseconds. Median first-export time rose from 2.86 to 8.90
+seconds with the disk kernel cache disabled. CUDA and ROCm compile the new
+kernel, and all three backends reject missing GPU hardware. Physical headset
+validation and the remaining ordinary source overlay computation are open.
+[Mapped source HDR evidence](validation/mapped-source-emission-gpu-20261128.json)
+
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
 their hashes verified and their workspace paths preserved. The same sweep
