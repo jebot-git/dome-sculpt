@@ -2042,6 +2042,24 @@ std::span<const int32_t> detail::EmissionExportAccess::writable_padding(const Pa
       throw std::invalid_argument("Invalid editable HDR raster layer");
   return surface.padding;
 }
+std::array<float,2> detail::EmissionExportAccess::writable_source_uv(const PaintedMesh &paint,
+    std::span<const std::array<float,2>> uv,size_t texel) {
+  const auto &surface=*paint.surface_;
+  if(texel>=surface.padding.size()||uv.size()!=surface.mesh.positions.size())
+    throw std::invalid_argument("HDR atlas sample does not match its original coordinate owner");
+  const auto owner=surface.padding[texel];
+  if(owner<0)return {};
+  const auto &sample=surface.texels.at(size_t(owner));
+  if(!sample.covered())throw std::logic_error("HDR atlas padding has no owning triangle");
+  const auto [a,b]=sample.bary;
+  const std::array bary{a,b,1-a-b};
+  std::array<float,2> result{};
+  for(size_t c=0;c<3;++c){
+    const auto &point=uv[surface.mesh.indices.at(size_t(sample.face)*3+c)];
+    for(size_t k=0;k<2;++k)result[k]+=point[k]*bary[c];
+  }
+  return result;
+}
 std::shared_ptr<PaintedMesh> detail::EmissionExportAccess::without_emission(const PaintedMesh &paint) {
   // An altered temporary may never publish maps under the original's visual
   // content identity, including actual physical zero/hidden contributions.

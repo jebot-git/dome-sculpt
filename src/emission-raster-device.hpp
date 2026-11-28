@@ -36,6 +36,7 @@ public:
   virtual void read(size_t first,std::span<Pixel>,const std::function<bool()> &) = 0;
   virtual void read_finite(size_t first,std::span<Radiance>,const std::function<bool()> &) = 0;
   virtual void read_mapped(std::span<const MappedSample>,std::span<Radiance>,const std::function<bool()> &) = 0;
+  virtual void read_mapped_field(std::span<const MappedSample>,std::span<Pixel>,const std::function<bool()> &) = 0;
   virtual void read_texture_set_preview(size_t first,std::span<TextureSetPreview>,const std::function<bool()> &) = 0;
 };
 
@@ -48,6 +49,9 @@ std::unique_ptr<EmissionRasterDevice> create_finite_emission_raster_device(
 std::unique_ptr<EmissionRasterDevice> create_mapped_emission_raster_device(
     const PaintedMesh &,const PaintSourceTexture *,std::array<float,3> background,uint32_t resolution,
     size_t capacity,const std::function<bool()> &);
+std::unique_ptr<EmissionRasterDevice> create_mapped_emission_field_device(
+    const PaintedMesh &,const PaintSourceTexture &,std::array<float,3> background,size_t capacity,
+    const std::function<bool()> &);
 std::unique_ptr<EmissionRasterDevice> create_texture_set_emission_device(
     const PaintedMesh &,const PaintSourceTexture *,const Image *aligned_mtoon,
     std::array<float,3> background,float strength,const std::function<bool()> &);
@@ -108,7 +112,7 @@ struct Input {
   uint32_t strength=0,resolution=0;
   std::vector<SourceTextureAxis> finite_axis;
   size_t mapped_capacity=0;
-  bool physical_bake=false,texture_set=false;
+  bool physical_bake=false,texture_set=false,mapped_field=false;
 };
 std::unique_ptr<EmissionRasterDevice> upload(const Input &,const std::function<bool()> &);
 std::unique_ptr<SourceMaterialRaster> upload_material(const Input &,const MaterialInput &,

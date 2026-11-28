@@ -24,8 +24,9 @@ public:
     view_.quantization=upload(std::span(&paint_compute::quantization(),1));
     texture_set_=input.texture_set;
     mapped_capacity_=input.mapped_capacity;
+    mapped_field_=input.mapped_field;
     finite_={upload(std::span(input.finite_axis)),uint32_t(input.finite_axis.size())};
-    if(!material)output_=allocate<uint32_t>(mapped_capacity_?mapped_capacity_*3:chunk_pixels*(finite_.resolution?3:10));
+    if(!material)output_=allocate<uint32_t>(mapped_capacity_?mapped_capacity_*(mapped_field_?10:3):chunk_pixels*(finite_.resolution?3:10));
     if(mapped_capacity_)coordinates_=allocate<MappedSample>(mapped_capacity_);
     stop();
     upload_common(input.common,stop);
@@ -61,7 +62,7 @@ public:
 
   void read(size_t first,std::span<Pixel> rows,const std::function<bool()> &cancelled) override {
     static_assert(sizeof(Pixel)==10*sizeof(uint32_t));
-    if(finite_.resolution)throw std::logic_error("Expected an exact GPU emission raster");
+    if(finite_.resolution||mapped_capacity_)throw std::logic_error("Expected a contiguous exact GPU emission raster");
     read_exact(first,rows,cancelled,[&](size_t at,size_t count){
       if(texture_set_)device_.render_texture_set(view_,at,count,output_,true);
       else device_.render(view_,at,count,output_);
@@ -96,19 +97,22 @@ public:
 
   void read_mapped(std::span<const MappedSample> samples,std::span<Radiance> pixels,
                    const std::function<bool()> &cancelled) override {
-    static_assert(sizeof(Radiance)==3*sizeof(uint32_t));
-    if(samples.size()!=pixels.size()||samples.empty()||samples.size()>mapped_capacity_)
-      throw std::invalid_argument("Invalid mapped GPU emission batch");
-    paint_compute::checkpoint(cancelled);
-    const auto size=size_t(finite_.resolution)*finite_.resolution;
-    for(const auto &sample:samples)
-      if(sample.texel>=size||!std::isfinite(sample.u)||!std::isfinite(sample.v))
-        throw std::invalid_argument("Invalid mapped GPU emission sample");
-    device_.upload(coordinates_,samples.data(),samples.size_bytes());
+    if(mapped_field_)throw std::logic_error("Expected a finite mapped GPU emission raster");
+    upload_mapped(samples,pixels.size(),finite_.resolution,cancelled);
     device_.render_mapped(view_,finite_,mapped_source_,coordinates_,samples.size(),output_);
     device_.download(pixels.data(),output_,pixels.size_bytes());
     paint_compute::checkpoint(cancelled);
     validate_finite(pixels);
+  }
+
+  void read_mapped_field(std::span<const MappedSample> samples,std::span<Pixel> pixels,
+                         const std::function<bool()> &cancelled) override {
+    if(!mapped_field_)throw std::logic_error("Expected an exact mapped GPU emission raster");
+    upload_mapped(samples,pixels.size(),view_.resolution,cancelled);
+    device_.render_mapped_field(view_,mapped_source_,coordinates_,samples.size(),output_);
+    device_.download(pixels.data(),output_,pixels.size_bytes());
+    paint_compute::checkpoint(cancelled);
+    validate_exact(std::span<const Pixel>(pixels));
   }
 
   size_t capacity() const noexcept override {return material_coordinates_.size();}
@@ -146,6 +150,17 @@ public:
   }
 
 private:
+  void upload_mapped(std::span<const MappedSample> samples,size_t count,size_t resolution,
+                     const std::function<bool()> &cancelled){
+    if(samples.size()!=count||samples.empty()||samples.size()>mapped_capacity_)
+      throw std::invalid_argument("Invalid mapped GPU emission batch");
+    paint_compute::checkpoint(cancelled);
+    const auto size=resolution*resolution;
+    for(const auto &sample:samples)
+      if(sample.texel>=size||!std::isfinite(sample.u)||!std::isfinite(sample.v))
+        throw std::invalid_argument("Invalid mapped GPU emission sample");
+    device_.upload(coordinates_,samples.data(),samples.size_bytes());
+  }
   void upload_material(const MaterialInput &input,const std::function<bool()> &cancelled){
     static_assert(sizeof(PaintPixel)==sizeof(paint_compute::Pixel));
     static_assert(sizeof(PaintColorTile)==tile_pixels*sizeof(paint_compute::ColorPixel));
@@ -201,6 +216,16 @@ private:
     for(const auto &pixel:pixels)if(std::bit_cast<uint32_t>(pixel[0])==invalid)
       throw std::invalid_argument("Native physical radiance is outside its finite range");
   }
+  template<class Output>
+  static void validate_exact(std::span<const Output> pixels){
+    for(const auto &pixel:pixels){
+      const auto status=std::bit_cast<uint32_t>(pixel[0]);
+      if(status==invalid_uv)throw std::runtime_error("MToon UV overflow");
+      if(status==radiance_overflow)throw std::overflow_error("Baked emission radiance exceeds FLOAT range");
+      for(unsigned k=0;k<3;++k)if(!std::isfinite(pixel[k]))
+        throw std::invalid_argument("GPU emission produced an invalid native FLOAT coefficient or radiance");
+    }
+  }
   template<class Output,class Render>
   void read_exact(size_t first,std::span<Output> pixels,const std::function<bool()> &cancelled,Render render){
     const auto size=size_t(view_.resolution)*view_.resolution;
@@ -210,13 +235,7 @@ private:
       auto batch=pixels.first(std::min(pixels.size(),chunk_pixels));
       render(first,batch.size());
       device_.download(batch.data(),output_,batch.size_bytes());
-      for(const auto &pixel:batch){
-        const auto status=std::bit_cast<uint32_t>(pixel[0]);
-        if(status==invalid_uv)throw std::runtime_error("MToon UV overflow");
-        if(status==radiance_overflow)throw std::overflow_error("Baked emission radiance exceeds FLOAT range");
-        for(unsigned k=0;k<3;++k)if(!std::isfinite(pixel[k]))
-          throw std::invalid_argument("GPU emission produced an invalid native FLOAT coefficient or radiance");
-      }
+      validate_exact(std::span<const Output>(batch));
       pixels=pixels.subspan(batch.size());
       first+=batch.size();
     }
@@ -284,6 +303,7 @@ private:
   MappedSourceImage mapped_source_{};
   MappedSample *coordinates_=nullptr;
   size_t mapped_capacity_=0;
+  bool mapped_field_=false;
   bool texture_set_=false;
   uint32_t *output_=nullptr;
   MaterialView material_;

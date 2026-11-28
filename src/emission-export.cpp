@@ -37,7 +37,8 @@ float linear(float v){return v<=.04045f?v/12.92f:std::pow((v+.055f)/1.055f,2.4f)
 float srgb(float v){return v<=.0031308f?v*12.92f:1.055f*std::pow(v,1/2.4f)-.055f;}
 bool exact(const auto&a,const auto&b){return a.size()==b.size()&&(a.empty()||std::memcmp(a.data(),b.data(),a.size()*sizeof(a[0]))==0);}
 bool same_mesh(const Mesh&a,const Mesh&b){return exact(a.positions,b.positions)&&exact(a.normals,b.normals)&&exact(a.uv,b.uv)&&a.indices==b.indices;}
-EmissionRgb prepared_background(const SculptObject &object,const std::function<bool()> &cancelled){
+EmissionRgb prepared_background(const SculptObject &object,const PaintSourceTexture *&mapped,
+    const std::function<bool()> &cancelled){
  const auto &paint=*object.painted;
  const auto &binding=object.material_bindings;
  if(!object_has_hdr(object)||!paint.source_sampling_prepared()||!paint.valid_source_sampling_attachment()||paint.baked()||
@@ -53,8 +54,10 @@ EmissionRgb prepared_background(const SculptObject &object,const std::function<b
  const auto &rgba=maps->emission.image->rgba;
  for(size_t i=0;i<rgba.size();i+=4){
   if((i&16383)==0)stop(cancelled);
-  for(size_t k=0;k<3;++k)if(factor[k]!=0&&rgba[i+k]!=rgba[k])
-   throw std::invalid_argument("Standard HDR on varying original emission needs an explicit portable export");
+  for(size_t k=0;k<3;++k)if(factor[k]!=0&&rgba[i+k]!=rgba[k]){
+   mapped=&maps->emission;
+   return factor;
+  }
  }
  for(size_t k=0;k<3;++k)factor[k]*=linear(float(rgba[k])/255);
  return factor;
@@ -93,14 +96,19 @@ EmissionExportRaster raster(const SculptObject &object,const std::function<bool(
  const auto baked=paint.baked();
  const bool baked_float=baked&&baked->emission_field;
  EmissionRgb original=toon?typed_background:object.material.emissive;
- if(prepared_source)original=prepared_background(object,cancelled);
+ const PaintSourceTexture *mapped=nullptr;
+ if(prepared_source)original=prepared_background(object,mapped,cancelled);
  else if(binding&&binding->physical_emission)original=*binding->physical_emission;
  const bool source_overridden=prepared_source||(binding&&binding->physical_emission);
  const bool typed_sampler=toon&&typed_emission.image&&!source_overridden;
+ const auto source_uv=mapped?source_texture_coordinates(paint.mesh(),*maps,mapped->texcoord):
+                              std::span<const std::array<float,2>>{};
  if(compute_backend()!="CPU"){
+  using Sample=EmissionRasterDevice::MappedSample;
   struct State {
    std::mutex mutex;
    std::unique_ptr<EmissionRasterDevice> device;
+   std::vector<Sample> samples;
   };
   auto state=std::make_shared<State>();
   PaintSourceTexture source;
@@ -115,10 +123,13 @@ EmissionExportRaster raster(const SculptObject &object,const std::function<bool(
       if(slot.offset!=std::array<float,2>{}||slot.scale!=std::array<float,2>{1,1}||slot.rotation!=0)
         transform=slot;
     }
-  }else if(!toon&&!source_overridden&&maps)source=maps->emission;
+  }else if(mapped)source=*mapped;
+  else if(!toon&&!source_overridden&&maps)source=maps->emission;
+  const auto capacity=mapped?std::min(EmissionRasterDevice::mapped_batch,size_t(r)*16):0;
+  if(mapped)storage+=mapped->image->rgba.size()+capacity*(2*sizeof(Sample)+sizeof(EmissionExrPixel));
   // Metadata-only qualification does not allocate an upload. Scanline
   // readers retain the same immutable, device-resident grid across passes.
-  auto read=[state,owner=paint.snapshot(),padding,source=std::move(source),transform,original,legacy_strength,r,cancelled]
+  auto read=[state,owner=paint.snapshot(),padding,source=std::move(source),source_uv,capacity,transform,original,legacy_strength,r,cancelled]
             (uint32_t y0,std::span<EmissionExrPixel> rows){
     const size_t first=size_t(y0)*r;
     if(first>padding.size()||rows.size()>padding.size()-first)
@@ -126,6 +137,25 @@ EmissionExportRaster raster(const SculptObject &object,const std::function<bool(
     stop(cancelled);
     if(rows.empty())return;
     std::lock_guard lock(state->mutex);
+    if(capacity){
+      if(!state->device){
+        state->samples.resize(capacity);
+        state->device=create_mapped_emission_field_device(*owner,source,original,capacity,cancelled);
+      }
+      for(size_t offset=0;offset<rows.size();offset+=capacity){
+        stop(cancelled);
+        auto batch=rows.subspan(offset,std::min(capacity,rows.size()-offset));
+        auto samples=std::span(state->samples).first(batch.size());
+        for(size_t i=0;i<samples.size();++i){
+          if((i&1023)==0)stop(cancelled);
+          const auto at=first+offset+i;
+          const auto uv=EmissionExportAccess::writable_source_uv(*owner,source_uv,at);
+          samples[i]={uint32_t(at),uv[0],uv[1]};
+        }
+        state->device->read_mapped_field(samples,batch,cancelled);
+      }
+      return;
+    }
     if(!state->device)
       state->device=create_emission_raster_device(*owner,padding,&source,transform?&*transform:nullptr,
                                                   original,legacy_strength,cancelled);
@@ -133,7 +163,9 @@ EmissionExportRaster raster(const SculptObject &object,const std::function<bool(
   };
   return {r,baked_float?2u:1u,storage+emission_raster_staging_bytes(paint),std::move(read)};
  }
- auto read=[padding,baked,&paint,cancelled,maps,source_overridden,
+ auto resolved_source=mapped?*mapped:PaintSourceTexture{};
+ resolved_source.texcoord=0;
+ auto read=[padding,baked,&paint,cancelled,maps,source_overridden,source_uv,resolved_source=std::move(resolved_source),
             toon=std::move(toon),typed_emission=std::move(typed_emission),legacy_strength,original,baked_float,r,count]
            (uint32_t y0,std::span<EmissionExrPixel> rows){
  const size_t begin=size_t(y0)*r;
@@ -142,7 +174,15 @@ EmissionExportRaster raster(const SculptObject &object,const std::function<bool(
   if(baked_float)resolved_base=baked_emission_texel(*baked,source);
   else if(baked){const float c=float(baked->coverage.at(source))/255;overlay.coverage=c;for(size_t k=0;k<3;++k)overlay.legacy[k]=linear(float(baked->maps.emission.rgba.at(source*4+k))/255)*c;}
   for(const auto &layer:paint.layers())if(layer.visible&&layer.opacity>0){const auto &common=paint.pixel(layer.id,x,y);auto value=paint.emission_pixel(layer.id,x,y);const auto opacity=layer.opacity*float(common.data[13])/255*value.coverage;if(opacity>0){if(baked_float){BakedEmissionSample above;above.coverage=opacity;for(size_t k=0;k<3;++k){above.legacy[k]=value.legacy[k]*opacity;above.absolute[k]=value.physical[k]*opacity;}resolved_base=BakedEmissionField::over(resolved_base,above);}else overlay=emission_over(overlay,value,opacity);}}
-  auto background=original;if(toon&&typed_emission.image&&!source_overridden){auto uv=mtoon_uv(*toon,MToonSlot::Emission,{(float(x)+.5f)/r,(float(y)+.5f)/r},0);auto sample=sample_source_texture(typed_emission,uv[0],uv[1],true);for(size_t k=0;k<3;++k)background[k]*=sample[k];}else if(!toon&&maps&&maps->emission.image&&!source_overridden){auto sample=sample_source_texture(maps->emission,(float(x)+.5f)/r,(float(y)+.5f)/r,true);for(size_t k=0;k<3;++k)background[k]*=sample[k];}
+  auto background=original;
+  if(resolved_source.image){
+    if(p<0)background={};
+    else{
+      const auto uv=EmissionExportAccess::writable_source_uv(paint,source_uv,index);
+      const auto sample=sample_source_texture(resolved_source,uv[0],uv[1],true);
+      for(size_t k=0;k<3;++k)background[k]*=sample[k];
+    }
+  }else if(toon&&typed_emission.image&&!source_overridden){auto uv=mtoon_uv(*toon,MToonSlot::Emission,{(float(x)+.5f)/r,(float(y)+.5f)/r},0);auto sample=sample_source_texture(typed_emission,uv[0],uv[1],true);for(size_t k=0;k<3;++k)background[k]*=sample[k];}else if(!toon&&maps&&maps->emission.image&&!source_overridden){auto sample=sample_source_texture(maps->emission,(float(x)+.5f)/r,(float(y)+.5f)/r,true);for(size_t k=0;k<3;++k)background[k]*=sample[k];}
   const auto resolved=baked_float?resolved_base.resolve(background,legacy_strength):emission_radiance(overlay,background,legacy_strength);auto &destination=rows[i];for(size_t k=0;k<3;++k){destination[k]=resolved[k];destination[3+k]=baked_float?resolved_base.legacy[k]:overlay.legacy[k];destination[6+k]=baked_float?resolved_base.absolute[k]:overlay.physical[k];}destination[9]=baked_float?resolved_base.coverage:overlay.coverage;
  }
  };

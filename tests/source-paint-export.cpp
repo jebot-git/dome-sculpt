@@ -604,21 +604,82 @@ void single_surface_emission(const std::filesystem::path &out,const Scene &initi
  check(file_bytes(retry)==bytes,"Restored single-surface HDR project exports the same exact GLB");
 
  material["emissiveTexture"]["index"]=0;
+ material["emissiveTexture"]["extensions"]["KHR_texture_transform"]={
+     {"offset",{-.42f,.15f}},{"scale",{2.2f,.9f}},{"rotation",.21f}};
+ fixture.j["extensionsUsed"].push_back("KHR_texture_transform");
+ fixture.j["samplers"][0]["magFilter"]=9729;
+ fixture.j["samplers"][0]["minFilter"]=9729;
  const auto varying=out/"varying-source-hdr-input.glb";
  fixture.save(varying);
- auto unsupported=prepare_authoring_import(initial,varying,options).scene;
- auto &varying_object=unsupported.active();
- for(const auto &other:unsupported.objects())if(other.id!=varying_object.id)unsupported.object(other.id).visible=false;
+ auto mapped=prepare_authoring_import(initial,varying,options).scene;
+ auto &varying_object=mapped.active();
+ for(const auto &other:mapped.objects())if(other.id!=varying_object.id)mapped.object(other.id).visible=false;
  varying_object.painted=varying_object.painted->snapshot();
+ PaintSettings color;
+ color.front_only=false;
+ color.color={.19f,.74f,.24f,.52f};
+ paint_uniform(*varying_object.painted,color,.28f);
+ varying_object.painted->add_layer("Mapped physical light");
  paint_uniform(*varying_object.painted,ink,.22f);
- const auto original=unsupported.encode();
- doc.replace(unsupported.snapshot());
- auto refused=doc.export_asset(path);
- auto queued_save=doc.save_async(out/"varying-source-hdr-preserved.dsculpt");
- check(rejects([&]{refused.get();}),"Varying original emission still requires the explicit portable compiler");
+ const auto original=mapped.encode();
+ doc.replace(mapped.snapshot());
+ settled(doc);
+ const auto mapped_reference=draw(native,doc.frame().surface);
+ const auto mapped_path=out/"varying-source-hdr.glb",mapped_save=out/"varying-source-hdr.dsculpt";
+ auto mapped_export=doc.export_asset(mapped_path);
+ auto queued_save=doc.save_async(mapped_save);
+ mapped_export.get();
  queued_save.get();
- check(file_bytes(path)==bytes&&Scene::load(out/"varying-source-hdr-preserved.dsculpt").encode()==original,
-       "Unsupported emission preserves the earlier GLB and saves all native authoring data");
+
+ color_consumer::Model mapped_core(mapped_path);
+ fbo.bind();
+ consumer.render(mapped_core.data);
+ const auto mapped_error=delta(mapped_reference,read());
+ std::cout<<"MAPPED_SURFACE_STANDARD max="<<mapped_error<<'\n';
+ check(mapped_error<=5,"Independent GLB renderer reproduces the mapped physical paint preview");
+ const auto mapped_bytes=file_bytes(mapped_path);
+ const auto mapped_glb=std::span(mapped_bytes);
+ const size_t length=mapped_glb[12]|(size_t(mapped_glb[13])<<8)|(size_t(mapped_glb[14])<<16)|(size_t(mapped_glb[15])<<24);
+ const auto parsed=nlohmann::json::parse(mapped_glb.begin()+20,mapped_glb.begin()+20+length);
+ const auto &field_ref=parsed.at("extras").at("domeSculptEmission").at("images").at(0);
+ const auto &field_view=parsed.at("bufferViews").at(field_ref.at("bufferView").get<size_t>());
+ const auto field=decode_emission_exr(mapped_glb.subspan(28+length+field_view.at("byteOffset").get<size_t>(),
+                                                         field_view.at("byteLength").get<size_t>()));
+ const auto &mesh=varying_object.painted->mesh();
+ const auto &source_maps=*varying_object.painted->source_maps();
+ const auto &emission=source_maps.emission;
+ size_t covered=0;
+ float minimum=1,maximum=0;
+ for(size_t t=0;t<mesh.indices.size()/3;++t){
+  const auto &a=mesh.uv[mesh.indices[3*t]],&b=mesh.uv[mesh.indices[3*t+1]],&c=mesh.uv[mesh.indices[3*t+2]];
+  const auto det=(b[1]-c[1])*(a[0]-c[0])+(c[0]-b[0])*(a[1]-c[1]);
+  for(size_t p=0;p<field.pixels.size();++p){
+   const float x=(float(p%field.width)+.5f)/field.width,y=(float(p/field.width)+.5f)/field.height;
+   const float wa=((b[1]-c[1])*(x-c[0])+(c[0]-b[0])*(y-c[1]))/det;
+   const float wb=((c[1]-a[1])*(x-c[0])+(a[0]-c[0])*(y-c[1]))/det;
+   const float wc=1-wa-wb;
+   if(std::min({wa,wb,wc})<.015f)continue;
+   const auto source_value=sample_surface_texture(mesh,source_maps,emission,t,{wa,wb,wc},true);
+   const auto &pixel=field.pixels[p];
+   for(size_t k=0;k<3;++k){
+    const float expected=varying_object.material.emissive[k]*source_value[k]*(1-pixel[9])+pixel[3+k]+pixel[6+k];
+    if(std::abs(expected-pixel[k])>7e-7f)throw std::runtime_error("Mapped EXR source-affine radiance differs from its original UV1 sampler");
+   }
+   minimum=std::min(minimum,source_value[0]);
+   maximum=std::max(maximum,source_value[0]);
+   ++covered;
+  }
+ }
+ check(covered>1000&&maximum-minimum>.2f&&emission.texcoord==1,
+       "EXR matches the independent affine source sampler across its varying UV1 backdrop");
+ const auto mapped_restored=extract_native_emission(mapped_bytes);
+ check(mapped_restored&&mapped_restored->encode()==original&&Scene::load(mapped_save).encode()==original&&
+       doc.copy_scene().encode()==original&&file_bytes(path)==bytes,
+       "Mapped HDR export and ordered Save preserve exact source textures, history and original output");
+ doc.replace(mapped_restored->snapshot());
+ const auto mapped_retry=out/"varying-source-hdr-retry.glb";
+ doc.export_asset(mapped_retry).get();
+ check(file_bytes(mapped_retry)==mapped_bytes,"Reopening mapped HDR reproduces every byte of the GLB");
 }
 }
 int main(int argc,char **argv)try{

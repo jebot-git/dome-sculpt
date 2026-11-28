@@ -130,8 +130,9 @@ DOME_EMISSION_FN bool typed_taps(const Source &source,uint32_t x,uint32_t y,pain
   return true;
 }
 
-template<bool bake_only=false,bool typed=false>
-DOME_EMISSION_FN void render(const DeviceInput &input,size_t at,uint32_t *destination){
+template<bool bake_only=false,bool typed=false,bool mapped=false>
+DOME_EMISSION_FN void render(const DeviceInput &input,size_t at,uint32_t *destination,
+    MappedSourceImage image={},SourceUvSampler::Coordinate uv={}){
   const auto owner=input.padding[at];
   const auto source=owner<0?at:size_t(owner);
   if(source>=size_t(input.resolution)*input.resolution){destination[0]=invalid;return;}
@@ -147,7 +148,11 @@ DOME_EMISSION_FN void render(const DeviceInput &input,size_t at,uint32_t *destin
         return;
       }
     }
-    if(input.source.rgba){
+    if constexpr(mapped){
+      uint32_t sampled[4]{};
+      if(owner>=0)sample_mapped_source(image,uv,*input.quantization,sampled,0);
+      for(unsigned k=0;k<3;++k)background[k]=product(background[k],sampled[k]);
+    }else if(input.source.rgba){
       const auto &job=input.source.coordinates;
       paint_compute::SourcePixelTaps taps;
       if constexpr(typed){

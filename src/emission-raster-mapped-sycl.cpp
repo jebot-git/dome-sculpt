@@ -10,4 +10,11 @@ void launch_mapped(sycl::queue &queue,DeviceInput input,FiniteGrid grid,MappedSo
     render_mapped(input,grid,image,samples[id[0]],out+3*id[0]);
   });
 }
+void launch_mapped_field(sycl::queue &queue,DeviceInput input,MappedSourceImage image,
+    const EmissionRasterDevice::MappedSample *samples,size_t count,uint32_t *out){
+  queue.parallel_for(sycl::range<1>{count},[=](sycl::id<1> id){
+    const auto sample=samples[id[0]];
+    render<false,false,true>(input,sample.texel,out+10*id[0],image,{sample.u,sample.v});
+  });
+}
 }
