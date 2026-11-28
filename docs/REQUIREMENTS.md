@@ -61,6 +61,7 @@ their independent coordinate domains, then preserves the native FLOAT
 rounding and overflow rules. Explicit physical backgrounds and sources without
 images use the same path. Retained polygon and caller-provided source resolvers
 still run on the worker.
+[GPU HDR Bake evidence](validation/bake-radiance-gpu-20261128.json)
 
 Eligible 512–2048 current-grid RGB8 Bake materials now composite color, ORM
 and legacy emission on the selected GPU. Their ordered paint, coverage,

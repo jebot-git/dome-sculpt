@@ -158,7 +158,12 @@ GPU. The same batch samples the original image, filters sparse legacy and
 absolute FLOAT paint through the retained padding, and resolves the final
 radiance using the original ordered binary64 arithmetic. The path also
 covers constant sources and explicit physical backgrounds. The worker still
-owns retained polygon field resolvers and ordered native publication.
+owns retained polygon field resolvers and ordered native publication. The
+five-layer 1024² HDR fixture produced a byte-identical project. Its median
+warm Arc Bake fell from 0.92 to 0.55 seconds. Its first Bake rose from 11.73
+to 14.48 seconds. Synthetic OpenXR tracking exercised the public HDR Bake,
+Save, Undo and Redo workflow on the ordinary app.
+[GPU HDR Bake evidence](validation/bake-radiance-gpu-20261128.json)
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing

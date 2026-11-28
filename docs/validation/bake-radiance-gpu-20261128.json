@@ -1,0 +1,95 @@
+{
+  "date": "2026-11-28",
+  "product": "3ea04aa7bc5243533c813af86ef388cdacb20f07",
+  "preceding": "be565c7c81f94cc7648d17d3ba40832ac13e6334",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Native Bake FLOAT radiance sampling, sparse overlay filtering and ordered binary64 resolve on the build-selected GPU.",
+  "oneapi_arc_release": {
+    "application_sha256": "aa87c846096dd8cb79b76e4061d5119419c0c738aed43c99164fa2e8d049b8cf",
+    "release_fltk_core_sha256": "35aa46ebf11f5f3a9772d926b05a24938572471d9dbcf3e2718e98376fadbdb3",
+    "bake_regression": {
+      "passed": 27,
+      "junit_sha256": "0453d8dac8191f4e19efd9d4d3e57b70ea90e27e4106cdf939e2a374707ead09",
+      "full_log_sha256": "1852b5a4efafaf49089104b4e5f129aa09d3ffd33cd8f0c0c4cceeb447707d56",
+      "synthetic_openxr": 4
+    },
+    "hdr_regression": {
+      "passed": 8,
+      "junit_sha256": "9d1b2a9895f7460402728615d496bf587fa5a60a19011207f7a42efeea0d4155",
+      "full_log_sha256": "b96c30bb0ca43a91558d3b29688f47dfc3f5beef441750239bea9f02d21ac74c",
+      "synthetic_openxr": 0
+    },
+    "explicit_physical_background_regression": {
+      "passed": 1,
+      "junit_sha256": "b506c9293628422507abc3a66af74bcef99f72ac5334da7fa41850809bbe91ed",
+      "full_log_sha256": "88fcf4bfe1b2945207935fe331ec838a37264a8921c3a525c72ae02465f7417d",
+      "synthetic_openxr": 0
+    },
+    "masked_radiance_oracle": {
+      "exact_samples": 2018,
+      "float_max_and_subnormal": true,
+      "overflow_refused": true,
+      "cancel_preserves_sparse_owner": true,
+      "log_sha256": "329efe4cb5603ec5c01207312331d9c5ad86de746fef57e4f3096bb5c832de7e"
+    },
+    "benchmark_1024": {
+      "projected_texels": 1048576,
+      "projection_rays": 1048576,
+      "source_layers": 5,
+      "identical_native_project_sha256": "df1b285d13d0c460edad06e89c280e800c90c3b41cd3bbac96424da9dbc61be3",
+      "seconds_cold_then_warm": {
+        "preceding": [
+          11.7283,
+          0.928564,
+          0.917093
+        ],
+        "candidate": [
+          14.4794,
+          0.540461,
+          0.553227
+        ]
+      },
+      "median_warm_seconds": {
+        "preceding": 0.9228285,
+        "candidate": 0.546844
+      },
+      "log_sha256": "32fc657dd85ffe57cbcde08f063ac7c7998513dfaa6c2dbfa4e99c8e4744a96a"
+    },
+    "hdr_public_openxr": {
+      "passed": 33,
+      "tracking": "synthetic",
+      "report_sha256": "006fba81b916f207b2a29d7ac97fabc6c9f45290cf4aeeb8623bb809d903a18e",
+      "actual_native_save_sha256": "b0bae1b50c6050d8a6bfd151abf1912281c9672da53de4b7519e4c094388d497",
+      "log_sha256": "d56dd2de5e9ca6ad303c04d0879e0fec883e0ea4881a9685777caeb0f2ef8d48"
+    },
+    "wayland": {
+      "passed": 15,
+      "report_sha256": "3206993dcd5a5c556e4a8584dc324197fcbb72c60819d1efa07f2d98534a9aa7",
+      "runtime_maps_sha256": "3315451a6185b279557398c27c23e0233ad935c8b151901048f3bc5c4e82fee4",
+      "log_sha256": "91c10c08fc6b8f632ab736ecb65920bc52d035f16068234f3af80bcf38ac223f"
+    },
+    "no_device_refusal": "No device of requested type 'info::device_type::gpu' available."
+  },
+  "headless_reference": {
+    "passed": 4,
+    "log_sha256": "7d67b612869f3c7d05fdf0b14109343091d477c86748f8ba4c2c9de2d9b5a7b1",
+    "asan_ubsan_mixed_source_domain_checks": 24,
+    "asan_ubsan_log_sha256": "e6d03b46e9fc6cf6c7cc5a2cc1d89780c37199d664991c7ec821d4bcd2bf3e02"
+  },
+  "cuda_and_rocm": {
+    "cuda": {
+      "compiled_kernel_sha256": "cb2f8ca90296c94894869e05d6ffa8c9f67f233df87b71620f0518a46b0cbb92",
+      "no_device_refusal": "CUDA driver version is insufficient for CUDA runtime version"
+    },
+    "rocm": {
+      "compiled_kernel_sha256": "b873ae5426fcc741a2cf6441777c8601ca6183489fb15806cbb6af3c304b5e7e",
+      "no_device_refusal": "no ROCm-capable device is detected"
+    }
+  },
+  "limits": [
+    "Retained polygon fields and explicit caller callbacks still evaluate on the worker. The worker also owns native history and publication.",
+    "First-run timing includes GPU program loading and compilation. The fixture uses one textured source with mixed RGB8 and FLOAT paint and no ambient rays.",
+    "CUDA and ROCm compile and link the kernels. Positive AMD and NVIDIA execution and physical headset testing remain open.",
+    "ASan and UBSan cover the headless host source-resolution and Bake path."
+  ]
+}
