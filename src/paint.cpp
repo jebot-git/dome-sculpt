@@ -32,6 +32,7 @@
 #include "source-bake-normal.hpp"
 #include "source-colors.hpp"
 #include "paint-source-admission.hpp"
+#include "source-uv-sampler.hpp"
 #include "paint-archive-shape.hpp"
 #include "source-uv-archive.hpp"
 #include "dome/paint-sampling.hpp"
@@ -4606,7 +4607,8 @@ std::shared_ptr<const SourceMaterialBindings> detail::TextureSetPaintAccess::rep
 
 std::shared_ptr<const detail::BakedNormalField> detail::TextureSetPaintAccess::reproject_retopology_normals(
     const PaintedMesh &from,const SourceMaterialBindings &before,
-    const PaintedMesh &replacement,const SourceMaterialBindings &after,RetopoTransfer &transfer) {
+    const PaintedMesh &replacement,const SourceMaterialBindings &after,RetopoTransfer &transfer,
+    const DeformationState *source_pose) {
   const auto source=from.baked()?from.baked()->normal_field:nullptr;
   const auto baseline=replacement.baked()?replacement.baked()->normal_field:nullptr;
   if (!source || !baseline || source->origin()!=before.canonical_attributes ||
@@ -4618,22 +4620,39 @@ std::shared_ptr<const detail::BakedNormalField> detail::TextureSetPaintAccess::r
   // Reconstruct the actual placed columns used by the renderer on both
   // atlases. Transforming the final sampled vector cannot account for shear
   // or the discrete tangent sign of reflected source triangles.
-  const auto columns=[&](const NormalFrames &frames,const AffineTransform &matrix) {
-    transfer.reserve(frames.normals.size(),sizeof(NormalBakeVertex));
+  const auto columns=[&](std::span<const Vec3> normals,std::span<const std::array<float,4>> tangents,
+                         const AffineTransform &matrix) {
+    if (normals.size()!=tangents.size())
+      throw std::invalid_argument("Retopology normal and tangent corner counts differ");
+    transfer.reserve(normals.size(),sizeof(NormalBakeVertex));
     const AffineInteractionFrame placement(matrix);
     std::vector<NormalBakeVertex> result;
-    result.reserve(frames.normals.size());
-    for (size_t corner=0;corner<frames.normals.size();++corner) {
+    result.reserve(normals.size());
+    for (size_t corner=0;corner<normals.size();++corner) {
       if ((corner&1023)==0) paint_compute::checkpoint(transfer.cancelled());
       transfer.work();
-      const auto t=placed_tangent(placement,frames.tangents.at(corner));
-      result.push_back(normal_bake_vertex(placed_normal(placement,frames.normals[corner]),
+      const auto t=placed_tangent(placement,tangents[corner]);
+      result.push_back(normal_bake_vertex(placed_normal(placement,normals[corner]),
                                          {t[0],t[1],t[2]},t[3],NormalVertexBitangent::UnitCross));
     }
     return result;
   };
-  const auto source_columns=columns(*before.normal_frames->pbr,transfer.previous_metric());
-  const auto target_columns=columns(*after.normal_frames->pbr,transfer.replacement_metric());
+  const auto &old_mesh=from.mesh();
+  const auto source_columns=[&] {
+    const auto &pbr=*before.normal_frames->pbr;
+    if (!source_pose) return columns(pbr.normals,pbr.tangents,transfer.previous_metric());
+    auto scratch=transfer.scratch();
+    scratch.reserve(old_mesh.indices.size()*(2*sizeof(uint32_t)+sizeof(Vec3)+sizeof(std::array<float,4>)));
+    transfer.work(old_mesh.indices.size()*(5+pbr.targets.size()));
+    NormalFrameLayout corners;
+    corners.vertices=old_mesh.indices;
+    corners.corners.resize(corners.vertices.size());
+    std::iota(corners.corners.begin(),corners.corners.end(),0u);
+    const auto posed=normal_frame_preview(*before.normal_frames,corners,source_pose,transfer.cancelled(),1);
+    return columns(posed.normals[0],posed.tangents[0],transfer.previous_metric());
+  }();
+  const auto &new_frames=*after.normal_frames->pbr;
+  const auto target_columns=columns(new_frames.normals,new_frames.tangents,transfer.replacement_metric());
   const auto basis=[](const std::vector<NormalBakeVertex> &values,uint32_t face,std::array<double,3> bary) {
     std::array<NormalBakeVertex,3> v;
     std::copy_n(values.begin()+size_t(face)*3,3,v.begin());
@@ -4644,39 +4663,92 @@ std::shared_ptr<const detail::BakedNormalField> detail::TextureSetPaintAccess::r
   transfer.reserve(count,9);
   std::array<Image,2> planes{blank_image(surface.resolution,true),blank_image(surface.resolution,true)};
   std::vector<uint8_t> coverage(count);
-  const auto &old_mesh=from.mesh();
   const auto &normal_uv=before.canonical_uv;
   const auto bound=before.canonical_attributes->receipt().accepted_angular_error;
-  size_t hits=0;
-  RetopoTexelMatches matches(surface,transfer);
-  for (size_t index=0;index<count;++index) {
-    if ((index&1023)==0) paint_compute::checkpoint(transfer.cancelled());
-    const auto &texel=surface.texels[index];
-    if (!texel.covered()) continue;
-    const auto &w=texel.bary;
-    const auto hit=matches.at(index);
-    if (!hit) continue;
-    transfer.work(64);
-    ++hits;
-    std::array<float,2> uv{};
-    for (size_t corner=0;corner<3;++corner) {
-      const auto i=size_t(hit->triangle)*3+corner;
-      const auto source_uv=normal_uv?normal_uv->coordinates().at(normal_uv->mesh()->indices.at(i)):
-                                     old_mesh.uv.at(old_mesh.indices.at(i));
-      for (size_t axis=0;axis<uv.size();++axis) uv[axis]+=source_uv[axis]*hit->barycentric[corner];
+  // Retained normal grids have their own coverage and original coordinates.
+  // Release the device images and batches before sealing the output planes.
+  {
+    struct Sample {
+      size_t texel;
+      uint32_t triangle;
+      std::array<float,3> bary;
+    };
+    using UvSampler=SourceUvSampler;
+    const auto capacity=std::min(count,size_t(4096));
+    auto scratch=transfer.scratch();
+    scratch.reserve(capacity*(sizeof(Sample)+3*sizeof(UvSampler::Coordinate)+16*sizeof(uint32_t)));
+    const auto upload=[&](const std::shared_ptr<const Image> &image) {
+      scratch.reserve(image->rgba.size()+UvSampler::table_bytes);
+      paint_compute::checkpoint(transfer.cancelled());
+      PaintSourceTexture view;
+      view.image=image;
+      view.wrap_s=view.wrap_t=33071;
+      view.min_filter=view.mag_filter=9729;
+      return upload_source_uv_sampler(view,false,UvSampler::Output::LinearRgba,capacity);
+    };
+    auto pbr=upload(source->pbr());
+    auto toon=source->mtoon()==source->pbr()?nullptr:upload(source->mtoon());
+    std::vector<Sample> samples;
+    std::vector<UvSampler::Coordinate> coordinates;
+    std::vector<uint32_t> pbr_pixels(4*capacity),toon_pixels(toon?4*capacity:0);
+    samples.reserve(capacity);
+    coordinates.reserve(capacity);
+    size_t hits=0;
+    const auto flush=[&] {
+      if (samples.empty()) return;
+      paint_compute::checkpoint(transfer.cancelled());
+      const auto words=4*samples.size();
+      pbr->read(coordinates,std::span(pbr_pixels).first(words));
+      if (toon) {
+        paint_compute::checkpoint(transfer.cancelled());
+        toon->read(coordinates,std::span(toon_pixels).first(words));
+      }
+      for (size_t i=0;i<samples.size();++i) {
+        if ((i&1023)==0) paint_compute::checkpoint(transfer.cancelled());
+        const auto &[index,triangle,bary]=samples[i];
+        const auto &texel=surface.texels[index];
+        const auto &w=texel.bary;
+        const auto original=basis(source_columns,triangle,{bary[0],bary[1],bary[2]});
+        const auto target=basis(target_columns,texel.face,{w[0],w[1],1.-w[0]-w[1]});
+        for (size_t role=0;role<planes.size();++role) {
+          const auto *rgb=(role&&toon?toon_pixels:pbr_pixels).data()+4*i;
+          const auto n=mtoon_normal_map({std::bit_cast<float>(rgb[0]),std::bit_cast<float>(rgb[1]),
+                                         std::bit_cast<float>(rgb[2])},1);
+          const auto sampled=normalized(original.t*n.x+original.b*n.y+original.n*n.z);
+          const auto value=encode_normal_bake(target,sampled);
+          if (!value || value->quantized_angle_radians>bound)
+            throw std::invalid_argument("Retopology exceeds the prepared normal encoding bound");
+          std::copy(value->rgba.begin(),value->rgba.end(),planes[role].rgba.begin()+index*4);
+        }
+        coverage[index]=255;
+      }
+      hits+=samples.size();
+      samples.clear();
+      coordinates.clear();
+    };
+    RetopoTexelMatches matches(surface,transfer);
+    for (size_t index=0;index<count;++index) {
+      if ((index&1023)==0) paint_compute::checkpoint(transfer.cancelled());
+      const auto &texel=surface.texels[index];
+      if (!texel.covered()) continue;
+      const auto hit=matches.at(index);
+      if (!hit) continue;
+      transfer.work(64);
+      std::array<float,2> uv{};
+      for (size_t corner=0;corner<3;++corner) {
+        const auto i=size_t(hit->triangle)*3+corner;
+        const auto source_uv=normal_uv?normal_uv->coordinates().at(normal_uv->mesh()->indices.at(i)):
+                                       old_mesh.uv.at(old_mesh.indices.at(i));
+        for (size_t axis=0;axis<uv.size();++axis) uv[axis]+=source_uv[axis]*hit->barycentric[corner];
+      }
+      const auto &b=hit->barycentric;
+      samples.push_back({index,hit->triangle,{b[0],b[1],b[2]}});
+      coordinates.push_back({uv[0],uv[1]});
+      if (samples.size()==capacity) flush();
     }
-    const auto &b=hit->barycentric;
-    const auto sampled=source->sample(basis(source_columns,hit->triangle,{b[0],b[1],b[2]}),uv);
-    const auto target=basis(target_columns,texel.face,{w[0],w[1],1.-w[0]-w[1]});
-    for (size_t role=0;role<sampled.size();++role) {
-      const auto value=encode_normal_bake(target,sampled[role]);
-      if (!value || value->quantized_angle_radians>bound)
-        throw std::invalid_argument("Retopology exceeds the prepared normal encoding bound");
-      std::copy(value->rgba.begin(),value->rgba.end(),planes[role].rgba.begin()+index*4);
-    }
-    coverage[index]=255;
+    flush();
+    if (!hits) throw std::invalid_argument("No matching old surface for the prepared retopology normals");
   }
-  if (!hits) throw std::invalid_argument("No matching old surface for the prepared retopology normals");
   // Preserve the chart's filtering footprint independently of material
   // coverage. A ray miss inside a chart uses the neutral baseline.
   for (size_t index=0;index<count;++index) {

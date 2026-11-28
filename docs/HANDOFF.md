@@ -298,8 +298,7 @@ The 64- and 1024-pixel tests cover editable FLOAT layers independently of
 FLOAT Bake data. DomeD Wayland covers native pointer placement, Apply, Save,
 Undo, Redo and standard GLB. Synthetic OpenXR verifies that the accepted
 patch has writable FLOAT paint and a hidden mask after the first Apply from
-a reflected, posed guide. Prepared native normal fields currently require
-the source rest pose for first transfer.
+a reflected, posed guide.
 [Native first-patch material evidence](validation/retopo-native-material-20261128.json)
 
 Retopology Apply and reapply now use the selected GPU to match source
@@ -323,10 +322,17 @@ color, ORM, tangent-space normal samples and emission on the selected GPU.
 The worker keeps linear sample values through affine tangent transport and
 native archive encoding. Imported PBR overlays use the same Bake filter
 before resolving the original source images. Resident and bounded GPU paths
-preserve FLOAT radiance above the editable brush limit. Transfer of
-independent authored normal fields and first transfer from posed prepared
-meshes remain open, along with physical headset and AMD/NVIDIA validation.
+preserve FLOAT radiance above the editable brush limit.
 [GPU Retopology Bake sampling evidence](validation/retopo-bake-gpu-20261128.json)
+
+First Apply also captures prepared normal maps from a skinned or morphed
+native guide in its current pose. Apply and reapply filter the independent
+PBR and MToon maps on the selected GPU in batches using their retained UVs.
+The worker transports the result through the same morph, skin and placement
+rules as viewport shading and checks the angular encoding budget for the
+new atlas. A cleared Bake retains its historical conversion lease through
+matching UV seam copies of the posed source. Physical headset and positive
+AMD and NVIDIA runs remain open.
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing

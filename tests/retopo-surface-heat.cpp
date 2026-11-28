@@ -3,6 +3,7 @@
 #include "dome/document.hpp"
 #include "dome/import.hpp"
 #include "dome/native-authoring.hpp"
+#include "dome/normal-preparation.hpp"
 #include "dome/paint-sampling.hpp"
 #include "dome/polygon-scene.hpp"
 #include "dome/rig-edit.hpp"
@@ -1413,6 +1414,203 @@ SourceMaterialBindings retopo_toon_binding(const TextureSetView &slot,bool trim,
   return binding;
 }
 
+void first_prepared_patch(bool affine, const std::filesystem::path &out) {
+  Mesh mesh;
+  mesh.positions={{-.5f,-.5f,0},{.5f,-.5f,0},{.5f,.5f,0},{-.5f,.5f,0}};
+  mesh.normals.assign(4,{0,0,1});
+  mesh.uv={{0,0},{1,0},{1,1},{0,1}};
+  mesh.indices={0,1,2,0,2,3};
+  Scene scene;
+  auto &guide=scene.active();
+  const auto source=guide.id;
+  guide.mesh_active=true;
+  guide.painted=std::make_shared<PaintedMesh>(mesh,64);
+  BakedTextures bake;
+  bake.coverage.assign(64*64,255);
+  bake.maps.color={64,64,std::vector<uint8_t>(4*64*64,255)};
+  bake.maps.metal_rough=bake.maps.color;
+  bake.maps.normal=bake.maps.color;
+  bake.maps.emission=bake.maps.color;
+  for (size_t i=0;i<bake.coverage.size();++i) {
+    bake.maps.normal.rgba[4*i]=158;
+    bake.maps.normal.rgba[4*i+1]=109;
+  }
+  guide.painted->install_bake(std::move(bake));
+  DeformationState pose(mesh);
+  pose.skeleton=Skeleton{{Bone{"Retopology pose joint"}}};
+  pose.skin=SkinWeights{};
+  pose.skin->vertices.assign(mesh.positions.size(),{{0,1}});
+  pose.morphs.emplace(mesh);
+  MorphTarget target{"Translated sloping pose",{}};
+  for (auto p:mesh.positions) target.delta.push_back({1.65f,0,.32f*p.x});
+  pose.morphs->targets.push_back(std::move(target));
+  scene.set_deformation(source,pose);
+  const auto converted=convert_canonical_normals({guide.painted,{}, {},guide.deformation,guide.material,{}});
+  guide.painted=converted.paint->snapshot();
+  guide.material_bindings=converted.material_bindings;
+  auto updated=*guide.painted->baked();
+  auto to_pbr=*updated.normal_field->pbr(),to_toon=*updated.normal_field->mtoon();
+  for (size_t i=0;i<updated.coverage.size();++i) {
+    to_pbr.rgba[4*i]=uint8_t(158+i%64/2);
+    to_toon.rgba[4*i+1]=uint8_t(157+i/64/2);
+  }
+  updated.normal_field=updated.normal_field->replace_planes(
+      to_pbr,to_toon,std::vector<uint8_t>(updated.coverage.size(),255));
+  guide.painted->clear_bake();
+  guide.painted->install_bake(std::move(updated));
+  pose.morph_weights={.8f};
+  pose.pose.resize(1);
+  pose.pose[0].rotation={.9659258f,0,.2588190f,0};
+  pose.pose[0].translation={.12f,-.08f,.11f};
+  scene.set_deformation(source,pose);
+  if (affine) guide.affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(
+      std::array<double,16>{-1.12,.13,.19,0,.27,.88,.07,0,.04,-.05,1.21,0,.08,-.11,.04,1}));
+  const auto posed=pose.preview(mesh);
+  const auto world=scene.world_matrix(source);
+  check(SurfaceQuery(mesh).closest(posed.positions[0]).distance>.35f,
+        "The guide pose moves the actual surface beyond REST projection reach");
+
+  RetopoMesh topology;
+  std::array<TopologyID,4> quad;
+  for (size_t i=0;i<quad.size();++i)
+    quad[i]=topology.add_vertex({point(world,posed.positions[i])});
+  if (affine) std::reverse(quad.begin(),quad.end());
+  topology.add_face(quad);
+  scene.validate();
+  scene.save(out/"posed-prepared-source.dsculpt");
+  auto cleared=scene.snapshot();
+  cleared.active().painted->clear_bake();
+  publish_retopology(cleared,topology,source,{});
+  check(!cleared.active().painted->baked() && cleared.active().material_bindings->canonical_attributes &&
+        cleared.active().material_bindings->canonical_attributes->before_paint()->baked(),
+        "First Apply on a posed cleared Bake preserves the conversion lease and live unbaked state");
+
+  if (affine) {
+    Document uv;
+    uv.replace(scene);
+    settled(uv);
+    uv.begin_uv();
+    check(uv.wait_uv(),"The posed prepared guide opens the independent UV editor");
+    uv.edit_uv(UvAction::Pick,.5f,.5f);
+    uv.edit_uv(UvAction::Seam);
+    check(uv.wait_uv(),"The UV worker splits the original shared edge");
+    uv.edit_uv(UvAction::Scale,.72f);
+    check(uv.wait_uv() && uv.frame().state->uv->valid,"The split chart can be committed");
+    uv.end_uv(true);
+    settled(uv);
+    auto split=uv.copy_scene();
+    check(split.active().painted->mesh().positions.size()>mesh.positions.size() &&
+          split.active().material_bindings->canonical_uv,
+          "Independent coordinates and split skin rows survive the real UV operation");
+    auto split_baked=split.snapshot();
+    publish_retopology(split_baked,topology,source,{});
+    check(split_baked.active().painted->baked()->normal_field &&
+          split_baked.object(source).material_bindings==split.active().material_bindings,
+          "First Apply samples live prepared normals through their original ordered corners after a seam split");
+    uv.clear_bake();
+    settled(uv);
+    split=uv.copy_scene();
+    publish_retopology(split,topology,source,{});
+    check(!split.active().painted->baked() &&
+          split.active().material_bindings->canonical_attributes->before_paint()->baked(),
+          "A cleared Bake reprojects its historical atlas through the shared pose of the split seam");
+    split.save(out/"posed-cleared-split.dsculpt");
+    check(Scene::load(out/"posed-cleared-split.dsculpt").encode()==split.encode(),
+          "Reopening preserves the cleared replacement and the split original material");
+  }
+
+  const auto original=guide.painted->baked()->normal_field;
+  const auto exact=guide.material_bindings;
+  Document doc;
+  doc.replace(scene);
+  settled(doc);
+  doc.begin_retopology();
+  drafted(doc);
+  for (auto id:quad) touch(doc,topology.vertices().at(id).position);
+  doc.edit_retopology(RetopoAction::Face);
+  drafted(doc);
+  doc.end_retopology(true);
+  doc.save_async(out/"posed-prepared-patch.dsculpt").get();
+  settled(doc);
+  const auto after=doc.copy_scene();
+  const auto &patch=after.active();
+  const auto field=patch.painted->baked()->normal_field;
+  check(!patch.deformation && patch.retopology && patch.retopology->source==source &&
+        !after.object(source).visible && after.object(source).material_bindings==exact &&
+        after.object(source).painted->baked()->normal_field==original && field->origin()==patch.material_bindings->canonical_attributes &&
+        field->origin()!=original->origin() && field->pbr()!=field->mtoon(),
+        "Apply captures a static patch with its own independent normal maps and retains the posed guide");
+  check(Scene::load(out/"posed-prepared-patch.dsculpt").encode()==after.encode(),
+        "The ordered save reopens with the original and replacement normal owners intact");
+
+  const auto patch_world=after.world_matrix(patch.id);
+  const detail::AffineInteractionFrame target_placement(patch_world);
+  const auto applied=detail::source_bake_normals(patch,{}, {256*1024*1024,{},&target_placement});
+  const auto &frame_set=*exact->normal_frames->pbr;
+  check(frame_set.targets.size()==1 && !frame_set.targets[0].normals.empty(),
+        "The guide owns authored directions for the active morph");
+  const SurfaceQuery query(posed);
+  const auto &result=patch.painted->mesh();
+  float error=0,rest_difference=0;
+  size_t samples=0;
+  for (uint32_t tri=0;tri<result.indices.size()/3;++tri) {
+    const auto a=result.indices[3*tri],b=result.indices[3*tri+1],c=result.indices[3*tri+2];
+    for (int row=2;row<15;++row) for (int col=2;row+col<19;++col) {
+      const std::array w{1.f-(row+col)*.05f,row*.05f,col*.05f};
+      const auto p=point(patch_world,result.positions[a]*w[0]+result.positions[b]*w[1]+result.positions[c]*w[2]);
+      const auto hit=query.nearest_result(p,world,{});
+      if (!hit || std::ranges::min(hit->surface.barycentric)<.06f) continue;
+      std::array<Vec3,3> posed_columns{},rest_columns{};
+      std::array<float,2> uv{};
+      for (size_t i=0;i<3;++i) {
+        const auto corner=hit->surface.triangle*3+i;
+        const auto j=mesh.indices[corner];
+        const float weight=hit->surface.barycentric[i];
+        for (size_t axis=0;axis<2;++axis) uv[axis]+=mesh.uv[j][axis]*weight;
+        const auto n=frame_set.normals[corner];
+        const auto at=frame_set.tangents[corner];
+        const Vec3 t{at[0],at[1],at[2]};
+        const auto accumulate=[&](std::array<Vec3,3> &frame,Vec3 normal,Vec3 tangent) {
+          const auto wn=world.normal({normal.x,normal.y,normal.z});
+          const auto wt=world.direction({tangent.x,tangent.y,tangent.z});
+          const auto N=normalized(Vec3{float(wn[0]),float(wn[1]),float(wn[2])});
+          const auto T=normalized(Vec3{float(wt[0]),float(wt[1]),float(wt[2])});
+          const auto B=normalized(cross(N,T))*((affine?-1.f:1.f)*at[3]);
+          frame[0]+=T*weight;
+          frame[1]+=B*weight;
+          frame[2]+=N*weight;
+        };
+        accumulate(rest_columns,n,t);
+        const auto &morph=frame_set.targets[0];
+        accumulate(posed_columns,pose.pose[0].rotation.rotate(n+morph.normals[corner]*.8f),
+            pose.pose[0].rotation.rotate(t+(morph.tangents.empty()?Vec3{}:morph.tangents[corner]*.8f)));
+      }
+      const auto actual=applied(tri,w);
+      for (size_t role=0;role<actual.size();++role) {
+        PaintSourceTexture texture;
+        texture.image=role?original->mtoon():original->pbr();
+        texture.wrap_s=texture.wrap_t=33071;
+        texture.min_filter=texture.mag_filter=9729;
+        const auto pixel=sample_source_texture(texture,uv[0],uv[1],false);
+        const auto direction=[&](const auto &columns) {
+          return normalized(normalized(columns[0])*(2*pixel[0]-1)+
+                            normalized(columns[1])*(2*pixel[1]-1)+
+                            normalized(columns[2])*(2*pixel[2]-1));
+        };
+        error=std::max(error,length(actual[role]-direction(posed_columns)));
+        rest_difference=std::max(rest_difference,length(actual[role]-direction(rest_columns)));
+      }
+      ++samples;
+    }
+  }
+  std::cout<<"POSED_PREPARED samples="<<samples<<" error="<<error<<" rest_difference="<<rest_difference<<'\n';
+  check(samples>100 && error<.026f && rest_difference>.20f,
+        "Both varying normal maps agree with independent morph, joint rotation and placement reconstruction");
+  check(doc.undo() && doc.copy_scene().encode()==scene.encode() && doc.redo() &&
+        doc.copy_scene().encode()==after.encode(),"History recovers the exact posed source and captured patch");
+  settled(doc);
+}
+
 void first_material_patch(bool affine, const std::filesystem::path &out, bool posed) {
   Mesh mesh;
   mesh.positions={{-.5f,-.5f,0},{0,-.5f,0},{.5f,-.5f,0},
@@ -2074,6 +2272,7 @@ int main(int argc,char **argv) try {
   if (mode!="plain" && mode!="affine" && mode!="affine-wire" && mode!="mixed-material" &&
       mode!="first-material-plain" && mode!="first-material-affine" &&
       mode!="first-material-posed-plain" && mode!="first-material-posed-affine" &&
+      mode!="first-prepared-posed-plain" && mode!="first-prepared-posed-affine" &&
       mode!="mtoon-plain" && mode!="mtoon-affine" && mode!="mtoon-v0" && mode!="mtoon-detached" &&
       mode!="reapply-plain" && mode!="reapply-affine" && mode!="prepared-plain" && mode!="prepared-affine" &&
       mode!="prepared-detached" && mode!="prepared-detached-affine" &&
@@ -2091,6 +2290,7 @@ int main(int argc,char **argv) try {
   else if (mode=="affine-wire") affine_wire_edit(out);
   else if (mode=="mixed-material") mixed_material_quad(out);
   else if (mode.starts_with("first-material-")) first_material_patch(mode.ends_with("affine"),out,mode.starts_with("first-material-posed-"));
+  else if (mode.starts_with("first-prepared-")) first_prepared_patch(mode.ends_with("affine"),out);
   else if (mode.starts_with("material-seam-")) split_material_seam(mode.ends_with("affine"),out);
   else if (mode.starts_with("subdivide-seam-")) split_material_seam(mode.ends_with("affine"),out,true);
   else if (mode.starts_with("mtoon-")) retopo_toon_materials(mode.ends_with("affine"),mode.ends_with("v0"),out,mode=="mtoon-detached");

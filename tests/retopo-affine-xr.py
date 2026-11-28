@@ -91,8 +91,14 @@ for mode in ('accept','focus','unconfirmed'):
           bool(replacement['layers'][0]['physical_emission_tiles']) and bool(replacement['layers'][1]['tiles']),
           mode+' publishes a writable FLOAT layer and hidden mask on the new native patch')
     baked = replacement.get('baked', {})
+    expected_prepared = guide_paint.get('baked', {}).get('normal_interpretation') == 'independent-baked-field-v1'
+    normal_preserved = (
+        baked.get('base_version') == 5 and
+        baked.get('normal_interpretation') == 'independent-baked-field-v1' and
+        'normal_field' in baked
+    ) if expected_prepared else bool(baked.get('normal', {}).get('bytes'))
     check(baked.get('version') == 6 and bool(baked.get('float_emission', {}).get('bytes')) and
-          bool(baked.get('normal', {}).get('bytes')) and 255 in baked.get('coverage', {}).get('bytes', []),
+          normal_preserved and 255 in baked.get('coverage', {}).get('bytes', []),
           mode+' publishes the separate FLOAT Bake and covered normal map')
     patch=objects[1]['retopology'];topology=json.loads(patch['topology'])
     positions=sorted(v[1] for v in topology['vertices'])

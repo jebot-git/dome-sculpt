@@ -22,7 +22,8 @@ struct TextureSetPaintAccess {
       const SculptObject *imported=nullptr);
   static std::shared_ptr<const BakedNormalField> reproject_retopology_normals(
       const PaintedMesh &from,const SourceMaterialBindings &before,
-      const PaintedMesh &replacement,const SourceMaterialBindings &after,RetopoTransfer &);
+      const PaintedMesh &replacement,const SourceMaterialBindings &after,RetopoTransfer &,
+      const DeformationState *source_pose);
   static const std::shared_ptr<const TextureSetFaceDomain>& domain(const PaintedMesh&)noexcept;
   static std::shared_ptr<const void> raster_owner(const PaintedMesh&)noexcept;
   // Membership-required Paint7 payload. The domain is minted only by the

@@ -9,6 +9,7 @@
 #include "normal-bake-frames.hpp"
 #include "normal-frame-runtime.hpp"
 #include "baked-normal-field.hpp"
+#include "canonical-normal-uv.hpp"
 #include "deformation-active.hpp"
 #include "paint-normal-access.hpp"
 #include "retopo-transfer.hpp"
@@ -770,9 +771,9 @@ public:
   RetopoReplacement(std::shared_ptr<const PaintedMesh> grid,const Mesh &original_rest,AffineTransform old_world,
                     AffineTransform new_world, std::span<const TopologyID> old_faces,
                     std::span<const TopologyID> new_faces, std::vector<detail::RetopoCorrespondence> correspondence,
-                    const std::function<bool()> &cancelled, const DeformationState *first_source_pose=nullptr)
+                    const std::function<bool()> &cancelled, std::shared_ptr<const DeformationState> first_source_pose={})
       : budget_(cancelled), old_world_(old_world), new_world_(new_world), first_grid_(std::move(grid)),
-        original_rest_(original_rest), first_source_pose_(first_source_pose),
+        original_rest_(original_rest), first_source_pose_(std::move(first_source_pose)),
         old_faces_(old_faces), new_faces_(new_faces), correspondence_(std::move(correspondence)) {
     const auto resolution = first_grid_->resolution();
     budget_.reserve(correspondence_.size(), sizeof(detail::RetopoCorrespondence));
@@ -829,7 +830,7 @@ private:
   AffineTransform old_world_, new_world_;
   std::shared_ptr<const PaintedMesh> first_grid_;
   const Mesh &original_rest_;
-  const DeformationState *first_source_pose_;
+  std::shared_ptr<const DeformationState> first_source_pose_;
   std::span<const TopologyID> old_faces_, new_faces_;
   std::vector<detail::RetopoCorrespondence> correspondence_;
   std::map<uint32_t,std::shared_ptr<const PaintedMesh>> grids_;
@@ -892,14 +893,13 @@ private:
   State reproject_canonical(const PaintedMesh &before,const Material &material,
       const std::shared_ptr<const DeformationState> &old_deformation,const SourceMaterialBindings &binding,
       const std::shared_ptr<const DeformationState> &deformation,detail::RetopoTransfer &projection) {
-    if (projection.posed_source())
-      throw std::invalid_argument("Use the rest pose before transferring prepared normal fields to a first patch");
     if (binding.has_mtoon || binding.normal_preparation ||
         binding.polygon_surface_transfer || binding.native_paint_sampling || binding.native_paint_frames ||
         !binding.normal_frames || !binding.normal_frames->pbr || binding.normal_frames->pbr->tangents.empty())
       throw std::invalid_argument("Retopology needs the prepared native normal material and its actual tangent frame");
     detail::source_paint_pairing(&before,&binding,nullptr,true);
-    detail::normal_frame_current_authority(binding,before.mesh(),old_deformation.get(),budget_.cancelled());
+    const auto *source_deformation = old_deformation ? old_deformation.get() : first_source_pose_.get();
+    detail::normal_frame_current_authority(binding,before.mesh(),source_deformation,budget_.cancelled());
     const auto bake=before.baked();
     if (bake && (!bake->normal_field || bake->normal_field->origin()!=binding.canonical_attributes))
       throw std::invalid_argument("The prepared Bake no longer owns its current normal field");
@@ -908,8 +908,7 @@ private:
     // Clear Bake keeps an original conversion lease. Transport its actual
     // previous raw input to establish the new frame while keeping the live
     // replacement unbaked.
-    const auto &anchor=*binding.canonical_attributes->before_paint();
-    auto conversion_input=bake?raw:reproject(anchor,query(anchor));
+    auto conversion_input=bake?raw:reproject_canonical_anchor(before,binding,projection);
     NormalPreparationOptions options;
     options.max_angular_error=binding.canonical_attributes->receipt().accepted_angular_error;
     options.max_working_bytes=budget_.remaining_bytes();
@@ -919,7 +918,8 @@ private:
     std::shared_ptr<const PaintedMesh> paint=raw;
     if (bake) {
       auto field=detail::TextureSetPaintAccess::reproject_retopology_normals(
-          before,binding,*output.paint,*output.material_bindings,projection);
+          before,binding,*output.paint,*output.material_bindings,projection,
+          projection.posed_source()?source_deformation:nullptr);
       paint=SourceNormalPreparationAccess::adopt_baked_field(*raw,std::move(field),budget_.cancelled());
     } else {
       const auto &origin=output.material_bindings->canonical_attributes;
@@ -929,6 +929,43 @@ private:
     if (!bake && color.material) material_binding->color_preparation=color.material->color_preparation;
     material_binding->physical_emission=binding.physical_emission;
     return {std::move(paint),deformation,std::move(material_binding),{}};
+  }
+
+  std::shared_ptr<const PaintedMesh> reproject_canonical_anchor(const PaintedMesh &before,
+      const SourceMaterialBindings &binding,detail::RetopoTransfer &projection) {
+    const auto &anchor=*binding.canonical_attributes->before_paint();
+    if (!projection.posed_source() || !binding.canonical_uv || &anchor.mesh()==&before.mesh())
+      return reproject(anchor,query(anchor));
+
+    // Remap the current pose onto the historical atlas via the retained
+    // vertex identities. A split UV seam may only collapse to one pose when
+    // every copy of that source vertex has the same deformation.
+    binding.canonical_uv->validate_current(before.mesh(),budget_.cancelled());
+    const auto &deformation=*first_source_pose_;
+    auto scratch=detail::RetopoTransferBudget::Scratch(budget_);
+    scratch.reserve(anchor.mesh().positions.size()*sizeof(uint32_t)+deformation.resource_entries()*sizeof(Vec3));
+    const auto &roots=binding.canonical_uv->layout()->source_vertices;
+    std::vector<uint32_t> original_vertices(anchor.mesh().positions.size(),UINT32_MAX);
+    for (size_t vertex=0;vertex<roots.size();++vertex) {
+      if ((vertex&1023)==0) stop(budget_.cancelled());
+      auto &previous=original_vertices.at(roots[vertex]);
+      if (previous==UINT32_MAX) {
+        previous=uint32_t(vertex);
+        continue;
+      }
+      if (deformation.skin && deformation.skin->vertices[previous]!=deformation.skin->vertices[vertex])
+        throw std::invalid_argument("The posed cleared Bake has different skin weights across its original UV seam");
+      if (deformation.morphs) for (const auto &target:deformation.morphs->targets) {
+        budget_.work();
+        if (!same_position(target.delta[previous],target.delta[vertex]))
+          throw std::invalid_argument("The posed cleared Bake has different morph positions across its original UV seam");
+      }
+    }
+    if (std::ranges::find(original_vertices,UINT32_MAX)!=original_vertices.end())
+      throw std::invalid_argument("The posed cleared Bake has an original atlas vertex with no current counterpart");
+    auto anchor_pose=detail::normal_frame_remap_deformation(
+        first_source_pose_,before.mesh(),anchor.mesh(),original_vertices,budget_.cancelled());
+    return reproject(anchor,query(anchor,anchor_pose.get()));
   }
 
   detail::RetopoTextureSets reproject_sets(const std::shared_ptr<const PaintedMesh> &primary,
@@ -1032,14 +1069,14 @@ private:
                  raster.raster_samples + raster.candidate_checks);
   }
 
-  detail::RetopoTransfer &query(const PaintedMesh &paint) {
+  detail::RetopoTransfer &query(const PaintedMesh &paint,const DeformationState *source_pose=nullptr) {
     auto &surface = surfaces_[paint.mesh_owner().get()];
     if (!surface) {
       std::span<const detail::RetopoCorrespondence> retained;
       if (&paint.mesh()==&original_rest_ || same_rest_corners(paint.mesh(),original_rest_,budget_.cancelled()))
         retained=correspondence_;
       surface=std::make_unique<detail::RetopoTransfer>(paint.mesh(),old_world_,new_world_,budget_,retained,
-          old_faces_.empty(),first_source_pose_);
+          old_faces_.empty(),source_pose?source_pose:first_source_pose_.get());
     }
     return *surface;
   }
@@ -1237,7 +1274,7 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
       recipe = previous.bake_recipe;
     } else if (project_materials || native) {
       RetopoReplacement replacement(painted, previous.painted->mesh(), scene.world_matrix(source), staged.world_matrix(id),
-          {}, triangles.source_faces, {}, cancelled,previous.deformation.get());
+          {}, triangles.source_faces, {}, cancelled,previous.deformation);
       auto current = replacement.project(previous.painted, previous.material, {}, previous.material_bindings,
                                           sets,previous.bake_recipe);
       painted = current.paint->snapshot();

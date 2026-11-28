@@ -3,10 +3,13 @@
 // in z=0 so the unchanged real-loader controller plane is an independent oracle.
 #include "dome/scene.hpp"
 #include "dome/source-placement.hpp"
+#include "dome/normal-preparation.hpp"
 #include <iostream>
+#include <string_view>
 using namespace dome;
 int main(int argc,char **argv)try {
-  if(argc!=2)return 2;
+  const bool prepared=argc==3 && std::string_view(argv[2])=="prepared";
+  if(argc!=2 && !prepared)return 2;
   Mesh m;m.positions={{-.6f,-.6f,0},{.6f,-.6f,0},{.6f,.6f,0},{-.6f,.6f,0}};
   m.normals.assign(4,{0,0,1});m.uv={{0,0},{1,0},{1,1},{0,1}};m.indices={0,1,2,0,2,3};
   Scene s;auto &o=s.active();o.name="Affine reference — původní 日本語";o.mesh_active=true;
@@ -31,7 +34,8 @@ int main(int argc,char **argv)try {
     const auto pixel=4*i;
     bake.maps.color.rgba[pixel+3]=255;
     bake.maps.metal_rough.rgba[pixel+3]=255;
-    bake.maps.normal.rgba[pixel]=bake.maps.normal.rgba[pixel+1]=128;
+    bake.maps.normal.rgba[pixel]=prepared?uint8_t(161+i%64/3):128;
+    bake.maps.normal.rgba[pixel+1]=128;
     bake.maps.normal.rgba[pixel+2]=bake.maps.normal.rgba[pixel+3]=255;
   }
   bake.emission_field=BakedEmissionField::generate_compact(64,[](size_t){
@@ -41,8 +45,15 @@ int main(int argc,char **argv)try {
   DeformationState d(m);d.skeleton=Skeleton{{{"root",-1,{},.2f}}};
   d.skin=SkinWeights{};d.skin->vertices.assign(4,{{0,1}});
   d.morphs=MorphSet(m);auto target=m.positions;for(auto &v:target){v.x+=.04f*(v.y+.6f);v.y+=.025f*(v.x+.6f);}
-  d.morphs->set_target(m,"in-plane",target);d.morph_weights={.35f};
+  d.morphs->set_target(m,"in-plane",target);
   d.expressions=AvatarExpressions{{{"aa",{{"in-plane",.6f}}}}};
+  if (prepared) {
+    s.set_deformation(o.id,d);
+    auto conversion=convert_canonical_normals({o.painted,{}, {},o.deformation,o.material,{}});
+    o.painted=conversion.paint->snapshot();
+    o.material_bindings=std::move(conversion.material_bindings);
+  }
+  d.morph_weights={.35f};
   d.pose.resize(1);d.pose[0].translation={.01f,-.02f,0};d.pose[0].scale={1.1f,.85f,1.2f};
   s.set_deformation(o.id,std::move(d));
   o.affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(
