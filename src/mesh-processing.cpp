@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/mesh-processing.hpp"
 #include "bake-ray-query.hpp"
+#include "bake-ambient-device.hpp"
+#include "surface-ray-kernel.hpp"
 #include "affine-query-metric.hpp"
 #include "packed-material-query.hpp"
 #include <bit>
@@ -104,56 +106,17 @@ struct Bounds {
     return x * x + y * y + z * z;
   }
   bool ray(Vec3 p, Vec3 d,double radius=0,double maximum=INFINITY) const {
-    double lo_t = 0, hi_t = maximum;
-    float ps[] = {p.x, p.y, p.z}, ds[] = {d.x, d.y, d.z},
-          ls[] = {lo.x, lo.y, lo.z}, hs[] = {hi.x, hi.y, hi.z};
-    for (int k = 0; k < 3; k++) {
-      if (std::abs(ds[k]) < 1e-20) {
-        if (ps[k] < double(ls[k])-radius || ps[k] > double(hs[k])+radius)
-          return false;
-        continue;
-      }
-      double a = (double(ls[k])-radius-ps[k])/ds[k], b = (double(hs[k])+radius-ps[k])/ds[k];
-      if (a > b)
-        std::swap(a, b);
-      lo_t = std::max(lo_t, a);
-      hi_t = std::min(hi_t, b);
-      if (lo_t > hi_t)
-        return false;
-    }
-    return true;
+    return detail::surface_ray::intersects_box(lo,hi,p,d,radius,maximum);
   }
 };
-// Dominant-axis shear/edge tests adapted from Blender 5.4 Alpha's
-// isect_ray_tri_watertight_v3[_precalc] (GPL-2.0-or-later), pinned in
-// third_party/blender/math_geom.cc.reference. Double intermediates retain
-// identical shared-edge expressions, avoiding holes between adjacent faces.
-struct SurfaceRay {
-  Vec3 origin;
-  int x, y, z;
-  double sx, sy, sz;
-  SurfaceRay(Vec3 p, Vec3 direction) : origin(p) {
-    float d[] = {direction.x,direction.y,direction.z};
-    z = std::abs(d[0]) > std::abs(d[1]) ? 0 : 1;
-    if (std::abs(d[2]) > std::abs(d[z])) z = 2;
-    x = (z+1)%3; y = (x+1)%3;
-    if (d[z] < 0) std::swap(x,y);
-    sz = 1. / d[z]; sx = d[x]*sz; sy = d[y]*sz;
-  }
+struct SurfaceRay : detail::surface_ray::WatertightRay<detail::surface_ray::NativePrecision> {
+  using WatertightRay::WatertightRay;
   bool hit(Vec3 a, Vec3 b, Vec3 c, double maximum, double &distance,
             std::array<float,3> &bary) const {
-    auto shear = [&](Vec3 v) {
-      double p[] = {double(v.x)-origin.x,double(v.y)-origin.y,double(v.z)-origin.z};
-      return std::array<double,3>{p[x]-sx*p[z],p[y]-sy*p[z],p[z]};
-    };
-    auto av=shear(a),bv=shear(b),cv=shear(c);
-    double u=cv[0]*bv[1]-cv[1]*bv[0], v=av[0]*cv[1]-av[1]*cv[0],
-           w=bv[0]*av[1]-bv[1]*av[0], det=u+v+w;
-    if (((u<0 || v<0 || w<0) && (u>0 || v>0 || w>0)) || !det || !std::isfinite(det))
-      return false;
-    distance=(u*av[2]+v*bv[2]+w*cv[2])*sz/det;
-    if (!std::isfinite(distance) || distance < 0 || distance > maximum) return false;
-    bary={float(u/det),float(v/det),float(w/det)};
+    detail::surface_ray::Hit<double> hit;
+    if(!WatertightRay::hit(a,b,c,maximum,hit))return false;
+    distance=hit.distance;
+    bary={float(hit.u/hit.determinant),float(hit.v/hit.determinant),float(hit.w/hit.determinant)};
     return true;
   }
 };
@@ -641,6 +604,33 @@ std::optional<SurfaceHit> detail::BakeRayQuery::cast(const SurfaceQuery &surface
   const auto result=surface.raycast_result(origin,direction,maximum,options,rounding_radius);
   return result?std::optional<SurfaceHit>(result->surface):std::nullopt;
 }
+#ifndef DOME_BAKE_AMBIENT_REFERENCE
+std::unique_ptr<detail::bake_ambient::Query> detail::BakeRayQuery::upload_ambient(const SurfaceQuery &surface,
+    std::span<const Vec3> pattern,float maximum,const std::function<bool()> &cancelled) {
+  cancel(cancelled);
+  const auto &tree=surface.impl_->tree;
+  std::vector<bake_ambient::Node> nodes(tree.nodes.size());
+  // Bvh::build places each left subtree immediately after its parent. A
+  // right subtree inherits the escape of its parent.
+  nodes.front().escape=uint32_t(nodes.size());
+  for(size_t i=0;i<nodes.size();++i){
+    if(i%512==0)cancel(cancelled);
+    const auto &source=tree.nodes[i];
+    auto &node=nodes[i];
+    node.lo=source.box.lo;node.hi=source.box.hi;
+    if(source.left<0){
+      node.first=uint32_t(source.start);
+      node.count=uint32_t(source.count);
+    }else{
+      nodes[source.left].escape=uint32_t(source.right);
+      nodes[source.right].escape=node.escape;
+    }
+  }
+  auto query=bake_ambient::upload({nodes,tree.order,tree.m.indices,tree.m.positions},pattern,maximum);
+  cancel(cancelled);
+  return query;
+}
+#endif
 std::optional<SurfaceQueryResult> SurfaceQuery::nearest_result(Vec3 point,const AffineTransform &world,
     const SurfaceQueryOptions &options) const {
   cancel(options.cancelled);

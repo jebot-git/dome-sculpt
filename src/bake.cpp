@@ -1,6 +1,7 @@
 #include "paint-overlay-packet.hpp"
 #include "emission-authority.hpp"
 #include "source-bake-normal.hpp"
+#include "bake-ambient-device.hpp"
 #include "bake-ray-query.hpp"
 #include "bake-paint-coordinates.hpp"
 #include "emission-bake-source.hpp"
@@ -137,20 +138,25 @@ std::array<Vec3,256> ambient_pattern(uint32_t count) {
   }
   return directions;
 }
+detail::bake_ambient::Frame ambient_frame(Vec3 position,Vec3 normal,float bias) {
+  const auto tangent=normalized(cross(std::abs(normal.x)<.8f?Vec3{1,0,0}:Vec3{0,1,0},normal));
+  return {position+normal*bias,tangent,cross(normal,tangent),normal};
+}
+#ifdef DOME_BAKE_AMBIENT_REFERENCE
 float ambient(const SurfaceQuery &query, Vec3 position, Vec3 normal,
     std::span<const Vec3> pattern,const BakeOptions &o,BakeResult &result) {
-  auto tangent=normalized(cross(std::abs(normal.x)<.8f?Vec3{1,0,0}:Vec3{0,1,0},normal));
-  const auto bitangent=cross(normal,tangent),origin=position+normal*o.ray_bias;
+  const auto [origin,tangent,bitangent,axis]=ambient_frame(position,normal,o.ray_bias);
   uint32_t blocked=0;
   for(size_t i=0;i<pattern.size();++i){
     if (!(i%16)) cancel(o);
     const auto sample=pattern[i];
-    const auto direction=tangent*sample.x+bitangent*sample.y+normal*sample.z;
+    const auto direction=tangent*sample.x+bitangent*sample.y+axis*sample.z;
     if (++result.rays>o.max_rays) throw std::length_error("Bake ray budget exceeded");
     blocked+=query.raycast(origin,direction,o.ao_distance).has_value();
   }
   return 1-float(blocked)/pattern.size();
 }
+#endif
 double edge(std::array<float,2> a,std::array<float,2> b,std::array<float,2> p) {
   return (double(b[0])-a[0])*(double(p[1])-a[1])-(double(b[1])-a[1])*(double(p[0])-a[0]);
 }
@@ -469,6 +475,39 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   for (auto *image:{&result.maps.color,&result.maps.metal_rough,&result.maps.emission,&result.normal,&result.ambient_occlusion})
     if(image!=&result.maps.emission||!float_emission)*image={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
   if(o.separate_pbr_color)result.maps.pbr_color={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
+  auto write_ambient=[&](size_t at,float ao){
+    const auto value=byte(ao);
+    result.maps.metal_rough.rgba[at*4]=value;
+    std::fill_n(result.ambient_occlusion.rgba.data()+at*4,3,value);
+    result.ambient_occlusion.rgba[at*4+3]=255;
+  };
+#ifndef DOME_BAKE_AMBIENT_REFERENCE
+  namespace ambient_device=detail::bake_ambient;
+  std::unique_ptr<ambient_device::Query> ambient_query;
+  struct AmbientTexel { uint32_t index;float material_ao; };
+  std::vector<AmbientTexel> ambient_texels;
+  std::vector<ambient_device::Frame> ambient_frames;
+  std::vector<uint16_t> ambient_counts;
+  size_t ambient_capacity=0;
+  if(!ambient_samples.empty()){
+    ambient_query=detail::BakeRayQuery::upload_ambient(*query,ambient_samples,o.ao_distance,o.cancelled);
+    ambient_capacity=std::min({pixels,ambient_device::max_texels_per_batch,
+                               ambient_device::max_rays_per_batch/ambient_samples.size()});
+    ambient_texels.reserve(ambient_capacity);
+    ambient_frames.reserve(ambient_capacity);
+    ambient_counts.resize(ambient_capacity);
+  }
+  auto flush_ambient=[&]{
+    if(ambient_frames.empty())return;
+    ambient_query->count_blocked(ambient_frames,std::span(ambient_counts).first(ambient_frames.size()),o.cancelled);
+    for(size_t i=0;i<ambient_frames.size();++i){
+      const auto [at,material_ao]=ambient_texels[i];
+      write_ambient(at,material_ao*(1-float(ambient_counts[i])/ambient_samples.size()));
+    }
+    ambient_texels.clear();
+    ambient_frames.clear();
+  };
+#endif
   std::vector<uint32_t> owner(pixels,UINT32_MAX);
   const size_t triangle_count=target_triangles.empty()?low.indices.size()/3:target_triangles.size();
   SurfaceQueryOptions ray_options;
@@ -661,9 +700,19 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
         }
       }else mapped=frame.to_tangent(high_normal);
       if (o.normal_y_down) mapped.y=-mapped.y;
-      float ao=channels.ao;
-      if(!ambient_samples.empty())
-        ao*=ambient(*query,hit->position,normalized(hit->normal),ambient_samples,o,result);
+#ifdef DOME_BAKE_AMBIENT_REFERENCE
+      const float occlusion=ambient_samples.empty()?1:
+          ambient(*query,hit->position,normalized(hit->normal),ambient_samples,o,result);
+      write_ambient(at,channels.ao*occlusion);
+#else
+      if(ambient_query){
+        if(ambient_samples.size()>o.max_rays-result.rays)throw std::length_error("Bake ray budget exceeded");
+        result.rays+=ambient_samples.size();
+        ambient_texels.push_back({uint32_t(at),channels.ao});
+        ambient_frames.push_back(ambient_frame(hit->position,normalized(hit->normal),o.ray_bias));
+        if(ambient_frames.size()==ambient_capacity)flush_ambient();
+      }else write_ambient(at,channels.ao);
+#endif
       for (int c=0;c<3;++c) {
         result.maps.color.rgba[at*4+c]=byte(linear_to_srgb(channels.color[c]));
         if(!float_emission)result.maps.emission.rgba[at*4+c]=byte(linear_to_srgb(channels.emission[c]));
@@ -671,12 +720,10 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       result.maps.color.rgba[at*4+3]=byte(channels.color[3]);
       if(o.separate_pbr_color)for(int c=0;c<4;++c)result.maps.pbr_color.rgba[at*4+c]=byte(c<3?linear_to_srgb(pbr_color[c]):pbr_color[c]);
       if(!float_emission)result.maps.emission.rgba[at*4+3]=255;
-      result.maps.metal_rough.rgba[at*4]=byte(ao); result.maps.metal_rough.rgba[at*4+1]=byte(channels.roughness);
+      result.maps.metal_rough.rgba[at*4+1]=byte(channels.roughness);
       result.maps.metal_rough.rgba[at*4+2]=byte(channels.metallic); result.maps.metal_rough.rgba[at*4+3]=255;
       if(!o.encode_target_normal&&!canonical_pair_error){result.normal.rgba[at*4]=byte(mapped.x*.5f+.5f);result.normal.rgba[at*4+1]=byte(mapped.y*.5f+.5f);
         result.normal.rgba[at*4+2]=byte(mapped.z*.5f+.5f);result.normal.rgba[at*4+3]=255;}
-      for (int c=0;c<3;++c) result.ambient_occlusion.rgba[at*4+c]=byte(ao);
-      result.ambient_occlusion.rgba[at*4+3]=255;
       result.maps.transparent|=channels.color[3]<.9999f;
       result.coverage[at]=1; ++result.projected;
     }
@@ -684,6 +731,10 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   if (result.overlapping&&o.fail_on_overlap) throw std::runtime_error("Overlapping low UV coverage: "+std::to_string(result.overlapping)+" texels");
   if (result.missed&&o.fail_on_miss) throw std::runtime_error("Projection missed "+std::to_string(result.missed)+" low UV texels");
   if (!result.projected) throw std::runtime_error("No low UV texels projected onto the high source");
+#ifndef DOME_BAKE_AMBIENT_REFERENCE
+  flush_ambient();
+  ambient_query.reset();
+#endif
   flush_emission();
   resident_sampler.reset();
   if(o.progress)o.progress(.9f);

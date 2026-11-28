@@ -8,6 +8,13 @@ references remain opt-in headless test targets. Command-line export also
 requires the selected compute device. GPU coverage and data-transfer efficiency
 across the remaining workflows still require qualification.
 
+Bake traces ambient occlusion on the selected GPU through the native
+source BVH. It preserves the original biased cosine hemisphere, inclusive
+ray distance and ordered native output. Continuation batches poll for
+cancellation and read back blocked-ray counts. Ordinary projection and its
+bounded edge recovery still use the native host query.
+[GPU ambient occlusion evidence](validation/bake-ambient-gpu-20261128.json)
+
 Eligible 512–2048 current-grid RGB8 Bake materials now composite color, ORM
 and legacy emission on the selected GPU. Their ordered paint, coverage,
 native normal-map output, and GLB export match the preceding implementation.

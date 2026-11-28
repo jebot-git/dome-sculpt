@@ -1,5 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake.hpp"
+#ifdef DOME_TEST_AMBIENT_DEVICE
+#include "bake-ambient-device.hpp"
+#include "bake-ray-query.hpp"
+#endif
 #include <algorithm>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -69,9 +73,40 @@ void edge_projection() {
           "Rounding recovery never extends a front or back projection depth");
   }
 }
+#ifdef DOME_TEST_AMBIENT_DEVICE
+void ambient_device_traversal() {
+  using namespace detail::bake_ambient;
+  Mesh surface;
+  surface.positions={{0,0,.25f},{1,0,.25f},{0,1,.25f}};
+  surface.normals.assign(3,{0,0,1});
+  for(size_t i=0;i<4100;++i)surface.indices.insert(surface.indices.end(),{0,1,2});
+  const SurfaceQuery reference(surface);
+  const std::array<Vec3,1> pattern{{{0,0,1}}};
+  const std::array<Frame,3> frames{{
+    {{.75f,.75f,0},{1,0,0},{0,1,0},{0,0,1}},
+    {{.5f,.5f,0},{1,0,0},{0,1,0},{0,0,1}},
+    {{1.1f,.5f,0},{1,0,0},{0,1,0},{0,0,1}},
+  }};
+  auto query=detail::BakeRayQuery::upload_ambient(reference,pattern,.25f,{});
+  std::array<uint16_t,3> counts{42,42,42};
+  unsigned polls=0;
+  check(rejects([&]{query->count_blocked(frames,counts,[&]{return ++polls==2;});})&&
+        counts==std::array<uint16_t,3>{42,42,42},"Cancellation between device passes leaves all staged AO results untouched");
+  polls=0;
+  query->count_blocked(frames,counts,[&]{++polls;return false;});
+  check(polls>3&&counts==std::array<uint16_t,3>{0,1,0},
+        "Long watertight GPU traversals resume and accept an exact shared-edge segment endpoint");
+  auto short_ray=detail::BakeRayQuery::upload_ambient(reference,pattern,std::nextafter(.25f,0.f),{});
+  short_ray->count_blocked(frames,counts,{});
+  check(counts==std::array<uint16_t,3>{0,0,0},"The device rejects a blocker one float step past the ray endpoint");
+}
+#endif
 } // namespace
 int main()try {
   edge_projection();
+#ifdef DOME_TEST_AMBIENT_DEVICE
+  ambient_device_traversal();
+#endif
   auto low=quad();BakeSource source;source.mesh=quad();
   BakeOptions options;options.resolution=32;options.padding=0;options.ao_samples=0;
   auto result=bake_mesh(low,source,options);
@@ -134,6 +169,9 @@ int main()try {
   auto shadow=bake_mesh(low,source,options);
   check(near(pixel(shadow.ambient_occlusion,16,16)[0],40,8)&&shadow.rays==uint64_t(1024)*65,
         "Cosine hemisphere AO detects a nearby high surface without altering projection bounds");
+  auto budget=options;
+  budget.max_rays=shadow.rays-1;
+  check(rejects([&]{bake_mesh(low,source,budget);}),"A late mixed projection and ambient budget failure rejects the complete Bake");
   options.ao_distance=.04f;auto distant=bake_mesh(low,source,options);
   check(pixel(distant.ambient_occlusion,16,16)[0]==255,"AO rays obey their explicit maximum distance");
 

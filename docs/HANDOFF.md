@@ -74,6 +74,16 @@ compatible joint rejects the complete operation. Recipient-side locks,
 native Restore, and Undo keep their existing semantics.
 [Joint correspondence evidence](validation/skin-joint-transfer-20261128.json)
 
+Ambient occlusion in Bake now traces the biased hemisphere on the selected
+GPU against the existing immutable source BVH. The device returns one
+blocked-ray count per projected texel. Long traversals resume on the device
+between cancellation checks. The bake retains the original inclusive ray
+distance, material occlusion, coverage and ray budget. Intel Arc uses integer
+binary64 for the watertight test. Native Wayland and synthetic OpenXR qualify
+Bake and Save on Arc. Surface projection and its edge recovery still use the
+native host query.
+[GPU ambient occlusion evidence](validation/bake-ambient-gpu-20261128.json)
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.

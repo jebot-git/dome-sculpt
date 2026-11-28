@@ -1,0 +1,73 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#pragma once
+#include "bake-ambient-kernel.hpp"
+
+namespace dome::detail::bake_ambient {
+template<class Api>
+class DeviceQuery final:public Query {
+  template<class T> struct Buffer {
+    Api &api;
+    T *data;
+    Buffer(Api &context,size_t size):api(context),data(static_cast<T*>(api.allocate(size*sizeof(T)))){}
+    ~Buffer(){api.release(data);}
+    Buffer(const Buffer &)=delete;
+  };
+  Api api_;
+  size_t samples_,capacity_;
+  float maximum_;
+  Buffer<Node> nodes_;
+  Buffer<uint32_t> order_,indices_,states_,remaining_;
+  Buffer<Vec3> vertices_,pattern_;
+  Buffer<Frame> frames_;
+  Buffer<uint16_t> counts_;
+  SurfaceView view_;
+public:
+  DeviceQuery(const Surface &surface,std::span<const Vec3> pattern,float maximum)
+      :samples_(pattern.size()),capacity_(std::min(max_texels_per_batch,max_rays_per_batch/samples_)),
+       maximum_(maximum),nodes_(api_,surface.nodes.size()),order_(api_,surface.order.size()),
+       indices_(api_,surface.indices.size()),states_(api_,capacity_*samples_),remaining_(api_,1),
+       vertices_(api_,surface.vertices.size()),pattern_(api_,samples_),frames_(api_,capacity_),counts_(api_,capacity_),
+       view_{nodes_.data,order_.data,indices_.data,vertices_.data,uint32_t(surface.nodes.size())} {
+    try {
+      api_.upload(nodes_.data,surface.nodes.data(),surface.nodes.size_bytes());
+      api_.upload(order_.data,surface.order.data(),surface.order.size_bytes());
+      api_.upload(indices_.data,surface.indices.data(),surface.indices.size_bytes());
+      api_.upload(vertices_.data,surface.vertices.data(),surface.vertices.size_bytes());
+      api_.upload(pattern_.data,pattern.data(),pattern.size_bytes());
+      api_.wait();
+    }catch(...){api_.drain();throw;}
+  }
+
+  void count_blocked(std::span<const Frame> frames,std::span<uint16_t> results,
+                     const std::function<bool()> &cancelled) override {
+    if(frames.empty()||frames.size()>capacity_||frames.size()!=results.size())
+      throw std::logic_error("Invalid ambient occlusion device batch");
+    auto poll=[&]{if(cancelled&&cancelled())throw std::runtime_error("Mesh baking cancelled");};
+    poll();
+    try {
+      api_.upload(frames_.data,frames.data(),frames.size_bytes());
+      bool first=true;
+      uint32_t remaining;
+      do {
+        api_.reset(remaining_.data);
+        api_.trace(view_,frames_.data,pattern_.data,samples_,maximum_,states_.data,
+                   frames.size()*samples_,remaining_.data,first);
+        api_.read(&remaining,remaining_.data,sizeof(remaining));
+        poll();
+        first=false;
+      }while(remaining);
+      api_.reduce(states_.data,samples_,counts_.data,frames.size());
+      api_.read(results.data(),counts_.data,results.size_bytes());
+      poll();
+    }catch(...){api_.drain();throw;}
+  }
+};
+
+template<class Api>
+std::unique_ptr<Query> upload_device(const Surface &surface,std::span<const Vec3> pattern,float maximum) {
+  if(surface.nodes.empty()||surface.order.empty()||surface.indices.empty()||surface.vertices.empty()||
+     pattern.empty()||pattern.size()>256||!std::isfinite(maximum)||maximum<=0)
+    throw std::logic_error("Invalid ambient occlusion device input");
+  return std::make_unique<DeviceQuery<Api>>(surface,pattern,maximum);
+}
+} // namespace dome::detail::bake_ambient

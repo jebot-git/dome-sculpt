@@ -1,0 +1,54 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include <sycl/sycl.hpp>
+#include "bake-ambient-device-query.hpp"
+#include "paint-composite-kernel.hpp"
+#include "surface-ray-softfloat.hpp"
+
+namespace dome::detail::bake_ambient {
+namespace {
+class SyclApi {
+  sycl::queue queue_{sycl::gpu_selector_v,[](sycl::exception_list errors){
+    for(auto error:errors)std::rethrow_exception(error);
+  },sycl::property_list{sycl::property::queue::in_order{}}};
+public:
+  void *allocate(size_t bytes){
+    auto *pointer=sycl::malloc_device(bytes,queue_);
+    if(!pointer)throw std::bad_alloc();
+    return pointer;
+  }
+  void release(void *pointer) noexcept {try{sycl::free(pointer,queue_);}catch(...){}}
+  void wait(){queue_.wait_and_throw();}
+  void drain() noexcept {try{wait();}catch(...){}}
+  void upload(void *to,const void *from,size_t bytes){queue_.memcpy(to,from,bytes);}
+  void read(void *to,const void *from,size_t bytes){queue_.memcpy(to,from,bytes).wait_and_throw();}
+  void reset(uint32_t *value){queue_.fill(value,uint32_t(0),1);}
+
+  void trace(SurfaceView surface,const Frame *frames,const Vec3 *pattern,size_t samples,float maximum,
+             uint32_t *states,size_t rays,uint32_t *remaining,bool first){
+    queue_.parallel_for(sycl::range<1>{rays},[=](sycl::id<1> id){
+      const size_t index=id[0];
+      const uint32_t start=first?0:states[index];
+      if(start>=surface.node_count)return;
+      const auto next=bake_ambient::trace<surface_ray::SoftPrecision>(surface,frames[index/samples],
+          pattern[index%samples],maximum,start,[](float value){
+            return paint_compute::normal_reciprocal(paint_compute::normal_length(value));
+          });
+      states[index]=next;
+      if(next<surface.node_count)
+        sycl::atomic_ref<uint32_t,sycl::memory_order::relaxed,sycl::memory_scope::device,
+                         sycl::access::address_space::global_space>(*remaining).store(1);
+    });
+  }
+
+  void reduce(const uint32_t *states,size_t samples,uint16_t *counts,size_t size){
+    queue_.parallel_for(sycl::range<1>{size},[=](sycl::id<1> id){
+      counts[id[0]]=count_blocked_rays(states+id[0]*samples,samples);
+    });
+  }
+};
+} // namespace
+
+std::unique_ptr<Query> upload(const Surface &surface,std::span<const Vec3> pattern,float maximum){
+  return upload_device<SyclApi>(surface,pattern,maximum);
+}
+} // namespace dome::detail::bake_ambient
