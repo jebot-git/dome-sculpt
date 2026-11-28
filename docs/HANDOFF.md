@@ -504,9 +504,18 @@ and metallic-roughness textures keep their sampling. Native package 7
 replays exact FLOAT32 scanlines and checks the atlas binding against the
 retained mesh, including splits for source tangent frames. The independent
 consumer matches the native preview within one output byte on Arc A770.
-Varying original emissive textures and typed MToon need their own Standard
-GLB HDR compilers.
 [Same-surface Standard HDR evidence](validation/single-surface-hdr-20261128.json)
+
+The same Standard GLB path now admits a varying original emissive texture.
+The sealed writable atlas provides triangle samples in the source UV set.
+One GPU pass applies the source transform, wrapping and level-zero filter
+while composing the exact FLOAT paint planes. The exported PNG is a static
+view at the authored atlas resolution. The editable project keeps the full
+original texture and sampler. A mirrored UV1 fixture with rotation and
+partial paint matches an independent FLOAT sampler and renders within one
+output byte of the native preview on Arc. Typed MToon and prepared source
+Bake HDR remain open.
+[Varying source HDR evidence](validation/varying-source-hdr-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with

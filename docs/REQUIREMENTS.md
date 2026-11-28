@@ -148,11 +148,15 @@ recovers the full native project, including hidden physical owners.
 [Mixed Standard GLB evidence](validation/mixed-source-hdr-20261128.json)
 
 Prepared-source Core PBR objects can also carry their own HDR paint in
-Standard GLB when the effective original emitting backdrop is constant.
+Standard GLB with constant or varying original emission.
 The native package verifies retained triangle and writable UV ownership,
 replays FLOAT32 rows and preserves the original texture sampling for other
-roles. Varying original emissive textures and typed MToon remain open.
+roles. The GPU resolves varying original emission on the writable atlas
+using the original transform, wrap and level-zero filter. The static GLB
+fallback is bounded by the atlas resolution. Typed MToon and prepared
+source Bake HDR remain open.
 [Same-surface Standard HDR evidence](validation/single-surface-hdr-20261128.json)
+[Varying source HDR evidence](validation/varying-source-hdr-20261128.json)
 
 ## Current validation — 2026-11-27
 

@@ -1,0 +1,72 @@
+{
+  "date": "2026-11-28",
+  "product": "d79bbc7758b13bbbc8a3001c701b11075a78ee70",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Standard GLB HDR over varying original emission on an imported Core PBR mesh.",
+  "source_sampling": "Triangle barycentrics from the native writable atlas carry source UV1. The GPU applies the original affine transform, wrapping and level-zero filter.",
+  "exact_native_round_trip": true,
+  "static_fallback": "A sampled image at the authored paint atlas resolution. The native package retains the exact original texture and source sampler.",
+  "baseline": "The same fixture refused varying emission before the change.",
+  "arc": {
+    "device": "Intel Arc A770 with oneAPI Level Zero and hardware EGL",
+    "checks": 549,
+    "maximum_pixel_difference_bytes": 1,
+    "direct_mapped_kernel": true
+  },
+  "release_ctest": [
+    "baked-emission-native",
+    "emission-raster-finite-compute",
+    "source-material-raster-compute",
+    "emission-raster-mapped-compute",
+    "emission-raster-mapped-missing-gpu",
+    "emission-raster-texture-set-compute",
+    "emission-export",
+    "emission-export-worker",
+    "source-paint-export",
+    "source-paint-bake",
+    "source-paint-authoring",
+    "source-paint-physical-authoring",
+    "vrm1-source-export",
+    "raw-hdr-authoring",
+    "xr-editable-export"
+  ],
+  "asan_ubsan": {
+    "mode": "opt-in headless CPU reference",
+    "checks": 549,
+    "glb_matches_arc": true
+  },
+  "missing_gpu": "Release CLI refused the prepared HDR project and preserved the existing GLB.",
+  "additional_gpu_builds": {
+    "cuda": "kernel and host adapter compiled",
+    "rocm": "kernel and host adapter compiled"
+  },
+  "native_wayland": {
+    "checks": 7,
+    "artifact_sha256": "497b70223ba5aeb39e6556950e824b471cc39714ff83de0966c42081cfaf9cc6"
+  },
+  "openxr": {
+    "checks": 10,
+    "synthetic_tracking": true,
+    "artifact_sha256": "497b70223ba5aeb39e6556950e824b471cc39714ff83de0966c42081cfaf9cc6",
+    "native_sha256": "b00ca601583fc066d83022928df04392ae7fec4cc50978b84d098b51dcd3b9f0"
+  },
+  "khronos": {
+    "validator": "2.0.0-dev.3.10",
+    "bytes": 365064,
+    "sha256": "497b70223ba5aeb39e6556950e824b471cc39714ff83de0966c42081cfaf9cc6",
+    "errors": 0,
+    "warnings": 0
+  },
+  "prior_glbs_byte_identical": {
+    "single-surface-hdr.glb": "54fe8dccaaf6fc0ba69ace992aade6199eaea18b60dc5aa19d6bd6a444527971",
+    "mixed-source.glb": "ff769fff8afebfb62309e67abf0bc5efc1843dc13151d909bb2d981ebe9c84fa",
+    "mixed-source-hidden.glb": "484678692c4aad88173eb79876d79241c09895fa3faf1a52c04020612a689f5d",
+    "spatial-color.glb": "e68f51a66633e6f97b50b960578072e9968b38851e87419a4027ff42e54824a0",
+    "uniform-coat.glb": "46fa973d49b84e51227102181a397a220b179df61a1b56bae704f60a2d91e759",
+    "uniform-mask-cross.glb": "98e526883365742fef5b60880641cb918d3f4b761424f88089ab9c3a948b1b9a"
+  },
+  "open": [
+    "Prepared typed MToon and source Bake HDR in Standard GLB.",
+    "Physical headset and CUDA and ROCm hardware qualification."
+  ]
+}

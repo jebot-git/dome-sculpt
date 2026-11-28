@@ -5,11 +5,15 @@ file-worker continuation is in [HDR-VRM-EXPORT.md](HDR-VRM-EXPORT.md).
 
 ## Prepared-source Standard GLB
 
-The current Standard GLB writer can combine physical paint with a constant
-emitting background on an imported Core PBR mesh with a writable atlas. The
-effective original emitter can come from a material factor or an original
-texture with constant contributing channels. Other roles keep their own
-images and coordinates unless Standard GLB compiles their authored paint.
+The current Standard GLB writer can combine physical paint with the
+original emissive texture on an imported Core PBR mesh with a writable
+atlas. For a varying background it evaluates original UVs with the paint
+atlas's retained triangle samples. One GPU pass applies the original
+texture transform, wrapping and level-zero filter, then resolves the
+FLOAT radiance and paint coefficients. The GLB fallback samples the
+resulting static atlas. Its resolution bounds the detail it can represent.
+The native Scene retains the original image and sampler. Other roles keep
+their own images and coordinates unless Standard GLB compiles their paint.
 
 Package version 7 uses the `prepared-source-domains` encoding suffix and
 bounded FLOAT32 scanlines. At least one field has `domain.kind` set to
@@ -18,7 +22,9 @@ identifies the writable atlas on the emitted mesh. The reader verifies
 ordered triangle positions and UVs, the fallback sampler and its reported
 error, then replays the exact FLOAT field from the native Scene. This
 supports vertex splits introduced when exporting source tangent frames.
-Varying original emission still requires the explicit portable compiler.
+Original minification behavior and finer source detail stay available in
+the editable project. Prepared typed MToon and source Bake HDR still need
+their own Standard GLB adapters.
 
 ## First GLB implementation
 
