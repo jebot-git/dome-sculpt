@@ -33,12 +33,14 @@ public:
   using Pixel=std::array<float,10>;
   using Radiance=std::array<float,3>;
   struct MappedSample { uint32_t texel; float u,v; };
+  struct BakeUvSample { uint32_t texels[4]{}; float weights[4]{}; };
   static constexpr size_t mapped_batch=16384;
   using TextureSetPreview=std::array<float,4>; // RGB radiance, coverage
   virtual void read(size_t first,std::span<Pixel>,const std::function<bool()> &) = 0;
   virtual void read_finite(size_t first,std::span<Radiance>,const std::function<bool()> &) = 0;
   virtual void read_mapped(std::span<const MappedSample>,std::span<Radiance>,const std::function<bool()> &) = 0;
   virtual void read_mapped_field(std::span<const MappedSample>,std::span<Pixel>,const std::function<bool()> &) = 0;
+  virtual void read_bake_uv(std::span<const BakeUvSample>,std::span<BakedEmissionSample>,const std::function<bool()> &) = 0;
   virtual void read_texture_set_preview(size_t first,std::span<TextureSetPreview>,const std::function<bool()> &) = 0;
 };
 
@@ -53,6 +55,8 @@ std::unique_ptr<EmissionRasterDevice> create_mapped_emission_raster_device(
     size_t capacity,const std::function<bool()> &);
 std::unique_ptr<EmissionRasterDevice> create_mapped_emission_field_device(
     const PaintedMesh &,const PaintSourceTexture &,std::array<float,3> background,float legacy_strength,size_t capacity,
+    const std::function<bool()> &);
+std::unique_ptr<EmissionRasterDevice> create_bake_uv_emission_device(const BakedEmissionField &,size_t capacity,
     const std::function<bool()> &);
 std::unique_ptr<EmissionRasterDevice> create_texture_set_emission_device(
     const PaintedMesh &,const PaintSourceTexture *,const Image *aligned_mtoon,
@@ -114,7 +118,7 @@ struct Input {
   std::array<uint32_t,3> background{};
   uint32_t strength=0,resolution=0;
   std::vector<SourceTextureAxis> finite_axis;
-  size_t mapped_capacity=0;
+  size_t mapped_capacity=0,bake_uv_capacity=0;
   bool physical_bake=false,texture_set=false,mapped_field=false;
 };
 std::unique_ptr<EmissionRasterDevice> upload(const Input &,const std::function<bool()> &);

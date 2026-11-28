@@ -144,6 +144,54 @@ bool exact(std::span<const Pixel> a,std::span<const Pixel> b){
   return true;
 }
 
+void compare_bake_uv(){
+  constexpr uint32_t extent=8;
+  constexpr auto peak=std::numeric_limits<float>::max();
+  constexpr auto tiny=8*std::numeric_limits<float>::denorm_min();
+  const BakedEmissionSample authored{{.25f,.5f,1.f},{peak,tiny,12000.f},1.f};
+  std::array<BakedEmissionSample,extent*extent> values{};
+  values[1]=authored;
+  values[35]=authored;
+  const auto dense=BakedEmissionField::create(extent,values);
+  const auto packed=BakedEmissionField::generate_compact(extent,[&](size_t at){return values[at];});
+  check(!packed->storage().binary_coverage.empty(),"Bake UV fixture needs compact binary coverage");
+  using Sample=detail::EmissionRasterDevice::BakeUvSample;
+  const std::array taps{
+    Sample{{1,0,0,0},{1,0,0,0}},
+    Sample{{0,35,40,2},{.25f,.25f,.25f,.25f}},
+    Sample{{1,14,35,3},{.25f,.25f,.25f,.25f}},
+    Sample{}};
+  const std::array expected{authored,
+    BakedEmissionSample{{.0625f,.125f,.25f},{peak*.25f,tiny*.25f,3000.f},.25f},
+    BakedEmissionSample{{.125f,.25f,.5f},{peak*.5f,tiny*.5f,6000.f},.5f},
+    BakedEmissionSample{}};
+  for(const auto &field:{dense,packed}){
+    auto device=detail::create_bake_uv_emission_device(*field,taps.size(),{});
+    std::array<BakedEmissionSample,taps.size()> out{};
+    device->read_bake_uv(taps,out,{});
+    check(std::memcmp(expected.data(),out.data(),sizeof(out))==0,
+      "Bake UV GPU filter changed FLOAT coefficients, coverage or subnormal energy");
+    bool cancelled=false;
+    try{device->read_bake_uv(taps,out,[]{return true;});}
+    catch(const std::runtime_error &){cancelled=true;}
+    check(cancelled,"Bake UV GPU filter ignored cancellation");
+    device->read_bake_uv(std::span(taps).subspan(1,1),std::span(out).first(1),{});
+    check(std::memcmp(&expected[1],&out[0],sizeof(out[0]))==0,
+      "Bake UV GPU short batch after cancellation used stale taps");
+  }
+  values[1]={{},{1e-7f,0,0},std::numeric_limits<float>::denorm_min()};
+  const auto underflow=BakedEmissionField::create(extent,values);
+  const auto device=detail::create_bake_uv_emission_device(*underflow,1,{});
+  const Sample fractional{{1,0,0,0},{.25f,0,0,0}};
+  BakedEmissionSample filtered;
+  device->read_bake_uv(std::span(&fractional,1),std::span(&filtered,1),{});
+  bool refused=false;
+  try{filtered.validate();}catch(const std::invalid_argument &){refused=true;}
+  check(refused&&filtered.coverage==0&&filtered.absolute[0]>0,
+    "Bake UV GPU filter silently discarded energy when coverage underflowed");
+  std::cout<<"PASS Bake UV exact dense/packed FLOAT, peak, subnormal and cancellation\n";
+}
+
 void compare_finite(Fixture fixture,uint32_t extent,bool original){
   const auto scene=model(fixture);
   const auto &object=scene.active();
@@ -471,6 +519,7 @@ int main(int argc,char **argv)try{
     throw std::runtime_error("Missing selected device returned a texture-set FLOAT raster");
   }
   if(argc>1&&std::string_view(argv[1])=="--finite"){
+    compare_bake_uv();
     compare_finite(Fixture::BakeOnly,512,false);
     compare_finite(Fixture::LegacyBake,256,false);
     compare_finite(Fixture::Paint,512,true);

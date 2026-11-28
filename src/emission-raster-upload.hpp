@@ -14,6 +14,15 @@ public:
   Raster(const Input &input,const std::function<bool()> &cancelled,const MaterialInput *material=nullptr){
     const auto stop=[&]{paint_compute::checkpoint(cancelled);};
     view_.resolution=input.resolution;
+    bake_uv_capacity_=input.bake_uv_capacity;
+    if(bake_uv_capacity_){
+      stop();
+      upload_bake(input);
+      bake_uv_samples_=allocate<BakeUvSample>(bake_uv_capacity_);
+      output_=allocate<uint32_t>(7*bake_uv_capacity_);
+      stop();
+      return;
+    }
     view_.layer_count=uint32_t(input.layers.size());
     view_.tiles_per_layer=(input.resolution/32)*(input.resolution/32);
     for(unsigned k=0;k<3;++k)view_.background[k]=input.background[k];
@@ -32,19 +41,7 @@ public:
     upload_common(input.common,stop);
     upload_physical(input.physical,stop);
 
-    auto &bake=view_.bake;
-    bake.physical=input.physical_bake;
-    if(bake.physical){
-      for(unsigned k=0;k<7;++k)bake.packed.constants[k]=std::bit_cast<uint32_t>(input.bake.constants[k]);
-      bake.packed.mask=input.bake.varying_mask;
-      bake.packed.stride=std::popcount(input.bake.varying_mask);
-      bake.dense=reinterpret_cast<const uint32_t *>(upload(std::as_bytes(input.bake.dense)));
-      bake.varying=reinterpret_cast<const uint32_t *>(upload(input.bake.varying));
-      bake.coverage_bits=upload(input.bake.binary_coverage);
-    }else{
-      bake.legacy=upload(input.legacy_bake);
-      bake.coverage=upload(input.bake_coverage);
-    }
+    upload_bake(input);
     stop();
     if(material)upload_material(*material,cancelled);
     if(input.mapped_source){
@@ -62,7 +59,7 @@ public:
 
   void read(size_t first,std::span<Pixel> rows,const std::function<bool()> &cancelled) override {
     static_assert(sizeof(Pixel)==10*sizeof(uint32_t));
-    if(finite_.resolution||mapped_capacity_)throw std::logic_error("Expected a contiguous exact GPU emission raster");
+    if(finite_.resolution||mapped_capacity_||bake_uv_capacity_)throw std::logic_error("Expected a contiguous exact GPU emission raster");
     read_exact(first,rows,cancelled,[&](size_t at,size_t count){
       if(texture_set_)device_.render_texture_set(view_,at,count,output_,true);
       else device_.render(view_,at,count,output_);
@@ -115,6 +112,22 @@ public:
     validate_exact(std::span<const Pixel>(pixels));
   }
 
+  void read_bake_uv(std::span<const BakeUvSample> samples,std::span<BakedEmissionSample> output,
+                    const std::function<bool()> &cancelled) override {
+    static_assert(sizeof(BakedEmissionSample)==7*sizeof(uint32_t));
+    if(samples.empty()||samples.size()!=output.size()||samples.size()>bake_uv_capacity_)
+      throw std::invalid_argument("Invalid GPU Bake UV filter batch");
+    paint_compute::checkpoint(cancelled);
+    const auto pixels=size_t(view_.resolution)*view_.resolution;
+    for(const auto &sample:samples)for(size_t i=0;i<4;++i)
+      if(sample.texels[i]>=pixels||!std::isfinite(sample.weights[i])||sample.weights[i]<0||sample.weights[i]>1)
+        throw std::invalid_argument("Invalid GPU Bake UV filter tap");
+    device_.upload(bake_uv_samples_,samples.data(),samples.size_bytes());
+    device_.filter_bake_uv(view_.bake,bake_uv_samples_,samples.size(),output_);
+    device_.download(output.data(),output_,output.size_bytes());
+    paint_compute::checkpoint(cancelled);
+  }
+
   size_t capacity() const noexcept override {return material_coordinates_.size();}
   void read_material(std::span<const uint32_t> texels,const Coordinates &coordinates,
       std::span<paint_compute::Output> pixels,const std::function<bool()> &cancelled) override {
@@ -151,6 +164,21 @@ public:
   }
 
 private:
+  void upload_bake(const Input &input){
+    auto &bake=view_.bake;
+    bake.physical=input.physical_bake;
+    if(bake.physical){
+      for(unsigned k=0;k<7;++k)bake.packed.constants[k]=std::bit_cast<uint32_t>(input.bake.constants[k]);
+      bake.packed.mask=input.bake.varying_mask;
+      bake.packed.stride=std::popcount(input.bake.varying_mask);
+      bake.dense=reinterpret_cast<const uint32_t *>(upload(std::as_bytes(input.bake.dense)));
+      bake.varying=reinterpret_cast<const uint32_t *>(upload(input.bake.varying));
+      bake.coverage_bits=upload(input.bake.binary_coverage);
+    }else{
+      bake.legacy=upload(input.legacy_bake);
+      bake.coverage=upload(input.bake_coverage);
+    }
+  }
   void upload_mapped(std::span<const MappedSample> samples,size_t count,size_t resolution,
                      const std::function<bool()> &cancelled){
     if(samples.size()!=count||samples.empty()||samples.size()>mapped_capacity_)
@@ -305,7 +333,9 @@ private:
   FiniteGrid finite_;
   MappedSourceImage mapped_source_{};
   MappedSample *coordinates_=nullptr;
+  BakeUvSample *bake_uv_samples_=nullptr;
   size_t mapped_capacity_=0;
+  size_t bake_uv_capacity_=0;
   bool mapped_field_=false;
   bool texture_set_=false;
   uint32_t *output_=nullptr;

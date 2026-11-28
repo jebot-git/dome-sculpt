@@ -59,19 +59,42 @@ DOME_EMISSION_FN void unpack(PackedField field,const uint32_t *data,size_t index
   size_t next=field.offset+index*field.stride;
   for(unsigned k=0;k<7;++k)result[k]=field.mask&(1u<<k)?data[next++]:field.constants[k];
 }
+DOME_EMISSION_FN void physical_base(const Bake &bake,size_t at,uint32_t (&value)[7]){
+  if(bake.dense){
+    for(unsigned k=0;k<7;++k)value[k]=bake.dense[at*7+k];
+  }else{
+    unpack(bake.packed,bake.varying,at,value);
+    if(bake.coverage_bits)value[6]=((bake.coverage_bits[at/32]>>(at%32))&1u)?one32:0;
+  }
+}
 DOME_EMISSION_FN void base(const Bake &bake,const paint_compute::Quantization &q,size_t at,uint32_t (&value)[7]){
-  if(bake.physical){
-    if(bake.dense){
-      for(unsigned k=0;k<7;++k)value[k]=bake.dense[at*7+k];
-    }else{
-      unpack(bake.packed,bake.varying,at,value);
-      if(bake.coverage_bits)value[6]=((bake.coverage_bits[at/32]>>(at%32))&1u)?one32:0;
-    }
-  }else if(bake.coverage){
+  if(bake.physical)physical_base(bake,at,value);
+  else if(bake.coverage){
     value[6]=paint_compute::bits(q.unit[bake.coverage[at]]);
     for(unsigned k=0;k<3;++k)
       value[k]=product(paint_compute::bits(q.srgb[bake.legacy[at*4+k]]),value[6]);
   }
+}
+DOME_EMISSION_FN void filter_bake_uv(const Bake &bake,const EmissionRasterDevice::BakeUvSample &sample,uint32_t *out){
+  uint32_t result[7]{};
+  for(unsigned tap=0;tap<4;++tap){
+    const auto weight=paint_compute::bits(sample.weights[tap]);
+    if(!magnitude(weight))continue;
+    uint32_t source[7];
+    physical_base(bake,sample.texels[tap],source);
+    for(unsigned c=0;c<7;++c)result[c]=sum(result[c],product(source[c],weight));
+  }
+  const auto coverage=result[6]>one32?one32:result[6];
+  // Baked radiance uses the full FLOAT domain, including energy imported or
+  // projected above the editable brush's maximum.
+  const auto limit=product(coverage,max32);
+  for(unsigned c=0;c<3;++c){
+    out[c]=result[c]>coverage?coverage:result[c];
+    // Keep unrepresentable energy visible to native field validation if
+    // its coverage rounded to zero.
+    out[c+3]=coverage&&result[c+3]>limit?limit:result[c+3];
+  }
+  out[6]=coverage;
 }
 DOME_EMISSION_FN bool valid_coefficients(const uint32_t (&value)[7],bool physical){
   if(!bounded(value[6],one32))return false;

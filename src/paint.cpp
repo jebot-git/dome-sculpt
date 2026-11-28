@@ -12,6 +12,7 @@
 #include "baked-emission-access.hpp"
 #include "source4-baked.hpp"
 #include "baked-emission-codec.hpp"
+#include "emission-raster-device.hpp"
 #include "current-paint-preview.hpp"
 #include "emission-paint-access.hpp"
 #include "emission-authority.hpp"
@@ -4687,26 +4688,80 @@ std::shared_ptr<PaintedMesh> SourcePaintAccess::transfer_bake_uv(const PaintedMe
       constexpr size_t storage=128*1024*1024;
       const auto used=result->storage_bytes()+converted.storage_bytes();
       if(used>=storage)throw std::length_error("UV transfer leaves no room for FLOAT emission");
-      const auto bytes=std::min(remaining,uint64_t(storage-used));
-      converted.emission_field=BakedEmissionField::generate_compact(r,[&](size_t at){
-        visit(8);
-        BakedEmissionSample filtered;
-        const auto &texel=surface.texels[at];
-        if(texel.covered())for(const auto tap:taps_at(texel))if(tap.weight!=0){
-          const auto sample=bake.emission_field->texel(tap.texel);
-          filtered.coverage+=float(tap.weight)*sample.coverage;
-          for(size_t k=0;k<3;++k){
-            filtered.legacy[k]+=float(tap.weight)*sample.legacy[k];
-            filtered.absolute[k]+=float(tap.weight)*sample.absolute[k];
+      const auto &field=*bake.emission_field;
+      const auto output_limit=uint64_t(storage-used);
+      if(compute_backend()=="CPU"){
+        // CPU reference builds exercise the same FLOAT coefficients.
+        converted.emission_field=BakedEmissionField::generate_compact(r,[&](size_t at){
+          using paint_compute::add;
+          using paint_compute::mul;
+          visit(8);
+          BakedEmissionSample filtered;
+          const auto &texel=surface.texels[at];
+          if(texel.covered())for(const auto tap:taps_at(texel))if(tap.weight!=0){
+            const auto weight=float(tap.weight);
+            const auto sample=field.texel(tap.texel);
+            filtered.coverage=add(filtered.coverage,mul(weight,sample.coverage));
+            for(size_t k=0;k<3;++k){
+              filtered.legacy[k]=add(filtered.legacy[k],mul(weight,sample.legacy[k]));
+              filtered.absolute[k]=add(filtered.absolute[k],mul(weight,sample.absolute[k]));
+            }
           }
+          filtered.coverage=std::min(1.f,filtered.coverage);
+          const float limit=mul(filtered.coverage,std::numeric_limits<float>::max());
+          for(size_t k=0;k<3;++k){
+            filtered.legacy[k]=std::min(filtered.legacy[k],filtered.coverage);
+            if(filtered.coverage)filtered.absolute[k]=std::min(filtered.absolute[k],limit);
+          }
+          return filtered;
+        },{size_t(std::min(remaining,output_limit)),options.cancelled});
+      }else{
+        using Device=detail::EmissionRasterDevice;
+        constexpr size_t row_bytes=sizeof(Device::BakeUvSample)+sizeof(BakedEmissionSample);
+        const auto input_bytes=field.storage_bytes();
+        if(input_bytes>=remaining)throw std::length_error("UV transfer cannot stage its FLOAT Bake on the GPU");
+        // Bound both host and device batches, leaving room for the native output field.
+        const auto capacity=std::min({Device::mapped_batch,pixels,size_t((remaining-input_bytes)/(4*row_bytes))});
+        if(!capacity)throw std::length_error("UV transfer cannot stage a FLOAT Bake filter batch");
+        const auto available=remaining-input_bytes-2*capacity*row_bytes;
+        const auto device=detail::create_bake_uv_emission_device(field,capacity,options.cancelled);
+        std::vector<Device::BakeUvSample> requests(capacity);
+        const auto filter=[&](size_t first,std::span<BakedEmissionSample> output){
+          auto batch=std::span(requests).first(output.size());
+          for(size_t n=0;n<batch.size();++n){
+            if((n&1023)==0)stop();
+            visit(8);
+            batch[n]={};
+            const auto &texel=surface.texels[first+n];
+            if(!texel.covered())continue;
+            const auto taps=taps_at(texel);
+            for(size_t tap=0;tap<taps.size();++tap){
+              batch[n].texels[tap]=uint32_t(taps[tap].texel);
+              batch[n].weights[tap]=float(taps[tap].weight);
+            }
+          }
+          device->read_bake_uv(batch,output,options.cancelled);
+        };
+        const auto dense_bytes=pixels*sizeof(BakedEmissionSample);
+        if(dense_bytes<=available/2){
+          std::vector<BakedEmissionSample> filtered(pixels);
+          for(size_t first=0;first<pixels;first+=capacity)
+            filter(first,std::span(filtered).subspan(first,std::min(capacity,pixels-first)));
+          converted.emission_field=BakedEmissionField::generate_compact(r,[&](size_t at){return filtered[at];},
+            {size_t(std::min(available-dense_bytes,output_limit)),options.cancelled});
+        }else{
+          std::vector<BakedEmissionSample> filtered(capacity);
+          size_t first=pixels,count=0;
+          converted.emission_field=BakedEmissionField::generate_compact(r,[&](size_t at){
+            if(at<first||at-first>=count){
+              first=at;
+              count=std::min(capacity,pixels-at);
+              filter(first,std::span(filtered).first(count));
+            }
+            return filtered[at-first];
+          },{size_t(std::min(available,output_limit)),options.cancelled});
         }
-        filtered.coverage=std::min(1.f,filtered.coverage);
-        for(size_t k=0;k<3;++k){
-          filtered.legacy[k]=std::min(filtered.legacy[k],filtered.coverage);
-          filtered.absolute[k]=std::min(filtered.absolute[k],filtered.coverage*maximum_native_emission);
-        }
-        return filtered;
-      },{size_t(bytes),options.cancelled});
+      }
       reserve(converted.emission_field->storage_bytes());
     }
     for(size_t at=0;at<pixels;++at){

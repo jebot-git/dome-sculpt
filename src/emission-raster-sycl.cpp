@@ -5,6 +5,7 @@
 
 namespace dome::detail::emission_raster {
 void launch_bake(sycl::queue &,DeviceInput,size_t,size_t,uint32_t *);
+void launch_bake_uv_filter(sycl::queue &,Bake,const EmissionRasterDevice::BakeUvSample *,size_t,uint32_t *);
 void launch_typed(sycl::queue &,DeviceInput,size_t,size_t,uint32_t *);
 void launch_finite(sycl::queue &,DeviceInput,FiniteGrid,size_t,size_t,uint32_t *);
 void launch_mapped(sycl::queue &,DeviceInput,FiniteGrid,MappedSourceImage,
@@ -60,6 +61,9 @@ public:
   void render_mapped_field(DeviceInput input,MappedSourceImage image,
       const EmissionRasterDevice::MappedSample *samples,size_t count,uint32_t *out){
     launch_mapped_field(queue_,input,image,samples,count,out);
+  }
+  void filter_bake_uv(Bake bake,const EmissionRasterDevice::BakeUvSample *samples,size_t count,uint32_t *out){
+    launch_bake_uv_filter(queue_,bake,samples,count,out);
   }
   void sample_material(MappedSourceImage image,const paint_compute::Quantization *q,
       const SourceUvSampler::Coordinate *uv,size_t count,uint32_t *out){
