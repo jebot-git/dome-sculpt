@@ -71,9 +71,17 @@ layer order, filters them independently, samples an eligible original UV0
 background and returns bounded RGB radiance for the existing PNG encoder.
 The authored FLOAT project stays embedded in the file. Arc validates exact
 radiance across six raster cases and exact worker output at the 256, 512 and
-1024 controller policies. Finite texture-set and alternate-coordinate
-sampling still need their own GPU adapters.
+1024 controller policies.
 [Editable emission evidence](validation/editable-emission-gpu-20261128.json)
+
+Native and authenticated retained texture sets now use the selected GPU
+for FLOAT emission rasterization in Editable GLB and for Standard GLB's
+exact FLOAT resource and replay. The current texture-set coordinates and
+the existing precision bounds govern PBR and admitted static MToon 1.0
+emission. The portable encoder reads RGB and coverage. Exact package replay
+reads radiance and all seven authored coefficients. Alternate-coordinate
+and arbitrary typed source resampling still require their own adapters.
+[Texture-set emission evidence](validation/texture-set-emission-gpu-20261128.json)
 
 ## Current validation — 2026-11-27
 

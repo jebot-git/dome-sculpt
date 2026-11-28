@@ -224,9 +224,28 @@ Release cases and the scoped headless sanitizer reference pass. The first
 oneAPI launch took about 8.2 seconds in the focused trace, including device
 compilation. The two subsequent 1024-pixel rasters including upload and
 readback took 26–44 milliseconds. CUDA and ROCm compile and refuse missing
-devices. Finite texture sets, alternate-coordinate backgrounds and positive
-AMD/NVIDIA and physical headset validation remain open.
+devices. Alternate-coordinate backgrounds and positive AMD/NVIDIA and
+physical headset validation remain open.
 [Editable emission evidence](validation/editable-emission-gpu-20261128.json)
+
+Native and retained texture-set FLOAT emission now compose on the selected
+GPU for Editable GLB, Standard GLB and exact package replay. Each set keeps
+its own writable paint grid, independent material coordinates and saved
+owner. The device applies binary32 paint over at the writable owner and
+binary64 radiance resolve with the display texel's backdrop. It uses the
+original static MToon 1.0 color conversion for aligned images. Portable
+encoding reads four FLOAT words per texel, including coverage for the
+filter-error bound. OpenEXR reads all ten words. Shared constant regions
+keep their analytic fast path. On Arc, four direct raster cases match more
+than one million reference texels. Eight focused regressions pass and the
+retained PBR and hardware-rendered MToon suites reproduce all 45 previous
+output files. Nested DomeD Wayland and the synthetic OpenXR loader both
+produce the same 1024-pixel Standard GLB. Initial oneAPI dispatches took
+1.37 seconds for a native backdrop and 6.95 seconds for coupled UV0 in
+the direct trace. Scoped ASan/UBSan and missing-device checks pass.
+Arbitrary typed backdrop resampling, alternate UVs and acceleration of
+other texture-set channels remain open.
+[Texture-set emission evidence](validation/texture-set-emission-gpu-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
