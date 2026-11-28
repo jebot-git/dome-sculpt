@@ -1,0 +1,166 @@
+{
+  "date": "2026-11-28",
+  "product": "69d721f1244c58c2933e0b11caca8e654314d55b",
+  "preceding_product": "03e0714d38ce2cea8ee79fe04494f65d4c4f02f3",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Exact direct weights for single-handle diffusion components and compact GPU fields for components with matching joint support.",
+  "oneapi_arc": {
+    "application_sha256": "e9643b31f0e2f4acbcd833ac2d92963ae2e5f1a0b371d14f679f10c2d90248a6",
+    "focused": {
+      "passed": 33,
+      "junit_sha256": "7bff313f013210e612d25416d6dada34903d4922401596b78a807559a02f00a7"
+    },
+    "additional_retopology_and_affine": {
+      "passed": 4,
+      "junit_sha256": "7922e5bdfe3cfd6b999a7d735587999b98b525dd4354467b57880519390ae26b"
+    },
+    "gpu_hidden_refusal": "FAIL No device of requested type 'info::device_type::gpu' available.",
+    "manufactured_cases": [
+      "PASS manufactured open-grid field after Cancel and retry, rows=3315 error=1.82077e-14 replay=7.54288e-16 iterations=200",
+      "PASS exact single-step field stops at its first converged iteration",
+      "PASS independent joint domains, interleaved rows and exact rigid weights"
+    ],
+    "compact_interleaved_fixture": {
+      "mesh_rows": 8,
+      "blocks": 2,
+      "rigid_rows": 2,
+      "coupled_rows": 6,
+      "largest_block": 4,
+      "field_rows": 12,
+      "whole_mesh_field_rows": 24,
+      "cross_component_edge_refused": true
+    }
+  },
+  "retained_19_part_vroid_shapes": {
+    "female": {
+      "domains": 11,
+      "rigid_rows": 236,
+      "coupled_rows": 5419,
+      "field_rows": 65355,
+      "whole_mesh_field_rows": 90679,
+      "largest_block": 2213,
+      "maximum_replayed_residual": 9.92730018982616e-10,
+      "maximum_preprune_partition_error": 5.773159728050814e-15,
+      "report_sha256": "8a237d7df8bb04c5ca2ddcf114a7abddc834d2ceb5fbe189461b65334d206d91"
+    },
+    "male": {
+      "domains": 10,
+      "rigid_rows": 190,
+      "coupled_rows": 5626,
+      "field_rows": 68324,
+      "whole_mesh_field_rows": 93478,
+      "largest_block": 2020,
+      "maximum_replayed_residual": 9.796651474980521e-10,
+      "maximum_preprune_partition_error": 3.9968028886505635e-15,
+      "report_sha256": "292db4280272c1c77a7a27fe744212d560efcb1aa729694dd3624dd43f99e629"
+    }
+  },
+  "archives_matching_preceding_product_byte_for_byte": [
+    {
+      "project": "surface-heat/male-owning/bound.dsculpt",
+      "sha256": "00b1d46aa7937b0a4a69555c855f3d0be188c55c643a756df48834523ac27847"
+    },
+    {
+      "project": "surface-heat/male-public/accepted.dsculpt",
+      "sha256": "00b1d46aa7937b0a4a69555c855f3d0be188c55c643a756df48834523ac27847"
+    },
+    {
+      "project": "surface-heat/female-mixed-targets/mixed-xr.dsculpt",
+      "sha256": "520a05a8d698b86d252fff411d842d09282ac8249db0b38e21eab82427b6a2c2"
+    },
+    {
+      "project": "surface-heat/male-mixed-targets/mixed-xr.dsculpt",
+      "sha256": "6926e4c3ffc4dbb7605d374a83b0c9012029d5f330737676b5e6d402e52e198c"
+    },
+    {
+      "project": "surface-heat/native-male-owning/bound.dsculpt",
+      "sha256": "76dc328851bcffb9f5a70aba5f65187715fe2890ca31bba1c214259c46d11064"
+    },
+    {
+      "project": "surface-heat/native-male-public/accepted.dsculpt",
+      "sha256": "76dc328851bcffb9f5a70aba5f65187715fe2890ca31bba1c214259c46d11064"
+    },
+    {
+      "project": "surface-heat/male-mixed-targets/bound.dsculpt",
+      "sha256": "97a48c703f975d3661163a8f874eb1f8a8ce462ee4b8a69dfdfb88d0be3dbcd1"
+    },
+    {
+      "project": "surface-heat/native-female-owning/bound.dsculpt",
+      "sha256": "a05aba3142dca30bd9844e0dc651247867a8cceced58897119c322aa025c9f26"
+    },
+    {
+      "project": "surface-heat/native-female-public/accepted.dsculpt",
+      "sha256": "a05aba3142dca30bd9844e0dc651247867a8cceced58897119c322aa025c9f26"
+    },
+    {
+      "project": "surface-heat/female-owning/bound.dsculpt",
+      "sha256": "a1b6071045c898a446f549cee7cc0bcef86d5b8d665a2687a11927b76a7fd895"
+    },
+    {
+      "project": "surface-heat/female-public/accepted.dsculpt",
+      "sha256": "a1b6071045c898a446f549cee7cc0bcef86d5b8d665a2687a11927b76a7fd895"
+    },
+    {
+      "project": "surface-heat/female-mixed-targets/bound.dsculpt",
+      "sha256": "cb633926eb4403a4a74ee452396e0bea2f4eb7e450d6ca3628bce819a4d25d70"
+    }
+  ],
+  "alternating_isolated_arc_native_male_trials": {
+    "variant_times": {
+      "baseline": {
+        "seconds": [
+          9.881497376016341,
+          9.079729966935702,
+          9.079382195952348
+        ],
+        "median_seconds": 9.079729966935702
+      },
+      "compact": {
+        "seconds": [
+          8.929528104956262,
+          8.879313356010243,
+          8.980298828915693
+        ],
+        "median_seconds": 8.929528104956262
+      }
+    },
+    "input_sha256": "05e9e52533e60a27089ee46b232dea93f38b2e43ca094745ef7422d7393bb07d",
+    "all_six_saved_projects_sha256": "76dc328851bcffb9f5a70aba5f65187715fe2890ca31bba1c214259c46d11064",
+    "report_sha256": "d5764830b914373e8490d55b18b9377f71151899615a590378509de7fd9151fd"
+  },
+  "nested_wayland": {
+    "checks": 7,
+    "report_sha256": "d14b42d0e5f697741951a9002c67282a4e21b9275227227091262e8c36ca6f0d",
+    "device_iteration_traced": true,
+    "dma_buf_render_node": "/dev/dri/renderD129"
+  },
+  "synthetic_openxr": {
+    "female": {
+      "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_submissions": 89,
+      "report_sha256": "c20bb890e78396d2cff757b27c1b5369e06276b27f08ee01888f5a085497c066"
+    },
+    "male": {
+      "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_submissions": 89,
+      "report_sha256": "c20bb890e78396d2cff757b27c1b5369e06276b27f08ee01888f5a085497c066"
+    }
+  },
+  "headless_reference": {
+    "focused": {
+      "passed": 2,
+      "junit_sha256": "afbe928777c8e5efa7fffbcfd02a3aee839cdac0ddfd342dd8288cffbd75a238"
+    },
+    "device_layout_with_checked_host_buffers_asan_ubsan": [
+      "PASS manufactured open-grid field after Cancel and retry, rows=3315 error=1.82077e-14 replay=7.54288e-16 iterations=200",
+      "PASS exact single-step field stops at its first converged iteration",
+      "PASS independent joint domains, interleaved rows and exact rigid weights"
+    ]
+  },
+  "limits": [
+    "Field rows count the matrix rows supplied for each joint field once. They do not measure kernels, PCG passes or elapsed time.",
+    "The relative residual is replayed per compact block. A checked principal block cannot cut a nonzero edge of the original matrix.",
+    "The timing change in three alternating isolated runs is small. No general speedup is claimed.",
+    "CUDA and ROCm use the same unchanged GPU kernels. Positive vendor hardware runs, physical XR, and a complete current Release sweep remain open."
+  ]
+}
