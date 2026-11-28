@@ -137,6 +137,7 @@ async def main():
    await chord('Control_L','w');await wait(lambda:named('Bake surface') is None)
   await command('Close Window');await wait(lambda:client.poll() is not None);check(client.returncode==0,'Native Wayland client closes through normal worker and graphics/font release')
   (out/'final-scene.json').write_text(json.dumps(scene(),indent=2));d.close();bus.disconnect()
+  (out/'report.json').write_text(json.dumps({'checks':checks,'complete':True},indent=2)+'\n')
 try:asyncio.run(main())
 finally:
  for p in reversed(processes):

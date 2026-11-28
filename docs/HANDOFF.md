@@ -241,8 +241,15 @@ Bake now offers four GPU samples per texel in the desktop dialog and the XR
 Bake quality panel. The worker filters linear channels and normal directions
 within the same UV chart before encoding. Writability and padding use output
 texels. Recipe Recall restores the saved sample mode.
-One sample remains the default for older recipes. See
-[four-sample Bake](BAKE-RECIPES.md#four-samples-per-texel).
+One sample remains the default for older recipes. The 2048 × 2048 retained
+HDR Bake saved and reopened a compact FLOAT field. The same fixture with
+one sample matched the preceding release byte for byte. A separate warm
+2048 × 2048 full-atlas four-sample projection took 3.31 seconds and peaked at
+about 804 MiB of process memory on Arc. Wayland verified Recall, Bake, Save,
+Undo and Redo. Synthetic OpenXR verified stereo controls, ordered Save,
+Cancel and focus loss on the same hardware.
+[Four-sample Bake controls](BAKE-RECIPES.md#four-samples-per-texel) ·
+[Validation evidence](validation/bake-supersample-20261128.json)
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing

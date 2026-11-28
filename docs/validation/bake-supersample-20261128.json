@@ -1,0 +1,67 @@
+{
+  "date": "2026-11-28",
+  "product": "1dfa2362a68635ed65d61b3b66d1bd2fa4c7045f",
+  "preceding": "83aa2b86ff03dbe43d6e4183938f467a5998cd93",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Opt-in four-sample Bake on the selected GPU with chart-aware linear worker resolve.",
+  "oneapi_arc_release": {
+    "application_sha256": "0c18bd65b8a41488b52d62dd5020b2e9599ebfccb6a837e5d7d73745d873e0fa",
+    "ctest_passed": 12,
+    "ctest_log_sha256": "69f60c43405c9d8422f60948f11f83cac50ecf8b6672e8e0c2bc981bd6a67086",
+    "wayland_assertions": 14,
+    "wayland_report_sha256": "4f4f022df80172d9248455ce6723172ac5c2d21aa1be2161209f6440466e1a3d",
+    "new_openxr_assertions": 20,
+    "openxr_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "openxr_expected_and_accepted_project_sha256": "3a1a04a583af4a34d794d2c8a7a7483828c7dd2002f13d83cff6c329295aa782",
+    "openxr_input_cancel_and_focus_loss_project_sha256": "bf219cf5a5f580bfed11488ee31cf0946782e82d9805b25d97d4486287c2866f",
+    "retained_hdr_2048": {
+      "supersampled_project_sha256": "c2fd65c6a5c50cfc17be49e4fd84c131b6a0bbcdf4481462c7bf3d5905b32224",
+      "unchanged_single_sample_project_sha256": "b83708450810b83774a6037f73cb3a2fe04e6701ca7c2c3d713cc3bb08c8822b",
+      "projected_texels": 1721344,
+      "padded_texels": 172032,
+      "projection_rays": 0,
+      "compact_field_bytes": 50855968,
+      "field_varying_mask": 56,
+      "coverage_words": 131072,
+      "single_cold_run_seconds": 14.1565
+    },
+    "single_warm_trial_per_mode": [
+      {
+        "resolution": 512,
+        "samples": 1,
+        "seconds": 0.063587,
+        "peak_rss_kib": 238272,
+        "projection_rays": 262144
+      },
+      {
+        "resolution": 512,
+        "samples": 4,
+        "seconds": 0.220202,
+        "peak_rss_kib": 267112,
+        "projection_rays": 1048576
+      },
+      {
+        "resolution": 2048,
+        "samples": 1,
+        "seconds": 0.963055,
+        "peak_rss_kib": 331772,
+        "projection_rays": 4194304
+      },
+      {
+        "resolution": 2048,
+        "samples": 4,
+        "seconds": 3.3106,
+        "peak_rss_kib": 823032,
+        "projection_rays": 16777216
+      }
+    ],
+    "trial_scope": "Full-atlas planar projection with constant HDR and color, AO and padding disabled. RSS includes runtime and retained results."
+  },
+  "headless_reference": {
+    "ctest_passed": 4,
+    "sanitizer": "ASan and UBSan on bake.cpp, bake-authoring.cpp, bake-recipe.cpp and both Bake fixture translation units linked against the matching headless Release core.",
+    "sanitizer_log_sha256": "2c4d1b774d6f072df7e25ede2ee8b81107c1b26d3ebccf9247af0a536b09bc2b"
+  },
+  "cuda_and_rocm": "Bake host and shared device translation units compiled. Positive vendor hardware execution and device loss remain unverified.",
+  "physical_headset": false
+}
