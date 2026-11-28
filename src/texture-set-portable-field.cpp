@@ -25,6 +25,13 @@ struct PendingNormalTexel {
  size_t index,work;
  Bary weights;
 };
+struct PendingNormalProbe { size_t work; Bary weights; };
+size_t certificate_scratch(uint32_t size) noexcept{
+ if(compute_backend()=="CPU")return 0;
+ const auto batch=std::min(size_t(size)*size,portable_normal::batch_pixels);
+ return batch*(sizeof(PendingNormalProbe)+sizeof(portable_normal::Probe)+sizeof(portable_normal::Verdict))+
+     std::min(batch,portable_normal::batch_charts)*(sizeof(portable_normal::Chart)+sizeof(uint32_t));
+}
 
 void stop(const TextureSetLimits &limits){
  if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Retained field export cancelled");
@@ -116,32 +123,105 @@ bool visit_normal_chart(const PolygonSurfacePreview &preview,uint32_t triangle,
 bool normal_map_matches(const PolygonSurfacePreview &preview,std::span<const uint32_t> domain,
     std::span<const PortableTextureSetCorner> corners,const AffineTransform &world,
     const std::shared_ptr<const Image> &image,uint32_t source_size,bool independent,
-    size_t &work,const TextureSetLimits &limits){
+    size_t &work,const TextureSetLimits &limits,portable_normal::Raster *device=nullptr){
+ image->validate();
  const auto size=image->width;
- const auto charge=[&]{
-  if(work>=limits.maximum_work)throw std::length_error("Portable normal validation exceeds its sample budget");
-  if((work++&1023)==0)stop(limits);
- };
+ const bool gpu=compute_backend()!="CPU";
+ if(certificate_scratch(size)>limits.maximum_bytes)
+  throw std::length_error("Portable normal validation exceeds its byte budget");
+ const auto capacity=gpu?std::min(size_t(size)*size,portable_normal::batch_pixels):0;
+ const auto chart_capacity=std::min(capacity,portable_normal::batch_charts);
+ std::vector<portable_normal::Chart> charts;
+ std::vector<uint32_t> chart_triangles;
+ std::vector<PendingNormalProbe> pending;
+ std::vector<portable_normal::Probe> probes;
+ std::vector<portable_normal::Verdict> results(capacity);
+ charts.reserve(chart_capacity);
+ chart_triangles.reserve(chart_capacity);
+ probes.reserve(capacity);
+ pending.reserve(capacity);
+ std::unique_ptr<portable_normal::Raster> owned_device;
+ bool uploaded=false;
  PaintSourceTexture lookup;
  lookup.image=image;
  lookup.wrap_s=lookup.wrap_t=33071;
  lookup.min_filter=lookup.mag_filter=9729;
+ const auto reference=[&](uint32_t triangle,const std::array<NormalBakeVertex,3> &frame,
+                          const Bary &b,Uv original_uv,Uv emitted_uv){
+  const auto wanted=preview.sample_baked_normal(triangle,b,world,original_uv);
+  const auto e=sample_source_texture(lookup,emitted_uv[0],emitted_uv[1],false);
+  const auto basis=normal_bake_basis(frame,b,NormalFragmentBasis::UnitColumns);
+  const auto q=basis.t*(2*e[0]-1)+basis.b*(2*e[1]-1)+basis.n*(2*e[2]-1);
+  return length(q)>1e-8f&&angle(wanted,normal_bake_math::unit(q))<=normal_error_limit;
+ };
+ const auto flush=[&]{
+  if(probes.empty())return true;
+  if(!uploaded){
+   if(!device){
+    const auto original=preview.native_bake()?preview.native_bake():preview.baked()->normal_field->pbr();
+    owned_device=portable_normal::upload(*original,limits.cancelled);
+    device=owned_device.get();
+   }
+   device->set_emitted_image(*image,limits.cancelled);
+   uploaded=true;
+  }
+  device->certify(charts,probes,std::span(results).first(probes.size()),limits.cancelled);
+  bool valid=true;
+  for(size_t i=0;i<probes.size();++i){
+   if((i&1023)==0)stop(limits);
+   if(results[i]==portable_normal::Verdict::Pass)continue;
+   const auto &p=probes[i];
+   const auto index=p.source.chart;
+   const auto &f=charts[index].destination;
+   if(results[i]==portable_normal::Verdict::Fail||
+      !reference(chart_triangles[index],{f[0],f[1],f[2]},pending[i].weights,
+         {p.source.uv[0],p.source.uv[1]},{p.emitted_uv[0],p.emitted_uv[1]})){
+    work=pending[i].work;
+    valid=false;
+    break;
+   }
+  }
+  charts.clear();
+  chart_triangles.clear();
+  probes.clear();
+  pending.clear();
+  return valid;
+ };
+ const auto charge=[&]{
+  if(work>=limits.maximum_work){
+   if(!flush())return false;
+   throw std::length_error("Portable normal validation exceeds its sample budget");
+  }
+  if((work++&1023)==0)stop(limits);
+  return true;
+ };
  for(size_t face=0;face<domain.size();++face){
   stop(limits);
   const bool accepted=visit_normal_chart(preview,domain[face],corners.subspan(face*3,3),world,size,[&](uint32_t triangle,const auto &source,const auto &chart,const auto &frame){
+   uint32_t slot=UINT32_MAX;
    const auto verify=[&](const Bary &b,Uv uv){
-    charge();
-    const auto wanted=preview.sample_baked_normal(triangle,b,world,interpolate(source,b));
-    const auto e=sample_source_texture(lookup,uv[0],uv[1],false);
-    const auto basis=normal_bake_basis(frame,b,NormalFragmentBasis::UnitColumns);
-    const auto q=basis.t*(2*e[0]-1)+basis.b*(2*e[1]-1)+basis.n*(2*e[2]-1);
-    return length(q)>1e-8f&&angle(wanted,normal_bake_math::unit(q))<=normal_error_limit;
+    if(!charge())return false;
+    const auto original=interpolate(source,b);
+    if(!gpu)return reference(triangle,frame,b,original,uv);
+    if(probes.size()==capacity||(slot==UINT32_MAX&&charts.size()==chart_capacity)){
+     if(!flush())return false;
+     slot=UINT32_MAX;
+    }
+    if(slot==UINT32_MAX){
+     slot=uint32_t(charts.size());
+     charts.push_back({portable_normal::source_frame(preview,triangle,world),{frame[0],frame[1],frame[2]}});
+     chart_triangles.push_back(triangle);
+    }
+    probes.push_back({{{float(b[0]),float(b[1]),float(b[2])},{original[0],original[1]},slot},
+                      {uv[0],uv[1]}});
+    pending.push_back({work,b});
+    return true;
    };
    const auto verify_grid=[&](const UvTriangle &grid,bool destination){
     const auto [x0,x1,y0,y1]=grid.bounds();
     for(int y=y0;y<=y1;++y)for(int x=x0;x<=x1;++x)
      for(double dy:probe_offsets)for(double dx:probe_offsets){
-      charge();
+      if(!charge())return false;
       const double u=(x+dx)/grid.resolution,v=(y+dy)/grid.resolution;
       const auto b=grid.barycentric(u,v);
       if(*std::min_element(b.begin(),b.end())<0)continue;
@@ -170,9 +250,9 @@ bool normal_map_matches(const PolygonSurfacePreview &preview,std::span<const uin
    const Bary center{1./3,1./3,1./3};
    return verify(center,interpolate(chart.corners,center));
   });
-  if(!accepted)return false;
+  if(!accepted){(void)flush();return false;}
  }
- return true;
+ return flush();
 }
 
 // Sample in the original field and encode into the explicit glTF tangent
@@ -322,7 +402,7 @@ std::optional<Image> reproject_normal(const PolygonSurfacePreview &preview,
   if(!accepted){(void)flush();return {};}
  }
  if(!flush())return {};
- if(!normal_map_matches(preview,domain,corners,world,raster,source_size,independent,work,limits))
+ if(!normal_map_matches(preview,domain,corners,world,raster,source_size,independent,work,limits,device.get()))
   return {};
  return std::move(image);
 }
@@ -380,7 +460,8 @@ size_t portable_normal_raster_scratch_bytes(uint32_t size) noexcept{
  const auto pixels=size_t(size)*size;
  const auto batch=compute_backend()=="CPU"?0:std::min(pixels,portable_normal::batch_pixels);
  return pixels*(sizeof(float)+4)+batch*(sizeof(PendingNormalTexel)+sizeof(portable_normal::Sample)+sizeof(uint32_t))+
-     std::min(batch,portable_normal::batch_charts)*(sizeof(portable_normal::Chart)+sizeof(uint32_t));
+     std::min(batch,portable_normal::batch_charts)*(sizeof(portable_normal::Chart)+sizeof(uint32_t))+
+     certificate_scratch(size);
 }
 
 PortableTextureSetField portable_texture_set_field(const TextureSetView &field,

@@ -227,6 +227,8 @@ NormalBakeBasis PolygonSurfacePreview::before_role_basis(
 portable_normal::SourceFrame portable_normal::source_frame(const PolygonSurfacePreview &preview,
     size_t triangle,const AffineTransform &world){
  const auto [before,current]=preview.triangle_frames(triangle,world);
+ // Authenticate both placed frames once before device probes use them.
+ (void)transport_polygon_direction(before.basis.n,before,current);
  SourceFrame out;
  out.before=before.basis;
  out.current=current.basis;

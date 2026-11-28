@@ -29,6 +29,7 @@
 #include "paint-grid-filter.hpp"
 #include "paint-source-coordinate-kernel.hpp"
 #include "portable-normal-raster-kernel.hpp"
+#include "portable-normal-certificate-kernel.hpp"
 #include "dome/paint.hpp"
 namespace dome {namespace {
 template<class E>void checked(E value){if(value!=DS_SUCCESS)throw std::runtime_error(DS_ERROR_TEXT(value));}
@@ -72,13 +73,25 @@ __global__ void normal_texels(const Chart *charts,ImageView source,const paint_c
   result[at]=encode_texel(charts[sample.chart],sample,source,*q);
  }
 }
+__global__ void normal_probes(const Chart *charts,ImageView source,ImageView emitted,
+    const paint_compute::Quantization *q,const Probe *probes,Verdict *result,size_t count){
+ const size_t at=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+ if(at<count){
+  const auto probe=probes[at];
+  result[at]=certify_texel(charts[probe.source.chart],probe,source,emitted,*q);
+ }
+}
 class GpuRaster final:public Raster {
  Buffer<uint8_t> image_;
  Buffer<paint_compute::Quantization> quantization_{1};
  Buffer<Chart> charts_{batch_charts};
  Buffer<Sample> samples_{batch_pixels};
  Buffer<uint32_t> result_{batch_pixels};
+ std::unique_ptr<Buffer<uint8_t>> emitted_;
+ std::unique_ptr<Buffer<Probe>> probes_;
+ std::unique_ptr<Buffer<Verdict>> verdicts_;
  uint32_t width_,height_;
+ uint32_t emitted_width_=0,emitted_height_=0;
 public:
  explicit GpuRaster(const Image &image):image_(image.rgba.size()),width_(image.width),height_(image.height){
   const auto &table=paint_compute::quantization();
@@ -95,6 +108,33 @@ public:
       quantization_.data,samples_.data,result_.data,pending.size());
   checked(DS_LAST_ERROR());
   checked(DS_COPY(output.data(),result_.data,output.size_bytes(),DS_TO_HOST));
+  paint_compute::checkpoint(cancelled);
+ }
+ void set_emitted_image(const Image &image,const std::function<bool()> &cancelled) override{
+  paint_compute::checkpoint(cancelled);
+  image.validate();
+  if(!probes_)probes_=std::make_unique<Buffer<Probe>>(batch_pixels);
+  if(!verdicts_)verdicts_=std::make_unique<Buffer<Verdict>>(batch_pixels);
+  emitted_.reset();
+  auto next=std::make_unique<Buffer<uint8_t>>(image.rgba.size());
+  checked(DS_COPY(next->data,image.rgba.data(),image.rgba.size(),DS_TO_DEVICE));
+  paint_compute::checkpoint(cancelled);
+  emitted_=std::move(next);
+  emitted_width_=image.width;
+  emitted_height_=image.height;
+ }
+ void certify(std::span<const Chart> charts,std::span<const Probe> pending,std::span<Verdict> output,
+     const std::function<bool()> &cancelled) override{
+  validate_batch(charts,pending,output);
+  paint_compute::checkpoint(cancelled);
+  if(!emitted_)throw std::logic_error("Portable normal certification has no emitted image");
+  checked(DS_COPY(charts_.data,charts.data(),charts.size_bytes(),DS_TO_DEVICE));
+  checked(DS_COPY(probes_->data,pending.data(),pending.size_bytes(),DS_TO_DEVICE));
+  normal_probes<<<(pending.size()+127)/128,128>>>(charts_.data,{image_.data,width_,height_},
+      {emitted_->data,emitted_width_,emitted_height_},quantization_.data,
+      probes_->data,verdicts_->data,pending.size());
+  checked(DS_LAST_ERROR());
+  checked(DS_COPY(output.data(),verdicts_->data,output.size_bytes(),DS_TO_HOST));
   paint_compute::checkpoint(cancelled);
  }
 };

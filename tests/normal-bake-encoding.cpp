@@ -99,6 +99,67 @@ void device_normals(){
  samples[0].chart=uint32_t(charts.size());
  check(refuses([&]{device->encode(charts,samples,actual,{});}),"A normal sample cannot address a foreign chart");
 }
+
+void device_certificate(){
+ using namespace portable_normal;
+ const auto original=std::make_shared<const Image>(Image{1,1,{128,128,255,255}});
+ const auto emitted=std::make_shared<const Image>(Image{2,1,{128,128,255,255,160,128,255,255}});
+ auto device=upload(*original,{});
+ std::array<Chart,2> charts{};
+ for(size_t i=0;i<charts.size();++i){
+  const float hand=i?-1.f:1.f;
+  auto &chart=charts[i];
+  chart.source.native=i==0;
+  chart.source.handedness=hand;
+  chart.source.before=chart.source.current={{1,0,0},{0,hand,0},{0,0,1}};
+  for(size_t k=0;k<3;++k)
+   chart.source.vertices[k]=chart.destination[k]=normal_bake_vertex({0,0,1},{1,0,0},hand,NormalVertexBitangent::UnitCross);
+ }
+ PaintSourceTexture lookup;
+ lookup.image=emitted;
+ lookup.wrap_s=lookup.wrap_t=33071;
+ const auto exact=[&](float u){
+  const auto e=sample_source_texture(lookup,u,.5f,false);
+  const auto z=normal_bake_math::unit(Vec3{2*e[0]-1,2*e[1]-1,2*e[2]-1});
+  const auto n=normal_bake_math::unit(Vec3{2.f*(128.f/255.f)-1,2.f*(128.f/255.f)-1,1});
+  return std::atan2(double(length(cross(n,z))),std::clamp(double(dot(n,z)),-1.,1.))<=.02;
+ };
+ float below=.25f,above=.75f;
+ while(std::nextafter(below,above)!=above){
+  const auto middle=(below+above)*.5f;
+  if(exact(middle))below=middle;
+  else above=middle;
+ }
+ std::vector<Probe> probes;
+ for(uint32_t i=0;i<charts.size();++i){
+  for(size_t j=0;j<513;++j)probes.push_back({{{.25f,.25f,.5f},{.5f,.5f},i},{float(j)/512.f,.5f}});
+  for(float u:{below,above})probes.push_back({{{.25f,.25f,.5f},{.5f,.5f},i},{u,.5f}});
+ }
+ std::vector<Verdict> output(probes.size());
+ check(refuses([&]{device->certify(charts,probes,output,{});}),"Certification needs its separately uploaded emitted atlas");
+ device->set_emitted_image(*emitted,{});
+ device->certify(charts,probes,output,{});
+ size_t passed=0,failed=0,rechecked=0;
+ for(size_t i=0;i<probes.size();++i){
+  if(i%515>=513&&output[i]!=Verdict::Reference)
+   throw std::runtime_error("A probe adjacent to the angular boundary did not retain the precision check");
+  if(output[i]==Verdict::Reference){++rechecked;continue;}
+  const bool accepted=output[i]==Verdict::Pass;
+  if(accepted!=exact(probes[i].emitted_uv[0]))throw std::runtime_error("A definite device verdict differs from the angular reference");
+  if(accepted)++passed;
+  else ++failed;
+ }
+ check(passed&&failed&&(passed+failed)>9*probes.size()/10,"Native and reflected atlas verdicts agree on definite passes and failures");
+ std::cout<<"CERTIFIED_PROBES accepted="<<passed<<" rejected="<<failed<<" precision="<<rechecked<<'\n';
+ unsigned polls=0;
+ check(refuses([&]{device->certify(charts,probes,output,[&]{return ++polls==2;});}),
+       "Cancellation after the certificate dispatch refuses the detached decision batch");
+ const Image replacement{1,1,{255,128,128,255}};
+ device->set_emitted_image(replacement,{});
+ device->certify(charts,probes,output,{});
+ check(std::all_of(output.begin(),output.end(),[](auto verdict){return verdict==Verdict::Fail;}),
+       "A replacement atlas invalidates all verdicts for its preceding image");
+}
 }
 int main(int argc,char **argv)try {
   if(argc>1&&std::string_view(argv[1])=="--missing"){
@@ -140,6 +201,6 @@ int main(int argc,char **argv)try {
   check(refuses([&]{normal_bake_basis(raw,{.2,.2,.2},NormalFragmentBasis::RawColumns);}),"Malformed barycentric authority is rejected");
   auto mixed=raw;mixed[1].w=-1;check(refuses([&]{normal_bake_basis(mixed,bary,NormalFragmentBasis::RawColumns);}),"A triangle cannot silently mix tangent handedness");
   check(refuses([&]{encode_normal_bake(identity,{NAN,0,1});}),"Nonfinite input does not publish encoded normals");
-  if(compute_backend()!="CPU")device_normals();
+  if(compute_backend()!="CPU"){device_normals();device_certificate();}
   std::cout<<"PASS "<<checks<<" normal-bake encoding foundation checks\n";return 0;
 } catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
