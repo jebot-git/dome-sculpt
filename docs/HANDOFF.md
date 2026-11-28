@@ -147,6 +147,21 @@ synthetic OpenXR reproduce the saved projects byte for byte. The affected
 host units compile under CUDA and ROCm configurations.
 [Grouped weight-preview evidence](validation/weight-preview-linked-20261128.json)
 
+Vertex-position shapekey Mirror now searches a resident spatial directory on the
+selected GPU. Bounded continuation batches preserve exact binary64 radius,
+ordered donor selection, coincident seam agreement and the candidate work
+budget. The worker reuses the reflected field for classification and authoring
+when they share the same rest domain. The prepared Wayland fixture now dispatches
+two searches for its two rest domains, down from four. Nested FLTK passes
+Apply, Cancel, Save, Undo and Redo. All six synthetic OpenXR project captures
+match the earlier Release fixtures byte for byte. The warm matching stage
+for 294,916 vertices takes a median 64 ms on Arc, down from 521 ms in the
+preceding scalar implementation. The isolated cold 516-vertex run took 3.63
+seconds including device startup. CUDA and ROCm compile and refuse missing
+devices in direct probes. Actual positive vendor runs and physical XR remain
+open.
+[Vertex-position Mirror evidence](validation/key-mirror-gpu-20261128.json)
+
 Ambient occlusion in Bake now traces the biased hemisphere on the selected
 GPU against the existing immutable source BVH. The device returns one
 blocked-ray count per projected texel. Long traversals resume on the device

@@ -1,0 +1,200 @@
+{
+  "date": "2026-11-28",
+  "product": "9d56cb4d57e68c29946a2f75323d12551dfafcf4",
+  "preceding": "7b1b786d2dc3a4b9ff6f49c985cbd95ef48a3ddd",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Vertex-position Mirror keeps the sorted cell directory, vertices and displacements on the selected GPU. Bounded launches preserve ordered donors, inclusive binary64 distance, exact signed-zero agreement and charged candidate visits. Classification and authoring share the result within the same mesh domain.",
+  "arc_a770": {
+    "application_sha256": "54b8f748e7cebefb0b7ed7175a92ee91e223624fbd9e68f04390ba0d952550fe",
+    "render_node": "/dev/dri/renderD129",
+    "release": [
+      {
+        "tests": [
+          "xr-mirror-control-faults",
+          "xr-mirror-controls",
+          "key-mirror-vertex",
+          "application-missing-gpu",
+          "key-mirror-missing-gpu",
+          "key-mirror-correspondence",
+          "shapekey-authoring",
+          "prepared-normal-shapes",
+          "independent-seam-key-mirror-prepared",
+          "independent-seam-key-mirror-retained",
+          "key-mirror-relative-kernel",
+          "shapekey-mirror-openxr"
+        ],
+        "log_sha256": "bad567893f7b69f79f768ba280e3c6371ab714f363f65097c466e38a01b9a501"
+      },
+      {
+        "tests": [
+          "weight-edit",
+          "surface-query-oblique",
+          "weight-transfer-batch"
+        ],
+        "log_sha256": "8726c6d05fa251e26716e21f95534c6836db19e3db0f3d54ca929fc363609e35"
+      },
+      {
+        "tests": [
+          "retopo"
+        ],
+        "log_sha256": "876b5b5e0b88efd751cb242dd44eff7715a491affbf59a247b96f5ab1307b6b2"
+      }
+    ],
+    "vertex_oracle_checks": 1454,
+    "synthetic_openxr": {
+      "checks": 40,
+      "report_sha256": "ae59a811a329ca35b6bbe8e63e9a21ad9909e6279128b01cf211d648c9df2780",
+      "projects": {
+        "accept-0.dsculpt": "cf3a4871e1d88af8e8313ba2772e406fef16e5c9bbbf2129b9be5347437e3992",
+        "accept-1.dsculpt": "6a5ce46bca85bcde074bc2251b1ddf69684d6a3b1336aeb83ff2b0db3b481080",
+        "accept-2.dsculpt": "16ea54370d05fb55095be502ff9926c03c06e953f724b123304b080f361b0451",
+        "cancel-0.dsculpt": "8e16ca54b46ba261d92562c5aa0667c14121df4db80cd233367e66799910d23d",
+        "focus-0.dsculpt": "8e16ca54b46ba261d92562c5aa0667c14121df4db80cd233367e66799910d23d",
+        "source.dsculpt": "8e16ca54b46ba261d92562c5aa0667c14121df4db80cd233367e66799910d23d"
+      },
+      "byte_identical_to": "Nov26 pre-acceleration production Release Mirror fixtures",
+      "physical_headset": false
+    },
+    "nested_domed_wayland": {
+      "checks": 9,
+      "saved_project_checks": 9,
+      "report_sha256": "ef6fd6f883807aadc0a056902de851dce5474b15f6066eaf34413b55333942bf",
+      "trace_sha256": "f4e9935b93060508b74a902a9c9f8ee88c2c96cff3a7ebbb37ba5c6246335718",
+      "kernel_launches_before_reuse": 4,
+      "kernel_launches_after_reuse": 2,
+      "projects": {
+        "mirror-after.dsculpt": "b8de228c54e2bc59d70437050754afe494bb16b189b59eaece3eb3fe5e82959d",
+        "mirror-before.dsculpt": "3240b4a24de203fbece45abbc8996b9cbc6e84afc77aa79ec25df9f4ffac4b33"
+      }
+    },
+    "matching_stage_benchmark": {
+      "fixture": "Deterministically shuffled symmetric vertices with separated occupied cells. Each iteration checks every reflected displacement bit against the generated field.",
+      "scope": "End-to-end reflected_key_vertex_deltas, including directory construction and device transfers. The preceding scalar implementation was compiled with the same Release toolchain.",
+      "runs": [
+        {
+          "vertices": 516,
+          "host": {
+            "first_ms": 0.29058,
+            "warm_ms": [
+              0.251933,
+              0.243781,
+              0.240778,
+              0.241201,
+              0.255847
+            ],
+            "warm_median_ms": 0.243781,
+            "log_sha256": "2050601527f29648cf51265790b60a45d88ee2e42fb3a53651d087d15e893c82"
+          },
+          "gpu": {
+            "first_ms": 3633.85,
+            "warm_ms": [
+              0.388573,
+              0.281703,
+              0.268353,
+              0.264113,
+              0.256151
+            ],
+            "warm_median_ms": 0.268353,
+            "log_sha256": "8907f509ffeb313eb300e9ee6248542e0439322d1a355d62a003b68cde7f4161"
+          }
+        },
+        {
+          "vertices": 32772,
+          "host": {
+            "first_ms": 26.0558,
+            "warm_ms": [
+              22.923,
+              22.8925,
+              22.7429,
+              22.5702,
+              22.5793
+            ],
+            "warm_median_ms": 22.7429,
+            "log_sha256": "7fb0c1efed64bd86398bf06707444fc479cecfeecee751ca284d1786445da54e"
+          },
+          "gpu": {
+            "first_ms": 57.5171,
+            "warm_ms": [
+              5.82502,
+              6.47519,
+              7.76601,
+              6.06838,
+              6.12011
+            ],
+            "warm_median_ms": 6.12011,
+            "log_sha256": "f34944c468a58fce54da5fe54fd2916df77079f608f0c6e685aa33f3e9ed6f0b"
+          }
+        },
+        {
+          "vertices": 294916,
+          "host": {
+            "first_ms": 569.241,
+            "warm_ms": [
+              507.953,
+              521.51,
+              523.88,
+              521.127,
+              521.302
+            ],
+            "warm_median_ms": 521.302,
+            "log_sha256": "24504a00e8281d7aa379716adce5f5ace0f91e5204b354b8f42273604bfd022d"
+          },
+          "gpu": {
+            "first_ms": 128.439,
+            "warm_ms": [
+              64.109,
+              62.7835,
+              63.8125,
+              66.9844,
+              61.1349
+            ],
+            "warm_median_ms": 63.8125,
+            "log_sha256": "6195476e1d25e904a3b41d32b09660d507251dde073044ed4429ee383caa20b3"
+          }
+        }
+      ]
+    }
+  },
+  "headless_reference": {
+    "tests": [
+      "cpu-reference-install-refused",
+      "shapekey-authoring",
+      "key-mirror-vertex",
+      "key-mirror-correspondence",
+      "xr-mirror-controls"
+    ],
+    "log_sha256": "95a4d79208008f5f2da49af8e43c428dbe07a47bac5281533ec3d0d2f0769745"
+  },
+  "scoped_asan_ubsan": {
+    "instrumented": [
+      "key-mirror-correspondence.cpp",
+      "normal-key-derivation.cpp",
+      "shapekey-normal-preparation.cpp",
+      "shapekey-authoring.cpp",
+      "tests/key-mirror-vertex.cpp"
+    ],
+    "vertex_oracle_checks": 1454,
+    "archive_endpoint_checks": 9,
+    "leak_detection": false,
+    "log_sha256": "0d2cc6e14615e3f744531fb8844bdbdd2967cd0291373dc09d2ddc56ab254125",
+    "archive_log_sha256": "bfeda825d3dfb1fdca3e0c0755070c6b7c73e59b59da16d2f33f4bcfa6d8f409"
+  },
+  "vendor_probes": {
+    "cuda": {
+      "shared_kernel_compiled": true,
+      "native_mirror_worker_linked": true,
+      "unavailable_device_refused": true,
+      "positive_hardware_tested": false,
+      "kernel_object_sha256": "0cccd52987601b33ff66c4ed450799bc22300cada99793afd015e8ecab1f6678",
+      "probe_log_sha256": "e6745c552c7801fcf109a2c0a7d523eabb1b5883693259b5caa31b42f6516bb3"
+    },
+    "rocm": {
+      "shared_kernel_compiled": true,
+      "native_mirror_worker_linked": true,
+      "unavailable_device_refused": true,
+      "positive_hardware_tested": false,
+      "kernel_object_sha256": "3cf65d47001e88583f5824cc20ebeac45b009c6191a27d7cac648daef712bbe8",
+      "probe_log_sha256": "cd7b90c39ace7cc2ee205a40fd17e6c7d0d24c9e5f6e7db1c35ea771cf31f982"
+    }
+  }
+}

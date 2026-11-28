@@ -14,6 +14,15 @@ GPU and headless test builds. It independently rejects CPU configuration
 without the reference opt-in or CTest, and with either desktop or XR enabled.
 The reference build also tests rejection before staging any installation files.
 
+Vertex-position shapekey Mirror performs neighboring-cell search, exact
+distance testing and seam agreement on the selected GPU. The device keeps
+the donor index resident and returns ordered donor IDs. The worker preserves
+the signed-zero displacement, logical work quota and owning rest-domain
+transactions. Current evidence covers Arc desktop Wayland, synthetic OpenXR,
+the headless numerical reference and scoped host sanitizers. Positive AMD and
+NVIDIA execution and physical XR still require qualification.
+[Vertex-position Mirror evidence](validation/key-mirror-gpu-20261128.json)
+
 Bake traces ambient occlusion on the selected GPU through the native
 source BVH. It preserves the original biased cosine hemisphere, inclusive
 ray distance and ordered native output. Continuation batches poll for
