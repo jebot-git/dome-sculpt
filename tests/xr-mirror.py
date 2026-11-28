@@ -20,7 +20,7 @@ with tempfile.TemporaryDirectory(prefix='dome-mirror-xr-') as directory:
  original=inspect(source);(out/"source.dsculpt").write_bytes(before_bytes);(out/"source.json").write_text(json.dumps(original,indent=2)+"\n")
  cases=[(mode,method,'',source,before_bytes,original) for mode,method in [('accept',0),('accept',1),('accept',2),('cancel',0),('focus',0)]]
  if args.refinement_helper:
-  for suffix,fixture in [('', '--xr-fixture'),('-rigged','--xr-rig-fixture')]:
+  for suffix,fixture in [('', '--xr-fixture'),('-rigged','--xr-rig-fixture'),('-baked','--xr-baked-fixture')]:
    refined_source=root/('refined-source'+suffix+'.dsculpt')
    subprocess.run([str(args.refinement_helper),fixture,str(refined_source)],env=env,check=True)
    refined_bytes=refined_source.read_bytes();(out/refined_source.name).write_bytes(refined_bytes)
@@ -37,7 +37,7 @@ with tempfile.TemporaryDirectory(prefix='dome-mirror-xr-') as directory:
   check(source.read_bytes()==before_bytes,stem+': original native project bytes remain untouched')
   if mode=='accept' and method==3:
    verification=subprocess.run([str(args.refinement_helper),'--verify-ui',str(source),str(target)],env=env)
-   check(verification.returncode==0,stem+': controller refinement preserves the mirrored field, paint, UV flags, any native skin and exact Restore')
+   check(verification.returncode==0,stem+': controller refinement preserves the mirrored field, paint, Bake or skin, UV flags and exact Restore')
   elif mode=='accept':
    check(len(after['keys'])==3 and after['keys'][:2]==original['keys'],stem+': explicit Mirror adds one real key while keeping both original targets exact')
    delta=after['keys'][2]['delta'];check(max(abs(a-b) for a,b in zip(delta[3],[-.015,0,.04]))<1e-6 and max(abs(x) for x in delta[0])<1e-6,stem+': independent off-centre counterpart oracle verifies REST-position mirroring')

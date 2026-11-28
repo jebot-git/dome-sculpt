@@ -3,11 +3,15 @@
 namespace allocation=mirror_failure;
 #include "key-mirror-refinement.hpp"
 #include "cgltf.h"
+#include "dome/bake-recipe.hpp"
 #include "dome/document.hpp"
+#include "dome/material-bindings.hpp"
 #include "dome/rig-edit.hpp"
 #include "dome/rig-rest.hpp"
 #include "dome/skin-authoring.hpp"
+#include "dome/tangents.hpp"
 #include <nlohmann/json.hpp>
+#include <png.h>
 #include <cmath>
 #include <iostream>
 #include <set>
@@ -75,6 +79,10 @@ double field(double x, double y) {
   const double u = x + .5, v = y + .5;
   return v <= u ? .04 * (u - v) - .06 * v : -.06 * u + .09 * (v - u);
 }
+double slide(double x,double y){
+  const double u=x+.5,v=y+.5;
+  return v<=u?.125*(u-v):-.0625*(v-u);
+}
 double sampled(const MirrorSurfacePoint &p) {
   constexpr double z[] = {0, .04, -.06, 0, -.06, .09};
   double sum = 0;
@@ -83,7 +91,7 @@ double sampled(const MirrorSurfacePoint &p) {
   return sum;
 }
 
-Scene native_fixture(bool split_edge=false){
+Scene native_fixture(bool split_edge=false,bool planar_key=false){
   Scene scene;
   const auto id=scene.active().id;
   auto mesh=*square();
@@ -110,14 +118,88 @@ Scene native_fixture(bool split_edge=false){
   brush.from=brush.to={.22f,.07f,0};ink.color={.8f,.15f,.1f,1};
   object.painted->begin_stroke();object.painted->stamp(brush,ink);object.painted->end_stroke();
   object.painted->layer_properties("Hidden original",false,.4f);
-  ShapeKeyEdit edit;edit.name="Asymmetric fold";
+  ShapeKeyEdit edit;edit.name=planar_key?"Asymmetric slide":"Asymmetric fold";
   author_shapekey(scene,id,edit);
   edit.action=ShapeKeyAction::Replace;edit.positions=mesh.positions;
-  for(auto &p:edit.positions)p.z=float(field(p.x,p.y));
+  for(auto &p:edit.positions){
+    if(planar_key)p.x+=float(slide(p.x,p.y));
+    else p.z=float(field(p.x,p.y));
+  }
   author_shapekey(scene,id,edit);
   auto deformation=*scene.active().deformation;deformation.morph_weights={.25f};
   scene.set_deformation(id,std::move(deformation));
   return scene;
+}
+
+Scene baked_fixture(bool masked=false){
+  auto scene=native_fixture(false,true);
+  const auto target=scene.active().id;
+  ObjectBakeSettings settings;
+  settings.front_mm=320;settings.back_mm=160;settings.ao_distance_mm=85;
+  settings.ao_samples=4;settings.padding=2;
+  if(masked){
+    const auto &paint=scene.active().painted;
+    paint->add_layer("Bake protection");
+    settings.mask_layer=paint->active_layer();
+    PaintSettings protection;protection.channel=PaintChannel::Mask;protection.mask=0;
+    Brush brush;brush.from=brush.to={.18f,-.17f,0};brush.normal={0,0,1};brush.radius=.28f;
+    paint->begin_stroke();paint->stamp(brush,protection);paint->end_stroke();
+  }
+  const auto donor=scene.add("Sloped material donor",Volume{});
+  auto surface=*square();
+  for(auto &p:surface.positions){p.x*=1.3f;p.y*=1.3f;p.z=.12f+.21f*p.x-.12f*p.y;}
+  surface.normals.assign(surface.positions.size(),normalized(Vec3{-.21f,.12f,1}));
+  auto &high=scene.object(donor);
+  high.mesh_active=true;high.painted=std::make_shared<PaintedMesh>(std::move(surface),64);
+  high.material.color={.27f,.43f,.66f,1};high.material.metallic=.31f;high.material.roughness=.52f;
+  high.material.emissive=masked?std::array<float,3>{2.5f,.125f,.75f}:std::array<float,3>{.3f,.1f,.2f};
+  scene.select(target);
+  RigEdit preview;preview.morph=MorphWeightEdit{0,0};
+  edit_rig(scene,target,preview);
+  const auto report=bake_object(scene,donor,settings);
+  preview.morph->weight=.25f;
+  edit_rig(scene,target,preview);
+  scene.object(donor).visible=false;
+  const auto bake=scene.active().painted->baked();
+  if(!report.canonical_captured)throw std::runtime_error("Fixture Bake could not capture the original tangent frame");
+  if(!bake||bake->maps.normal.rgba.empty()||!report.projected||report.missed||
+     (masked&&(!report.protected_texels||!bake->emission_field)))
+    throw std::runtime_error("Fixture needs an actual canonical normal Bake and its material coverage");
+  return scene;
+}
+
+const nlohmann::json &paint_fields(const nlohmann::json &encoded){
+  return encoded.contains("payload")?encoded.at("payload"):encoded;
+}
+
+void check_bake(const Scene &before,const Scene &after){
+  const auto &a=before.active(), &b=after.active();
+  const auto prior=a.painted->encode(),current=b.painted->encode();
+  const auto in=a.painted->baked(),out=b.painted->baked();
+  check(in&&out&&paint_fields(prior).at("baked")==paint_fields(current).at("baked")&&
+        out->coverage==in->coverage&&bool(out->emission_field)==bool(in->emission_field),
+        "Canonical normals, material channels and native Bake coverage survive exactly");
+  check(a.bake_recipe&&b.bake_recipe&&a.bake_recipe->encode()==b.bake_recipe->encode(),
+        "The named donor, mask and saved Bake settings stay attached to the refined mesh");
+  const auto original=a.painted->preview(a.material),refined=b.painted->preview(b.material);
+  check(original->color.rgba==refined->color.rgba&&original->metal_rough.rgba==refined->metal_rough.rgba&&
+        original->normal.rgba==refined->normal.rgba&&original->emission.rgba==refined->emission.rgba&&
+        original->baked_normal.rgba==refined->baked_normal.rgba&&
+        original->baked_coverage.rgba==refined->baked_coverage.rgba,
+        "The composed Bake and editable paint keep identical visible pixels across material roles");
+  if(out->emission_field){
+    bool equal=true;
+    for(size_t i=0;i<out->coverage.size();++i){
+      const auto a=in->emission_field->texel(i),b=out->emission_field->texel(i);
+      equal&=a.legacy==b.legacy&&a.absolute==b.absolute&&a.coverage==b.coverage;
+    }
+    check(equal,"Masked high-dynamic-range Bake retains independent FLOAT radiance and coverage");
+  }
+  const auto canonical=b.material_bindings->normal_frames->canonical;
+  check(canonical&&canonical->transport==NormalFrameTransport::CanonicalMikk&&
+        canonical->tangents.size()==b.painted->mesh().indices.size()&&
+        std::ranges::all_of(canonical->tangents,[](const auto &t){return t==Tangent{1,0,0,1};}),
+        "Refined corners retain the captured bake tangent directions and handedness");
 }
 
 Scene rigged_fixture(bool split_edge=false){
@@ -315,10 +397,15 @@ void check_authored(const Scene &before,const Scene &after){
   check(m.indices.size()>a.painted->mesh().indices.size()&&keys.size()==2&&
         b.deformation->morph_weights==std::vector<float>({.25f,0}),
         "Native Mirror explicitly refines the topology and carries both key weights");
+  const bool planar=keys[0].name=="Asymmetric slide";
   bool interpolated=false;
   for(size_t v=0;v<m.positions.size();++v){
     const auto p=m.positions[v];
-    if(std::abs(keys[0].delta[v].z-field(p.x,p.y))>1e-7||std::abs(keys[1].delta[v].z-field(-p.x,p.y))>1e-7)
+    const auto evaluate=planar?slide:field;
+    const auto original=float(evaluate(p.x,p.y)),mirrored=float(evaluate(-p.x,p.y));
+    const auto expected=planar?Vec3{original,0,0}:Vec3{0,0,original};
+    const auto reflection=planar?Vec3{-mirrored,0,0}:Vec3{0,0,mirrored};
+    if(length(keys[0].delta[v]-expected)>1e-7||length(keys[1].delta[v]-reflection)>1e-7)
       throw std::runtime_error("Authored native key disagrees with the independent continuous-field oracle");
     interpolated|=std::abs(p.x)<.49f&&std::abs(p.y)<.49f;
   }
@@ -328,7 +415,7 @@ void check_authored(const Scene &before,const Scene &after){
   check(vertex!=m.positions.end()&&std::ranges::count_if(m.positions,middle)==1&&
         std::ranges::count(m.indices,uint32_t(vertex-m.positions.begin()))>=4,
         "A continuous original and reflected field shares the crossing vertex between triangles");
-  check(a.painted->encode()["layers"]==b.painted->encode()["layers"]&&
+  check(paint_fields(a.painted->encode()).at("layers")==paint_fields(b.painted->encode()).at("layers")&&
         a.painted->preview(a.material)->color.rgba==b.painted->preview(b.material)->color.rgba,
         "Every hidden and visible paint layer and the composited UV pixels survive refinement");
   check(std::any_of(m.uv_pins.begin(),m.uv_pins.end(),[](auto pin){return pin;})&&
@@ -339,6 +426,94 @@ void check_authored(const Scene &before,const Scene &after){
   author_shapekey(restored,b.id,restore);
   check(restored.encode()==before.encode(),"Restore recovers the exact pre-refinement mesh, frame data and layers");
   if(a.deformation->skin)check_skin(before,after);
+  if(a.painted->baked())check_bake(before,after);
+}
+
+void check_baked_glb(const std::filesystem::path &file,const SculptObject &object){
+  cgltf_options options{};
+  cgltf_data *raw=nullptr;
+  check(cgltf_parse_file(&options,file.c_str(),&raw)==cgltf_result_success,"Independent reader opens the GLB of the baked refined mesh");
+  const std::unique_ptr<cgltf_data,decltype(&cgltf_free)> model(raw,cgltf_free);
+  if(cgltf_load_buffers(&options,raw,file.c_str())!=cgltf_result_success||cgltf_validate(raw)!=cgltf_result_success||
+     raw->meshes_count!=1||raw->meshes[0].primitives_count!=1)
+    throw std::runtime_error("Invalid refined baked GLB mesh or accessors");
+  const auto &primitive=raw->meshes[0].primitives[0];
+  const auto *material=primitive.material;
+  const auto *tangent=cgltf_find_accessor(&primitive,cgltf_attribute_type_tangent,0);
+  check(primitive.targets_count==2&&tangent&&material&&material->normal_texture.texture&&
+        material->normal_texture.texture->image&&
+        material->occlusion_texture.texture==material->pbr_metallic_roughness.metallic_roughness_texture.texture,
+        "GLB retains both key targets, explicit baked tangents and the shared AO and material map");
+  const auto *view=material->normal_texture.texture->image->buffer_view;
+  if(!view||!view->buffer||!view->buffer->data)throw std::runtime_error("Baked GLB is missing its embedded normal map");
+  png_image image{};image.version=PNG_IMAGE_VERSION;
+  if(!png_image_begin_read_from_memory(&image,static_cast<const uint8_t*>(view->buffer->data)+view->offset,view->size))
+    throw std::runtime_error("Independent PNG reader cannot read refined normal texture");
+  image.format=PNG_FORMAT_RGBA;
+  std::vector<uint8_t> bytes(PNG_IMAGE_SIZE(image));
+  const bool read=png_image_finish_read(&image,nullptr,bytes.data(),0,nullptr);
+  png_image_free(&image);
+  check(read&&bytes==object.painted->composite(object.material)->baked_normal.rgba,
+        "Independent PNG reader recovers the exact retained GLB normal texture");
+}
+
+void baked_workflow(const std::filesystem::path &out){
+  std::filesystem::create_directories(out);
+  ShapeKeyEdit edit;edit.action=ShapeKeyAction::Mirror;edit.mirror_frames=ShapeKeyMirrorFrames::RefinedSurface;
+  edit.name="Reflected slide";
+  for(const bool masked:{false,true}){
+    const auto source=baked_fixture(masked);
+    const auto id=source.active().id;
+    auto direct=source;
+    author_shapekey(direct,id,edit);
+    check(source.active().painted->baked()==direct.active().painted->baked()&&
+          source.active().bake_recipe==direct.active().bake_recipe,
+          "Mirror shares the immutable native Bake map and recipe owners");
+    check_authored(source,direct);
+    Document document;document.replace(source);
+    document.author_shape(edit);
+    const auto file=out/(masked?"refined-masked.dsculpt":"refined-baked.dsculpt");
+    document.save_async(file).get();
+    check(document.wait_asset()&&document.wait_mesh()&&document.frame().state->error.empty()&&
+          Scene::load(file).encode()==direct.encode()&&document.undo()&&document.copy_scene().encode()==source.encode()&&
+          document.redo()&&document.copy_scene().encode()==direct.encode(),
+          "Ordered Save and one Undo or Redo preserve the complete Bake and its refined topology");
+    auto reopened=Scene::load(file);
+    document.replace(reopened);
+    const auto recipe=reopened.active().bake_recipe;
+    check(document.wait_mesh()&&document.frame().state->bake_recipe&&
+          document.frame().state->bake_recipe->encode()==recipe->encode()&&
+          document.frame().state->bake_settings.mask_layer==recipe->settings.mask_layer&&
+          document.frame().surface->ranges.front().canonical_frame,
+          "Cold Open restores the saved Bake settings and publishes the canonical preview frame");
+    if(!masked){
+      const auto glb=out/"refined-baked.glb";
+      document.export_asset(glb).get();
+      check_baked_glb(glb,reopened.active());
+    }
+    RigEdit rest;rest.morph=MorphWeightEdit{0,0};
+    edit_rig(reopened,id,rest);
+    reopened.object(recipe->source.object).material.color={.6f,.15f,.26f,1};
+    document.replace(reopened);
+    document.bake_from_object(recipe->source.object,recipe->settings);
+    const bool completed=document.wait_asset()&&document.wait_mesh()&&document.frame().state->error.empty();
+    const auto rebaked=document.copy_scene();
+    const auto previous=reopened.active().painted->baked(),updated=rebaked.active().painted->baked();
+    check(completed&&previous&&updated&&rebaked.active().bake_recipe&&
+          rebaked.active().painted->mesh().indices==reopened.active().painted->mesh().indices&&
+          rebaked.active().bake_recipe->encode()==recipe->encode()&&
+          previous->maps.color.rgba!=updated->maps.color.rgba&&previous->coverage==updated->coverage,
+          "The saved projection recipe can bake again on the refined topology");
+    source.save(out/(masked?"source-masked.dsculpt":"source-baked.dsculpt"));
+  }
+  auto legacy=baked_fixture();
+  auto binding=std::make_shared<SourceMaterialBindings>(*legacy.active().material_bindings);
+  auto frames=std::make_shared<NormalFrameSet>(*binding->normal_frames);
+  frames->canonical.reset();binding->normal_frames=std::move(frames);
+  legacy.active().material_bindings=std::move(binding);
+  const auto before=legacy.encode();
+  check(refuses([&]{author_shapekey(legacy,legacy.active().id,edit);},"retained constant tangent frame")&&
+        legacy.encode()==before,"Legacy baked normals without captured frames remain intact on refusal");
 }
 
 void workflow(const std::filesystem::path &out,bool rigged){
@@ -415,6 +590,11 @@ int main(int argc,char **argv) try {
   const auto source = square();
   if(argc==3&&std::string_view(argv[1])=="--ui-fixture"){native_fixture().save(argv[2]);return 0;}
   if(argc==3&&std::string_view(argv[1])=="--ui-rig-fixture"){rigged_fixture().save(argv[2]);return 0;}
+  if(argc==3&&std::string_view(argv[1])=="--ui-baked-fixture"){baked_fixture().save(argv[2]);return 0;}
+  if(argc==3&&std::string_view(argv[1])=="--baked-authoring"){baked_workflow(argv[2]);return 0;}
+  if(argc==3&&std::string_view(argv[1])=="--xr-baked-fixture"){
+    auto scene=baked_fixture(true);scene.active().transform.position={0,1.3f,-1.1f};scene.save(argv[2]);return 0;
+  }
   if(argc==3&&(std::string_view(argv[1])=="--xr-fixture"||std::string_view(argv[1])=="--xr-rig-fixture")){
     auto scene=std::string_view(argv[1])=="--xr-rig-fixture"?rigged_fixture():native_fixture();
     scene.active().transform.position={0,1.3f,-1.1f};scene.save(argv[2]);return 0;

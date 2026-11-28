@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "shapekey-refinement.hpp"
+#include "bake-canonical-frame.hpp"
 #include "dome/material-bindings.hpp"
 #include "key-mirror-refinement.hpp"
 #include "normal-bake-frames.hpp"
@@ -128,8 +129,8 @@ SkinWeights refine_skin(const DeformationState &before,const KeyMirrorRefinement
 void admit(const SculptObject &source){
   const auto &paint=*source.painted;
   const auto binding=source.material_bindings;
-  if(source.appearance||source.polygon||source.texture_sets||source.retopology||source.bake_recipe||
-     paint.in_stroke()||paint.source_maps()||paint.baked()||paint.paint_sampling_domain()||
+  if(source.appearance||source.polygon||source.texture_sets||source.retopology||
+     paint.in_stroke()||paint.source_maps()||paint.paint_sampling_domain()||
      paint.normal_projection()||paint.color_projection()||paint.surface_diagnostics().policy!=PaintUvPolicy::Strict||
      source.deformation->source_skin_instance||
      (binding&&(binding->has_mtoon||binding->sampling_reparameterized||binding->key_derivation||binding->canonical_attributes||binding->canonical_uv||
@@ -137,12 +138,12 @@ void admit(const SculptObject &source){
        binding->native_paint_frames||binding->canonical_paint_sampling||binding->polygon_surface_transfer||
        (binding->uv_origin&&(!binding->uv_origin->paint||binding->uv_origin->appearance||!binding->uv_origin->creator_kind.empty()||
                             binding->uv_origin->paint->source_maps())))))
-    throw std::invalid_argument("Refined surface Mirror requires a native mesh with writable UVs and plain paint layers");
+    throw std::invalid_argument("Refined surface Mirror requires a native mesh with writable UVs");
 }
 
 std::shared_ptr<NormalFrames> refine_frame(const NormalFrames &before,const KeyMirrorRefinement &refined,
     const Mesh &mesh,const std::function<bool()> &cancelled){
-  if(before.source_vertex_count||before.source_corner_count||before.transport==NormalFrameTransport::CanonicalMikk)
+  if(before.source_vertex_count||before.source_corner_count)
     throw std::invalid_argument("Refined surface Mirror requires native artist-frame coordinates");
   auto after=std::make_shared<NormalFrames>();
   after->transport=before.transport;
@@ -186,6 +187,17 @@ ShapeKeyResult author_refined_shapekey(Scene &scene,uint64_t object,const ShapeK
   const auto old=source.material_bindings?source.material_bindings->normal_frames:nullptr;
   if(old)normal_frame_current_authority(*source.material_bindings,rest,source.deformation.get(),cancelled);
   else source.deformation->validate(rest);
+  bool baked_normals=false;
+  if(const auto baked=source.painted->baked()){
+    if(baked->normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||
+       baked->color_interpretation!=BakedColorInterpretation::VertexComponent||
+       baked->normal_authority||baked->normal_field||!baked->maps.mtoon_normal.rgba.empty())
+      throw std::invalid_argument("Refined surface Mirror requires ordinary native Bake maps on the same UV grid");
+    baked_normals=!baked->maps.normal.rgba.empty();
+    if(baked_normals&&(!old||!old->canonical||
+       !constant_bake_frame(*old->canonical,rest,source.deformation.get(),true,cancelled)))
+      throw std::invalid_argument("Refined surface Mirror needs a retained constant tangent frame for baked normals");
+  }
   const auto refined=refine_reflected_key(source.painted->mesh_owner(),{edit.mirror_plane},
       edit.mirror_tolerance,{128*1024*1024,64*1024*1024,cancelled});
   const auto corners=refined.corners.size();
@@ -264,11 +276,21 @@ ShapeKeyResult author_refined_shapekey(Scene &scene,uint64_t object,const ShapeK
   auto mirrored=transfer(before.targets.at(edit.target),true,std::move(name));
   std::vector<Vec3> endpoint=basis.positions;
   for(size_t i=0;i<endpoint.size();++i){if((i&1023)==0)stop(cancelled);endpoint[i]+=mirrored.delta[i];}
+  if(baked_normals){
+    auto geometry=basis;
+    geometry.positions=endpoint;
+    geometry.validate();
+  }
   const auto source_pbr=frames->pbr,source_mtoon=frames->mtoon,source_canonical=frames->canonical;
   auto role=[&](const std::shared_ptr<const NormalFrames> &source_frame)->std::shared_ptr<const NormalFrames>{
     if(!source_frame)return {};
     auto frame=old?refine_frame(*source_frame,refined,basis,cancelled):std::make_shared<NormalFrames>(*source_frame);
-    frame->targets.push_back(author_key_attributes(basis,*frame,nullptr,basis.positions,endpoint,id,cancelled));
+    // Captured Bake frames own constant authored directions with zero key
+    // deltas. Reflect zero exactly and keep the texture's tangent basis.
+    if(baked_normals&&(source_frame==old->canonical||
+       constant_bake_frame(*source_frame,rest,source.deformation.get(),false,cancelled)))
+      frame->targets.push_back({id,{},{}});
+    else frame->targets.push_back(author_key_attributes(basis,*frame,nullptr,basis.positions,endpoint,id,cancelled));
     frame->validate();
     return frame;
   };
