@@ -1,0 +1,164 @@
+{
+  "date": "2026-11-28",
+  "product": "86fbd97976dc45ac5a9fd8f77fc97562dfcc1c71",
+  "preceding_product": "354461181719f1f811f8f6498e652653d755ae4b",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Surface Heat screened PCG and refinement with device-resident matrix, IC factors and work vectors.",
+  "oneapi_arc": {
+    "application_sha256": "49704cfa6cd956adbf6a7998a70f2776adc157a0b575b99803738383b74d65e0",
+    "focused": {
+      "passed": 33,
+      "junit_sha256": "37bab3f31cb13a1379a9dfd7975e95b131202d00770be1bb0003d65be90c9a9c"
+    },
+    "additional_retopology_and_affine": {
+      "passed": 4,
+      "junit_sha256": "efcf6d9f6346d6bc66185e92fad1734bdd38f6f7176d4016404134f28e8f4043"
+    },
+    "manufactured_open_field": {
+      "rows": 3315,
+      "max_absolute_field_error": 1.82077e-14,
+      "independently_replayed_relative_residual": 7.54288e-16,
+      "iterations": 200
+    },
+    "cancel_leaves_destination_untouched_and_retry_succeeds": true,
+    "gpu_hidden_refusal": "FAIL No device of requested type 'info::device_type::gpu' available."
+  },
+  "archives_matching_preceding_product_byte_for_byte": [
+    {
+      "project": "surface-heat/male-owning/bound.dsculpt",
+      "sha256": "00b1d46aa7937b0a4a69555c855f3d0be188c55c643a756df48834523ac27847"
+    },
+    {
+      "project": "surface-heat/male-public/accepted.dsculpt",
+      "sha256": "00b1d46aa7937b0a4a69555c855f3d0be188c55c643a756df48834523ac27847"
+    },
+    {
+      "project": "surface-heat/female-mixed-targets/mixed-xr.dsculpt",
+      "sha256": "520a05a8d698b86d252fff411d842d09282ac8249db0b38e21eab82427b6a2c2"
+    },
+    {
+      "project": "surface-heat/male-mixed-targets/mixed-xr.dsculpt",
+      "sha256": "6926e4c3ffc4dbb7605d374a83b0c9012029d5f330737676b5e6d402e52e198c"
+    },
+    {
+      "project": "surface-heat/native-male-owning/bound.dsculpt",
+      "sha256": "76dc328851bcffb9f5a70aba5f65187715fe2890ca31bba1c214259c46d11064"
+    },
+    {
+      "project": "surface-heat/native-male-public/accepted.dsculpt",
+      "sha256": "76dc328851bcffb9f5a70aba5f65187715fe2890ca31bba1c214259c46d11064"
+    },
+    {
+      "project": "surface-heat/male-mixed-targets/bound.dsculpt",
+      "sha256": "97a48c703f975d3661163a8f874eb1f8a8ce462ee4b8a69dfdfb88d0be3dbcd1"
+    },
+    {
+      "project": "surface-heat/native-female-owning/bound.dsculpt",
+      "sha256": "a05aba3142dca30bd9844e0dc651247867a8cceced58897119c322aa025c9f26"
+    },
+    {
+      "project": "surface-heat/native-female-public/accepted.dsculpt",
+      "sha256": "a05aba3142dca30bd9844e0dc651247867a8cceced58897119c322aa025c9f26"
+    },
+    {
+      "project": "surface-heat/female-owning/bound.dsculpt",
+      "sha256": "a1b6071045c898a446f549cee7cc0bcef86d5b8d665a2687a11927b76a7fd895"
+    },
+    {
+      "project": "surface-heat/female-public/accepted.dsculpt",
+      "sha256": "a1b6071045c898a446f549cee7cc0bcef86d5b8d665a2687a11927b76a7fd895"
+    },
+    {
+      "project": "surface-heat/female-mixed-targets/bound.dsculpt",
+      "sha256": "cb633926eb4403a4a74ee452396e0bea2f4eb7e450d6ca3628bce819a4d25d70"
+    }
+  ],
+  "cancellation_maximum_principle_partition_and_ownership_preserved": true,
+  "nested_wayland": {
+    "checks": 7,
+    "report_sha256": "d14b42d0e5f697741951a9002c67282a4e21b9275227227091262e8c36ca6f0d",
+    "concave_archive_sha256": "5b2cc5d6e1cfda417446f55588d03a5f7472dbb95049d49c8bf938968f0a2d47",
+    "sycl_ur_client_trace_sha256": "ddf7d41de3413650572a933d243efb55c6937344eed5990f99797ac31c83610b",
+    "traced_successful_device_kernel_launches": {
+      "DotChunks": 40,
+      "Zero": 4,
+      "Copy": 12,
+      "Triangular": 80,
+      "Multiply": 18,
+      "Combine": 36
+    },
+    "dma_buf_render_node": "/dev/dri/renderD129"
+  },
+  "synthetic_openxr": {
+    "female": {
+      "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_submissions": 89,
+      "report_sha256": "c20bb890e78396d2cff757b27c1b5369e06276b27f08ee01888f5a085497c066"
+    },
+    "male": {
+      "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_submissions": 89,
+      "report_sha256": "c20bb890e78396d2cff757b27c1b5369e06276b27f08ee01888f5a085497c066"
+    }
+  },
+  "headless_reference": {
+    "focused": {
+      "passed": 2,
+      "junit_sha256": "4348ccab15b4bea48d17fcfe828d4ed9db8674004cd0226683ed0c9932ce21f6"
+    },
+    "host_reference_asan_ubsan": {
+      "rows": 3315,
+      "max_absolute_field_error": 1.80966e-14,
+      "independently_replayed_relative_residual": 7.79918e-16,
+      "iterations": 148
+    },
+    "shared_device_layout_with_checked_host_buffers_asan_ubsan": {
+      "rows": 3315,
+      "max_absolute_field_error": 1.82077e-14,
+      "independently_replayed_relative_residual": 7.54288e-16,
+      "iterations": 200
+    }
+  },
+  "cuda_and_rocm": {
+    "cuda": {
+      "kernel_object_sha256": "5482b6e26dccc74a9a4046d51611e5ceaea0867138a897ecc8d8c688c91c0896",
+      "missing_device_refusal": "CUDA driver version is insufficient for CUDA runtime version"
+    },
+    "rocm": {
+      "kernel_object_sha256": "947d8caea84e2bea1ad931f473c15e022aa26919420414a24e3c46cf2b6a807e",
+      "missing_device_refusal": "no ROCm-capable device is detected"
+    }
+  },
+  "diagnostic_focused_ctest_times": {
+    "surface-heat-female-mixed-openxr": {
+      "preceding_host_seconds": 8.2587,
+      "arc_seconds": 9.52638
+    },
+    "surface-heat-female-owning": {
+      "preceding_host_seconds": 4.92233,
+      "arc_seconds": 12.7887
+    },
+    "surface-heat-male-mixed-openxr": {
+      "preceding_host_seconds": 8.35696,
+      "arc_seconds": 9.27483
+    },
+    "surface-heat-male-owning": {
+      "preceding_host_seconds": 4.30275,
+      "arc_seconds": 12.7403
+    },
+    "surface-heat-native-female-owning": {
+      "preceding_host_seconds": 6.78818,
+      "arc_seconds": 14.4845
+    },
+    "surface-heat-native-male-owning": {
+      "preceding_host_seconds": 6.95599,
+      "arc_seconds": 14.7206
+    }
+  },
+  "limits": [
+    "The measured focused test cohorts are indicative elapsed times. They were not a controlled accelerator benchmark. The GPU solve increases latency for the larger owning cases.",
+    "The background host worker supplies topology, visibility, sparse factor construction and final native weight adoption. The production iterative field solve requires the GPU. The CPU solve is compiled only for explicit headless references.",
+    "CUDA sm_86 and ROCm gfx1030 have compile, link and missing-device evidence for the backend. Positive hardware runs remain open.",
+    "Physical headset and a complete current Release sweep remain open."
+  ]
+}
