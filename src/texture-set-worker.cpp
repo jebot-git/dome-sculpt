@@ -117,6 +117,7 @@ void append_texture_set_surface(MeshSnapshot&snapshot,const ObjectSurface&o,
  preview_work+=corners+vertices;
  std::set<std::shared_ptr<const void>,std::owner_less<>> retained_rasters;
  NormalHistoryOwners normal_history;
+ size_t material_scratch=0;
  for(size_t i=0;i<plan->fields().size();++i){
   if(!plan->draws()[i].count)continue;
   const auto&field=plan->fields()[i];
@@ -127,6 +128,7 @@ void append_texture_set_surface(MeshSnapshot&snapshot,const ObjectSurface&o,
   }else if(view.render_only&&!field.source&&!field.material_bindings&&field.painted->baked()&&field.painted->baked()->emission_field&&native_hdr_grid(*field.painted)){
    charge_grid_capture(bytes,preview_work,field,limits,false);
    charge(bytes,1,native_material_grid_bytes(*field.painted,TextureSetGridMode::NativeHdr),limits);
+   material_scratch=std::max(material_scratch,native_material_grid_scratch_bytes(*field.painted,TextureSetGridMode::NativeHdr));
    charge_native_material_grid_work(*field.painted,preview_work,limits,TextureSetGridMode::NativeHdr);
   }else if(view.render_only&&retained_material_grid(field)){
    const auto read=field.source->read_view(field,limits);
@@ -141,6 +143,7 @@ void append_texture_set_surface(MeshSnapshot&snapshot,const ObjectSurface&o,
    }
    const auto mode=retained_grid_mode(field);
    charge(bytes,1,native_material_grid_bytes(*read,mode),limits);
+   material_scratch=std::max(material_scratch,native_material_grid_scratch_bytes(*read,mode));
    charge(bytes,1,normals,limits);
    charge_preview_work(preview_work,normals/2,1,limits);
    charge_native_material_grid_work(*read,preview_work,limits,mode);
@@ -149,6 +152,7 @@ void append_texture_set_surface(MeshSnapshot&snapshot,const ObjectSurface&o,
    charge_preview_work(preview_work,pixels,(layers+1)*32,limits);
   }
  }
+ charge(bytes,1,material_scratch,limits);
  const bool affine=layout->has_source()||bool(o.affine_edit)||std::any_of(o.groups.begin(),o.groups.end(),[](const auto&g){return g.source_placement||g.affine_edit;});
  const auto frame=affine?std::optional<AffineInteractionFrame>(placement_frame(o)):std::nullopt;
  const bool reflected=frame&&frame->orientation()==AffineOrientation::Reversing;const auto world=affine?CanvasTransform{}:o.world_transform();

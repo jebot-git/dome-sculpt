@@ -3,6 +3,7 @@
 #include "dome/paint.hpp"
 #include <algorithm>
 #include <cmath>
+#include <cstring>
 #include <stdexcept>
 namespace dome::paint_compute {
 void checkpoint(const std::function<bool()> &cancelled){if(cancelled&&cancelled())throw std::runtime_error("Paint compositing cancelled");}
@@ -26,18 +27,21 @@ std::array<OutputGrid,4> Input::output_grids() const noexcept {
  };
  add(extent(Color),Color|(projected_color.empty()?0u:Pbr));
  add(extent(Orm),Orm);
- add(extent(Emission),Emission);
- if(!bake.normal.empty())add(native_extent(),Normal);
+ if(!native_channels||(native_channels&Emission))add(extent(Emission),Emission);
+ if(!bake.normal.empty())add(native_extent(),Normal|(raw_bake_normal?RawBake:0u));
  return grids;
 }
 Result::Result(const Input &input){
- if(input.expanded()){
-  for(unsigned plane=0;plane<planes.size();++plane)planes[plane].resize(input.extent(1u<<plane).size()*4);
+ if(input.split_output()){
+  const auto channels=input.native_channels?input.native_channels:material_channels;
+  for(unsigned plane=0;plane<planes.size();++plane)if(channels&(1u<<plane))
+   planes[plane].resize(input.extent(1u<<plane).size()*4);
   color_info.resize(input.extent(Color).size());
-  emission_coverage.resize(input.extent(Emission).size());
+  if(channels&Emission)emission_coverage.resize(input.extent(Emission).size());
  }else pixels.resize(input.native_extent().size());
  if(!input.projected_color.empty())pbr_colors.resize(input.extent(Color).size()*4);
  if(!input.bake.normal.empty())normals.resize(input.native_extent().size()*4);
+ if(input.raw_bake_normal)bake_coverage.resize(input.native_extent().size());
 }
 OutputView Result::view(OutputGrid grid,size_t first){
  OutputView view;
@@ -50,6 +54,7 @@ OutputView Result::view(OutputGrid grid,size_t first){
  }
  if(grid.writes(Pbr))view.pbr=pbr_colors.data()+4*first;
  if(grid.writes(Normal))view.normal=normals.data()+4*first;
+ if(grid.writes(RawBake))view.bake_coverage=bake_coverage.data()+first;
  return view;
 }
 OutputView scratch_view(uint8_t *buffer,OutputGrid grid,bool combined){
@@ -64,15 +69,41 @@ OutputView scratch_view(uint8_t *buffer,OutputGrid grid,bool combined){
  }
  if(grid.writes(Pbr))view.pbr=reserve(4);
  if(grid.writes(Normal))view.normal=reserve(4);
+ if(grid.writes(RawBake))view.bake_coverage=reserve(1);
  return view;
+}
+void visit_native_tile_uploads(const Input &in,
+    const std::function<void(size_t,std::span<const std::byte>)> &copy,const std::function<bool()> &cancelled){
+ const auto batch=std::min(Input::native_upload_tiles,in.native_tiles.size());
+ std::vector<std::byte> staging(batch*Input::tile_bytes);
+ for(size_t first=0;first<in.native_tiles.size();first+=batch){
+  checkpoint(cancelled);
+  const auto count=std::min(batch,in.native_tiles.size()-first);
+  for(size_t tile=0;tile<count;++tile){
+   const auto bytes=in.native_tiles[first+tile];
+   std::memcpy(staging.data()+tile*Input::tile_bytes,bytes.data(),bytes.size());
+  }
+  copy(first*Input::tile_texels,std::span(staging).first(count*Input::tile_bytes));
+ }
 }
 void validate(const Input &in,const std::function<bool()> &cancelled){
  checkpoint(cancelled);const auto &p=in.parameters;const uint64_t count=uint64_t(p.resolution)*p.resolution,tiles=uint64_t((p.resolution+31)/32)*((p.resolution+31)/32);
- if(p.resolution<32||p.resolution>2048||p.resolution%32||count>maximum_pixels||p.layers>128||p.layers!=in.layers.size()||p.tiles!=tiles||in.tiles.size()!=tiles*p.layers||in.padding.size()!=count||in.pixels.size()%1024||in.pixels.size()>maximum_tile_bytes/sizeof(Pixel)||count*std::max(1u,p.layers)>128*1024*1024)throw std::length_error("Paint composite packet exceeds bounded dimensions/work");
+ const auto padding=in.padding_view();
+ const auto texels=in.packed_texels();
+ if(p.resolution<32||p.resolution>2048||p.resolution%32||count>maximum_pixels||p.layers>128||p.layers!=in.layers.size()||p.tiles!=tiles||in.tiles.size()!=tiles*p.layers||padding.size()!=count||texels%1024||texels>maximum_tile_bytes/sizeof(Pixel)||count*std::max(1u,p.layers)>128*1024*1024)throw std::length_error("Paint composite packet exceeds bounded dimensions/work");
  const auto &bake=in.bake;
  const size_t baked_pixels=bake.coverage.empty()?0:count;
+ const bool emission=!in.native_channels||(in.native_channels&Emission);
+ if((!in.native_padding.empty()&&!in.padding.empty())||(!in.native_tiles.empty()&&!in.pixels.empty())||
+    ((!in.native_padding.empty()||!in.native_tiles.empty()||in.raw_bake_normal)&&!in.native_channels)||
+    (in.native_channels&&in.native_channels!=(Color|Orm)&&in.native_channels!=material_channels)||
+    (in.native_channels&&(in.image_bytes()!=bake.size_bytes()||!in.color_tiles.empty()))||
+    (in.raw_bake_normal&&bake.normal.empty()))
+  throw std::invalid_argument("Invalid native paint composite view");
+ for(const auto bytes:in.native_tiles)if(bytes.size()!=Input::tile_bytes)
+  throw std::invalid_argument("Borrowed paint compositor tile has an invalid extent");
  if(bake.coverage.size()!=baked_pixels||bake.color.size()!=4*baked_pixels||
-    bake.orm.size()!=4*baked_pixels||bake.emission.size()!=4*baked_pixels||
+    bake.orm.size()!=4*baked_pixels||bake.emission.size()!=(emission?4*baked_pixels:0)||
     (!bake.normal.empty()&&bake.normal.size()!=4*baked_pixels))
   throw std::invalid_argument("Baked paint compositor images must match the native grid");
  const bool prepared=!in.projected_color.empty();
@@ -80,7 +111,7 @@ void validate(const Input &in,const std::function<bool()> &cancelled){
     (!in.color_tiles.empty()&&(!prepared||in.color_tiles.size()!=in.pixels.size()/1024))||
     in.color_pixels.size()%1024||(!in.color_pixels.empty()&&in.color_tiles.empty()))
   throw std::invalid_argument("Prepared color compositor inputs must match the native grid and common tiles");
- if(in.color_pixels.size()>(maximum_tile_bytes-in.pixels.size()*sizeof(Pixel))/sizeof(ColorPixel))
+ if(in.color_pixels.size()>(maximum_tile_bytes-texels*sizeof(Pixel))/sizeof(ColorPixel))
   throw std::length_error("Prepared color compositor tiles exceed the shared storage budget");
  for(auto id:in.color_tiles)
   if(id!=absent&&id>=in.color_pixels.size()/1024)
@@ -142,8 +173,8 @@ void validate(const Input &in,const std::function<bool()> &cancelled){
  for(float v:p.emission)if(!std::isfinite(v)||v<0||v>100)throw std::invalid_argument("Invalid paint composite emission");
  for(float v:{p.metallic,p.roughness})if(!std::isfinite(v)||v<0||v>1)throw std::invalid_argument("Invalid paint composite material");
  for(size_t i=0;i<in.layers.size();++i)if(!std::isfinite(in.layers[i].opacity)||in.layers[i].opacity<=0||in.layers[i].opacity>1||in.layers[i].first_tile!=i*tiles)throw std::invalid_argument("Invalid paint composite layer");
- for(size_t i=0;i<in.tiles.size();++i){if(in.tiles[i]!=absent&&in.tiles[i]>=in.pixels.size()/1024)throw std::out_of_range("Paint composite tile owner is invalid");if((i&4095)==0)checkpoint(cancelled);}
- for(size_t i=0;i<in.padding.size();++i){if(in.padding[i]<-1||int64_t(in.padding[i])>=int64_t(count))throw std::out_of_range("Paint composite padding owner is invalid");if((i&4095)==0)checkpoint(cancelled);}
+ for(size_t i=0;i<in.tiles.size();++i){if(in.tiles[i]!=absent&&in.tiles[i]>=texels/1024)throw std::out_of_range("Paint composite tile owner is invalid");if((i&4095)==0)checkpoint(cancelled);}
+ for(size_t i=0;i<padding.size();++i){if(padding[i]<-1||int64_t(padding[i])>=int64_t(count))throw std::out_of_range("Paint composite padding owner is invalid");if((i&4095)==0)checkpoint(cancelled);}
  checkpoint(cancelled);
 }
 }

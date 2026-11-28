@@ -1916,7 +1916,8 @@ std::shared_ptr<TextureMaps> detail::PolygonSurfacePaintCodec::preview_retained_
   const auto mode=retained_grid_mode(field);
   const auto normal_bytes=retained_hdr_normal_bytes(field);
   const auto map_bytes=native_material_grid_bytes(*paint,mode);
-  if(map_bytes>limits.maximum_bytes||normal_bytes>limits.maximum_bytes-map_bytes)
+  if(map_bytes>limits.maximum_bytes||normal_bytes>limits.maximum_bytes-map_bytes||
+     native_material_grid_scratch_bytes(*paint,mode)>limits.maximum_bytes-map_bytes-normal_bytes)
     throw std::length_error("Retained preview exceeds its material and normal byte limit");
   if(work>limits.maximum_work||normal_bytes/2>limits.maximum_work-work)
     throw std::length_error("Retained normal carriage exceeds its work limit");

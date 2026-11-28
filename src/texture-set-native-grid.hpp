@@ -12,6 +12,7 @@ bool retained_hdr_grid(const TextureSetView &) noexcept;
 TextureSetGridMode retained_grid_mode(const TextureSetView &) noexcept;
 size_t retained_hdr_normal_bytes(const TextureSetView &) noexcept;
 size_t native_material_grid_bytes(const PaintedMesh &,TextureSetGridMode) noexcept;
+size_t native_material_grid_scratch_bytes(const PaintedMesh &,TextureSetGridMode) noexcept;
 void charge_native_material_grid_work(const PaintedMesh &,size_t &,const TextureSetLimits &,TextureSetGridMode);
 std::shared_ptr<TextureMaps> compile_native_material_grid(const PaintedMesh &,const Material &,
     size_t &,const TextureSetLimits &,TextureSetGridMode);

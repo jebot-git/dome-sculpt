@@ -183,6 +183,54 @@ struct VertexFixture {
  }
 };
 template<class F>bool refuses(F f){try{f();return false;}catch(const std::exception&e){std::cout<<"REFUSAL "<<e.what()<<'\n';return true;}}
+Input native_view(const Input &owned){
+ Input view;
+ view.parameters=owned.parameters;
+ view.layers=owned.layers;
+ view.tiles=owned.tiles;
+ view.native_padding=owned.padding;
+ view.native_channels=material_channels;
+ view.bake=owned.bake;
+ for(size_t i=0;i<owned.pixels.size();i+=Input::tile_texels)
+  view.native_tiles.push_back(std::as_bytes(std::span(owned.pixels).subspan(i,Input::tile_texels)));
+ return view;
+}
+void verify_native_views(){
+ auto owned=fixture(288,3,97);
+ const BakeFixture baked(owned.padding.size());
+ owned.bake=baked.images();
+ for(bool raw:{false,true}){
+  auto input=native_view(owned);
+  if(raw){
+   input.native_channels=Color|Orm;
+   input.raw_bake_normal=true;
+   input.bake.emission={};
+  }
+  const auto out=paint_compute::composite(input);
+  check(out.pixels.empty()&&out.planes[2].empty()==raw&&out.bake_coverage.empty()!=raw,
+        "Borrowed native maps must read back only selected channels");
+  for(size_t at=0;at<owned.padding.size();++at){
+   const auto expect=reference(owned,at);
+   check(std::equal(expect.color,expect.color+4,out.planes[0].data()+4*at)&&
+         std::equal(expect.orm,expect.orm+4,out.planes[1].data()+4*at)&&
+         out.color_info[at].coverage==expect.color_coverage&&out.color_info[at].transparency==expect.transparent,
+         "Borrowed native tiles changed color, alpha, coverage or ORM");
+   auto normal=reference_normal(owned,at);
+   if(raw){
+    const auto owner=owned.padding[at];
+    const uint8_t coverage=owner<0?0:baked.coverage[owner];
+    normal={};
+    if(coverage)std::copy_n(baked.normal.data()+size_t(owner)*4,4,normal.begin());
+    check(out.bake_coverage[at]==coverage,"Raw MToon Bake coverage differs from the padded owner");
+   }else check(std::equal(expect.emission,expect.emission+4,out.planes[2].data()+4*at)&&
+       out.emission_coverage[at]==expect.emission_coverage,"Borrowed native tiles changed legacy emission");
+   check(std::equal(normal.begin(),normal.end(),out.normals.data()+4*at),"Native Bake normals changed bytes");
+  }
+ }
+ auto malformed=native_view(owned);
+ malformed.native_tiles.front()=malformed.native_tiles.front().subspan(1);
+ check(refuses([&]{paint_compute::composite(malformed);}),"Truncated borrowed tile reached the selected device");
+}
 }
 int main(int argc,char**argv)try{
  auto in=fixture(64,3,17);if(argc>1&&std::string_view(argv[1])=="--missing"){
@@ -196,11 +244,18 @@ int main(int argc,char**argv)try{
   auto separate=fixture(64,2,41);
   const SourceFixture expanded(separate,0b0111,true);
   check(refuses([&]{paint_compute::composite(separate);}),"Missing device silently returned CPU expanded texture composite");
-  std::cout<<"PASS selected-backend missing-device refusal for plain, baked, prepared and expanded textured paint\n";return 0;
+  const auto borrowed=fixture(64,3,675);
+  const auto view=native_view(borrowed);
+  check(refuses([&]{paint_compute::composite(view);}),"Missing device silently returned borrowed native texture-set maps");
+  std::cout<<"PASS selected-backend missing-device refusal for all tested paint compositor views\n";return 0;
  }
 #ifdef DOME_TEST_SYCL
  sycl::device device{sycl::gpu_selector_v};auto name=device.get_info<sycl::info::device::name>();auto pci=device.get_info<sycl::ext::intel::info::device::pci_address>();std::cout<<"ACTUAL_GPU "<<name<<" pci="<<pci<<'\n';if(std::getenv("DOME_REQUIRE_ARC_PCI03"))check(name.find("Arc")!=std::string::npos&&name.find("A770")!=std::string::npos&&pci=="0000:03:00.0","Wrong requested paint compute device");
 #endif
+ verify_native_views();
+ if(argc>1&&std::string_view(argv[1])=="--native-set"){
+  std::cout<<"PASS "<<checks<<" borrowed texture-set checks on "<<compute_backend()<<'\n';return 0;
+ }
  const auto &q=quantization();std::mt19937 rng(0x832ec5);
  for(size_t i=0;i<200000;++i){float v=float(rng())/float(UINT32_MAX);check(srgb_byte(v,q)==byte(linear_to_srgb(v)),"Canonical float-to-sRGB byte map differs from native pow/round");check(linear_byte(v)==byte(v),"Linear byte rounding differs at float half boundary");}
  for(auto t:q.threshold)for(int offset=-8;offset<=8;++offset){float v=std::bit_cast<float>(uint32_t(int64_t(t)+offset));check(srgb_byte(v,q)==byte(linear_to_srgb(v)),"sRGB byte threshold neighbor lost exact canonical rounding");}

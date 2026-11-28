@@ -64,7 +64,8 @@ namespace paint_compute {
 Result composite(const Input &in,const std::function<bool()> &cancelled){
  validate(in,cancelled);const auto &q=quantization();
  Buffer<Layer> layers(std::max(size_t(1),in.layers.size()));Buffer<uint32_t> tiles(std::max(size_t(1),in.tiles.size()));
- Buffer<Pixel> pixels(std::max(size_t(1),in.pixels.size()));Buffer<int32_t> padding(in.padding.size());Buffer<Quantization> quant(1);
+ const auto host_padding=in.padding_view();
+ Buffer<Pixel> pixels(std::max(size_t(1),in.packed_texels()));Buffer<int32_t> padding(host_padding.size());Buffer<Quantization> quant(1);
  Buffer<uint8_t> output(output_scratch_bytes);
  Buffer<uint8_t> baked(in.image_bytes());
  Buffer<detail::SourceTextureAxis> axes(in.axis_count());
@@ -78,9 +79,12 @@ Result composite(const Input &in,const std::function<bool()> &cancelled){
   if(!in.layers.empty())checked(DS_COPY(layers.data,in.layers.data(),in.layers.size()*sizeof(Layer),DS_TO_DEVICE));
   if(!in.tiles.empty())checked(DS_COPY(tiles.data,in.tiles.data(),in.tiles.size()*sizeof(uint32_t),DS_TO_DEVICE));
   if(!in.pixels.empty())checked(DS_COPY(pixels.data,in.pixels.data(),in.pixels.size()*sizeof(Pixel),DS_TO_DEVICE));
+  if(!in.native_tiles.empty())visit_native_tile_uploads(in,[&](size_t first,std::span<const std::byte> bytes){
+   checked(DS_COPY(pixels.data+first,bytes.data(),bytes.size(),DS_TO_DEVICE));
+  },cancelled);
   if(color_tiles.data)checked(DS_COPY(color_tiles.data,in.color_tiles.data(),in.color_tiles.size()*sizeof(uint32_t),DS_TO_DEVICE));
   if(color_pixels.data)checked(DS_COPY(color_pixels.data,in.color_pixels.data(),in.color_pixels.size()*sizeof(ColorPixel),DS_TO_DEVICE));
-  checked(DS_COPY(padding.data,in.padding.data(),in.padding.size()*sizeof(int32_t),DS_TO_DEVICE));checked(DS_COPY(quant.data,&q,sizeof(q),DS_TO_DEVICE));
+  checked(DS_COPY(padding.data,host_padding.data(),host_padding.size_bytes(),DS_TO_DEVICE));checked(DS_COPY(quant.data,&q,sizeof(q),DS_TO_DEVICE));
   const auto bake=in.bake.device_view(baked.data);
   const auto prepared=in.device_colors(baked.data,color_tiles.data,color_pixels.data,axes.data);
   auto *image_target=baked.data;

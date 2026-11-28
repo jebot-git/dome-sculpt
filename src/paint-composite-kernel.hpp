@@ -18,7 +18,7 @@ struct Pixel { uint8_t data[14]{}; };
 struct ColorPixel { uint8_t rgba[4]{}; };
 struct Output { uint8_t color[4]{},orm[4]{},emission[4]{};uint8_t color_coverage=0,emission_coverage=0,transparent=0,reserved=0; };
 inline constexpr uint8_t common_transparency=1,prepared_transparency=2;
-enum OutputChannel : unsigned { Color=1, Orm=2, Emission=4, Normal=8, Pbr=16 };
+enum OutputChannel : unsigned { Color=1, Orm=2, Emission=4, Normal=8, Pbr=16, RawBake=32 };
 inline constexpr unsigned material_channels=Color|Orm|Emission;
 struct Extent {
  uint32_t width=0,height=0;
@@ -35,7 +35,7 @@ struct OutputView {
  Output *combined=nullptr;
  uint8_t *images[3]{};
  ColorInfo *color_info=nullptr;
- uint8_t *emission_coverage=nullptr,*pbr=nullptr,*normal=nullptr;
+ uint8_t *emission_coverage=nullptr,*pbr=nullptr,*normal=nullptr,*bake_coverage=nullptr;
 };
 struct Layer {float opacity=1;uint32_t first_tile=0;};
 struct Parameters {float color[4]{},emission[3]{},metallic=0,roughness=0;uint32_t resolution=0,layers=0,tiles=0;};
@@ -156,6 +156,10 @@ DOME_PC_FN void compose_normal(int32_t owner,Bake bake,const Quantization &q,uin
  out[1]=linear_byte(add(mul(mul(y,scale),.5f),.5f));
  out[2]=linear_byte(add(mul(mul(z,scale),.5f),.5f));
 }
+DOME_PC_FN void copy_raw_bake(int32_t owner,Bake bake,uint8_t *normal,uint8_t &coverage){
+ coverage=owner<0?0:bake.coverage[owner];
+ for(unsigned k=0;k<4;++k)normal[k]=coverage?bake.normal[size_t(owner)*4+k]:0;
+}
 DOME_PC_FN uint32_t paint_coordinate(uint32_t pixel,uint32_t extent,uint32_t resolution){
  // Native power-of-two resolution scales the rounded center exactly. An
  // integral cell boundary is representable before scaling, and other centers
@@ -264,7 +268,8 @@ DOME_PC_FN Output compose(uint32_t at,OutputGrid grid,const Parameters &p,const 
 DOME_PC_FN void write_output(OutputView view,OutputGrid grid,uint32_t index,uint32_t at,const Parameters &p,
     const Layer *layers,const uint32_t *tiles,const Pixel *pixels,const int32_t *padding,Bake bake,
     const PreparedColor &prepared,const SourceMaterial &source,const Quantization &q){
- if(view.normal)compose_normal(padding[at],bake,q,view.normal+size_t(index)*4);
+ if(view.bake_coverage)copy_raw_bake(padding[at],bake,view.normal+size_t(index)*4,view.bake_coverage[index]);
+ else if(view.normal)compose_normal(padding[at],bake,q,view.normal+size_t(index)*4);
  if(!(grid.channels&material_channels))return;
  const auto value=compose(at,grid,p,layers,tiles,pixels,padding,bake,prepared,source,q,
                          view.pbr?view.pbr+size_t(index)*4:nullptr);

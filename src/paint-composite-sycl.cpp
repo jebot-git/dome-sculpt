@@ -15,7 +15,8 @@ Result composite(const Input &in,const std::function<bool()> &cancelled){
  sycl::queue queue{sycl::gpu_selector_v,[](sycl::exception_list errors){for(auto error:errors)std::rethrow_exception(error);},sycl::property_list{sycl::property::queue::in_order{}}};
  auto allocate=[&]<class T>(size_t count){auto p=std::unique_ptr<T,UsmDeleter>{sycl::malloc_device<T>(std::max(size_t(1),count),queue),{&queue}};if(!p)throw std::bad_alloc();return p;};
  auto layers=allocate.template operator()<Layer>(in.layers.size());auto tiles=allocate.template operator()<uint32_t>(in.tiles.size());
- auto pixels=allocate.template operator()<Pixel>(in.pixels.size());auto padding=allocate.template operator()<int32_t>(in.padding.size());
+ const auto host_padding=in.padding_view();
+ auto pixels=allocate.template operator()<Pixel>(in.packed_texels());auto padding=allocate.template operator()<int32_t>(host_padding.size());
  std::unique_ptr<uint8_t,UsmDeleter> baked{nullptr,{&queue}};
  if(const auto bytes=in.image_bytes())baked=allocate.template operator()<uint8_t>(bytes);
  std::unique_ptr<detail::SourceTextureAxis,UsmDeleter> axes{nullptr,{&queue}};
@@ -36,9 +37,12 @@ Result composite(const Input &in,const std::function<bool()> &cancelled){
   if(!in.layers.empty())queue.memcpy(layers.get(),in.layers.data(),in.layers.size()*sizeof(Layer));
   if(!in.tiles.empty())queue.memcpy(tiles.get(),in.tiles.data(),in.tiles.size()*sizeof(uint32_t));
   if(!in.pixels.empty())queue.memcpy(pixels.get(),in.pixels.data(),in.pixels.size()*sizeof(Pixel));
+  if(!in.native_tiles.empty())visit_native_tile_uploads(in,[&](size_t first,std::span<const std::byte> bytes){
+   queue.memcpy(pixels.get()+first,bytes.data(),bytes.size()).wait_and_throw();
+  },cancelled);
   if(color_tiles)queue.memcpy(color_tiles.get(),in.color_tiles.data(),in.color_tiles.size()*sizeof(uint32_t));
   if(color_pixels)queue.memcpy(color_pixels.get(),in.color_pixels.data(),in.color_pixels.size()*sizeof(ColorPixel));
-  queue.memcpy(padding.get(),in.padding.data(),in.padding.size()*sizeof(int32_t));queue.memcpy(quant.get(),&table,sizeof(table));
+  queue.memcpy(padding.get(),host_padding.data(),host_padding.size_bytes());queue.memcpy(quant.get(),&table,sizeof(table));
   const auto bake=in.bake.device_view(baked.get());
   const auto prepared=in.device_colors(baked.get(),color_tiles.get(),color_pixels.get(),axes.get());
   auto *image_target=baked.get();

@@ -36,11 +36,14 @@ struct TextureInput {
   }
 };
 struct Input {
+  static constexpr size_t tile_texels=1024,tile_bytes=tile_texels*sizeof(Pixel),native_upload_tiles=16;
   Parameters parameters;
   std::vector<Layer> layers;
   std::vector<uint32_t> tiles;
   std::vector<Pixel> pixels;
   std::vector<int32_t> padding;
+  std::span<const int32_t> native_padding;
+  std::vector<std::span<const std::byte>> native_tiles;
   BakeImages bake;
   std::span<const uint8_t> projected_color,baked_pbr_color;
   std::span<const detail::SourceTextureAxis> projected_columns,projected_rows;
@@ -49,6 +52,10 @@ struct Input {
   std::vector<ColorPixel> color_pixels;
   std::array<TextureInput,SourceRoleCount> sources;
   float occlusion_strength=1;
+  unsigned native_channels=0;
+  bool raw_bake_normal=false;
+  std::span<const int32_t> padding_view() const noexcept {return native_padding.empty()?std::span(padding):native_padding;}
+  size_t packed_texels() const noexcept {return native_tiles.empty()?pixels.size():native_tiles.size()*tile_texels;}
   Extent native_extent() const noexcept {return {parameters.resolution,parameters.resolution};}
   Extent extent(unsigned channels) const noexcept {
     auto result=native_extent();
@@ -59,6 +66,7 @@ struct Input {
     return result;
   }
   bool expanded() const noexcept {return extent(material_channels)!=native_extent();}
+  bool split_output() const noexcept {return native_channels||expanded();}
   std::array<OutputGrid,4> output_grids() const noexcept;
   size_t bake_and_projection_bytes() const noexcept {
     return bake.size_bytes()+projected_color.size()+baked_pbr_color.size();
@@ -169,13 +177,16 @@ struct Result {
   std::array<std::vector<uint8_t>,3> planes;
   std::vector<ColorInfo> color_info;
   std::vector<uint8_t> emission_coverage;
-  std::vector<uint8_t> normals,pbr_colors;
+  std::vector<uint8_t> normals,pbr_colors,bake_coverage;
   explicit Result(const Input &);
   OutputView view(OutputGrid,size_t first);
 };
 const Quantization &quantization();
 void validate(const Input &,const std::function<bool()> &cancelled);
 void checkpoint(const std::function<bool()> &cancelled);
+// Each callback consumes its bytes before the staging buffer is reused.
+void visit_native_tile_uploads(const Input &,
+    const std::function<void(size_t,std::span<const std::byte>)> &,const std::function<bool()> &);
 // Selected backend only: all image results remain detached until every chunk
 // and the final cancellation check succeed. No renderer/model memory aliases.
 Result composite(const Input &,const std::function<bool()> &cancelled={});
@@ -193,5 +204,6 @@ void read_output(OutputView target,OutputView scratch,size_t count,Copy copy){
   if(target.emission_coverage)copy(target.emission_coverage,scratch.emission_coverage,count);
   if(target.normal)copy(target.normal,scratch.normal,count*4);
   if(target.pbr)copy(target.pbr,scratch.pbr,count*4);
+  if(target.bake_coverage)copy(target.bake_coverage,scratch.bake_coverage,count);
 }
 }
