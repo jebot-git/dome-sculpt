@@ -152,7 +152,7 @@ pkg_check_modules(DOME_EMISSION_OPENEXR REQUIRED IMPORTED_TARGET OpenEXR>=3.2)
 add_library(dome-sculpt-emission-codec STATIC src/emission-exr.cpp src/emission-exr-owned.cpp)
 target_include_directories(dome-sculpt-emission-codec PUBLIC include)
 target_link_libraries(dome-sculpt-emission-codec PRIVATE PkgConfig::DOME_EMISSION_OPENEXR dome-sculpt-baked-emission)
-target_sources(dome-sculpt-core PRIVATE src/emission-package.cpp src/native-authoring.cpp src/native-authoring-compiler.cpp src/emission-export.cpp src/emission-raster-device.cpp)
+target_sources(dome-sculpt-core PRIVATE src/emission-package.cpp src/native-authoring.cpp src/native-authoring-compiler.cpp src/emission-export.cpp src/emission-raster-device.cpp src/source-paint-export.cpp)
 target_link_libraries(dome-sculpt-core PRIVATE dome-sculpt-emission-codec)
 if(BUILD_TESTING)
   # Standalone typed field: no borrowed core objects/public TextureMaps ABI.

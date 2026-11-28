@@ -27,6 +27,127 @@ import_fixture::Fixture source(int kind,bool flat,const char *alpha,float weight
  return f;
 }
 void settled(Document &d){check(d.wait_mesh()&&d.frame().state->error.empty(),"Actual imported native project publishes its complete render surface");}
+std::vector<uint8_t> file_bytes(const std::filesystem::path &path){
+ std::ifstream input(path,std::ios::binary);
+ return {std::istreambuf_iterator<char>(input),{}};
+}
+void paint_uniform(PaintedMesh &paint,const PaintSettings &settings,float radius=5){
+ Brush brush;
+ brush.radius=radius;
+ brush.normal={0,0,1};
+ paint.begin_stroke();
+ paint.stamp(brush,settings);
+ check(paint.end_stroke(),"Actual paint tools author the test field");
+}
+void certified_paint(const std::filesystem::path &out,const Scene &initial,
+    const ImportAuthoringOptions &options,SurfaceRenderer &native,Fbo &fbo,
+    prepared_normal_consumer::Renderer &consumer) {
+ auto fixture=source(1,false,"BLEND",.65f);
+ auto &pbr=fixture.j["materials"][0]["pbrMetallicRoughness"];
+ pbr["metallicFactor"]=.75f;
+ pbr["metallicRoughnessTexture"]={{"index",0},{"texCoord",1}};
+ const auto input=out/"certified-input.glb";
+ fixture.save(input);
+ auto scene=prepare_authoring_import(initial,input,options).scene;
+ const auto id=scene.active().id;
+ for(const auto &object:scene.objects())if(object.id!=id)scene.object(object.id).visible=false;
+ auto &object=scene.active();
+ const auto original=object.painted->source_sampling_original()->source_maps();
+ const auto pristine=out/"certified-pristine.glb";
+ Document untouched;
+ untouched.replace(scene.snapshot());
+ untouched.export_asset(pristine).get();
+
+ object.painted=object.painted->snapshot();
+ PaintSettings settings;
+ settings.front_only=false;
+ settings.channel=PaintChannel::Mask;
+ settings.mask=.35f;
+ paint_uniform(*object.painted,settings,.06f);
+ const auto masked=scene.encode();
+ const auto mask_path=out/"certified-mask-only.glb";
+ Document neutral;
+ neutral.replace(scene.snapshot());
+ neutral.export_asset(mask_path).get();
+ check(file_bytes(pristine)==file_bytes(mask_path)&&neutral.copy_scene().encode()==masked,
+       "Mask-only Source4 work exports the original material and alternate coordinates byte for byte");
+
+ object.painted=object.painted->snapshot();
+ object.painted->add_layer("Whole-surface finish");
+ settings.channel=PaintChannel::Color;
+ settings.color={.18f,.71f,.32f,.55f};
+ paint_uniform(*object.painted,settings);
+ settings.channel=PaintChannel::Metallic;
+ settings.metallic=.6f;
+ paint_uniform(*object.painted,settings);
+ const auto exact=scene.encode();
+ const auto surfaces=scene.export_surfaces();
+ check(surfaces.size()==1&&surfaces[0].textures->source_only&&
+       !surfaces[0].textures->source_maps->color.image&&
+       surfaces[0].textures->source_maps->normal.image==original->normal.image,
+       "Whole-surface paint folds into factors and borrows the original UV1 normal texture");
+ const auto &orm=surfaces[0].textures->source_maps->metal_rough;
+ bool preserved=orm.texcoord==1&&orm.mag_filter==original->metal_rough.mag_filter&&
+                orm.min_filter==original->metal_rough.min_filter&&orm.wrap_s==original->metal_rough.wrap_s;
+ for(size_t at=0;at<orm.image->rgba.size();at+=4)
+  preserved&=orm.image->rgba[at+1]==original->metal_rough.image->rgba[at+1]&&orm.image->rgba[at+2]==255;
+ check(preserved&&std::abs(surfaces[0].material.metallic-.6f)<1e-6f,
+       "Uniform metallic paint preserves every untreated roughness sample and the alternate ORM sampler");
+ Document painted;
+ painted.replace(scene.snapshot());
+ painted.shading(false);
+ settled(painted);
+ const auto reference=draw(native,painted.frame().surface);
+ const auto output=out/"certified-factors.glb",saved=out/"certified-native.dsculpt";
+ auto exported=painted.export_asset(output);
+ auto native_save=painted.save_async(saved);
+ exported.get();
+ native_save.get();
+ color_consumer::Model result(output);
+ fbo.bind();
+ consumer.render(result.data);
+ check(delta(reference,read())<=2,"Independent GLB consumer reproduces uniform paint, original normals, alpha and the active morph");
+ const auto &material=result.data->materials[0];
+ check(!material.pbr_metallic_roughness.base_color_texture.texture&&material.normal_texture.texcoord==1&&
+       material.pbr_metallic_roughness.metallic_roughness_texture.texcoord==1&&
+       !result.json.value("extras",nlohmann::json::object()).contains("domeSculptAuthoring"),
+       "Standard GLB carries direct Core PBR factors and the original numbered UV attributes");
+ check(painted.copy_scene().encode()==exact&&Scene::load(saved).encode()==exact,
+       "Certified export and ordered Save retain the original masks, paint and source metadata");
+
+ auto partial=scene.snapshot();
+ partial.active().painted=partial.active().painted->snapshot();
+ partial.active().painted->layer_properties("Whole-surface finish",true,.5f);
+ const auto refused=partial.encode();
+ check(rejects([&]{partial.export_surfaces();})&&partial.encode()==refused,
+       "Uniform partial paint over a varying original image still needs explicit portable baking");
+
+ auto flat=source(1,false,"BLEND",0);
+ flat.j["materials"][0]["pbrMetallicRoughness"]["baseColorTexture"]["index"]=1;
+ const auto flat_input=out/"certified-flat-input.glb";
+ flat.save(flat_input);
+ auto flat_scene=prepare_authoring_import(initial,flat_input,options).scene;
+ auto &flat_object=flat_scene.active();
+ flat_object.painted=flat_object.painted->snapshot();
+ settings.channel=PaintChannel::Color;
+ settings.color={0,1,0,1};
+ paint_uniform(*flat_object.painted,settings);
+ flat_object.painted->layer_properties("Half-opacity finish",true,.5f);
+ const auto &flat_map=flat_object.painted->source_sampling_original()->source_maps()->color;
+ auto sample=flat_map;
+ sample.texcoord=0;
+ const auto underlying=sample_source_texture(sample,0,0,true);
+ const auto flat_surfaces=flat_scene.export_surfaces();
+ const auto view=std::find_if(flat_surfaces.begin(),flat_surfaces.end(),
+     [&](const auto &surface){return surface.id==flat_object.id;});
+ check(view!=flat_surfaces.end()&&!view->textures->source_maps->color.image,
+       "Uniform partial coverage folds a constant original color image into Core PBR factors");
+ for(size_t channel=0;channel<4;++channel){
+  const float expected=(flat_object.material.color[channel]*underlying[channel]+settings.color[channel])*.5f;
+  check(std::abs(view->material.color[channel]-expected)<1e-6f,
+        "Partial uniform paint preserves linear color and alpha");
+ }
+}
 }
 int main(int argc,char **argv)try{
  if(argc<2||argc>3)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
@@ -65,5 +186,6 @@ int main(int argc,char **argv)try{
    check(protected_bytes=="earlier export"&&rejected.copy_scene().encode()==painted&&Scene::load(saved).encode()==painted,"Failed painted standard export preserves prior output, native ownership and immediately queued Save");
   }
  }
+ certified_paint(out,initial,options,native,fbo,separate_roles);
  std::cout<<"PASS "<<checks<<" source-aware original standard export checks maxerror="<<maximum<<'\n';return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

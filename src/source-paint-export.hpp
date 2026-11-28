@@ -6,6 +6,10 @@
 #include "source-extra-uv-authority.hpp"
 #include "source-paint-pairing.hpp"
 namespace dome::detail {
+// Prove that the live overlay reduces to Core PBR factors on the complete
+// writable surface. Pristine and effect-free fields need no material rewrite.
+void fold_source_paint_factors(const PaintedMesh &,const ObjectSurface &,const PaintOverlayPacket &,
+    PaintSourceMaps &,Material &,const std::function<bool()> &);
 // Export compilation owns a detached coordinate view. The native writable UV
 // atlas and its exact original/current correspondence remain untouched.
 inline void source_paint_export(const PaintedMesh &paint,ObjectSurface &out,
@@ -20,8 +24,6 @@ inline void source_paint_export(const PaintedMesh &paint,ObjectSurface &out,
   if(!marker||!marker->source_only||!marker->overlay||
       marker->overlay->source_maps()!=paint.source_maps())
     throw std::invalid_argument("Source paint export requires its actual captured contribution packet");
-  if(!marker->overlay->empty())
-    throw std::invalid_argument("Painted independent source sampling requires an explicit portable material bake before standard export; the complete native project is retained");
   const auto before=paint.source_sampling_original();
   const auto vertices=paint.source_sampling_vertices();
   if(!before||vertices.size()!=out.mesh.positions.size()||out.mesh.indices!=paint.mesh().indices)
@@ -40,6 +42,9 @@ inline void source_paint_export(const PaintedMesh &paint,ObjectSurface &out,
     return result;
   };
   auto source=std::make_shared<PaintSourceMaps>(original);
+  auto material=out.material;
+  if(!marker->overlay->empty())
+    fold_source_paint_factors(paint,out,*marker->overlay,*source,material,cancelled);
   if(original.uv1)source->uv1=std::make_shared<const std::vector<std::array<float,2>>>(remap(*original.uv1));
   for(auto &[set,values]:source->extra_uv_sets)
     values=std::make_shared<const std::vector<std::array<float,2>>>(remap(*values));
@@ -49,7 +54,9 @@ inline void source_paint_export(const PaintedMesh &paint,ObjectSurface &out,
   out.mesh.uv_pins.clear();out.mesh.uv_seams.clear();
   source->validate_surface(out.mesh);
   auto textures=std::make_shared<TextureMaps>();textures->source_only=true;
-  textures->source_maps=std::move(source);textures->transparent=marker->transparent;
+  textures->source_maps=std::move(source);
+  textures->transparent=marker->transparent||(material.color[3]!=out.material.color[3]&&out.material.color[3]<1);
+  out.material=std::move(material);
   out.textures=std::move(textures);
   stop();
 }
