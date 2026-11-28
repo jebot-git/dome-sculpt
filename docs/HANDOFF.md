@@ -383,6 +383,17 @@ filtering when there is no active physical emission. Broader source sampler
 domains and physical headset qualification remain open.
 [Standalone MToon physical emission evidence](validation/retopo-float-mtoon-20261128.json)
 
+Physical-emission export now also handles different source and paint
+resolutions on the standalone static MToon 1 path. The GPU samples each
+grid at the shared output coordinates and returns radiance, background and
+coverage. A half-texel glTF texture transform puts both power-of-two grids'
+filter boundaries on output texel centers. The worker checks the continuous
+radiance error over the patch's UVs. Standard and Editable GLB preserve the
+authored variant when the emission image is larger than the paint grid and
+after enlarging the paint grid past the image resolution. The current proof
+uses clamp-linear UV0 sampling. Other sampler domains still need adapters.
+[Independent MToon emission grids evidence](validation/retopo-mixed-hdr-20261128.json)
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.

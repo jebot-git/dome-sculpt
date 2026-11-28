@@ -116,6 +116,10 @@ for mode in ('accept','focus','unconfirmed'):
         if painted:
             check(all(layer['tiles'] for layer in replacement['layers']),
                   mode+' keeps the visible and hidden paint on the standalone MToon patch')
+        physical=any(layer.get('physical_emission_tiles') for layer in guide_paint['layers'])
+        if physical:
+            check(replacement['layers'][0]['physical_emission_tiles'],
+                  mode+' retains the authored FLOAT paint layer')
         if base:
             baked=replacement['baked']
             coverage=baked['coverage']['bytes']
@@ -124,9 +128,6 @@ for mode in ('accept','focus','unconfirmed'):
             check(baked['normal']['bytes'] and emission['bytes'] and
                   any(0<value<255 for value in coverage) and max(coverage)>128,
                   mode+' retains partially covered native normal and emission Bake maps')
-            if floating:
-                check(replacement['layers'][0]['physical_emission_tiles'],
-                      mode+' keeps physical paint separate from the FLOAT Bake')
         if mode=='accept':
             glb=out/'mtoon-portable.glb'
             subprocess.run([str(binary),'--export-project',str(out/'accept.dsculpt'),str(glb)],
@@ -148,17 +149,21 @@ for mode in ('accept','focus','unconfirmed'):
                       all(bounds[key]<=.008 for key in ('maximumLinearColorError','maximumLinearShadeError')) and
                       bounds['maximumLinearEmissionError']<=emission_limit,
                       'Standard GLB certifies color, shared shade and emission from the visible paint layers')
+                core=exported['materials'][primitive['material']]
                 if base:
-                    core=exported['materials'][primitive['material']]
                     check(0<bounds['maximumNormalErrorRadians']<.02 and
                           core['normalTexture']['index']!=material['normalTexture']['index'],
                           'Standard GLB certifies the independent covered MToon normal Bake')
-                    if floating:
-                        proof=material['extras']['domeSculptPortableEmission']
-                        check(proof['evaluation']=='finite-current-authored-mtoon-retopology' and
-                              0<proof['betweenTexelErrorBound']<=emission_limit and
-                              core['emissiveTexture']['index']!=material['emissiveTexture']['index'],
-                              'Standard GLB keeps separate Core and authored MToon HDR textures')
+                if physical:
+                    proof=material['extras']['domeSculptPortableEmission']
+                    check(proof['evaluation']=='finite-current-authored-mtoon-retopology' and
+                          0<proof['betweenTexelErrorBound']<=emission_limit and
+                          core['emissiveTexture']['index']!=material['emissiveTexture']['index'],
+                          'Standard GLB keeps separate Core and authored MToon HDR textures')
+                if 'mixed-float' in fixture.name:
+                    transform=material['emissiveTexture']['extensions']['KHR_texture_transform']
+                    check(transform['offset']==[.5/256,.5/256],
+                          'Standard GLB aligns the emitted HDR texture to both source and paint centers')
     patch=objects[1]['retopology'];topology=json.loads(patch['topology'])
     positions=sorted(v[1] for v in topology['vertices'])
     want=sorted([[-.2,-.2,0],[.2,-.2,0],[0,.2,0]])

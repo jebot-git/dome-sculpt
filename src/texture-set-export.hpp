@@ -14,6 +14,7 @@ struct TextureSetExportEmission {
   ResolvedFallbackMetrics measured;
   std::optional<double> filter_error;
   bool retopo_uv_domain=false;
+  std::array<float,2> texture_offset{};
 };
 bool texture_set_physical_emission(const TextureSetView &);
 struct EmissionExportRaster;

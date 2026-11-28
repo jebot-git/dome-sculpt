@@ -19,7 +19,7 @@ void launch_mapped(sycl::queue &,DeviceInput,FiniteGrid,MappedSourceImage,
 void launch_mapped_field(sycl::queue &,DeviceInput,MappedSourceImage,
     const EmissionRasterDevice::MappedSample *,size_t,uint32_t *);
 void launch_bake_radiance(sycl::queue &,DeviceInput,MappedSourceImage,
-    const EmissionRasterDevice::BakeRadianceSample *,size_t,uint32_t *);
+    const EmissionRasterDevice::BakeRadianceSample *,size_t,uint32_t *,bool);
 void launch_bake_radiance_summary(sycl::queue &,const uint32_t *,size_t,BakeRadianceSummary *);
 void launch_material_sources(sycl::queue &,MappedSourceImage,const paint_compute::Quantization *,
     const SourceUvSampler::Coordinate *,size_t,uint32_t *);
@@ -77,8 +77,8 @@ public:
     launch_mapped_field(queue_,input,image,samples,count,out);
   }
   void render_bake_radiance(DeviceInput input,MappedSourceImage image,
-      const EmissionRasterDevice::BakeRadianceSample *samples,size_t count,uint32_t *out){
-    launch_bake_radiance(queue_,input,image,samples,count,out);
+      const EmissionRasterDevice::BakeRadianceSample *samples,size_t count,uint32_t *out,bool filter_proof){
+    launch_bake_radiance(queue_,input,image,samples,count,out,filter_proof);
   }
   void summarize_bake_radiance(const uint32_t *radiance,size_t count,BakeRadianceSummary *summary){
     launch_bake_radiance_summary(queue_,radiance,count,summary);

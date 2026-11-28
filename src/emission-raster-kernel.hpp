@@ -385,7 +385,7 @@ DOME_EMISSION_FN void filter_finite(const DeviceInput &input,FiniteGrid grid,uin
 }
 
 DOME_EMISSION_FN void render_bake_radiance(const DeviceInput &input,MappedSourceImage image,
-    const EmissionRasterDevice::BakeRadianceSample &sample,uint32_t *out){
+    const EmissionRasterDevice::BakeRadianceSample &sample,uint32_t *out,bool filter_proof){
   uint32_t sampled[4]{one32,one32,one32,one32};
   if(image.rgba)
     sample_mapped_source(image,{sample.image_uv[0],sample.image_uv[1]},*input.quantization,sampled,0);
@@ -412,7 +412,9 @@ DOME_EMISSION_FN void render_bake_radiance(const DeviceInput &input,MappedSource
     const auto radiance=sum64(sum64(base,legacy),widen(value[c+3]));
     if((radiance&~sign64)>limit){out[0]=radiance_overflow;return;}
     out[c]=narrow(radiance);
+    if(filter_proof)out[c+3]=background[c];
   }
+  if(filter_proof)out[6]=value[6];
 }
 
 DOME_EMISSION_FN void resolve_finite(const DeviceInput &input,const uint32_t (&value)[7],

@@ -10,6 +10,7 @@
 #include "emission-raster-device.hpp"
 #include "paint-composite-backend.hpp"
 #include "paint-emission-sample.hpp"
+#include "paint-overlay-packet.hpp"
 #include "texture-set-native-grid.hpp"
 #include "texture-set-surface.hpp"
 #include "mtoon-role-sampling.hpp"
@@ -1216,6 +1217,20 @@ std::optional<BakedEmissionSample> shared_baked_emission(const BakedTextures &ba
  return baked_emission_texel(bake,0);
 }
 
+std::array<float,3> mtoon_emission_background(const TextureSetView &field) {
+ const auto &binding=*field.material_bindings;
+ if(binding.physical_emission)return *binding.physical_emission;
+ const auto &p=binding.material.parameters;
+ const std::array factor{p.emission.x,p.emission.y,p.emission.z};
+ std::array<float,3> background;
+ for(size_t k=0;k<3;++k){
+  background[k]=mtoon_factor(factor[k],binding.native_reference.emission[k],field.material.emissive[k])*p.emission_strength;
+  if(!std::isfinite(background[k]))
+   throw std::overflow_error("Typed FLOAT Bake background exceeds the radiance range");
+ }
+ return background;
+}
+
 // The per-field exporter uses the same paint-grid coordinate as the fragment
 // shader. Contributions are composed before sampling. The original field and
 // its exact FLOAT values remain in the author's native Scene payload.
@@ -1243,13 +1258,7 @@ public:
    if(!typed_source_)
     throw MToonFloatUnavailable("Typed FLOAT emission needs a constant or aligned clamp-linear emission source");
    legacy_strength_=p.emission_strength;
-   const std::array factor{p.emission.x,p.emission.y,p.emission.z};
-   for(size_t k=0;k<3;++k){
-    if(!binding->physical_emission)
-     background_[k]=mtoon_factor(factor[k],binding->native_reference.emission[k],field.material.emissive[k])*legacy_strength_;
-    if(!std::isfinite(background_[k]))
-     throw std::overflow_error("Typed FLOAT Bake background exceeds the radiance range");
-   }
+   background_=mtoon_emission_background(field);
   }
   if(source_.image&&source_.texcoord!=0)
    throw std::invalid_argument("Texture-set HDR requires its actual alternate emission coordinates");
@@ -1950,6 +1959,124 @@ std::vector<uint8_t> retopo_sampled_cells(const Mesh &mesh,std::span<const doubl
  return visible;
 }
 
+TextureSetExportEmission compile_mixed_retopo_emission(const TextureSetView &field,
+    const PaintSourceTexture &role,size_t &bytes,size_t &work,const TextureSetLimits &limits) {
+ using Device=EmissionRasterDevice;
+ const auto &paint=*field.painted;
+ const auto &material=field.material_bindings->material;
+ const auto &slot=material.textures[size_t(MToonSlot::Emission)];
+ if(!clamp_linear_mtoon_source(role,slot)||!std::has_single_bit(role.image->width)||
+    !std::has_single_bit(role.image->height)||role.image->width>2048||role.image->height>2048)
+  throw MToonFloatUnavailable("Independent MToon emission needs dyadic clamp-linear UV0 textures");
+ const auto r=paint.resolution();
+ // With the half-texel translation, exported centers are x/width and
+ // y/height. Both native grids' texel centers lie exactly on these knots.
+ const auto width=2*std::max(r,role.image->width),height=2*std::max(r,role.image->height);
+ const size_t count=size_t(width)*height;
+ const size_t capacity=std::min(count,Device::mapped_batch);
+ charge(bytes,count,4,limits.maximum_bytes);
+ charge(work,count,64+32*paint.layers().size(),limits.maximum_work);
+ size_t staging=bytes;
+ charge(staging,capacity,sizeof(Device::BakeRadianceSample)+sizeof(Device::RadianceProof),limits.maximum_bytes);
+ charge(staging,width,2*sizeof(MToonSourceTap),limits.maximum_bytes);
+ charge(staging,size_t(width+1)*(height+1),1,limits.maximum_bytes);
+ charge(staging,size_t(width)+height+2,sizeof(double),limits.maximum_bytes);
+ auto mesh_limits=limits;
+ mesh_limits.maximum_work-=work;
+ const auto knots=[](uint32_t size){
+  std::vector<double> axis(size+1);
+  for(uint32_t i=0;i<=size;++i)axis[i]=double(i)/size;
+  return axis;
+ };
+ const auto xs=knots(width),ys=knots(height);
+ const auto &mesh=paint.mesh();
+ const bool unit_uv=std::ranges::all_of(mesh.uv,[](const auto &uv){return uv[0]>=0&&uv[0]<=1&&uv[1]>=0&&uv[1]<=1;});
+ const auto sampled=unit_uv?retopo_sampled_cells(mesh,xs,ys,mesh_limits):std::vector<uint8_t>{};
+ work=limits.maximum_work-mesh_limits.maximum_work;
+ const auto visible=[&](uint32_t x,uint32_t y){
+  if(sampled.empty())return true;
+  const size_t stride=size_t(width)+1,at=size_t(y)*stride+x;
+  // A final clamp interval has the same boundary values as its neighbor.
+  return sampled[at]||(x+1==width&&sampled[at+1])||(y+1==height&&sampled[at+stride])||
+      (x+1==width&&y+1==height&&sampled[at+stride+1]);
+ };
+ auto source=role;
+ source.texcoord=0;
+ source.uv_transform={1,0,0,1,0,0};
+ const auto background=mtoon_emission_background(field);
+ const auto strength=material.parameters.emission_strength;
+ std::unique_ptr<Device> device;
+ std::optional<PaintEmissionSampler> reference;
+ if(compute_backend()!="CPU"){
+  charge(staging,1,PaintOverlayFactory::raster_storage_bytes(paint),limits.maximum_bytes);
+  const auto overlay=PaintOverlayFactory::capture_native_emission(paint,limits.cancelled);
+  device=create_bake_radiance_device(overlay.get(),&source,background,strength,capacity,limits.cancelled,
+      [&](size_t allocation){charge(staging,1,allocation,limits.maximum_bytes);},false,true);
+ }else{
+  reference.emplace(paint,limits.cancelled);
+  charge(work,reference->index_work(),1,limits.maximum_work);
+ }
+ std::vector<Device::BakeRadianceSample> requests(capacity);
+ std::vector<Device::RadianceProof> samples(capacity);
+ const auto visit=[&](const auto &consume){
+  for(size_t first=0;first<count;first+=capacity){
+   stop(limits);
+   const auto length=std::min(capacity,count-first);
+   for(size_t i=0;i<length;++i){
+    const auto at=first+i;
+    const float u=float(xs[at%width]),v=float(ys[at/width]);
+    requests[i]={{u,v},{u,v}};
+   }
+   if(device)device->read_bake_radiance_proof(std::span(requests).first(length),std::span(samples).first(length),limits.cancelled);
+   else for(size_t i=0;i<length;++i){
+    const auto [u,v]=requests[i].paint_uv;
+    const auto image=sample_source_texture(source,u,v,true);
+    const std::array light{background[0]*image[0],background[1]*image[1],background[2]*image[2]};
+    const auto contribution=reference->sample(u,v);
+    const auto rgb=contribution.resolve(light,strength);
+    samples[i]={rgb[0],rgb[1],rgb[2],light[0],light[1],light[2],contribution.coverage};
+   }
+   for(size_t i=0;i<length;++i)consume(first+i,samples[i]);
+  }
+ };
+ std::array<float,3> peak{};
+ std::vector<MToonSourceTap> previous(width),row(width);
+ double covariance=0;
+ visit([&](size_t at,const Device::RadianceProof &sample){
+  const auto x=uint32_t(at%width),y=uint32_t(at/width);
+  auto &tap=row[x];
+  tap.uncovered=1.-sample[6];
+  for(size_t k=0;k<3;++k){
+   peak[k]=std::max(peak[k],sample[k]);
+   tap.background[k]=sample[k+3];
+  }
+  if(x&&y&&visible(x,y)){
+   const std::array<const MToonSourceTap*,4> taps{&previous[x-1],&previous[x],&row[x-1],&tap};
+   for(size_t k=0;k<3;++k)covariance=std::max(covariance,mtoon_source_filter_error(taps,k));
+  }
+  if(x+1==width)previous.swap(row);
+ });
+ TextureSetExportEmission out;
+ out.strength=std::max({1.f,peak[0],peak[1],peak[2]});
+ out.texture_offset={.5f/width,.5f/height};
+ out.retopo_uv_domain=unit_uv;
+ for(size_t k=0;k<3;++k)out.factor[k]=peak[k]/out.strength;
+ out.image={width,height,std::vector<uint8_t>(count*4,255)};
+ visit([&](size_t at,const Device::RadianceProof &sample){
+  for(size_t k=0;k<3;++k){
+   const auto byte=mtoon_srgb_byte(peak[k]>0?double(sample[k])/peak[k]:0);
+   out.image.rgba[at*4+k]=byte;
+   out.measured.sample(sample[k],resolved_fallback_radiance(byte,out.factor[k],out.strength));
+  }
+ });
+ // The union of source and coverage knots is present in the exported
+ // lattice. Within each cell only their product departs from bilinear.
+ const double bound=out.measured.maximum_absolute_error+covariance+1e-6*out.strength;
+ if(bound>.005*out.strength)throw MToonFloatUnavailable("Independent MToon emission exceeds its portable filter bound");
+ out.filter_error=bound;
+ return out;
+}
+
 std::shared_ptr<const Image> raster_retopo_mtoon_role(const RetopoPaintInputs &input,
     const MToonParameters &params,std::array<uint32_t,2> output,
     const Mesh *mesh,PortableMToonSetPaint &proof,TextureSetLimits &remaining) {
@@ -2085,6 +2212,17 @@ std::optional<TextureSetExportEmission> compile_retopo_mtoon_emission(
  const auto &paint=*field.painted;
  const auto r=paint.resolution();
  try {
+  const auto &binding=*field.material_bindings;
+  const auto &source=binding.roles[size_t(MToonSlot::Emission)];
+  if(source.image&&(source.image->width!=r||source.image->height!=r)){
+   charge(work,size_t(source.image->width)*source.image->height,1,remaining.maximum_work);
+   if(!mtoon_paint_source(binding,binding.material,MToonSlot::Emission,r,remaining)){
+    auto emission=compile_mixed_retopo_emission(field,source,bytes,work,remaining);
+    remaining.maximum_work-=work;
+    remaining.maximum_bytes-=bytes;
+    return emission;
+   }
+  }
   charge(bytes,size_t(r)*r,4,remaining.maximum_bytes);
   auto budget=remaining;
   budget.maximum_bytes-=bytes;

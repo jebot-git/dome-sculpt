@@ -917,7 +917,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     if(hdr){
       roles[size_t(MToonSlot::Emission)]={};
       typed.textures[size_t(MToonSlot::Emission)]=MToonTexture{
-          .index=texture(hdr->image,paint_sampler),.encoding=MToonEncoding::Srgb};
+          .index=texture(hdr->image,paint_sampler),.offset=hdr->texture_offset,.encoding=MToonEncoding::Srgb};
       params.emission={hdr->factor[0],hdr->factor[1],hdr->factor[2]};
       params.emission_strength=hdr->strength;
     }

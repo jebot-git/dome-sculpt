@@ -90,7 +90,8 @@ private:
     finite_={upload(std::span(input.finite_axis)),uint32_t(input.finite_axis.size())};
     if(input.bake_radiance_capacity){
       bake_radiance_capacity_=input.bake_radiance_capacity;
-      output_=allocate<uint32_t>(3*bake_radiance_capacity_);
+      bake_radiance_proof_=input.bake_radiance_proof;
+      output_=allocate<uint32_t>((bake_radiance_proof_?7:3)*bake_radiance_capacity_);
       bake_radiance_coordinates_=allocate<BakeRadianceSample>(bake_radiance_capacity_);
       if(input.summarize_bake_radiance)bake_summary_=allocate<BakeRadianceSummary>(1);
     }else if(!material)output_=allocate<uint32_t>(mapped_capacity_?mapped_capacity_*(mapped_field_?10:3):chunk_pixels*(finite_.resolution?3:10));
@@ -174,14 +175,8 @@ public:
 
   void read_bake_radiance(std::span<const BakeRadianceSample> samples,std::span<Radiance> pixels,
                           const std::function<bool()> &cancelled,BakeRadianceSummary *summary) override {
-    if(samples.empty()||samples.size()!=pixels.size()||samples.size()>bake_radiance_capacity_||(summary&&!bake_summary_))
-      throw std::invalid_argument("Invalid GPU Bake radiance batch");
-    paint_compute::checkpoint(cancelled);
-    for(const auto &sample:samples)
-      if(!bake_material::finite_uv(sample.paint_uv)||!bake_material::finite_uv(sample.image_uv))
-        throw std::invalid_argument("Invalid Bake radiance sample coordinate");
-    device_.upload(bake_radiance_coordinates_,samples.data(),samples.size_bytes());
-    device_.render_bake_radiance(view_,mapped_source_,bake_radiance_coordinates_,samples.size(),output_);
+    if(bake_radiance_proof_||(summary&&!bake_summary_))throw std::invalid_argument("Invalid GPU Bake radiance output");
+    upload_bake_radiance(samples,pixels.size(),cancelled);
     if(summary)device_.summarize_bake_radiance(output_,samples.size(),bake_summary_);
     device_.download(pixels.data(),output_,pixels.size_bytes());
     paint_compute::checkpoint(cancelled);
@@ -192,6 +187,16 @@ public:
       paint_compute::checkpoint(cancelled);
       summary->merge(result);
     }
+  }
+
+  void read_bake_radiance_proof(std::span<const BakeRadianceSample> samples,std::span<RadianceProof> pixels,
+                                const std::function<bool()> &cancelled) override {
+    static_assert(sizeof(RadianceProof)==7*sizeof(uint32_t));
+    if(!bake_radiance_proof_)throw std::invalid_argument("Expected a GPU radiance filter proof");
+    upload_bake_radiance(samples,pixels.size(),cancelled);
+    device_.download(pixels.data(),output_,pixels.size_bytes());
+    paint_compute::checkpoint(cancelled);
+    validate_exact(std::span<const RadianceProof>(pixels));
   }
 
   void read_bake_uv(std::span<const BakeUvSample> samples,std::span<BakedEmissionSample> output,
@@ -408,6 +413,17 @@ private:
     for(const auto &pixel:pixels)if(std::bit_cast<uint32_t>(pixel[0])==invalid)
       throw std::invalid_argument("Native physical radiance is outside its finite range");
   }
+  void upload_bake_radiance(std::span<const BakeRadianceSample> samples,size_t count,
+                            const std::function<bool()> &cancelled){
+    if(samples.empty()||samples.size()!=count||count>bake_radiance_capacity_)
+      throw std::invalid_argument("Invalid GPU Bake radiance batch");
+    paint_compute::checkpoint(cancelled);
+    for(const auto &sample:samples)
+      if(!bake_material::finite_uv(sample.paint_uv)||!bake_material::finite_uv(sample.image_uv))
+        throw std::invalid_argument("Invalid Bake radiance sample coordinate");
+    device_.upload(bake_radiance_coordinates_,samples.data(),samples.size_bytes());
+    device_.render_bake_radiance(view_,mapped_source_,bake_radiance_coordinates_,count,output_,bake_radiance_proof_);
+  }
   template<class Output>
   static void validate_exact(std::span<const Output> pixels){
     for(const auto &pixel:pixels){
@@ -482,6 +498,7 @@ private:
   size_t bake_radiance_capacity_=0;
   bool mapped_field_=false;
   bool texture_set_=false;
+  bool bake_radiance_proof_=false;
   uint32_t *output_=nullptr;
   MaterialView material_;
   MaterialSources material_sources_;

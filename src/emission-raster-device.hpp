@@ -35,6 +35,7 @@ public:
   virtual ~EmissionRasterDevice() = default;
   using Pixel=std::array<float,10>;
   using Radiance=std::array<float,3>;
+  using RadianceProof=std::array<float,7>; // RGB radiance, RGB background, coverage
   struct MappedSample { uint32_t texel; float u,v; };
   struct BakeRadianceSample { float paint_uv[2]{},image_uv[2]{}; };
   struct BakeUvSample {
@@ -74,6 +75,8 @@ public:
   virtual void read_mapped_field(std::span<const MappedSample>,std::span<Pixel>,const std::function<bool()> &) = 0;
   virtual void read_bake_radiance(std::span<const BakeRadianceSample>,std::span<Radiance>,
       const std::function<bool()> &,BakeRadianceSummary *summary=nullptr) = 0;
+  virtual void read_bake_radiance_proof(std::span<const BakeRadianceSample>,std::span<RadianceProof>,
+      const std::function<bool()> &) = 0;
   virtual void read_bake_uv(std::span<const BakeUvSample>,std::span<BakedEmissionSample>,const std::function<bool()> &) = 0;
   virtual void read_bake_uv_maps(std::span<const BakeUvSample>,std::span<BakeUvMapsPixel>,
                                  std::span<BakedEmissionSample>,const std::function<bool()> &) = 0;
@@ -102,7 +105,7 @@ std::unique_ptr<EmissionRasterDevice> create_mapped_emission_field_device(
     const std::function<bool()> &);
 std::unique_ptr<EmissionRasterDevice> create_bake_radiance_device(const PaintOverlayPacket *,const PaintSourceTexture *,
     std::array<float,3> background,float legacy_strength,size_t capacity,const std::function<bool()> &,
-    const std::function<void(size_t)> &reserve={},bool summarize=false);
+    const std::function<void(size_t)> &reserve={},bool summarize=false,bool filter_proof=false);
 std::unique_ptr<EmissionRasterDevice> create_bake_uv_emission_device(const BakedEmissionField &,size_t capacity,
     const std::function<bool()> &);
 std::unique_ptr<EmissionRasterDevice> create_bake_uv_maps_device(const BakedTextures &,uint32_t resolution,
@@ -218,7 +221,7 @@ struct Input {
   std::vector<SourceTextureAxis> finite_axis;
   size_t mapped_capacity=0,bake_uv_capacity=0,bake_radiance_capacity=0;
   std::optional<RetopoBakeFormat> retopo_bake;
-  bool physical_bake=false,texture_set=false,mapped_field=false,summarize_bake_radiance=false;
+  bool physical_bake=false,texture_set=false,mapped_field=false,summarize_bake_radiance=false,bake_radiance_proof=false;
 };
 Input describe_bake_overlay(const PaintOverlayPacket &,MaterialInput &,bool separate_pbr,bool include_emission,
                             const std::function<bool()> &cancelled);

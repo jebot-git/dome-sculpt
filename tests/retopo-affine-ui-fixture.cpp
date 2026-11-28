@@ -10,9 +10,11 @@
 using namespace dome;
 int main(int argc,char **argv)try {
   const bool prepared=argc==3 && std::string_view(argv[2])=="prepared";
-  const bool float_mtoon=argc==3 && std::string_view(argv[2])=="float-mtoon";
-  const bool baked_mtoon=float_mtoon || (argc==3 && std::string_view(argv[2])=="baked-mtoon");
-  const bool painted_mtoon=baked_mtoon || (argc==3 && std::string_view(argv[2])=="painted-mtoon");
+  const bool mixed_float_mtoon=argc==3 && std::string_view(argv[2])=="mixed-float-mtoon";
+  const bool float_bake=argc==3 && std::string_view(argv[2])=="float-mtoon";
+  const bool float_mtoon=mixed_float_mtoon||float_bake;
+  const bool baked_mtoon=float_bake || (argc==3 && std::string_view(argv[2])=="baked-mtoon");
+  const bool painted_mtoon=float_mtoon||baked_mtoon || (argc==3 && std::string_view(argv[2])=="painted-mtoon");
   const bool mtoon=painted_mtoon || (argc==3 && std::string_view(argv[2])=="mtoon");
   if(argc!=2 && !prepared && !mtoon)return 2;
   Mesh m;m.positions={{-.6f,-.6f,0},{.6f,-.6f,0},{.6f,.6f,0},{-.6f,.6f,0}};
@@ -35,10 +37,11 @@ int main(int argc,char **argv)try {
     binding->native_reference={o.material.color,o.material.emissive,int(o.material.alpha),
                                o.material.alpha_cutoff,o.material.double_sided};
     for(size_t role=0;role<4;++role){
-      Image image{16,16,std::vector<uint8_t>(16*16*4,255)};
-      for(size_t i=0;i<16*16;++i){
-        image.rgba[4*i]=uint8_t(120+3*(i%16));
-        image.rgba[4*i+1]=uint8_t(100+3*(i/16));
+      const uint32_t size=mixed_float_mtoon&&role==size_t(MToonSlot::Emission)?128:16;
+      Image image{size,size,std::vector<uint8_t>(size_t(size)*size*4,255)};
+      for(size_t i=0;i<size_t(size)*size;++i){
+        image.rgba[4*i]=uint8_t(120+48*(i%size)/size);
+        image.rgba[4*i+1]=uint8_t(100+48*(i/size)/size);
         image.rgba[4*i+2]=role==size_t(MToonSlot::Normal)?237:145;
       }
       binding->roles[role].image=std::make_shared<const Image>(std::move(image));

@@ -2527,7 +2527,7 @@ struct PortableRetopoImages {
  Image core_orm, mtoon_base, mtoon_normal, mtoon_emission, mtoon_shade;
  Image core_emission;
  std::array<float,3> core_factor{},mtoon_factor{};
- std::array<float,2> core_emission_offset{};
+ std::array<float,2> core_emission_offset{},mtoon_emission_offset{};
  float core_strength=1,mtoon_strength=1;
  double mtoon_filter_error=0;
 };
@@ -2634,6 +2634,17 @@ PortableRetopoImages check_portable_retopo_mtoon(const std::filesystem::path &pa
   images.core_emission=read_image(core.emissive_texture);
   if(core.emissive_texture.has_transform)
    std::copy_n(core.emissive_texture.transform.offset,2,images.core_emission_offset.begin());
+  const auto &authored=binding.roles[size_t(MToonSlot::Emission)].image;
+  const auto r=patch.painted->resolution();
+  if(authored&&(authored->width!=r||authored->height!=r)){
+   const auto w=2*std::max(r,authored->width),h=2*std::max(r,authored->height);
+   const auto &transform=toon.emissive_texture.transform;
+   check(toon.emissive_texture.has_transform&&images.mtoon_emission.width==w&&images.mtoon_emission.height==h&&
+         transform.offset[0]==.5f/w&&transform.offset[1]==.5f/h&&transform.rotation==0&&
+         transform.scale[0]==1&&transform.scale[1]==1,
+         "The portable HDR texture aligns the sample centers of both independent grids");
+   std::copy_n(transform.offset,2,images.mtoon_emission_offset.begin());
+  }
   std::copy_n(core.emissive_factor,3,images.core_factor.begin());
   std::copy_n(toon.emissive_factor,3,images.mtoon_factor.begin());
   images.core_strength=strength(core);
@@ -2665,7 +2676,10 @@ void verify_mixed_retopo_sampling(const Scene &scene,const PortableRetopoImages 
   role.min_filter=role.mag_filter=9729;
   return role;
  };
- const auto base=texture(exported.mtoon_base),shade=texture(exported.mtoon_shade),emission=texture(exported.mtoon_emission);
+ const auto base=texture(exported.mtoon_base),shade=texture(exported.mtoon_shade);
+ auto emission=texture(exported.mtoon_emission);
+ emission.uv_transform[4]=exported.mtoon_emission_offset[0];
+ emission.uv_transform[5]=exported.mtoon_emission_offset[1];
  auto core_emission=texture(exported.core_emission);
  core_emission.uv_transform[4]=exported.core_emission_offset[0];
  core_emission.uv_transform[5]=exported.core_emission_offset[1];
@@ -2825,12 +2839,27 @@ void standalone_retopo_mtoon(const Scene &guide) {
  if(physical){
   auto unbaked=accepted.snapshot();
   auto writable=unbaked.active().painted->snapshot();
-  writable->clear_bake();
-  unbaked.active().painted=writable;
-  doc.replace(unbaked);
-  ready(doc);
-  doc.export_asset("unbaked-physical-standard.glb",AssetExportFormat::Glb).get();
-  verify_mixed_retopo_sampling(unbaked,check_portable_retopo_mtoon("unbaked-physical-standard.glb",unbaked.active(),true),true);
+  if(baked){
+   writable->clear_bake();
+   unbaked.active().painted=writable;
+   doc.replace(unbaked);
+   ready(doc);
+   doc.export_asset("unbaked-physical-standard.glb",AssetExportFormat::Glb).get();
+   verify_mixed_retopo_sampling(unbaked,check_portable_retopo_mtoon("unbaked-physical-standard.glb",unbaked.active(),true),true);
+  }else{
+   const auto &authored=patch.material_bindings->roles[size_t(MToonSlot::Emission)].image;
+   check(authored->width==128&&patch.painted->resolution()==64,
+         "The first patch keeps the larger authored emission image and the original physical paint grid");
+   const auto resized=resample_native_texture_grid(unbaked,patch.id,{256});
+   check(resized.resolution==256&&unbaked.active().material_bindings==patch.material_bindings&&
+         unbaked.active().painted->has_physical_emission(),"Paint-grid resize preserves the independent source material and its FLOAT paint");
+   doc.replace(unbaked);
+   ready(doc);
+   doc.export_asset("resized-physical-editable.glb",AssetExportFormat::EditableGlb256).get();
+   verify_mixed_retopo_sampling(unbaked,check_portable_retopo_mtoon("resized-physical-editable.glb",unbaked.active(),true),true);
+   check(Scene::load("resized-physical-editable.glb").encode()==unbaked.encode(),
+         "Editable GLB reloads the resized physical patch and its independent image exactly");
+  }
   auto hidden=unbaked.snapshot();
   writable=hidden.active().painted->snapshot();
   writable->select_layer(writable->layers().front().id);

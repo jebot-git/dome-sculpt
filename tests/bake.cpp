@@ -633,6 +633,10 @@ void bake_radiance_device_sampling(){
     std::vector<Device::Radiance> actual(samples.size());
     raster::BakeRadianceSummary gpu,expected;
     device->read_bake_radiance(samples,actual,{},&gpu);
+    auto proof_device=raster::create_bake_radiance_device(packet.get(),textured?&image:nullptr,
+        background,strength,samples.size(),{},{},false,true);
+    std::vector<Device::RadianceProof> proof(samples.size());
+    proof_device->read_bake_radiance_proof(samples,proof,{});
     for(size_t i=0;i<samples.size();++i){
       const auto &sample=samples[i];
       const auto overlay=raster::sample_overlay_values(*packet,sample.paint_uv[0],sample.paint_uv[1],false);
@@ -644,6 +648,10 @@ void bake_radiance_device_sampling(){
       for(unsigned c=0;c<3;++c)original_light[c]=float(double(background[c])*texel[c]);
       if(sample_value.resolve(original_light,strength)!=actual[i])
         throw std::runtime_error("GPU Bake radiance differs from native ordered arithmetic at "+std::to_string(i));
+      const Device::RadianceProof expected_proof{actual[i][0],actual[i][1],actual[i][2],
+          original_light[0],original_light[1],original_light[2],sample_value.coverage};
+      if(proof[i]!=expected_proof)
+        throw std::runtime_error("GPU radiance filter proof differs from its source and coverage at "+std::to_string(i));
       expected.include(actual[i]);
     }
     check(std::ranges::equal(gpu.common,expected.common)&&std::ranges::equal(gpu.seen,expected.seen),
@@ -651,6 +659,7 @@ void bake_radiance_device_sampling(){
     check(rejects([&]{device->read_bake_radiance(samples,actual,[]{return true;});})&&paint->encode()==original,
           "Cancelled HDR sampling preserves the captured sparse source");
   }
+  check(true,"GPU radiance proof returns exact background and coverage for independently addressed UVs");
   constexpr float maximum=std::numeric_limits<float>::max();
   auto edge=std::make_shared<PaintedMesh>(quad(),resolution);
   baked.emission_field=BakedEmissionField::generate_compact(resolution,[](size_t){

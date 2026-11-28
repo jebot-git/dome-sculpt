@@ -41,9 +41,9 @@ __global__ void render_mapped_field_pixels(DeviceInput input,MappedSourceImage i
   }
 }
 __global__ void render_bake_radiance_pixels(DeviceInput input,MappedSourceImage image,
-    const EmissionRasterDevice::BakeRadianceSample *samples,size_t count,uint32_t *out){
+    const EmissionRasterDevice::BakeRadianceSample *samples,size_t count,uint32_t *out,bool filter_proof){
   const size_t index=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
-  if(index<count)render_bake_radiance(input,image,samples[index],out+3*index);
+  if(index<count)render_bake_radiance(input,image,samples[index],out+(filter_proof?7:3)*index,filter_proof);
 }
 inline constexpr unsigned summary_lanes=128;
 __global__ void summarize_bake_radiance_pixels(const uint32_t *radiance,size_t count,BakeRadianceSummary *summary){
@@ -161,9 +161,9 @@ public:
     checked(DOME_DEVICE(GetLastError)());
   }
   void render_bake_radiance(DeviceInput input,MappedSourceImage image,
-      const EmissionRasterDevice::BakeRadianceSample *samples,size_t count,uint32_t *out){
+      const EmissionRasterDevice::BakeRadianceSample *samples,size_t count,uint32_t *out,bool filter_proof){
     constexpr size_t block=128;
-    render_bake_radiance_pixels<<<(count+block-1)/block,block,0,stream_>>>(input,image,samples,count,out);
+    render_bake_radiance_pixels<<<(count+block-1)/block,block,0,stream_>>>(input,image,samples,count,out,filter_proof);
     checked(DOME_DEVICE(GetLastError)());
   }
   void summarize_bake_radiance(const uint32_t *radiance,size_t count,BakeRadianceSummary *summary){
