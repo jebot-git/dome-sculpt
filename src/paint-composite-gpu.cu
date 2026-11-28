@@ -72,6 +72,11 @@ __global__ void sample_source_uvs(MappedSourceImage source, const paint_compute:
   const size_t at = size_t(blockIdx.x) * blockDim.x + threadIdx.x;
   if (at < count) sample_mapped_source(source, coordinates[at], *table, colors, at);
 }
+__global__ void rewrite_source_texels(MappedSourceImage source,const paint_compute::Quantization *table,
+    SourceUvSampler::TexelAffine affine,uint32_t *result,size_t first,size_t count) {
+  const size_t i=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+  if(i<count)result[i]=rewrite_source_texel(source.rgba+4*(first+i),source.srgb,affine,*table);
+}
 
 class GpuSourceUvSampler final : public SourceUvSampler {
   Buffer<uint8_t> image_;
@@ -82,7 +87,7 @@ class GpuSourceUvSampler final : public SourceUvSampler {
 
 public:
   GpuSourceUvSampler(const PaintSourceTexture &source, bool srgb, Output format, size_t capacity,Transform transform)
-      : SourceUvSampler(capacity, format), image_(source.image->rgba.size()), coordinates_(capacity),
+      : SourceUvSampler(capacity, format,source.image->rgba.size()/4), image_(source.image->rgba.size()), coordinates_(capacity),
         colors_(capacity * words(format)),
         source_(mapped_source_image(source,image_.data,srgb,format,transform)) {
     const auto &table = paint_compute::quantization();
@@ -97,6 +102,11 @@ private:
         coordinates_.data, colors_.data, pending.size());
     checked(DS_LAST_ERROR());
     checked(DS_COPY(result.data(), colors_.data, result.size_bytes(), DS_TO_HOST));
+  }
+  void rewrite_texels(size_t first,const TexelAffine &affine,std::span<uint32_t> result) override {
+    rewrite_source_texels<<<(result.size()+127)/128,128>>>(source_,table_.data,affine,colors_.data,first,result.size());
+    checked(DS_LAST_ERROR());
+    checked(DS_COPY(result.data(),colors_.data,result.size_bytes(),DS_TO_HOST));
   }
 };
 }

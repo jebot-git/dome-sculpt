@@ -15,6 +15,10 @@ namespace detail {
 class SourceUvSampler {
 public:
   struct Coordinate { float u, v; };
+  struct TexelAffine {
+    float scale[4]{},offset[4]{};
+    unsigned channels=0;
+  };
   enum class Output : uint8_t { Red, Green, Blue, Alpha, LinearRgba, EncodedRgba };
   enum class Transform { ResolvedCoordinates, SourceAffine };
   static constexpr size_t words(Output output) { return output == Output::LinearRgba ? 4 : 1; }
@@ -33,8 +37,23 @@ public:
     dispatch(coordinates, output);
   }
 
+  // Rewrite original texels in place in their own coordinate domain. The
+  // caller owns the detached destination. Unselected channel bytes pass through.
+  void rewrite(size_t first,const TexelAffine &affine,std::span<uint32_t> output) {
+    if(output.empty()||output.size()>capacity_||first>pixel_count_||output.size()>pixel_count_-first||
+       !affine.channels||affine.channels>15)
+      throw std::invalid_argument("Invalid source texture rewrite batch");
+    for(unsigned c=0;c<4;++c)if(affine.channels&(1u<<c)){
+      const auto a=affine.scale[c],b=affine.offset[c];
+      if(!std::isfinite(a)||!std::isfinite(b)||a<0||b<0||a+b>1.000001f)
+        throw std::invalid_argument("Invalid source texture channel transform");
+    }
+    rewrite_texels(first,affine,output);
+  }
+
 protected:
-  SourceUvSampler(size_t capacity, Output output) : capacity_(capacity), words_per_sample_(words(output)) {
+  SourceUvSampler(size_t capacity, Output output,size_t pixel_count)
+      : capacity_(capacity),words_per_sample_(words(output)),pixel_count_(pixel_count) {
     if (!capacity || capacity > max_batch)
       throw std::invalid_argument("Invalid source UV sample capacity");
     if (output > Output::EncodedRgba)
@@ -43,8 +62,10 @@ protected:
 
 private:
   virtual void dispatch(std::span<const Coordinate>, std::span<uint32_t>) = 0;
+  virtual void rewrite_texels(size_t,const TexelAffine &,std::span<uint32_t>) = 0;
   size_t capacity_;
   size_t words_per_sample_;
+  size_t pixel_count_;
 };
 std::unique_ptr<SourceUvSampler> upload_source_uv_sampler(
     const PaintSourceTexture &, bool srgb, SourceUvSampler::Output, size_t capacity,

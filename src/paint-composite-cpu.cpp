@@ -16,7 +16,7 @@ class ReferenceSourceUvSampler final : public SourceUvSampler {
 public:
   ReferenceSourceUvSampler(const PaintSourceTexture &source, bool srgb, Output format, size_t capacity,
                            Transform transform)
-      : SourceUvSampler(capacity, format), source_(source), srgb_(srgb), format_(format) {
+      : SourceUvSampler(capacity, format,source.image->rgba.size()/4), source_(source), srgb_(srgb), format_(format) {
     source_.texcoord = 0;
     if(transform==Transform::ResolvedCoordinates)source_.uv_transform = {1, 0, 0, 1, 0, 0};
   }
@@ -37,6 +37,23 @@ private:
       } else {
         result[i] = std::bit_cast<uint32_t>(color[unsigned(format_)]);
       }
+    }
+  }
+  void rewrite_texels(size_t first,const TexelAffine &affine,std::span<uint32_t> result) override {
+    const auto &pixels=source_.image->rgba;
+    for(size_t i=0;i<result.size();++i){
+      uint32_t packed=0;
+      for(unsigned c=0;c<4;++c){
+        auto value=pixels[4*(first+i)+c];
+        if(affine.channels&(1u<<c)){
+          const bool nonlinear=srgb_&&c<3;
+          const float sample=nonlinear?srgb_to_linear(value/255.f):value/255.f;
+          const float mapped=sample*affine.scale[c]+affine.offset[c];
+          value=uint8_t(std::lround(std::clamp(nonlinear?linear_to_srgb(mapped):mapped,0.f,1.f)*255));
+        }
+        packed|=uint32_t(value)<<(8*c);
+      }
+      result[i]=packed;
     }
   }
 };

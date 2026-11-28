@@ -76,14 +76,88 @@ void visit_footprint(const Mesh &mesh,const PaintOverlayPacket &packet,ProofWork
   if(!visited)portable_required();
 }
 
-float constant_channel(const Image &image,unsigned channel,bool srgb,ProofWork &work) {
+std::optional<float> constant_source_channel(const Image &image,unsigned channel,bool srgb,ProofWork &work) {
   const auto first=image.rgba[channel];
-  work.charge(image.rgba.size()/4);
+  constexpr size_t block_bytes=16384;
   for(size_t at=channel;at<image.rgba.size();at+=4){
-    if((at&16383)==channel)work.stop();
-    if(image.rgba[at]!=first)portable_required();
+    if(at%block_bytes==channel){
+      work.charge(std::min(block_bytes,image.rgba.size()-(at-channel))/4);
+      work.stop();
+    }
+    if(image.rgba[at]!=first)return {};
   }
   return srgb?overlay_linear_byte(first):first/255.f;
+}
+
+float constant_channel(const Image &image,unsigned channel,bool srgb,ProofWork &work) {
+  const auto value=constant_source_channel(image,channel,srgb,work);
+  if(!value)portable_required();
+  return *value;
+}
+
+struct UniformChannel {
+  float *factor=nullptr;
+  float coverage=0,addition=0;
+};
+
+void rewrite_uniform_image(PaintSourceTexture &texture,const SourceUvSampler::TexelAffine &affine,
+    bool srgb,ProofWork &work) {
+  const auto &original=*texture.image;
+  const auto pixels=original.rgba.size()/4;
+  work.charge(pixels*std::popcount(affine.channels));
+  const auto capacity=std::min(pixels,SourceUvSampler::max_batch);
+  work.stop();
+  auto sampler=upload_source_uv_sampler(texture,srgb,SourceUvSampler::Output::EncodedRgba,capacity);
+  auto image=std::make_shared<Image>(Image{original.width,original.height,std::vector<uint8_t>(original.rgba.size())});
+  std::vector<uint32_t> encoded(capacity);
+  for(size_t first=0;first<pixels;first+=capacity){
+    work.stop();
+    const auto count=std::min(capacity,pixels-first);
+    auto batch=std::span(encoded).first(count);
+    sampler->rewrite(first,affine,batch);
+    for(size_t i=0;i<count;++i)for(unsigned c=0;c<4;++c)
+      image->rgba[4*(first+i)+c]=uint8_t(batch[i]>>(8*c));
+  }
+  work.stop();
+  texture.image=std::move(image);
+}
+
+void fold_uniform_image(PaintSourceTexture &texture,const std::array<UniformChannel,4> &channels,
+    bool srgb,bool masked,ProofWork &work) {
+  SourceUvSampler::TexelAffine affine;
+  bool keep_image=false;
+  for(unsigned c=0;c<channels.size();++c){
+    const auto &channel=channels[c];
+    if(!channel.factor)continue;
+    auto &factor=*channel.factor;
+    const float scale=factor*(1-channel.coverage);
+    const float offset=channel.addition;
+    if(!texture.image){factor=scale+offset;continue;}
+    if(offset==0&&(scale!=0||channel.coverage==0)){
+      // Use the old factor and texels' exact encoding for scaling alone.
+      factor=scale;
+      keep_image=true;
+      continue;
+    }
+    auto original=scale==0?std::optional<float>(0):
+        constant_source_channel(*texture.image,c,srgb&&c<3,work);
+    affine.channels|=1u<<c;
+    if(original){
+      factor=factor*(*original)*(1-channel.coverage)+offset;
+      affine.offset[c]=1;
+      continue;
+    }
+    // The new alpha texture must preserve cutout decisions. A varying affine
+    // alpha can move a crossing after PNG quantization or mip regeneration.
+    if(masked&&c==3)portable_required();
+    factor=scale+offset;
+    if(factor>1)portable_required();
+    affine.scale[c]=scale/factor;
+    affine.offset[c]=offset/factor;
+    keep_image=true;
+  }
+  if(!keep_image)texture.image.reset();
+  else if(affine.channels)rewrite_uniform_image(texture,affine,srgb,work);
 }
 
 struct OverlayRange {
@@ -122,8 +196,9 @@ uint8_t unorm8(float value) {
 }
 
 template<size_t N>
-void fold_color(PaintSourceTexture &,std::array<float,N> &,const std::array<float,4> &,float,ProofWork &);
-void fold_orm(PaintSourceTexture &,Material &,const PaintOverlayValues &,ProofWork &);
+void fold_color(PaintSourceTexture &,std::array<float,N> &,const std::array<float,4> &,float,
+                ProofWork &,bool rewrite=false,bool masked=false);
+void fold_orm(PaintSourceTexture &,Material &,const PaintOverlayValues &,ProofWork &,bool rewrite=false);
 
 // Preserve masked coverage exactly. A constant alpha can be carried outside
 // the texture even when its value falls between two PNG alpha bytes.
@@ -174,21 +249,21 @@ PaintAtlas compile_atlas(const PaintedMesh &paint,const PaintOverlayPacket &pack
     }
     material.color={1,1,1,alpha.constant.value_or(1)};
   }else if(range.high[3][0]!=0){
-    fold_color(source.color,material.color,value[0],value[3][0],work);
+    fold_color(source.color,material.color,value[0],value[3][0],work,true,material.alpha==Material::AlphaMode::Mask);
   }
   if(orm){
     background.roughness=atlas_background(source.metal_rough,1,false,material.roughness,value[3][2],work);
     background.metallic=atlas_background(source.metal_rough,2,false,material.metallic,value[3][1],work);
     material.roughness=material.metallic=1;
   }else if(range.high[3][1]!=0||range.high[3][2]!=0){
-    fold_orm(source.metal_rough,material,value,work);
+    fold_orm(source.metal_rough,material,value,work,true);
   }
   if(emission){
     for(unsigned c=0;c<3;++c)
       background.emissive[c]=atlas_background(source.emission,c,true,material.emissive[c],value[3][3],work);
     material.emissive={1,1,1};
   }else if(range.high[3][3]!=0){
-    fold_color(source.emission,material.emissive,value[2],value[3][3],work);
+    fold_color(source.emission,material.emissive,value[2],value[3][3],work,true);
   }
   if(std::ranges::any_of(material.emissive,[](float v){return v>1;}))portable_required();
   // Only emitted images need final byte storage. The device also produces
@@ -248,9 +323,15 @@ PaintAtlas compile_atlas(const PaintedMesh &paint,const PaintOverlayPacket &pack
 
 template<size_t N>
 void fold_color(PaintSourceTexture &texture,std::array<float,N> &factor,
-    const std::array<float,4> &addition,float coverage,ProofWork &work) {
+    const std::array<float,4> &addition,float coverage,ProofWork &work,bool rewrite,bool masked) {
   if(std::ranges::all_of(std::span(addition).first(N),[](float value){return value==0;})){
     for(auto &value:factor)value*=1-coverage;
+    return;
+  }
+  if(rewrite){
+    std::array<UniformChannel,4> channels{};
+    for(unsigned c=0;c<N;++c)channels[c]={&factor[c],coverage,addition[c]};
+    fold_uniform_image(texture,channels,true,masked,work);
     return;
   }
   for(unsigned channel=0;channel<N;++channel){
@@ -261,7 +342,15 @@ void fold_color(PaintSourceTexture &texture,std::array<float,N> &factor,
   texture.image.reset();
 }
 
-void fold_orm(PaintSourceTexture &texture,Material &material,const PaintOverlayValues &value,ProofWork &work) {
+void fold_orm(PaintSourceTexture &texture,Material &material,const PaintOverlayValues &value,ProofWork &work,
+    bool rewrite) {
+  if(rewrite&&(value[1][1]!=0||value[1][2]!=0)){
+    std::array<UniformChannel,4> channels{};
+    channels[1]={&material.roughness,value[3][2],value[1][1]};
+    channels[2]={&material.metallic,value[3][1],value[1][2]};
+    fold_uniform_image(texture,channels,false,false,work);
+    return;
+  }
   std::array<bool,4> neutral{};
   const auto channel=[&](unsigned index,float &factor,float coverage,float addition){
     if(addition==0){factor*=1-coverage;return;}
@@ -301,10 +390,12 @@ PaintAtlas compile_source_paint(const PaintedMesh &paint,const ObjectSurface &ob
     if(object.material.toon)portable_required();
     return compile_atlas(paint,packet,range,sources,material,work);
   }
-  fold_color(sources.color,material.color,value[0],value[3][0],work);
-  fold_color(sources.emission,material.emissive,value[2],value[3][3],work);
+  const bool rewrite=allow_atlas&&!object.material.toon;
+  fold_color(sources.color,material.color,value[0],value[3][0],work,rewrite,
+             material.alpha==Material::AlphaMode::Mask);
+  fold_color(sources.emission,material.emissive,value[2],value[3][3],work,rewrite);
   if(std::ranges::any_of(material.emissive,[](float channel){return channel>1;}))portable_required();
-  fold_orm(sources.metal_rough,material,value,work);
+  fold_orm(sources.metal_rough,material,value,work,rewrite);
   material.validate();
   work.stop();
   return {};

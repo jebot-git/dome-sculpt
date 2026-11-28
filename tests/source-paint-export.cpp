@@ -8,6 +8,7 @@
 #include "import-authoring-fixtures.hpp"
 #include "source-color-consumer.hpp"
 #include "prepared-normal-consumer.hpp"
+#include "paint-overlay-sample.hpp"
 namespace {
 import_fixture::Fixture source(int kind,bool flat,const char *alpha,float weight){
  import_fixture::Fixture f;while(f.bin.size()%4)f.bin.push_back(0);
@@ -120,7 +121,7 @@ void certified_paint(const std::filesystem::path &out,const Scene &initial,
  partial.active().painted->layer_properties("Whole-surface finish",true,.5f);
  const auto refused=partial.encode();
  check(rejects([&]{partial.export_surfaces();})&&partial.encode()==refused,
-       "Uniform partial paint over a varying original image still needs explicit portable baking");
+       "Factor-only avatar admission retains exact project ownership for a varying source coat");
 
  auto flat=source(1,false,"BLEND",0);
  flat.j["materials"][0]["pbrMetallicRoughness"]["baseColorTexture"]["index"]=1;
@@ -146,6 +147,133 @@ void certified_paint(const std::filesystem::path &out,const Scene &initial,
   const float expected=(flat_object.material.color[channel]*underlying[channel]+settings.color[channel])*.5f;
   check(std::abs(view->material.color[channel]-expected)<1e-6f,
         "Partial uniform paint preserves linear color and alpha");
+ }
+}
+
+void uniform_coat(const std::filesystem::path &out,const Scene &initial,const ImportAuthoringOptions &options,
+    SurfaceRenderer &native,Fbo &fbo,prepared_normal_consumer::Renderer &consumer) {
+ const auto make_scene=[&](std::string_view name,bool masked){
+  auto fixture=source(1,false,masked?"MASK":"BLEND",.65f);
+  auto &material=fixture.j["materials"][0];
+  auto &pbr=material["pbrMetallicRoughness"];
+  pbr["metallicFactor"]=.62f;
+  pbr["roughnessFactor"]=.67f;
+  pbr["metallicRoughnessTexture"]={{"index",0},{"texCoord",1}};
+  material["occlusionTexture"]={{"index",0},{"texCoord",1},{"strength",.65f}};
+  material["emissiveFactor"]={.19f,.12f,.26f};
+  material["emissiveTexture"]={{"index",0},{"texCoord",0},{"extensions",
+      {{"KHR_texture_transform",{{"offset",{.19f,-.11f}}}}}}};
+  fixture.j["extensionsUsed"].push_back("KHR_texture_transform");
+  // More than one device readback batch. The alternating fine detail also
+  // exercises the original mip sampler at the rendered scale.
+  Image image{193,89,std::vector<uint8_t>(193*89*4)};
+  for(size_t at=0;at<image.rgba.size();at+=4){
+   const auto x=at/4%image.width,y=at/4/image.width;
+   image.rgba[at]=uint8_t((x+y)%2?210:44);
+   image.rgba[at+1]=uint8_t(64+(x/11+y/9)%6*19);
+   image.rgba[at+2]=uint8_t(36+(x/7+2*(y/6))%7*28);
+   image.rgba[at+3]=masked?255:uint8_t(96+(x/11+y/7)%8*19);
+  }
+  const auto png=image.png();
+  while(fixture.bin.size()%4)fixture.bin.push_back(0);
+  const auto view=fixture.j["bufferViews"].size();
+  fixture.j["bufferViews"].push_back({{"buffer",0},{"byteOffset",fixture.bin.size()},{"byteLength",png.size()}});
+  fixture.bin.insert(fixture.bin.end(),png.begin(),png.end());
+  fixture.j["images"][0]["bufferView"]=view;
+  const auto path=out/(std::string(name)+"-input.glb");
+  fixture.save(path);
+  auto scene=prepare_authoring_import(initial,path,options).scene;
+  const auto active=scene.active().id;
+  for(const auto &object:scene.objects())if(object.id!=active)scene.object(object.id).visible=false;
+  auto &object=scene.active();
+  object.painted=object.painted->snapshot();
+  PaintSettings settings;
+  settings.front_only=false;
+  settings.color={.19f,.69f,.24f,.72f};
+  paint_uniform(*object.painted,settings);
+  settings.channel=PaintChannel::Metallic;settings.metallic=.57f;
+  paint_uniform(*object.painted,settings);
+  settings.channel=PaintChannel::Emission;settings.emission={.08f,.12f,.18f};
+  paint_uniform(*object.painted,settings);
+  object.painted->layer_properties("Paint",true,.43f);
+  return scene;
+ };
+ for(bool masked:{false,true}){
+  const std::string name=masked?"uniform-masked":"uniform-coat";
+  auto scene=make_scene(name,masked);
+  const auto exact=scene.encode();
+  const auto &object=scene.active();
+  const auto &raw=*object.painted->source_sampling_original()->source_maps();
+  const auto packet=detail::PaintOverlayFactory::capture(*object.painted);
+  const auto owner=std::ranges::find_if(*packet->padding(),[](int32_t p){return p>=0;});
+  const auto ink=detail::sample_overlay_texel_owner(*packet,size_t(*owner),true).values;
+  Document doc;doc.replace(scene.snapshot());doc.shading(false);settled(doc);
+  const auto reference=draw(native,doc.frame().surface);
+  const auto path=out/(name+".glb"),save=out/(name+".dsculpt");
+  auto exported=doc.export_asset(path);auto saved=doc.save_async(save);
+  exported.get();saved.get();
+  color_consumer::Model file(path);
+  fbo.bind();consumer.render(file.data);
+  const auto error=delta(reference,read());
+  std::cout<<"UNIFORM_SOURCE "<<name<<" max="<<error<<'\n';
+  check(error<=2,"Independent GLB consumer preserves a uniform coat through the original mip sampler");
+  check(Scene::load(save).encode()==exact&&doc.copy_scene().encode()==exact,
+        "Uniform coat export and queued Save preserve the original editable project");
+  const auto &material=file.data->materials[0];
+  const auto &pbr=material.pbr_metallic_roughness;
+  const auto &attrs=file.json["meshes"][0]["primitives"][0]["attributes"];
+  check(pbr.base_color_texture.texcoord==1&&pbr.metallic_roughness_texture.texcoord==1&&
+        material.emissive_texture.texcoord==0&&material.emissive_texture.has_transform&&
+        material.emissive_texture.transform.offset[0]==.19f&&material.emissive_texture.transform.offset[1]==-.11f&&
+        !attrs.contains("TEXCOORD_2"),"Every coat keeps its original UV set and the retained emission transform");
+  const auto compare_view=[&](const cgltf_texture_view &out_view,const PaintSourceTexture &original){
+   const auto &sampler=*out_view.texture->sampler;
+   return int(sampler.wrap_s)==original.wrap_s&&int(sampler.wrap_t)==original.wrap_t&&
+       int(sampler.min_filter)==original.min_filter&&int(sampler.mag_filter)==original.mag_filter;
+  };
+  check(compare_view(pbr.base_color_texture,raw.color)&&compare_view(pbr.metallic_roughness_texture,raw.metal_rough)&&
+        compare_view(material.emissive_texture,raw.emission),"Source wrap, magnification and mip filters stay paired with each rewritten image");
+  const auto color=prepared_normal_consumer::image(pbr.base_color_texture.texture);
+  const auto orm=prepared_normal_consumer::image(pbr.metallic_roughness_texture.texture);
+  const auto glow=prepared_normal_consumer::image(material.emissive_texture.texture);
+  const auto ao=prepared_normal_consumer::image(material.occlusion_texture.texture);
+  const auto normal=prepared_normal_consumer::image(material.normal_texture.texture);
+  check(color.width==193&&color.height==89&&orm.width==193&&orm.height==89&&
+        glow.width==193&&glow.height==89,"GPU batching rewrites each image at its original rectangular resolution");
+  check(ao.rgba==raw.occlusion.image->rgba&&normal.rgba==raw.normal.image->rgba,
+        "An occlusion view of the same source image and the independent normal stay byte-exact");
+  bool formula=true,untouched=true;
+  const auto linear=[](uint8_t byte){return srgb_to_linear(byte/255.f);};
+  for(size_t at=0;at<color.rgba.size();at+=4){
+   const auto &input=raw.color.image->rgba;
+   for(unsigned c=0;c<4;++c){
+    const auto decode=[&](uint8_t byte){return c<3?linear(byte):byte/255.f;};
+    const float expected=object.material.color[c]*decode(input[at+c])*(1-ink[3][0])+ink[0][c];
+    formula&=std::abs(expected-pbr.base_color_factor[c]*decode(color.rgba[at+c]))<=(c<3?.0045f:.002f);
+    if(c<3){
+     const float emitted=object.material.emissive[c]*linear(input[at+c])*(1-ink[3][3])+ink[2][c];
+     formula&=std::abs(emitted-material.emissive_factor[c]*linear(glow.rgba[at+c]))<=.0045f;
+    }
+   }
+   const float metal=object.material.metallic*(input[at+2]/255.f)*(1-ink[3][1])+ink[1][2];
+   formula&=std::abs(metal-pbr.metallic_factor*(orm.rgba[at+2]/255.f))<=.002f;
+   untouched&=orm.rgba[at]==input[at]&&orm.rgba[at+1]==input[at+1]&&orm.rgba[at+3]==input[at+3];
+  }
+  check(formula&&untouched,"All rewritten texels obey the independent linear coat equation and preserve untouched packed bytes");
+  if(masked){
+   const float alpha=object.material.color[3]*(1-ink[3][0])+ink[0][3];
+   check(material.alpha_mode==cgltf_alpha_mode_mask&&pbr.base_color_factor[3]==alpha,
+         "A constant masked alpha travels in the exact factor outside the RGB rewrite");
+  }else{
+   scene.active().material.alpha=Material::AlphaMode::Mask;
+   scene.active().material.alpha_cutoff=.48f;
+   const auto state=scene.encode();
+   const auto previous=file_bytes(path);
+   Document strict;strict.replace(scene.snapshot());
+   auto refused=strict.export_asset(path);
+   check(rejects([&]{refused.get();})&&strict.copy_scene().encode()==state&&file_bytes(path)==previous,
+         "Uncertified varying mask alpha preserves the earlier GLB and exact editable owner");
+  }
  }
 }
 
@@ -295,6 +423,7 @@ int main(int argc,char **argv)try{
   }
  }
  certified_paint(out,initial,options,native,fbo,separate_roles);
+ uniform_coat(out,initial,options,native,fbo,separate_roles);
  spatial_paint(out,initial,options,native,fbo,separate_roles);
  std::cout<<"PASS "<<checks<<" source-aware original standard export checks maxerror="<<maximum<<'\n';return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

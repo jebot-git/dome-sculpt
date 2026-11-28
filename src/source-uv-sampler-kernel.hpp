@@ -74,4 +74,24 @@ inline void sample_mapped_source(MappedSourceImage image,
     output[at] = bits(color[unsigned(image.format)]);
   }
 }
+
+#if defined(__CUDACC__) || defined(__HIPCC__)
+__host__ __device__
+#endif
+inline uint32_t rewrite_source_texel(const uint8_t *rgba,bool srgb,SourceUvSampler::TexelAffine affine,
+    const paint_compute::Quantization &table) {
+  using namespace paint_compute;
+  uint32_t packed=0;
+  for(unsigned c=0;c<4;++c){
+    auto value=rgba[c];
+    if(affine.channels&(1u<<c)){
+      const bool nonlinear=srgb&&c<3;
+      const float source=nonlinear?table.srgb[value]:table.unit[value];
+      const float mapped=add(mul(source,affine.scale[c]),affine.offset[c]);
+      value=nonlinear?srgb_byte(mapped,table):linear_byte(mapped);
+    }
+    packed|=uint32_t(value)<<(8*c);
+  }
+  return packed;
+}
 }

@@ -31,7 +31,7 @@ class SyclSampler final : public SourceUvSampler {
 
 public:
   SyclSampler(const PaintSourceTexture &source, bool srgb, Output format, size_t capacity,Transform transform)
-      : SourceUvSampler(capacity, format), image_(allocate<uint8_t>(source.image->rgba.size())),
+      : SourceUvSampler(capacity, format,source.image->rgba.size()/4), image_(allocate<uint8_t>(source.image->rgba.size())),
         table_(allocate<paint_compute::Quantization>(1)),
         coordinates_(allocate<Coordinate>(capacity)), colors_(allocate<uint32_t>(capacity * words(format))),
         source_(mapped_source_image(source,image_.get(),srgb,format,transform)) {
@@ -52,6 +52,21 @@ private:
         sample_mapped_source(source, coordinates[id[0]], *table, colors, id[0]);
       });
       queue_.memcpy(result.data(), colors, result.size_bytes()).wait_and_throw();
+    } catch (...) {
+      try { queue_.wait_and_throw(); } catch (...) {}
+      throw;
+    }
+  }
+  void rewrite_texels(size_t first,const TexelAffine &affine,std::span<uint32_t> result) override {
+    const auto *rgba=image_.get();
+    const auto *table=table_.get();
+    auto *out=colors_.get();
+    const auto srgb=source_.srgb;
+    try {
+      queue_.parallel_for(sycl::range<1>{result.size()},[=](sycl::id<1> id){
+        out[id[0]]=rewrite_source_texel(rgba+4*(first+id[0]),srgb,affine,*table);
+      });
+      queue_.memcpy(result.data(),out,result.size_bytes()).wait_and_throw();
     } catch (...) {
       try { queue_.wait_and_throw(); } catch (...) {}
       throw;
