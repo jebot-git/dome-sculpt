@@ -68,6 +68,26 @@ struct EditableMToonExport {
   TextureSetLimits budget;
   bool &wrote_preview;
 };
+static bool collect_mtoon_extensions(const nlohmann::json &value,std::set<std::string> &extensions) {
+  if(value.is_array())return std::ranges::all_of(value,[&](const auto &child){
+    return collect_mtoon_extensions(child,extensions);
+  });
+  if(!value.is_object())return true;
+  for(const auto &[name,child]:value.items()){
+    if(name=="extras")continue;
+    if(name=="extensions"){
+      if(!child.is_object())return false;
+      for(const auto &[extension,body]:child.items()){
+        (void)body;
+        if(extension!="VRMC_materials_mtoon"&&extension!="KHR_texture_transform"&&
+           extension!="KHR_materials_emissive_strength")return false;
+        extensions.insert(extension);
+      }
+    }
+    if(!collect_mtoon_extensions(child,extensions))return false;
+  }
+  return true;
+}
 static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objects,
     SourceMorphSpace source_space,bool recompute_changed_normals,std::function<bool()> cancelled,
     const NativeAuthoringCapture *raw_authority,const EmissionExportPrepared *physical,
@@ -801,26 +821,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     // Source JSON retains independent metadata. Remap only extensions whose
     // wire semantics are known here, including transforms on individual slots.
     std::set<std::string> extensions;
-    const auto collect_extensions=[&](auto &&self,const nlohmann::json &value)->bool{
-      if(value.is_array())return std::all_of(value.begin(),value.end(),[&](const auto &child){return self(self,child);});
-      if(!value.is_object())return true;
-      for(const auto &[name,child]:value.items()){
-        if(name=="extras")continue;
-        if(name=="extensions"){
-          if(!child.is_object())return false;
-          for(const auto &[extension,body]:child.items()){
-            (void)body;
-            if(extension!="VRMC_materials_mtoon"&&extension!="KHR_texture_transform"&&
-               extension!="KHR_materials_emissive_strength")
-              return false;
-            extensions.insert(extension);
-          }
-        }
-        if(!self(self,child))return false;
-      }
-      return true;
-    };
-    if(!collect_extensions(collect_extensions,original))return retain_native();
+    if(!collect_mtoon_extensions(original,extensions))return retain_native();
     const auto &native=binding->native_reference;
     const auto &current=field.material;
     auto &params=typed.parameters;
@@ -979,13 +980,18 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
           {"erasedNonzeroSamples",hdr->measured.erased_nonzero_samples}};
     }
     extensions.clear();
-    if(!collect_extensions(collect_extensions,output))
+    if(!collect_mtoon_extensions(output,extensions))
       throw std::logic_error("MToon material writing introduced an unknown extension");
     for(const auto &extension:extensions)use_extension(extension.c_str());
     j["materials"][material_id]=std::move(output);
     return true;
   };
   std::array<bool,8> uv_available{};
+  const auto prepared_mtoon=[&](uint64_t id){
+    return physical&&!physical->authored_mtoon&&std::ranges::any_of(physical->images,[&](const auto &entry){
+      return entry.object==id&&entry.prepared_source_mesh&&entry.authored_mtoon;
+    });
+  };
   auto source_info = [&](const PaintSourceTexture &slot) {
     slot.validate(8);
     if(slot.texcoord<0||slot.texcoord>7||!uv_available[size_t(slot.texcoord)]) throw std::invalid_argument("Export surface has no requested source UV set");
@@ -1023,7 +1029,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       const auto &source=*maps.source_maps; source.validate();
       if(source.color.image) pbr["baseColorTexture"]=source_info(source.color);
       if(source.metal_rough.image) pbr["metallicRoughnessTexture"]=source_info(source.metal_rough);
-      if(source.emission.image) material["emissiveTexture"]=source_info(source.emission);
+      if(source.emission.image&&!prepared_mtoon(object.id)) material["emissiveTexture"]=source_info(source.emission);
     } else {
       PaintSourceTexture sampler; sampler.wrap_s=sampler.wrap_t=33071;
       sampler.min_filter=sampler.mag_filter=9729;
@@ -1107,6 +1113,69 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       material["normalTexture"]["scale"]=1;
     }
   };
+  const auto write_prepared_mtoon=[&](const ObjectSurface &object,size_t i,int material_id){
+    if(!prepared_mtoon(object.id))return;
+    const auto &binding=*object.material_bindings;
+    const auto &frames=binding.normal_frames;
+    const auto &params=binding.material.parameters;
+    if(!frames||!frames->pbr||!frames->mtoon||
+       !normal_frame_attribute_equal(*frames->pbr,*frames->mtoon,params.normal_enabled,cancelled)||
+       (params.normal_enabled&&frames->pbr->tangents.empty()))
+      throw std::invalid_argument("Prepared MToon1 HDR needs its shared glTF normal and tangent frame");
+    (void)binding.material.copy_working_bytes(12*1024*1024,cancelled);
+    auto typed=binding.material;
+    auto &effective=typed.parameters;
+    const auto &current=object.material;
+    const auto &native=binding.native_reference;
+    for(size_t k=0;k<effective.base_color.size();++k)
+      effective.base_color[k]=mtoon_factor(effective.base_color[k],native.color[k],current.color[k]);
+    if(current.double_sided!=native.double_sided)
+      effective.cull=current.double_sided?MToonCull::Off:MToonCull::Back;
+    if(current.alpha!=Material::AlphaMode::Automatic&&int(current.alpha)!=native.alpha){
+      const bool blend=current.alpha==Material::AlphaMode::Blend;
+      effective.alpha=blend?MToonAlpha::Blend:current.alpha==Material::AlphaMode::Mask?MToonAlpha::Mask:MToonAlpha::Opaque;
+      effective.depth_write=!blend;
+      effective.source_blend=blend?5:1;
+      effective.destination_blend=blend?10:0;
+      effective.queue_offset=0;
+      effective.render_queue=blend?3000:effective.alpha==MToonAlpha::Mask?2450:2000;
+    }
+    if(current.alpha_cutoff!=native.alpha_cutoff)effective.alpha_cutoff=current.alpha_cutoff;
+    const auto &identity=result.objects[i];
+    const auto &attributes=j["meshes"][identity.mesh]["primitives"][0]["attributes"];
+    constexpr auto emission_slot=size_t(MToonSlot::Emission);
+    typed.textures[emission_slot].index=-1;
+    for(size_t role=0;role<binding.roles.size();++role){
+      stop();
+      auto &slot=typed.textures[role];
+      if(slot.index<0)continue;
+      const auto &view=binding.roles[role];
+      if(!view.image||view.uv_transform!=std::array<float,6>{1,0,0,1,0,0}||
+         (role!=size_t(MToonSlot::Matcap)&&
+          !attributes.contains("TEXCOORD_"+std::to_string(mtoon_coordinate(slot)))))
+        throw std::invalid_argument("Prepared MToon1 HDR lost an original texture role or coordinate");
+      slot.index=texture(*view.image,view);
+    }
+    auto source=typed.source_json();
+    if(source.contains("extensions"))source["extensions"].erase("KHR_materials_unlit");
+    std::set<std::string> extensions;
+    if(!collect_mtoon_extensions(source,extensions))
+      throw std::invalid_argument("Prepared MToon1 HDR requires known material and texture extensions");
+    auto &output=j["materials"][material_id];
+    output["pbrMetallicRoughness"]["baseColorFactor"]=effective.base_color;
+    if(typed.textures[size_t(MToonSlot::Base)].index>=0)
+      output["pbrMetallicRoughness"]["baseColorTexture"]=source.at("pbrMetallicRoughness").at("baseColorTexture");
+    else output["pbrMetallicRoughness"].erase("baseColorTexture");
+    if(effective.normal_enabled)output["normalTexture"]=source.at("normalTexture");
+    else output.erase("normalTexture");
+    output["doubleSided"]=effective.cull==MToonCull::Off;
+    output["alphaMode"]=effective.alpha==MToonAlpha::Mask?"MASK":effective.alpha==MToonAlpha::Blend?"BLEND":"OPAQUE";
+    if(effective.alpha==MToonAlpha::Mask)output["alphaCutoff"]=effective.alpha_cutoff;
+    else output.erase("alphaCutoff");
+    output["extensions"]["VRMC_materials_mtoon"]=std::move(source["extensions"].at("VRMC_materials_mtoon"));
+    extensions.erase("KHR_materials_emissive_strength"); // Finalized with the compiled emission.
+    for(const auto &extension:extensions)use_extension(extension.c_str());
+  };
   for(size_t i=0;i<objects.size();++i){
     const auto *field=bundles[i]&&objects[i].texture_set_surface?&bundles[i]->fields.front():nullptr;
     if(field){
@@ -1118,6 +1187,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     write_textures(object_at(i),i,result.objects[i].material,
         field&&!bundles[i]->paint_coordinates.empty(),field&&field->normal_role,
         field&&field->emission?&*field->emission:nullptr);
+    write_prepared_mtoon(object_at(i),i,result.objects[i].material);
     if(!field&&bundles[i]&&objects[i].retopo_mtoon_export){
       auto &materials=j["materials"];
       const int id=int(materials.size());

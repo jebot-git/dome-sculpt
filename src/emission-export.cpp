@@ -4,6 +4,7 @@
 #include "emission-paint-access.hpp"
 #include "emission-raster-device.hpp"
 #include "emission-linear.hpp"
+#include "mtoon-uv.hpp"
 #include "baked-emission-access.hpp"
 #include "emission-fallback-metrics.hpp"
 #include "emission-authority.hpp"
@@ -89,20 +90,70 @@ EmissionExportRaster raster(const SculptObject &object,const std::function<bool(
    if(streaming&&toon)storage+=toon->copy_working_bytes(16u*1024*1024,cancelled);
   }
  }
- PaintSourceTexture typed_emission;float legacy_strength=1;EmissionRgb typed_background{};
- if(toon){toon->validate();const auto &parameters=toon->parameters;legacy_strength=parameters.emission_strength;if(parameters.scroll!=std::array<float,2>{}||parameters.rotation_speed!=0)throw std::invalid_argument("Typed HDR export requires explicit frozen UV animation, not an animated compiled emission texture");const auto &slot=toon->textures[size_t(MToonSlot::Emission)];if(mtoon_coordinate(slot)!=0&&slot.index>=0)throw std::invalid_argument("Typed HDR emission needs its actual alternate-coordinate export raster");if(toon->version()==MToonVersion::V0){const auto &main=toon->textures[0];if(main.offset!=std::array<float,2>{}||main.scale!=std::array<float,2>{1,1}||main.rotation!=0)throw std::invalid_argument("VRM0 shared ST requires genuine all-role UV preparation before compiled HDR emission");}SourceNativeMaterial reference;if(binding)reference=binding->native_reference;else reference=native_source(*object.appearance);const std::array<float,3> source{parameters.emission.x,parameters.emission.y,parameters.emission.z};for(size_t k=0;k<3;++k)typed_background[k]=mtoon_factor(source[k],reference.emission[k],object.material.emissive[k])*legacy_strength;
-  if(slot.index>=0){if(binding)typed_emission=binding->roles[size_t(MToonSlot::Emission)];else {const auto &appearance=*object.appearance;const auto &texture=appearance.asset->textures.at(size_t(slot.index));if(texture.image<0||!appearance.decoded_images||size_t(texture.image)>=appearance.decoded_images->size())throw std::invalid_argument("Typed HDR emission has no owned original image");typed_emission.image=appearance.decoded_images->at(size_t(texture.image));typed_emission.wrap_s=texture.wrap_s;typed_emission.wrap_t=texture.wrap_t;typed_emission.min_filter=texture.min_filter;typed_emission.mag_filter=texture.mag_filter;}if(!typed_emission.image)throw std::invalid_argument("Typed HDR emission role has no image owner");}
- }if(paint.paint_sampling_domain()&&!native_domain)throw std::invalid_argument("Retained HDR paint export requires its exact current/source UV correspondence adapter");if(!prepared_source&&maps&&maps->emission.image&&(maps->emission.texcoord!=0))throw std::invalid_argument("HDR emission source requires its exact alternate-coordinate export raster");
+ constexpr auto emission_slot=MToonSlot::Emission;
+ PaintSourceTexture typed_emission;
+ float legacy_strength=1;
+ EmissionRgb typed_background{};
+ if(toon){
+  toon->validate();
+  const auto &parameters=toon->parameters;
+  legacy_strength=parameters.emission_strength;
+  if(parameters.scroll!=std::array<float,2>{}||parameters.rotation_speed!=0)
+   throw std::invalid_argument("Typed HDR export requires explicit frozen UV animation, not an animated compiled emission texture");
+  const auto &slot=toon->textures[size_t(emission_slot)];
+  if(slot.index>=0&&!prepared_source&&mtoon_coordinate(slot)!=0)
+   throw std::invalid_argument("Typed HDR emission needs its actual alternate-coordinate export raster");
+  if(toon->version()==MToonVersion::V0){
+   const auto &main=toon->textures[0];
+   if(main.offset!=std::array<float,2>{}||main.scale!=std::array<float,2>{1,1}||main.rotation!=0)
+    throw std::invalid_argument("VRM0 shared ST requires genuine all-role UV preparation before compiled HDR emission");
+  }
+  const auto reference=binding?binding->native_reference:native_source(*object.appearance);
+  const EmissionRgb source{parameters.emission.x,parameters.emission.y,parameters.emission.z};
+  for(size_t k=0;k<3;++k)
+   typed_background[k]=mtoon_factor(source[k],reference.emission[k],object.material.emissive[k])*legacy_strength;
+  if(slot.index>=0){
+   if(binding)typed_emission=binding->roles[size_t(emission_slot)];
+   else{
+    const auto &appearance=*object.appearance;
+    const auto &texture=appearance.asset->textures.at(size_t(slot.index));
+    if(texture.image<0||!appearance.decoded_images||size_t(texture.image)>=appearance.decoded_images->size())
+     throw std::invalid_argument("Typed HDR emission has no owned original image");
+    typed_emission.image=appearance.decoded_images->at(size_t(texture.image));
+    typed_emission.wrap_s=texture.wrap_s;
+    typed_emission.wrap_t=texture.wrap_t;
+    typed_emission.min_filter=texture.min_filter;
+    typed_emission.mag_filter=texture.mag_filter;
+   }
+   if(!typed_emission.image)throw std::invalid_argument("Typed HDR emission role has no image owner");
+  }
+ }
+ if(paint.paint_sampling_domain()&&!native_domain)
+  throw std::invalid_argument("Retained HDR paint export requires its exact current/source UV correspondence adapter");
+ if(!prepared_source&&maps&&maps->emission.image&&maps->emission.texcoord!=0)
+  throw std::invalid_argument("HDR emission source requires its exact alternate-coordinate export raster");
  const auto baked=paint.baked();
  const bool baked_float=baked&&baked->emission_field;
  EmissionRgb original=toon?typed_background:object.material.emissive;
  const PaintSourceTexture *mapped=nullptr;
- if(prepared_source)original=prepared_background(object,mapped,cancelled);
- else if(binding&&binding->physical_emission)original=*binding->physical_emission;
- const bool source_overridden=prepared_source||(binding&&binding->physical_emission);
+ const bool physical_background=binding&&binding->physical_emission;
+ std::shared_ptr<const std::vector<std::array<float,2>>> typed_uv;
+ if(prepared_source&&authored_mtoon){
+  if(!toon||toon->version()!=MToonVersion::V1||!binding||!binding->has_mtoon||
+     !paint.source_sampling_prepared()||!paint.valid_source_sampling_attachment()||
+     paint.color_projection()||paint.normal_projection())
+   throw std::invalid_argument("Prepared HDR requires its actual MToon1 source and paint coordinates");
+  if(typed_emission.image&&!physical_background){
+   typed_uv=EmissionExportAccess::prepared_role_uv(paint,mtoon_coordinate(toon->textures[size_t(emission_slot)]));
+   typed_emission.texcoord=0;
+   mapped=&typed_emission;
+  }
+ }else if(prepared_source)original=prepared_background(object,mapped,cancelled);
+ if(physical_background)original=*binding->physical_emission;
+ const bool source_overridden=prepared_source||physical_background;
  const bool typed_sampler=toon&&typed_emission.image&&!source_overridden;
- const auto source_uv=mapped?source_texture_coordinates(paint.mesh(),*maps,mapped->texcoord):
-                              std::span<const std::array<float,2>>{};
+ const auto source_uv=typed_uv?std::span(*typed_uv):
+     mapped?source_texture_coordinates(paint.mesh(),*maps,mapped->texcoord):std::span<const std::array<float,2>>{};
  if(compute_backend()!="CPU"){
   using Sample=EmissionRasterDevice::MappedSample;
   struct State {
@@ -129,7 +180,8 @@ EmissionExportRaster raster(const SculptObject &object,const std::function<bool(
   if(mapped)storage+=mapped->image->rgba.size()+capacity*(2*sizeof(Sample)+sizeof(EmissionExrPixel));
   // Metadata-only qualification does not allocate an upload. Scanline
   // readers retain the same immutable, device-resident grid across passes.
-  auto read=[state,owner=paint.snapshot(),padding,source=std::move(source),source_uv,capacity,transform,original,legacy_strength,r,cancelled]
+  auto read=[state,owner=paint.snapshot(),padding,source=std::move(source),source_uv,capacity,transform,
+             mapped_toon=typed_uv?std::move(toon):std::nullopt,original,legacy_strength,r,cancelled]
             (uint32_t y0,std::span<EmissionExrPixel> rows){
     const size_t first=size_t(y0)*r;
     if(first>padding.size()||rows.size()>padding.size()-first)
@@ -140,7 +192,7 @@ EmissionExportRaster raster(const SculptObject &object,const std::function<bool(
     if(capacity){
       if(!state->device){
         state->samples.resize(capacity);
-        state->device=create_mapped_emission_field_device(*owner,source,original,capacity,cancelled);
+        state->device=create_mapped_emission_field_device(*owner,source,original,legacy_strength,capacity,cancelled);
       }
       for(size_t offset=0;offset<rows.size();offset+=capacity){
         stop(cancelled);
@@ -149,7 +201,8 @@ EmissionExportRaster raster(const SculptObject &object,const std::function<bool(
         for(size_t i=0;i<samples.size();++i){
           if((i&1023)==0)stop(cancelled);
           const auto at=first+offset+i;
-          const auto uv=EmissionExportAccess::writable_source_uv(*owner,source_uv,at);
+          auto uv=EmissionExportAccess::writable_source_uv(*owner,source_uv,at);
+          if(mapped_toon&&padding[at]>=0)uv=mtoon_uv_validated(*mapped_toon,emission_slot,uv,0,1);
           samples[i]={uint32_t(at),uv[0],uv[1]};
         }
         state->device->read_mapped_field(samples,batch,cancelled);
@@ -178,7 +231,8 @@ EmissionExportRaster raster(const SculptObject &object,const std::function<bool(
   if(resolved_source.image){
     if(p<0)background={};
     else{
-      const auto uv=EmissionExportAccess::writable_source_uv(paint,source_uv,index);
+      auto uv=EmissionExportAccess::writable_source_uv(paint,source_uv,index);
+      if(toon)uv=mtoon_uv_validated(*toon,emission_slot,uv,0,1);
       const auto sample=sample_source_texture(resolved_source,uv[0],uv[1],true);
       for(size_t k=0;k<3;++k)background[k]*=sample[k];
     }
@@ -293,10 +347,7 @@ static EmissionExportRaster owning_raster(const SculptObject &object,
 }
 EmissionExportRaster export_emission_raster(const SculptObject &object,
     const std::function<bool()> &cancelled, bool authored_mtoon,bool prepared_source) {
- if(prepared_source){
-  if(authored_mtoon)throw std::invalid_argument("Prepared source HDR requires Standard GLB Core PBR export");
-  return raster(object,cancelled,false,false,true,true);
- }
+ if(prepared_source)return raster(object,cancelled,authored_mtoon,false,true,true);
  return owning_raster(object,cancelled,authored_mtoon,true);
 }
 EmissionInterchangeImage canonical_paint_emission_field(const SculptObject &object,
@@ -420,18 +471,24 @@ EmissionExportPrepared prepare_emission_export(std::span<const ObjectSurface> ob
  if(native_domain||canonical){if(surface.material_bindings.owner_before(owner.material_bindings)||owner.material_bindings.owner_before(surface.material_bindings))throw std::invalid_argument("Native HDR borrowed a foreign material control block");if(surface.deformation.owner_before(owner.deformation)||owner.deformation.owner_before(surface.deformation)||surface.rig_source!=owner.rig_source||surface.rig_source.owner_before(owner.rig_source)||owner.rig_source.owner_before(surface.rig_source))throw std::invalid_argument("Native HDR borrowed a foreign current model control block");const auto attachment=owner.painted->paint_sampling_attachment();if(attachment!=surface.paint_sampling_attachment||attachment.owner_before(surface.paint_sampling_attachment)||surface.paint_sampling_attachment.owner_before(attachment)||surface.paint_corner_coordinates!=attachment->domain()->corner_coordinates(owner.painted->mesh()))throw std::invalid_argument("Native HDR surface borrowed another paint coordinate owner");}
  EmissionExportImage entry;
  entry.object=surface.id;
- entry.authored_mtoon=authored_mtoon;
  entry.native_paint_domain=native_domain;
  entry.canonical_paint_domain=canonical;
  if(!authored_mtoon&&owner.painted->source_sampling_prepared())
   entry.prepared_source_mesh=owner.painted->mesh_owner();
+ const auto &binding=owner.material_bindings;
+ const bool prepared_mtoon=entry.prepared_source_mesh&&binding&&binding->has_mtoon&&
+     binding->material.version()==MToonVersion::V1;
+ if(prepared_mtoon&&(!owner.appearance||owner.painted->baked()))
+  throw std::invalid_argument("Prepared MToon1 HDR Bake requires separate typed color and normal adapters");
+ entry.authored_mtoon=authored_mtoon||prepared_mtoon;
  auto &image=entry.image;
  if(result.streaming){
-  auto source=export_emission_raster(owner,cancelled,authored_mtoon,bool(entry.prepared_source_mesh));
+  auto source=export_emission_raster(owner,cancelled,entry.authored_mtoon,bool(entry.prepared_source_mesh));
   image.width=image.height=source.resolution;
   image.version=source.version;
  }else image=materialize(owning_raster(owner,cancelled,authored_mtoon,false));
  safe.material.emissive={};
+ if(prepared_mtoon)safe.material.unlit=false;
  if(entry.prepared_source_mesh){
   if(owner.painted->baked())source_baked_hdr_export(owner,safe,cancelled);
   else{

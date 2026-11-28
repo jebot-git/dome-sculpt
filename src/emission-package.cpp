@@ -372,7 +372,15 @@ void prepared_source_domain(const Json &j,std::span<const uint8_t> binary,const 
  const auto &primitives=j.at("meshes").at(node.at("mesh").get<size_t>()).at("primitives");
  if(primitives.size()!=1||primitives[0].at("material")!=entry.at("material")||primitives[0].value("mode",4)!=4)
   throw std::invalid_argument("Prepared HDR lost its original emitted primitive");
- const auto &info=j.at("materials").at(entry.at("material").get<size_t>()).at("emissiveTexture");
+ const auto &material=j.at("materials").at(entry.at("material").get<size_t>());
+ const auto extensions=material.find("extensions");
+ const bool typed=entry.at("view")=="authored-mtoon";
+ if(typed!=(extensions!=material.end()&&extensions->contains("VRMC_materials_mtoon"))||
+    (typed&&(!object.appearance||!object.material_bindings||!object.material_bindings->has_mtoon||
+     object.material_bindings->material.version()!=MToonVersion::V1||
+     extensions->at("VRMC_materials_mtoon").at("specVersion")!="1.0"||object.painted->baked())))
+  throw std::invalid_argument("Prepared HDR lost its actual emitted MToon1 view");
+ const auto &info=material.at("emissiveTexture");
  if(info.value("texCoord",size_t(0))!=coordinate||info.contains("extensions"))
   throw std::invalid_argument("Prepared HDR emissive texture uses different coordinates");
  const auto &texture=j.at("textures").at(info.at("index").get<size_t>());
@@ -558,7 +566,7 @@ void detail::attach_native_emission(GltfDocument &document,const NativeEmissionE
  exr_bytes+=bytes.size();auto record=append(bytes);record["object"]=entry.object;record["node"]=entry.node;record["material"]=entry.material;if(streaming)record["view"]=entry.authored_mtoon?"authored-mtoon":"pbr";record["fallback"]={{"strength",entry.fallback_strength},{"emissiveFactor",entry.fallback_factor},{"maximumAbsoluteError",entry.maximum_absolute_error},{"maximumRelativeError",entry.maximum_relative_error},{"erasedNonzeroSamples",entry.erased_nonzero_samples},{"evaluation","current-static-view"}};if(entry.image.version==2){record["fallback"]["version"]=2;record["fallback"]["units"]=detail::resolved_fallback_units;record["fallback"]["view"]=entry.authored_mtoon?"authored-mtoon":"pbr";}fallback(record.at("fallback"),entry.image.version);if(entry.native_paint_domain||entry.canonical_paint_domain){record["domain"]={{"version",1},{"kind",entry.canonical_paint_domain?"canonical-paint37":"native-paint32"},{"texCoord",entry.texcoord}};native_domain(j,document.binary,record,owner.object(entry.object),cancelled,canonical_domains);}
  if(entry.prepared_source_mesh){
   const auto mesh=current_object.painted?current_object.painted->mesh_owner():nullptr;
-  if(entry.authored_mtoon||entry.native_paint_domain||entry.canonical_paint_domain||entry.texture_set||
+  if(entry.native_paint_domain||entry.canonical_paint_domain||entry.texture_set||
      entry.prepared_source_mesh!=mesh||entry.prepared_source_mesh.owner_before(mesh)||mesh.owner_before(entry.prepared_source_mesh))
    throw std::invalid_argument("Prepared HDR record lost its immutable mesh owner");
   record["domain"]={{"version",1},{"kind","prepared-source"},{"texCoord",entry.texcoord}};
@@ -599,10 +607,8 @@ std::optional<Scene> extract_native_emission(std::span<const uint8_t> bytes,cons
   fallback(entry.at("fallback"));if(entry.contains("domain")){domain_descriptor(entry.at("domain"),allow_canonical,prepared_sources);++domain_count;
    const auto &kind=entry.at("domain").at("kind");
    if(kind=="canonical-paint37")++canonical_count;
-   if(kind=="prepared-source"){
-    if(entry.at("view")!="pbr")throw std::invalid_argument("Prepared HDR export requires its Core PBR view");
-    ++prepared_count;
-   }}auto resource=view(j,binary,entry);if(encoded>limits.max_exr_bytes||resource.size()>limits.max_exr_bytes-encoded)throw std::length_error("Native HDR EXR bytes exceed aggregate limit");encoded+=resource.size();auto image_limits=limits.image;image_limits.cancelled=limits.cancelled;const auto description=detail::emission_exr_owned_description(resource,image_limits,{},streaming);
+   if(kind=="prepared-source")++prepared_count;
+  }auto resource=view(j,binary,entry);if(encoded>limits.max_exr_bytes||resource.size()>limits.max_exr_bytes-encoded)throw std::length_error("Native HDR EXR bytes exceed aggregate limit");encoded+=resource.size();auto image_limits=limits.image;image_limits.cancelled=limits.cancelled;const auto description=detail::emission_exr_owned_description(resource,image_limits,{},streaming);
   fallback(entry.at("fallback"),description.version);
   if(streaming&&((entry.at("view")!="pbr"&&entry.at("view")!="authored-mtoon")||
       (description.version==2&&entry.at("fallback").at("view")!=entry.at("view"))))

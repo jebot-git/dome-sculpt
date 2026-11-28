@@ -301,11 +301,11 @@ std::unique_ptr<EmissionRasterDevice> create_mapped_emission_raster_device(
 
 std::unique_ptr<EmissionRasterDevice> create_mapped_emission_field_device(
     const PaintedMesh &paint,const PaintSourceTexture &source,std::array<float,3> background,
-    size_t capacity,const std::function<bool()> &cancelled){
+    float legacy_strength,size_t capacity,const std::function<bool()> &cancelled){
   if(!paint.source_maps()||!source.image||!capacity||capacity>EmissionRasterDevice::mapped_batch)
     throw std::invalid_argument("Invalid mapped HDR emission field");
   source.validate(paint.source_maps()->coordinate_count());
-  auto input=describe_raster(paint,EmissionExportAccess::writable_padding(paint),background,1,false,cancelled);
+  auto input=describe_raster(paint,EmissionExportAccess::writable_padding(paint),background,legacy_strength,false,cancelled);
   input.mapped_capacity=capacity;
   input.mapped_field=true;
   input.source=source.image->rgba;

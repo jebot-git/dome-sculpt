@@ -51,7 +51,7 @@ std::unique_ptr<EmissionRasterDevice> create_mapped_emission_raster_device(
     const PaintedMesh &,const PaintSourceTexture *,std::array<float,3> background,uint32_t resolution,
     size_t capacity,const std::function<bool()> &);
 std::unique_ptr<EmissionRasterDevice> create_mapped_emission_field_device(
-    const PaintedMesh &,const PaintSourceTexture &,std::array<float,3> background,size_t capacity,
+    const PaintedMesh &,const PaintSourceTexture &,std::array<float,3> background,float legacy_strength,size_t capacity,
     const std::function<bool()> &);
 std::unique_ptr<EmissionRasterDevice> create_texture_set_emission_device(
     const PaintedMesh &,const PaintSourceTexture *,const Image *aligned_mtoon,

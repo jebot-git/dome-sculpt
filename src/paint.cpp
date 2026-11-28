@@ -2052,6 +2052,16 @@ detail::EmissionExportAccess::WritableSample detail::EmissionExportAccess::writa
   const auto [a,b]=sample.bary;
   return {sample.face,{a,b,1-a-b}};
 }
+std::shared_ptr<const std::vector<std::array<float,2>>>
+detail::EmissionExportAccess::prepared_role_uv(const PaintedMesh &paint,int coordinate) {
+  if(coordinate<0||coordinate>1||!paint.source_sampling_prepared()||!paint.valid_source_sampling_attachment())
+    throw std::invalid_argument("Prepared MToon emission needs its original sampling owner");
+  const auto &proof=*paint.surface_->original_sampling;
+  auto result=coordinate==0?proof.original_uv0:proof.original_uv1;
+  if(!result||result->size()!=paint.mesh().positions.size())
+    throw std::invalid_argument("Prepared MToon emission is missing its original role coordinates");
+  return result;
+}
 std::array<float,2> detail::EmissionExportAccess::writable_source_uv(const PaintedMesh &paint,
     std::span<const std::array<float,2>> uv,size_t texel) {
   const auto &mesh=paint.mesh();

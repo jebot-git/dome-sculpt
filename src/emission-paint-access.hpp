@@ -7,6 +7,8 @@ namespace emission_raster {struct PhysicalTile;}
 struct EmissionExportAccess {
  // Borrow the sealed, immutable paint grid for an offline per-texel export.
  static std::span<const int32_t> writable_padding(const PaintedMesh &);
+ // Actual original ordinal coordinates in the current vertex domain.
+ static std::shared_ptr<const std::vector<std::array<float,2>>> prepared_role_uv(const PaintedMesh &,int);
  struct WritableSample { uint32_t face; std::array<float,3> bary; };
  static WritableSample writable_sample(const PaintedMesh &,size_t texel);
  // Interpolate the original UV at the paint texel's sealed triangle sample.

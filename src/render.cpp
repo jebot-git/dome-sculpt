@@ -126,7 +126,7 @@ std::string pbr_surface_source(std::string source) {
 }
 } // namespace
 namespace {
-bool mtoon_shade_alias(const MToonMaterial&m){auto &a=m.textures[0],&b=m.textures[1];return a.index>=0&&a.index==b.index&&mtoon_coordinate(a)==mtoon_coordinate(b)&&(m.version()==MToonVersion::V0||(a.offset==b.offset&&a.scale==b.scale&&a.rotation==b.rotation));}
+bool mtoon_shade_alias(const MToonMaterial&m){auto &a=m.textures[0],&b=m.textures[1];return a.index>=0&&a.index==b.index&&mtoon_coordinate(a,7)==mtoon_coordinate(b,7)&&(m.version()==MToonVersion::V0||(a.offset==b.offset&&a.scale==b.scale&&a.rotation==b.rotation));}
 GLenum mtoon_blend(int value){constexpr GLenum factors[]={GL_ZERO,GL_ONE,GL_DST_COLOR,GL_SRC_COLOR,GL_ONE_MINUS_DST_COLOR,GL_SRC_ALPHA,GL_ONE_MINUS_SRC_COLOR,GL_DST_ALPHA,GL_ONE_MINUS_DST_ALPHA,GL_SRC_ALPHA_SATURATE,GL_ONE_MINUS_SRC_ALPHA};if(value<0||value>10)throw std::runtime_error("Unsupported MToon blend factor");return factors[value];}
 }
 
@@ -526,7 +526,13 @@ struct SurfaceRenderer::TextureState {
         bool needs_uv1=false;
         auto original=[&](int destination,int role) {
           const auto &t=typed->textures[role];if(t.index<0)return;
-          if(role!=int(MToonSlot::Matcap))needs_uv1|=mtoon_coordinate(t)==1;
+          if(role!=int(MToonSlot::Matcap)){
+            const int coordinate=mtoon_coordinate(t,7);
+            needs_uv1|=coordinate==1;
+            if(coordinate>=2&&(!maps||maps->overlay||!maps->source_maps||
+                !maps->source_maps->extra_uv_sets.contains(uint32_t(coordinate))))
+              throw std::invalid_argument("MToon draw role lacks its original additional coordinates");
+          }
           const auto &view=toon.roles[role];slot(destination,view.image,view,t.encoding==MToonEncoding::Srgb);
         };
         for(int role=0;role<11;++role)if(!prepared_normal||role!=int(MToonSlot::Normal))original(role,role);
@@ -1079,7 +1085,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       else {glBindTexture(GL_TEXTURE_2D,slot.image);glBindSampler(n,slot.sampler);}
       present[n]=slot.image!=0;coordinates[n]=slot.coordinate;
       int role=n==12?0:n==13?3:n;scales[n*2]=scales[n*2+1]=1;
-      if(role<11){auto &texture=t.material.textures[role];coordinates[n]=role==int(MToonSlot::Matcap)?0:mtoon_coordinate(texture);offsets[n*2]=texture.offset[0];offsets[n*2+1]=texture.offset[1];scales[n*2]=texture.scale[0];scales[n*2+1]=texture.scale[1];rotations[n]=texture.rotation;channels[n]=texture.channel;}
+      if(role<11){auto &texture=t.material.textures[role];coordinates[n]=role==int(MToonSlot::Matcap)?0:mtoon_coordinate(texture,7);offsets[n*2]=texture.offset[0];offsets[n*2+1]=texture.offset[1];scales[n*2]=texture.scale[0];scales[n*2+1]=texture.scale[1];rotations[n]=texture.rotation;channels[n]=texture.channel;}
       if(n>=14){int k=n-14;pbrx[k*3]=slot.uv[0];pbrx[k*3+1]=slot.uv[1];pbrx[k*3+2]=slot.uv[4];pbry[k*3]=slot.uv[2];pbry[k*3+1]=slot.uv[3];pbry[k*3+2]=slot.uv[5];}
       auto name="tex"+std::to_string(n);glUniform1i(glGetUniformLocation(program_,name.c_str()),n);
     }

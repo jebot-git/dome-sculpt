@@ -13,6 +13,7 @@ struct SourceNativeMaterial;
 // Shared by GPU binding and worker-built picking; no metadata parsing on input.
 std::optional<MToonMaterial> retained_mtoon(const CreatorAppearance *);
 int mtoon_coordinate(const MToonTexture &);
+int mtoon_coordinate(const MToonTexture &,int maximum);
 SourceNativeMaterial native_source(const CreatorAppearance &);
 float mtoon_factor(float typed, float original, float current);
 struct PaintCornerCoordinates { std::span<const std::array<float,2>> values; };

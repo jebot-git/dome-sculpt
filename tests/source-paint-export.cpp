@@ -12,6 +12,7 @@
 #include "source-color-consumer.hpp"
 #include "prepared-normal-consumer.hpp"
 #include "paint-overlay-sample.hpp"
+#include "emission-paint-access.hpp"
 namespace {
 import_fixture::Fixture source(int kind,bool flat,const char *alpha,float weight){
  import_fixture::Fixture f;while(f.bin.size()%4)f.bin.push_back(0);
@@ -683,6 +684,128 @@ void single_surface_emission(const std::filesystem::path &out,const Scene &initi
  doc.export_asset(mapped_retry).get();
  check(file_bytes(mapped_retry)==mapped_bytes,"Reopening mapped HDR reproduces every byte of the GLB");
 }
+void prepared_mtoon_emission(const std::filesystem::path &out,const Scene &initial,
+    const ImportAuthoringOptions &options,SurfaceRenderer &renderer,int coordinate) {
+ auto source_file=source(1,false,"OPAQUE",.32f);
+ auto &material=source_file.j["materials"][0];
+ material["emissiveFactor"]={.34f,.19f,.23f};
+ material["emissiveTexture"]={{"index",0},{"extensions",{{"KHR_texture_transform",
+     {{"texCoord",coordinate},{"offset",{.17f,-.12f}},{"scale",{.83f,.91f}},{"rotation",.23f}}}}}};
+ material["extensions"]={{"KHR_materials_emissive_strength",{{"emissiveStrength",2.25f}}},
+     {"VRMC_materials_mtoon",{{"specVersion","1.0"},{"shadingToonyFactor",.55f},
+     {"shadeColorFactor",{.42f,.23f,.53f}},{"shadeMultiplyTexture",{{"index",0},{"texCoord",1}}},
+     {"parametricRimColorFactor",{.021f,.012f,.031f}},{"rimMultiplyTexture",{{"index",0},{"texCoord",0}}}}}};
+ source_file.j["extensionsUsed"]={"VRMC_materials_mtoon","KHR_texture_transform","KHR_materials_emissive_strength"};
+ source_file.j["samplers"][0]["magFilter"]=9729;
+ source_file.j["samplers"][0]["minFilter"]=9729;
+ const std::string stem=coordinate==1?"prepared-mtoon-hdr":"prepared-mtoon-hdr-uv0";
+ const auto input=out/(stem+"-input.glb");
+ source_file.save(input);
+ auto scene=prepare_authoring_import(initial,input,options).scene;
+ const auto id=scene.active().id;
+ for(const auto &object:scene.objects())if(object.id!=id)scene.object(object.id).visible=false;
+ auto &subject=scene.active();
+ const auto &binding=*subject.material_bindings;
+ check(binding.has_mtoon&&subject.painted->source_sampling_prepared()&&
+       mtoon_coordinate(binding.material.textures[size_t(MToonSlot::Emission)])==coordinate,
+       "Imported typed emission retains its overridden original UV role");
+ subject.painted=subject.painted->snapshot();
+ subject.painted->add_layer("Relative light");
+ PaintSettings paint;
+ paint.channel=PaintChannel::Emission;
+ paint.front_only=false;
+ paint.emission={.27f,.42f,.19f};
+ paint_uniform(*subject.painted,paint,.25f);
+ subject.painted->layer_properties("Relative light",true,.42f);
+ subject.painted->add_layer("Absolute light");
+ paint.emission_units=PaintEmissionUnits::Physical;
+ paint.emission={1.65f,.079f,.014f};
+ paint_uniform(*subject.painted,paint,.19f);
+ const auto exact=scene.encode();
+ Document doc;
+ doc.replace(scene.snapshot());
+ doc.authored_shading();
+ settled(doc);
+ const auto reference=draw(renderer,doc.frame().surface);
+ const auto path=out/(stem+".glb"),project=out/(stem+".dsculpt");
+ auto export_job=doc.export_asset(path);
+ auto save_job=doc.save_async(project);
+ export_job.get();
+ save_job.get();
+ PreviewGlb file(path);
+ const auto &entry=file.json.at("extras").at("domeSculptEmission").at("images").at(0);
+ const auto &emitted=file.json.at("materials").at(entry.at("material").get<size_t>());
+ auto retained_roles=emitted.at("extensions").at("VRMC_materials_mtoon");
+ check(retained_roles.at("shadeMultiplyTexture").at("texCoord")==1&&
+       retained_roles.contains("rimMultiplyTexture")&&emitted.contains("normalTexture")&&
+       entry.at("domain").at("texCoord")==2&&entry.at("view")=="authored-mtoon"&&
+       emitted.at("emissiveTexture").at("texCoord")==2&&
+       !emitted.at("emissiveTexture").contains("extensions"),
+       "GLB retains the typed shade, rim and normal roles and gives compiled emission its own atlas");
+ const auto &field_view=file.json.at("bufferViews").at(entry.at("bufferView").get<size_t>());
+ const auto bytes=std::span(file.bytes);
+ const auto field=decode_emission_exr(bytes.subspan(28+file.json_size+field_view.at("byteOffset").get<size_t>(),
+                                                    field_view.at("byteLength").get<size_t>()));
+ const auto &original=*subject.painted->source_sampling_original();
+ const auto &mesh=subject.painted->mesh();
+ const auto vertices=subject.painted->source_sampling_vertices();
+ const auto original_uv=source_texture_coordinates(original.mesh(),*original.source_maps(),coordinate);
+ const auto &slot=binding.material.textures[size_t(MToonSlot::Emission)];
+ const auto &view=binding.roles[size_t(MToonSlot::Emission)];
+ const auto cos_angle=std::cos(double(slot.rotation)),sin_angle=std::sin(double(slot.rotation));
+ const auto &p=binding.material.parameters;
+ const std::array emission{p.emission.x,p.emission.y,p.emission.z};
+ size_t covered=0,mixed=0;
+ float low=1,high=0;
+ for(size_t i=0;i<field.pixels.size();++i){
+  const auto [face,bary]=detail::EmissionExportAccess::writable_sample(*subject.painted,i);
+  if(face==UINT32_MAX)continue;
+  std::array<float,2> uv{};
+  for(size_t k=0;k<3;++k)for(size_t axis=0;axis<2;++axis)
+   uv[axis]+=original_uv[vertices[mesh.indices[face*3+k]]][axis]*bary[k];
+  const double x=double(uv[0])*slot.scale[0],y=double(uv[1])*slot.scale[1];
+  const float s=float(cos_angle*x-sin_angle*y+slot.offset[0]);
+  const float t=float(sin_angle*x+cos_angle*y+slot.offset[1]);
+  const auto original_sample=sample_source_texture(view,s,t,true);
+  const auto &pixel=field.pixels[i];
+  low=std::min(low,original_sample[0]);
+  high=std::max(high,original_sample[0]);
+  for(size_t k=0;k<3;++k){
+   const auto expected=(emission[k]*p.emission_strength*original_sample[k])*(1.f-pixel[9])+
+       pixel[3+k]*p.emission_strength+pixel[6+k];
+   if(std::abs(expected-pixel[k])>5e-7f)throw std::runtime_error("Typed FLOAT export changed original sampling or paint units");
+  }
+  ++covered;
+  mixed+=pixel[3]>0&&pixel[6]>0&&pixel[9]<1;
+ }
+ check(covered>1000&&mixed>10&&high-low>.22f,
+       "EXR resolves varying original emission with both gain-scaled and absolute paint");
+ const auto restored=extract_native_emission(file.bytes);
+ check(restored&&restored->encode()==exact&&Scene::load(project).encode()==exact&&doc.copy_scene().encode()==exact,
+       "Typed Standard GLB and its queued Save preserve the exact editable project");
+ doc.replace(restored->snapshot());
+ const auto retry=out/(stem+"-retry.glb");
+ doc.export_asset(retry).get();
+ check(file_bytes(retry)==file.bytes,"Typed Standard GLB export is byte-identical after recovery");
+ import_fixture::Fixture portable;
+ portable.j=file.json;
+ portable.j.erase("extras");
+ portable.bin.assign(bytes.begin()+28+file.json_size,bytes.end());
+ const auto portable_path=out/(stem+"-portable.glb");
+ portable.save(portable_path);
+ auto pure=options;
+ pure.prepare_texture_atlas=false;
+ auto imported=prepare_authoring_import(initial,portable_path,pure).scene;
+ check(imported.active().material_bindings->has_mtoon,
+       "The interoperable GLB imports as MToon1 without the native package");
+ doc.replace(std::move(imported));
+ doc.authored_shading();
+ settled(doc);
+ const auto error=delta(reference,draw(renderer,doc.frame().surface));
+ std::cout<<"MTOON_STANDARD "<<stem<<" max="<<error<<'\n';
+ check(error<=7,"Re-imported portable MToon1 matches the native physical paint preview");
+}
+
 enum class BakeFrame { AuthoredTangents, ImportedNormals, NativeNormals };
 enum class BakeMask { None, Visible, Hidden, Mixed };
 
@@ -936,6 +1059,7 @@ int main(int argc,char **argv)try{
  spatial_paint(out,initial,options,native,fbo,separate_roles);
  mixed_emission(out,fbo,separate_roles);
  single_surface_emission(out,initial,options,native,fbo,separate_roles);
+ for(const int coordinate:{0,1})prepared_mtoon_emission(out,initial,options,native,coordinate);
  for(const auto frame:{BakeFrame::AuthoredTangents,BakeFrame::ImportedNormals,BakeFrame::NativeNormals})
   baked_surface_emission(out,initial,options,native,fbo,separate_roles,frame);
  for(const auto mask:{BakeMask::Visible,BakeMask::Hidden,BakeMask::Mixed})

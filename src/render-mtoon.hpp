@@ -24,10 +24,14 @@ if(r==4)return texture(tex4,q);if(r==5)return texture(tex5,q);if(r==6)return tex
 if(r==8)return texture(tex8,q);if(r==9)return texture(tex9,q);if(r==10)return texture(tex10,q);if(r==11)return texture(tex11,q);
 if(r==12)return texture(tex12,q);if(r==13)return texture(tex13,q);if(r==14)return vec4(1);return texture(tex15,q);}
 float mt_scalar(int r,vec4 x){return mt_channel[r]==1?x.g:mt_channel[r]==2?x.b:mt_channel[r]==3?x.a:x.r;}
-vec2 mt_uv(int r,vec2 a,vec2 b,vec3 N,vec3 V,float mask){
+vec2 mt_coordinate(int set,vec2 a,vec2 b,vec4 uv23,vec4 uv45,vec4 uv67){
+if(set==1)return b;if(set==2)return uv23.xy;if(set==3)return uv23.zw;
+if(set==4)return uv45.xy;if(set==5)return uv45.zw;if(set==6)return uv67.xy;if(set==7)return uv67.zw;
+return a;}
+vec2 mt_uv(int r,vec2 a,vec2 b,vec3 N,vec3 V,float mask,vec4 uv23,vec4 uv45,vec4 uv67){
 if(r==11||mt_derived[r]!=0)return a;
 if(r>=14){int k=r-14;return vec2(dot(mt_pbr_x[k],vec3(a,1)),dot(mt_pbr_y[k],vec3(a,1)));}
-int s=r==12?0:r==13?3:r;vec2 q=s==5?dome_mtoon_matcap_uv(N,V,mt_camera_up):(mt_coord[s]==1?b:a);
+int s=r==12?0:r==13?3:r;vec2 q=s==5?dome_mtoon_matcap_uv(N,V,mt_camera_up):mt_coordinate(mt_coord[s],a,b,uv23,uv45,uv67);
 int transform=mt[8].x<.5?0:s;
 return dome_mtoon_uv(mt,q,mt_offset[transform],mt_scale[transform],mt_rotation[transform],s==5,s==8,s==7,mt_time,mask);}
 )GLSL";
@@ -44,8 +48,8 @@ if(prepared_pbr_frame==1)source_b=dome_mtoon_unit(source_b);
 vec3 N=source_frame==1?source_n:geometric;world=p.xyz;cut_position=position;n=geometric;source_color=retained_color;normal_coordinates=retained_normal_coordinates;source_uv23=extra_uv23;source_uv45=extra_uv45;source_uv67=extra_uv67;
 canonical_n=canonical_frame==1?dome_mtoon_unit(normal_transform*dome_mtoon_unit(retained_canonical_normal)):geometric;
 canonical_t=dome_mtoon_unit(mat3(model)*tangent.xyz);canonical_b=cross(canonical_n,canonical_t)*tangent.w*model_hand;texcoord=uv;texcoord1=uv1;paintcoord=paint_domain==1?retained_paint_coordinates:uv;weight_value=selected_weight;mask_value=sculpt_mask;gl_Position=mvp*vec4(position,1);
-if(mt_mode==1&&mt_outline==1&&selected_weight<0){float mask=mt_scalar(8,mt_read(8,mt_uv(8,uv,uv1,N,V,1)));
-float width=mt_scalar(7,mt_read(7,mt_uv(7,uv,uv1,N,V,mask)));
+if(mt_mode==1&&mt_outline==1&&selected_weight<0){float mask=mt_scalar(8,mt_read(8,mt_uv(8,uv,uv1,N,V,1,extra_uv23,extra_uv45,extra_uv67)));
+float width=mt_scalar(7,mt_read(7,mt_uv(7,uv,uv1,N,V,mask,extra_uv23,extra_uv45,extra_uv67)));
 if(int(mt[10].x+.5)==1){world+=N*dome_mtoon_outline_world_width(mt,width);gl_Position=view_projection*vec4(world,1);}
 else if(int(mt[10].x+.5)==2){vec2 projected=(view_projection*vec4(N,0)).xy;vec3 right=dome_mtoon_unit(cross(mt_camera_forward,mt_camera_up));
 vec3 viewNormal=vec3(dot(N,right),dot(N,mt_camera_up),-dot(N,mt_camera_forward));gl_Position.xy+=dome_mtoon_outline_clip_offset(mt,projected,viewNormal,gl_Position.w,mt_aspect,width);}
@@ -112,8 +116,10 @@ ivec2 size=textureSize(tex13,0);vec2 p=paintcoord*vec2(size)-.5;ivec2 base=ivec2
 for(int y=0;y<2;++y)for(int x=0;x<2;++x){ivec2 q=clamp(base+ivec2(x,y),ivec2(0),size-1);float w=(x==1?f.x:1-f.x)*(y==1?f.y:1-f.y)*texelFetch(tex15,q,0).r;coverage+=w;sum+=(texelFetch(tex13,q,0).rgb*2-1)*w;}
 return coverage>1e-8?sum/coverage:vec3(0,0,1);
 }
+vec2 mt_fragment_uv(int role,vec2 a,vec2 b,vec3 N,vec3 V,float mask){
+return mt_uv(role,a,b,N,V,mask,source_uv23,source_uv45,source_uv67);}
 vec2 mt_original_emission_uv(vec2 a,vec2 b,vec3 N,vec3 V,float mask){
-int transform=mt[8].x<.5?0:3;vec2 q=mt_coord[3]==1?b:a;
+int transform=mt[8].x<.5?0:3;vec2 q=mt_coordinate(mt_coord[3],a,b,source_uv23,source_uv45,source_uv67);
 return dome_mtoon_uv(mt,q,mt_offset[transform],mt_scale[transform],mt_rotation[transform],false,false,false,mt_time,mask);}
 vec3 mt_source_normal(vec3 encoded){
 vec3 N=dome_mtoon_unit(source_n);bool legacy=mt[8].x<.5;
@@ -125,8 +131,8 @@ vec3 T=dome_mtoon_unit(source_t),B=dome_mtoon_unit(cross(N,T))*(source_w>0?1:-1)
 return dome_mtoon_unit(T*ts.x+B*ts.y+N*ts.z);
 }
 vec4 mt_surface(vec3 geometric,vec3 V,out bool killed){
-vec3 N=dome_mtoon_unit(source_frame==1?source_n:geometric);float mask=mt_scalar(8,mt_read(8,mt_uv(8,texcoord,texcoord1,N,V,1)));
-vec2 normalUV=retained_normal_domain==1?normal_coordinates.zw:mt_uv(2,texcoord,texcoord1,N,V,mask),a=dFdx(normalUV),b=dFdy(normalUV);vec3 dx=dFdx(world),dy=dFdy(world);
+vec3 N=dome_mtoon_unit(source_frame==1?source_n:geometric);float mask=mt_scalar(8,mt_read(8,mt_fragment_uv(8,texcoord,texcoord1,N,V,1)));
+vec2 normalUV=retained_normal_domain==1?normal_coordinates.zw:mt_fragment_uv(2,texcoord,texcoord1,N,V,mask),a=dFdx(normalUV),b=dFdy(normalUV);vec3 dx=dFdx(world),dy=dFdy(world);
 float determinant=a.x*b.y-a.y*b.x;vec4 tangent=vec4(1,0,0,1);bool valid=abs(determinant)>1e-8*max(length(a)*length(b),1e-20);
 if(valid){vec3 T=(dx*b.y-dy*a.y)/determinant,B=(dy*a.x-dx*b.x)/determinant;T=dome_mtoon_unit(T-N*dot(N,T));tangent=vec4(T,dot(cross(N,T),B)<0?-1:1);}
 if(mt_baked_normal==0){
@@ -141,8 +147,8 @@ float coverage;vec3 detail=mt_baked_detail(coverage);vec3 Tc=canonical_t,Bc=cano
 vec3 canonical=dome_mtoon_unit(Tc*detail.x+(back?-Bc:Bc)*detail.y+(back?-Nc:Nc)*detail.z);
 N=dome_mtoon_unit(mix(original,canonical,coverage));if(mt[8].x<.5)N=dome_mtoon_facing_normal(0,N,V,gl_FrontFacing,mt_outline==1);
 }
-DomeMToonSamples s;s.base=mt_read(0,mt_uv(0,texcoord,texcoord1,N,V,mask));s.shade=mt_read(1,mt_uv(1,texcoord,texcoord1,N,V,mask)).rgb;
-if(mt_derived[0]!=0){float coverage=mt_read(11,texcoord).r;vec4 original=mt_read(12,mt_uv(12,texcoord,texcoord1,N,V,mask));vec4 pbr=mt_packed_read(0,mt_uv(14,texcoord,texcoord1,N,V,mask));
+DomeMToonSamples s;s.base=mt_read(0,mt_fragment_uv(0,texcoord,texcoord1,N,V,mask));s.shade=mt_read(1,mt_fragment_uv(1,texcoord,texcoord1,N,V,mask)).rgb;
+if(mt_derived[0]!=0){float coverage=mt_read(11,texcoord).r;vec4 original=mt_read(12,mt_fragment_uv(12,texcoord,texcoord1,N,V,mask));vec4 pbr=mt_packed_read(0,mt_fragment_uv(14,texcoord,texcoord1,N,V,mask));
 vec3 paint=coverage==0?vec3(0):max(vec3(0),s.base.rgb-mt_native_color.rgb*pbr.rgb*(1-coverage));
 if(mt_shade_alias==1){vec3 contribution;for(int k=0;k<3;++k)contribution[k]=mt_native_color[k]!=0?paint[k]/mt_native_color[k]:paint[k];s.shade=max(vec3(0),s.shade*(1-coverage)+contribution);}
 s.base=coverage==0?mt_effective_color*original:max(vec4(0),s.base+(mt_effective_color*original-mt_native_color*pbr)*(1-coverage));s.base.a=clamp(s.base.a,0,1);}
@@ -150,7 +156,7 @@ if(mt_overlay==1){float coverage=mt_paint_read(3,paintcoord).r;vec4 paint=mt_pai
 vec4 original=s.base;
 if(mt_shade_alias==1){vec3 contribution;for(int k=0;k<3;++k)contribution[k]=mt_native_color[k]!=0?paint[k]/mt_native_color[k]:paint[k];s.shade=s.shade*(1-coverage)+contribution;}
 s.base=mt_effective_color*original*(1-coverage)+paint;s.base.a=clamp(s.base.a,0,1);}
-s.emission=mt_read(3,mt_uv(3,texcoord,texcoord1,N,V,mask)).rgb;
+s.emission=mt_read(3,mt_fragment_uv(3,texcoord,texcoord1,N,V,mask)).rgb;
 if(mt_derived[3]!=0){float coverage=mt_packed_read(3,texcoord).r;
 vec3 original=mt_packed_read(1,mt_original_emission_uv(texcoord,texcoord1,N,V,mask)).rgb;
 vec2 genericUV=vec2(dot(mt_pbr_x[1],vec3(texcoord,1)),dot(mt_pbr_y[1],vec3(texcoord,1)));
@@ -168,8 +174,8 @@ vec3 physical=mt_overlay==2?mt_paint_read(5,paintcoord).rgb:vec3(0);
 s.emission=mt_retained_emission(s.emission,1.-coverage)+legacy*mt_emission_strength+physical;
 }else if(mt_absolute_background==1)s.emission*=mt_background;
 s.emission=dome_preview_positive_finite(s.emission);
-s.rim=mt_read(4,mt_uv(4,texcoord,texcoord1,N,V,mask)).rgb;s.matcap=mt_read(5,mt_uv(5,texcoord,texcoord1,N,V,mask)).rgb;
-s.shift=mt_scalar(6,mt_read(6,mt_uv(6,texcoord,texcoord1,N,V,mask)));s.receiveShadow=mt_scalar(9,mt_read(9,mt_uv(9,texcoord,texcoord1,N,V,mask)));s.grade=mt_scalar(10,mt_read(10,mt_uv(10,texcoord,texcoord1,N,V,mask)));
+s.rim=mt_read(4,mt_fragment_uv(4,texcoord,texcoord1,N,V,mask)).rgb;s.matcap=mt_read(5,mt_fragment_uv(5,texcoord,texcoord1,N,V,mask)).rgb;
+s.shift=mt_scalar(6,mt_read(6,mt_fragment_uv(6,texcoord,texcoord1,N,V,mask)));s.receiveShadow=mt_scalar(9,mt_read(9,mt_fragment_uv(9,texcoord,texcoord1,N,V,mask)));s.grade=mt_scalar(10,mt_read(10,mt_fragment_uv(10,texcoord,texcoord1,N,V,mask)));
 DomeMToonLight q;q.normal=N;q.view=V;q.direction=normalize(vec3(-.4,.8,.7));q.color=vec3(1);q.giUp=vec3(.25);q.giDown=vec3(.10);q.gi=mix(q.giDown,q.giUp,clamp(.5+.5*N.y,0,1));q.shadow=1;q.normalOriented=true;
 return dome_mtoon_shade(mt,s,q,gl_FrontFacing,mt_outline==1,killed);
 }

@@ -28,7 +28,12 @@ std::optional<MToonMaterial> retained_mtoon(const CreatorAppearance *appearance)
   if(result&&(!appearance->asset||!appearance->decoded_images||appearance->decoded_images->size()!=appearance->asset->images.size()||appearance->material<0||size_t(appearance->material)>=appearance->asset->materials.size()))throw std::runtime_error("MToon retained image/material source is incomplete");
   return result;
 }
-int mtoon_coordinate(const MToonTexture&t){int coordinate=t.transform_texcoord>=0?t.transform_texcoord:int(t.texcoord);if(coordinate<0||coordinate>1)throw std::runtime_error("MToon preview requires a retained UV0 or UV1 set");return coordinate;}
+int mtoon_coordinate(const MToonTexture &texture,int maximum){
+  const int coordinate=texture.transform_texcoord>=0?texture.transform_texcoord:int(texture.texcoord);
+  if(coordinate<0||coordinate>maximum)throw std::runtime_error("MToon needs a retained coordinate set supported by this operation");
+  return coordinate;
+}
+int mtoon_coordinate(const MToonTexture &texture){return mtoon_coordinate(texture,1);}
 SourceNativeMaterial native_source(const CreatorAppearance &appearance) {
   const auto &m=appearance.asset->materials.at(size_t(appearance.material));
   return {m.color,m.emissive,m.alpha==ImportedMaterial::AlphaMode::Opaque?1:m.alpha==ImportedMaterial::AlphaMode::Mask?2:3,m.alpha_cutoff,m.double_sided};
@@ -204,7 +209,10 @@ struct Visibility {
         view.min_filter = texture.min_filter; view.mag_filter = texture.mag_filter;
       }
       view.validate();
-      if (mtoon_coordinate(slot) == 1) {
+      const int coordinate=mtoon_coordinate(slot,7);
+      if(coordinate>=2&&(overlay||!owned_extra_uv.contains(uint32_t(coordinate))))
+        throw std::invalid_argument("Visibility MToon role lacks its original additional coordinates");
+      if (coordinate == 1) {
         if(overlay){
           const auto &logical=overlay->original_uv1();
           if(!logical)
@@ -281,8 +289,7 @@ struct Visibility {
     if (toon) {
       auto coordinate = [&](MToonSlot role) {
         auto &slot = toon->textures[size_t(role)];
-        auto input = slot.index >= 0 && mtoon_coordinate(slot) == 1 ? uv(m, triangle, bary, true) : primary;
-        return input;
+        return slot.index>=0?uv(m,triangle,bary,mtoon_coordinate(slot,7)):primary;
       };
       auto mask_uv = mtoon_uv(*toon, MToonSlot::UvMask, coordinate(MToonSlot::UvMask), seconds);
       float animation = sample(mask, mask_uv, toon->textures[size_t(MToonSlot::UvMask)].channel);
