@@ -271,6 +271,15 @@ the angular limit.
 Physical device tests and production scenes remain open.
 [Retained texture-set skin evidence](validation/retained-texture-set-skin-20261127.json)
 
+Selected-mesh Surface Heat now handles retained avatar parts and independent
+native accessories in one transaction. The complete source instance remains
+the authority for retained anatomy. Each native accessory uses its own rest
+geometry under the shared reference rig. Both CC0 VRoid fixtures verify
+selection-order independence, exact cancellation and persistence, and one
+Undo/Redo. A linked VRM 1.0 texture-set fixture also verifies first binding
+of the reference and its accessory in the same operation.
+[Mixed-target binding evidence](validation/surface-heat-mixed-targets-20261128.json)
+
 Surface Heat now covers independent native paint frames, authored POSITION
 domains and prepared normal and corner-color recipes. Binding after key
 creation and rebinding after Mirror keep the original role coordinates,

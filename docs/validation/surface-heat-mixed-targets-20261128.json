@@ -1,0 +1,85 @@
+{
+  "date": "2026-11-28",
+  "product": "b50a0f89983d9482607cd778cf4302388ab2b348",
+  "reference_product": "fcf6b3f4",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Selected Surface Heat with retained avatar parts and independent native accessories under one reference rig.",
+  "release": {
+    "backend": "ONEAPI",
+    "application_sha256": "c8f870ed1d7fe7fc68c3661da326eaad10fe542d50b8815bc0d1631967290b58",
+    "distinct_passed_cases": [
+      "anatomical-female-fixture",
+      "anatomical-male-fixture",
+      "retopology-surface-heat-affine",
+      "retopology-surface-heat-plain",
+      "surface-heat-current-components",
+      "surface-heat-current-mixed-generic",
+      "surface-heat-female-articulation",
+      "surface-heat-female-mixed-targets",
+      "surface-heat-female-owning",
+      "surface-heat-female-public",
+      "surface-heat-female-quality",
+      "surface-heat-male-articulation",
+      "surface-heat-male-mixed-targets",
+      "surface-heat-male-owning",
+      "surface-heat-male-public",
+      "surface-heat-male-quality",
+      "surface-heat-native",
+      "surface-heat-native-female-owning",
+      "surface-heat-native-female-public",
+      "surface-heat-native-male-owning",
+      "surface-heat-native-male-public",
+      "vrm1-attachment-openxr",
+      "vrm1-source-export"
+    ],
+    "junit_sha256": {
+      "mixed-surface-heat.xml": "e3f8aca154dac71bbcffc7e5ffda51ebf5cd4812354e805ec3a1e386c0e137d1",
+      "mixed-vrm-retopo.xml": "f07aa3fbf9dba5aa6c1e964ad24cc91ad103258c07b0cb332b5100a8d5d87dbf"
+    }
+  },
+  "mixed_retained_and_native": {
+    "source": "Genuinely unskinned glTF fixtures generated from both repository CC0 VRoid bases",
+    "each_selection_order_exact_against_isolated_binds": true,
+    "changes_only_explicit_recipients": true,
+    "cancellation_exact": true,
+    "ordered_document_save_cold_reopen_and_one_undo_redo_exact": true,
+    "release_matches_asan_ubsan_opt_in_headless_reference": {
+      "female": {
+        "checks": 10,
+        "ordered_save_sha256": "cb633926eb4403a4a74ee452396e0bea2f4eb7e450d6ca3628bce819a4d25d70"
+      },
+      "male": {
+        "checks": 10,
+        "ordered_save_sha256": "97a48c703f975d3661163a8f874eb1f8a8ce462ee4b8a69dfdfb88d0be3dbcd1"
+      }
+    },
+    "preceding_product_reproduces_mixed_owner_rejection_on_both_bases": true
+  },
+  "vrm1_initial_reference_and_linked_accessory": {
+    "prior_order_defect_reproduced_using_preceding_header_and_core": true,
+    "current_project_exact_in_both_orders": true,
+    "preserves_original_joint_table": true
+  },
+  "synthetic_openxr": {
+    "scope": "Existing attachment, weight-transfer and single textured accessory Surface Heat routes",
+    "checks": 24,
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "surface_heat_stereo_submissions": 77,
+    "surface_heat_saved_project_matches_native": "9967112bcdc766a63f3571529ad3b3d90dd3b7543688e6a773fff1184ddb9849"
+  },
+  "nested_wayland": {
+    "passed_checks": [
+      "Native texture-set editor publishes the canonical Dome Sculpt Wayland identity",
+      "The actual Wayland universal menu enables Bind or transfer skin on the texture-set mesh",
+      "The skin dialog shares the native Wayland application identity",
+      "The skin dialog disables duplicate commands",
+      "Return defaults to Cancel and keeps the original project"
+    ],
+    "apply": "Nested pointer fixture timed out waiting for the Apply dialog to close",
+    "compositor_dma_buf": "/dev/dri/renderD129"
+  },
+  "open": [
+    "Mixed-target interaction through the actual Wayland and OpenXR frontends",
+    "Physical headset and broad automatic-weight and rig fitting qualification"
+  ]
+}

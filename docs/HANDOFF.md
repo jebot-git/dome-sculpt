@@ -754,6 +754,20 @@ pass in both Release and ASan/UBSan. An independent reader reconstructs all
 four GLB fixtures from their skin and morph accessors within 0.06 micrometres.
 [Retained texture-set skin validation](validation/retained-texture-set-skin-20261127.json)
 
+Surface Heat can bind retained avatar parts and native accessories to the
+same reference rig in one selected-mesh operation. Retained parts still
+authenticate against a complete source instance. Native objects use their
+own rest geometry. The two CC0 VRoid fixtures reproduce their independent
+bind results in either selection order. Cancellation, ordered Save, cold
+reopen, and one-step Undo/Redo retain the full scene. A VRM 1.0 reference
+receiving its first skin in the batch can also establish the accessory's
+original-joint link regardless of selection order. Twenty-three focused
+oneAPI Release cases pass. Both mixed CC0 fixtures pass the headless sanitizer
+reference and save byte-identically to Release. Synthetic OpenXR covers the
+existing linked-accessory bind on Intel Arc A770. Nested DomeD Wayland verifies
+the universal menu and default Cancel. The nested Apply input check timed out.
+[Mixed-target binding validation](validation/surface-heat-mixed-targets-20261128.json)
+
 Surface Heat now accepts editable retopology patches and their retained rig
 origins. Admission counts the stable topology records and shared patch
 owner before allocating a request. Plain and reflected, sheared source
