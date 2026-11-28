@@ -495,9 +495,18 @@ suites each pass 533 checks. Both fixtures pass Khronos validation with zero
 errors and warnings. Native DomeD Wayland and synthetic OpenXR produce the
 same visible-light GLB as the file worker. A CPU application configuration
 and a release CLI export with the GPU unavailable both fail explicitly.
-Physical emission on the same independently sampled object still needs
-its own Standard GLB compiler.
 [Mixed Standard GLB evidence](validation/mixed-source-hdr-20261128.json)
+
+An imported Core PBR object with a constant original emitter can now
+export HDR paint and other supported paint in the same Standard GLB
+primitive. The HDR fallback uses the writable atlas while original normal
+and metallic-roughness textures keep their sampling. Native package 7
+replays exact FLOAT32 scanlines and checks the atlas binding against the
+retained mesh, including splits for source tangent frames. The independent
+consumer matches the native preview within one output byte on Arc A770.
+Varying original emissive textures and typed MToon need their own Standard
+GLB HDR compilers.
+[Same-surface Standard HDR evidence](validation/single-surface-hdr-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with

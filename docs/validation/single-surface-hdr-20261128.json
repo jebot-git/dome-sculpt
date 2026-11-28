@@ -1,0 +1,74 @@
+{
+  "date": "2026-11-28",
+  "product": "4773ad6fc4b0636a29f94e38901626e474ba4b2c",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Standard GLB physical emission on the same imported Core PBR mesh as independent source normal and metallic-roughness roles.",
+  "baseline": "Standard GLB refused the original UV1 emitter before portable compilation.",
+  "format": {
+    "package_version": 7,
+    "native_domain": "prepared-source",
+    "writable_uv": 2,
+    "independent_normal_and_orm_uv": 1,
+    "raw_float_coefficients": true,
+    "exact_native_and_glb_round_trip": true
+  },
+  "arc": {
+    "device": "Intel Arc A770 with oneAPI Level Zero and hardware EGL",
+    "checks": 545,
+    "maximum_pixel_difference_bytes": 1
+  },
+  "release_ctest": [
+    "baked-emission-native",
+    "emission-raster-finite-compute",
+    "source-material-raster-compute",
+    "emission-raster-mapped-compute",
+    "emission-raster-mapped-missing-gpu",
+    "emission-raster-texture-set-compute",
+    "emission-export",
+    "emission-export-worker",
+    "source-paint-export",
+    "source-paint-bake",
+    "source-paint-authoring",
+    "source-paint-physical-authoring",
+    "vrm1-source-export",
+    "raw-hdr-authoring",
+    "xr-editable-export"
+  ],
+  "asan_ubsan": {
+    "mode": "opt-in headless CPU reference",
+    "checks": 545
+  },
+  "native_wayland": {
+    "checks": 7,
+    "artifact_sha256": "54fe8dccaaf6fc0ba69ace992aade6199eaea18b60dc5aa19d6bd6a444527971"
+  },
+  "openxr": {
+    "checks": 10,
+    "synthetic_tracking": true,
+    "artifact_sha256": "54fe8dccaaf6fc0ba69ace992aade6199eaea18b60dc5aa19d6bd6a444527971",
+    "native_sha256": "da51f38f362429216fa72d2b44dc8aef4935860894519b459d4e3dd2f78569aa"
+  },
+  "khronos": {
+    "validator": "2.0.0-dev.3.10",
+    "bytes": 372268,
+    "sha256": "54fe8dccaaf6fc0ba69ace992aade6199eaea18b60dc5aa19d6bd6a444527971",
+    "errors": 0,
+    "warnings": 0
+  },
+  "rehashed_owner_refusals": [
+    "Prepared HDR emitted positions or UVs differ from native paint",
+    "Prepared HDR emissive texture requires its actual writable sampler",
+    "Prepared HDR package has no prepared-source witness"
+  ],
+  "prior_glbs_byte_identical": {
+    "mixed-source.glb": "ff769fff8afebfb62309e67abf0bc5efc1843dc13151d909bb2d981ebe9c84fa",
+    "mixed-source-hidden.glb": "484678692c4aad88173eb79876d79241c09895fa3faf1a52c04020612a689f5d",
+    "spatial-color.glb": "e68f51a66633e6f97b50b960578072e9968b38851e87419a4027ff42e54824a0",
+    "uniform-coat.glb": "46fa973d49b84e51227102181a397a220b179df61a1b56bae704f60a2d91e759",
+    "uniform-mask-cross.glb": "98e526883365742fef5b60880641cb918d3f4b761424f88089ab9c3a948b1b9a"
+  },
+  "open": [
+    "Independently varying original emissive textures, prepared typed MToon and baked-source HDR in Standard GLB.",
+    "Physical headset and other compute hardware qualification."
+  ]
+}

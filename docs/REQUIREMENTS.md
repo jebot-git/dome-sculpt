@@ -144,10 +144,15 @@ Both paths keep the original alpha texture bytes and sampling.
 
 Standard GLB applies the same prepared-source paint compiler in scenes with
 a separate physical light. It retains visible HDR fields as FLOAT32 and
-recovers the full native project, including hidden physical owners. Physical
-emission on a prepared-source object with its own independent sampling
-still needs a Standard GLB compiler.
+recovers the full native project, including hidden physical owners.
 [Mixed Standard GLB evidence](validation/mixed-source-hdr-20261128.json)
+
+Prepared-source Core PBR objects can also carry their own HDR paint in
+Standard GLB when the effective original emitting backdrop is constant.
+The native package verifies retained triangle and writable UV ownership,
+replays FLOAT32 rows and preserves the original texture sampling for other
+roles. Varying original emissive textures and typed MToon remain open.
+[Same-surface Standard HDR evidence](validation/single-surface-hdr-20261128.json)
 
 ## Current validation — 2026-11-27
 

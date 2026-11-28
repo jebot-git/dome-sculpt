@@ -3,6 +3,25 @@
 The historical GLB-only scope below is preserved. The later qualified VRM and
 file-worker continuation is in [HDR-VRM-EXPORT.md](HDR-VRM-EXPORT.md).
 
+## Prepared-source Standard GLB
+
+The current Standard GLB writer can combine physical paint with a constant
+emitting background on an imported Core PBR mesh with a writable atlas. The
+effective original emitter can come from a material factor or an original
+texture with constant contributing channels. Other roles keep their own
+images and coordinates unless Standard GLB compiles their authored paint.
+
+Package version 7 uses the `prepared-source-domains` encoding suffix and
+bounded FLOAT32 scanlines. At least one field has `domain.kind` set to
+`prepared-source` and `domain.version` set to `1`. Its `domain.texCoord`
+identifies the writable atlas on the emitted mesh. The reader verifies
+ordered triangle positions and UVs, the fallback sampler and its reported
+error, then replays the exact FLOAT field from the native Scene. This
+supports vertex splits introduced when exporting source tangent frames.
+Varying original emission still requires the explicit portable compiler.
+
+## First GLB implementation
+
 This private component extends 06816fe. It is the first plain writable-mesh GLB
 adapter, not full HDR/VRM/source-coordinate or frontend admission. Root owns the
 separate Source28 renderer/import integration; this tree does not contain it.
