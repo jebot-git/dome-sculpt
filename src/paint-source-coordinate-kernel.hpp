@@ -12,32 +12,32 @@
 
 namespace dome::paint_compute {
 namespace coordinates {
-inline constexpr uint64_t sign=1ull<<63, hidden=1ull<<52;
+inline constexpr uint64_t sign=1ull<<63;
 inline constexpr uint64_t one=0x3ff0000000000000ull,two=0x4000000000000000ull;
 
 DOME_COORD_FN uint64_t subtract(uint64_t a,uint64_t b){
   return paint_grid::add(a,b^sign);
 }
-// Validated F32 coefficients and offsets bound both coordinates to ±30000.
-DOME_COORD_FN int truncated(uint64_t bits){
+// Keep the integral part as binary64. Typed MToon coordinates can exceed
+// the range of an integer type after the separately authored transforms.
+DOME_COORD_FN uint64_t truncated(uint64_t bits,bool even){
   const int exponent=int((bits>>52)&0x7ffu)-1023;
-  if(exponent<0)return 0;
-  const int magnitude=int((hidden|(bits&(hidden-1)))>>(52-exponent));
-  return bits&sign?-magnitude:magnitude;
+  if(exponent<int(even))return 0;
+  const int fraction=52-exponent+int(even);
+  if(fraction<=0)return bits;
+  return bits&~((1ull<<fraction)-1);
 }
 DOME_COORD_FN uint64_t wrap(uint64_t bits,int mode){
   if(!(bits&~sign))return 0;
   if(mode==33071)return bits&sign?0:bits>one?one:bits;
-  const int integral=truncated(bits);
   if(mode==33648){
-    auto r=subtract(bits,paint_grid::integer((integral/2)*2));
+    auto r=subtract(bits,truncated(bits,true));
     if(!(r&~sign))return 0;
     if((r&sign)&&(r&~sign))r=paint_grid::add(r,two);
     return r>one?subtract(two,r):r;
   }
-  const auto exact_integer=paint_grid::integer(integral);
-  const bool below=(bits&sign)&&(bits&~sign)&&bits!=exact_integer;
-  return subtract(bits,below?paint_grid::integer(integral-1):exact_integer);
+  const auto r=subtract(bits,truncated(bits,false));
+  return (r&sign)&&(r&~sign)?paint_grid::add(r,one):r;
 }
 DOME_COORD_FN float narrow(uint64_t bits){
   const auto word=paint_grid::narrow_float_bits(bits);

@@ -2,14 +2,54 @@
 
 #include "emission-raster-device.hpp"
 #include "emission-paint-access.hpp"
+#include "dome/mtoon.hpp"
 #include "paint-composite-backend.hpp"
 #include "source-texture-grid.hpp"
 #include <algorithm>
 #include <bit>
 #include <cmath>
+#include <limits>
 #include <unordered_map>
 
 namespace dome::detail {
+namespace {
+SourceTextureProducts typed_products(const PaintSourceTexture &source,const MToonTexture &slot,uint32_t r,
+                                     bool &coupled){
+  source.validate();
+  const auto bits=[](double value){return std::bit_cast<uint64_t>(value);};
+  const auto center=[r](uint32_t at){return double((float(at)+.5f)/r);};
+  const auto transformed=[&](uint32_t at,unsigned axis){return center(at)*slot.scale[axis]+slot.offset[axis];};
+  const auto representable=[&](unsigned axis){
+    constexpr double limit=std::numeric_limits<float>::max();
+    return std::abs(transformed(0,axis))<=limit&&std::abs(transformed(r-1,axis))<=limit;
+  };
+  // Each axis is monotone before FLOAT rounding. If its endpoints are valid,
+  // store the already-rounded axis in the retained affine sampler's terms.
+  // Overflowing axes stay with the per-texel device validation.
+  coupled=slot.rotation!=0||!representable(0)||!representable(1);
+  SourceTextureProducts result;
+  result.columns.reserve(r);
+  result.rows.reserve(r);
+  if(!coupled){
+    const auto &m=source.uv_transform;
+    result.transform={bits(m[4]),bits(m[5]),source.wrap_s,source.wrap_t};
+    for(uint32_t i=0;i<r;++i){
+      const double x=float(transformed(i,0)),y=float(transformed(i,1));
+      result.columns.push_back({bits(m[0]*x),bits(m[2]*x)});
+      result.rows.push_back({bits(m[1]*y),bits(m[3]*y)});
+    }
+    return result;
+  }
+  const double cosine=std::cos(slot.rotation),sine=std::sin(slot.rotation);
+  result.transform={bits(slot.offset[0]),bits(slot.offset[1]),source.wrap_s,source.wrap_t};
+  for(uint32_t i=0;i<r;++i){
+    const double x=center(i)*slot.scale[0],y=center(i)*slot.scale[1];
+    result.columns.push_back({bits(cosine*x),bits(sine*x)});
+    result.rows.push_back({bits(-(sine*y)),bits(cosine*y)});
+  }
+  return result;
+}
+}
 emission_raster::PhysicalTile EmissionExportAccess::emission_tile(const PaintEmissionTile &tile){
   emission_raster::PhysicalTile view;
   for(unsigned k=0;k<7;++k)view.field.constants[k]=std::bit_cast<uint32_t>(tile.constants_[k]);
@@ -36,7 +76,7 @@ size_t emission_raster_staging_bytes(const PaintedMesh &paint) noexcept {
 
 std::unique_ptr<EmissionRasterDevice> create_emission_raster_device(
     const PaintedMesh &paint,std::span<const int32_t> padding,const PaintSourceTexture *source,
-    std::array<float,3> background,float strength,const std::function<bool()> &cancelled){
+    const MToonTexture *typed,std::array<float,3> background,float strength,const std::function<bool()> &cancelled){
   using namespace emission_raster;
   const auto stop=[&]{paint_compute::checkpoint(cancelled);};
   stop();
@@ -58,10 +98,13 @@ std::unique_ptr<EmissionRasterDevice> create_emission_raster_device(
     }
   }
   if(source&&source->image){
-    auto products=source_texture_products(*source,input.resolution,input.resolution);
+    auto products=typed?typed_products(*source,*typed,input.resolution,input.source_sampler.typed_transform):
+                        source_texture_products(*source,input.resolution,input.resolution);
     input.source=source->image->rgba;
-    input.source_sampler={nullptr,nullptr,nullptr,products.transform,source->image->width,source->image->height,
-                          source->mag_filter==9728};
+    input.source_sampler.coordinates={nullptr,nullptr,nullptr,products.transform,
+        source->image->width,source->image->height,source->mag_filter==9728};
+    if(input.source_sampler.typed_transform)for(unsigned k=0;k<source->uv_transform.size();++k)
+      input.source_sampler.sampler_affine[k]=std::bit_cast<uint32_t>(source->uv_transform[k]);
     input.columns=std::move(products.columns);
     input.rows=std::move(products.rows);
   }

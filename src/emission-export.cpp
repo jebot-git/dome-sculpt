@@ -66,17 +66,28 @@ EmissionExportRaster raster(const SculptObject &object,const std::function<bool(
  EmissionRgb original=toon?typed_background:object.material.emissive;if(binding&&binding->physical_emission)original=*binding->physical_emission;
  const bool source_overridden=binding&&binding->physical_emission;
  const bool typed_sampler=toon&&typed_emission.image&&!source_overridden;
- if(compute_backend()!="CPU"&&!typed_sampler){
+ if(compute_backend()!="CPU"){
   struct State {
    std::mutex mutex;
    std::unique_ptr<EmissionRasterDevice> device;
   };
   auto state=std::make_shared<State>();
   PaintSourceTexture source;
-  if(!toon&&!source_overridden&&maps)source=maps->emission;
+  std::optional<MToonTexture> transform;
+  if(typed_sampler){
+    source=typed_emission;
+    // The admitted VRM 0.0 shared transform is identity. At time zero
+    // both legacy animation conjugation and the VRM 1.0 pivot are exact
+    // identities on the native power-of-two texel centers.
+    if(toon->version()==MToonVersion::V1){
+      const auto &slot=toon->textures[size_t(MToonSlot::Emission)];
+      if(slot.offset!=std::array<float,2>{}||slot.scale!=std::array<float,2>{1,1}||slot.rotation!=0)
+        transform=slot;
+    }
+  }else if(!toon&&!source_overridden&&maps)source=maps->emission;
   // Metadata-only qualification does not allocate an upload. Scanline
   // readers retain the same immutable, device-resident grid across passes.
-  auto read=[state,owner=paint.snapshot(),padding,source=std::move(source),original,legacy_strength,r,cancelled]
+  auto read=[state,owner=paint.snapshot(),padding,source=std::move(source),transform,original,legacy_strength,r,cancelled]
             (uint32_t y0,std::span<EmissionExrPixel> rows){
     const size_t first=size_t(y0)*r;
     if(first>padding.size()||rows.size()>padding.size()-first)
@@ -85,7 +96,8 @@ EmissionExportRaster raster(const SculptObject &object,const std::function<bool(
     if(rows.empty())return;
     std::lock_guard lock(state->mutex);
     if(!state->device)
-      state->device=create_emission_raster_device(*owner,padding,&source,original,legacy_strength,cancelled);
+      state->device=create_emission_raster_device(*owner,padding,&source,transform?&*transform:nullptr,
+                                                  original,legacy_strength,cancelled);
     state->device->read(first,rows,cancelled);
   };
   return {r,baked_float?2u:1u,storage+emission_raster_staging_bytes(paint),std::move(read)};

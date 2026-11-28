@@ -7,7 +7,7 @@
 #include <cstddef>
 #include <span>
 
-namespace dome {struct PaintSourceTexture;}
+namespace dome {struct MToonTexture;struct PaintSourceTexture;}
 namespace dome::detail {
 class EmissionRasterDevice {
 public:
@@ -17,7 +17,7 @@ public:
 };
 
 std::unique_ptr<EmissionRasterDevice> create_emission_raster_device(
-    const PaintedMesh &,std::span<const int32_t>,const PaintSourceTexture *,
+    const PaintedMesh &,std::span<const int32_t>,const PaintSourceTexture *,const MToonTexture *,
     std::array<float,3> background,float strength,const std::function<bool()> &);
 size_t emission_raster_staging_bytes(const PaintedMesh &) noexcept;
 
@@ -43,6 +43,8 @@ struct Bake {
 struct Source {
   paint_compute::SourceCoordinateJob coordinates;
   const uint8_t *rgba=nullptr;
+  uint32_t sampler_affine[6]{};
+  bool typed_transform=false;
 };
 struct Input {
   std::span<const int32_t> padding;
@@ -54,7 +56,7 @@ struct Input {
   std::span<const uint8_t> legacy_bake,bake_coverage;
   std::span<const uint8_t> source;
   std::vector<paint_compute::SourceTerms> columns,rows;
-  paint_compute::SourceCoordinateJob source_sampler;
+  Source source_sampler;
   std::array<uint32_t,3> background{};
   uint32_t strength=0,resolution=0;
   bool physical_bake=false;

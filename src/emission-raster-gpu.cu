@@ -17,9 +17,10 @@ namespace {
 void checked(DOME_RUNTIME_ERROR status){
   if(status!=DOME_DEVICE(Success))throw std::runtime_error(DOME_DEVICE(GetErrorString)(status));
 }
+template<bool typed>
 __global__ void render_pixels(DeviceInput input,size_t first,size_t count,uint32_t *out){
   const size_t index=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
-  if(index<count)emission_raster::render(input,first+index,out+10*index);
+  if(index<count)emission_raster::render<false,typed>(input,first+index,out+10*index);
 }
 class Device {
 public:
@@ -47,7 +48,9 @@ public:
   }
   void render(DeviceInput input,size_t first,size_t count,uint32_t *out){
     constexpr size_t block=128;
-    render_pixels<<<(count+block-1)/block,block,0,stream_>>>(input,first,count,out);
+    if(input.source.typed_transform)
+      render_pixels<true><<<(count+block-1)/block,block,0,stream_>>>(input,first,count,out);
+    else render_pixels<false><<<(count+block-1)/block,block,0,stream_>>>(input,first,count,out);
     checked(DOME_DEVICE(GetLastError)());
   }
 private:

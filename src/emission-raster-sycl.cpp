@@ -5,6 +5,7 @@
 
 namespace dome::detail::emission_raster {
 void launch_bake(sycl::queue &,DeviceInput,size_t,size_t,uint32_t *);
+void launch_typed(sycl::queue &,DeviceInput,size_t,size_t,uint32_t *);
 
 namespace {
 class Device {
@@ -26,6 +27,10 @@ public:
   void upload(void *device,const void *host,size_t bytes){queue_.memcpy(device,host,bytes).wait_and_throw();}
   void download(void *host,const void *device,size_t bytes){queue_.memcpy(host,device,bytes).wait_and_throw();}
   void render(DeviceInput input,size_t first,size_t count,uint32_t *out){
+    if(input.source.typed_transform){
+      launch_typed(queue_,input,first,count,out);
+      return;
+    }
     if(!input.layer_count&&!input.source.rgba){
       launch_bake(queue_,input,first,count,out);
       return;

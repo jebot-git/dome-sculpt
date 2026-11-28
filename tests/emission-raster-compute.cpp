@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "dome/scene.hpp"
+#include "dome/material-bindings.hpp"
 #include "dome/source-maps.hpp"
 #include "emission-export.hpp"
 #include <chrono>
@@ -25,6 +26,7 @@ Mesh mesh(){
   return quad;
 }
 enum class Fixture { Paint, LegacyBake, DenseBake, PackedBake, BakeOnly };
+enum class Typed { None, Legacy, Rotated, Wide, ZeroStrength };
 Scene model(Fixture fixture){
   Scene scene;
   auto &object=scene.active();
@@ -97,6 +99,35 @@ Scene model(Fixture fixture){
   paint->layer_properties("Hidden physical paint",false,1);
   return scene;
 }
+void sample_typed(Scene &scene,Typed fixture){
+  auto &owner=scene.active();
+  auto binding=std::make_shared<SourceMaterialBindings>();
+  const size_t role=size_t(MToonSlot::Emission);
+  if(fixture==Typed::Legacy)
+    binding->material=MToonMaterial::from_vrm0({{"shader","VRM/MToon"},{"textureProperties",{{"_EmissionMap",0}}}});
+  auto &slot=binding->material.textures[role];
+  slot.index=0;
+  auto &image=binding->roles[role];
+  image=owner.painted->source_maps()->emission;
+  binding->material.parameters.emission={.41f,.19f,.82f};
+  binding->material.parameters.emission_strength=fixture==Typed::ZeroStrength?0.f:
+                                                 fixture==Typed::Legacy?1.f:4.375f;
+  binding->native_reference.emission={.41f,.19f,.82f};
+  owner.material.emissive={.53f,.27f,.94f};
+  if(fixture!=Typed::Legacy){
+    slot.rotation=.4315f;
+    slot.offset={-.1281f,.413f};
+    slot.scale={-1.1357f,.837f};
+  }
+  if(fixture==Typed::Wide){
+    slot.rotation=0;
+    slot.offset={0x1.304p31f,0x1p60f};
+    slot.scale={0x1p35f,-0x1p36f};
+    image.uv_transform={1.375f,0,0x1p-30f,-1.f,-.25f,.25f};
+    image.mag_filter=9729;
+  }
+  owner.material_bindings=std::move(binding);
+}
 
 using Pixel=detail::EmissionExrPixel;
 bool exact(std::span<const Pixel> a,std::span<const Pixel> b){
@@ -116,22 +147,25 @@ std::string_view wrapped_backend() asm("__wrap__ZN4dome15compute_backendEv");
 std::string_view wrapped_backend(){return host_reference?"CPU":actual_backend();}
 
 int main(int argc,char **argv)try{
-  if(argc>1&&std::string_view(argv[1])=="--missing"){
-    const auto scene=model(Fixture::Paint);
-    auto raster=detail::export_emission_raster(scene.active(),{},false);
+  if(argc>1&&std::string_view(argv[1]).starts_with("--missing")){
+    const bool typed=std::string_view(argv[1])=="--missing-typed";
+    auto scene=model(Fixture::Paint);
+    if(typed)sample_typed(scene,Typed::Rotated);
+    auto raster=detail::export_emission_raster(scene.active(),{},typed);
     Pixel one;
     try{raster.read(10,std::span(&one,1));}
     catch(const std::exception &error){std::cout<<"REFUSED "<<error.what()<<'\n';return 0;}
     throw std::runtime_error("Missing selected device returned a FLOAT raster");
   }
-  for(auto fixture:{Fixture::BakeOnly,Fixture::Paint,Fixture::LegacyBake,Fixture::DenseBake,Fixture::PackedBake}){
-    const auto scene=model(fixture);
+  const auto compare=[](Fixture fixture,Typed typed){
+    auto scene=model(fixture);
+    if(typed!=Typed::None)sample_typed(scene,typed);
     const auto owner=scene.active().painted->baked();
     const auto layers=scene.active().painted->layers();
     auto cancelled=false;
-    auto device=detail::export_emission_raster(scene.active(),[&]{return cancelled;},false);
+    auto device=detail::export_emission_raster(scene.active(),[&]{return cancelled;},typed!=Typed::None);
     host_reference=true;
-    auto reference=detail::export_emission_raster(scene.active(),{},false);
+    auto reference=detail::export_emission_raster(scene.active(),{},typed!=Typed::None);
     host_reference=false;
     check(device.version==reference.version&&device.resolution==reference.resolution,"Raster metadata must be preserved");
     std::vector<Pixel> before(size_t(resolution)*resolution),after(before.size());
@@ -155,7 +189,30 @@ int main(int argc,char **argv)try{
       check(layers[layer].tiles==scene.active().painted->layers()[layer].tiles&&
             layers[layer].emission_tiles==scene.active().painted->layers()[layer].emission_tiles,
             "Selected device replaced editable layer tiles");
-    std::cout<<"PASS "<<int(fixture)<<' '<<before.size()<<" exact FLOAT pixels on "<<actual_backend()
+    std::cout<<"PASS fixture="<<int(fixture)<<" typed="<<int(typed)<<' '<<before.size()<<" exact FLOAT pixels on "<<actual_backend()
              <<" in "<<ms<<" ms, host reference "<<reference_ms<<" ms\n";
+  };
+  for(auto fixture:{Fixture::BakeOnly,Fixture::Paint,Fixture::LegacyBake,Fixture::DenseBake,Fixture::PackedBake})
+    compare(fixture,Typed::None);
+  compare(Fixture::Paint,Typed::Legacy);
+  compare(Fixture::PackedBake,Typed::Rotated);
+  compare(Fixture::DenseBake,Typed::Wide);
+  compare(Fixture::LegacyBake,Typed::ZeroStrength);
+  auto overflow=model(Fixture::Paint);
+  sample_typed(overflow,Typed::Rotated);
+  auto binding=std::make_shared<SourceMaterialBindings>(*overflow.active().material_bindings);
+  auto &slot=binding->material.textures[size_t(MToonSlot::Emission)];
+  slot.rotation=0;
+  slot.scale={std::numeric_limits<float>::max(),1};
+  slot.offset={std::numeric_limits<float>::max(),0};
+  overflow.active().material_bindings=std::move(binding);
+  for(bool reference:{false,true}){
+    host_reference=reference;
+    auto raster=detail::export_emission_raster(overflow.active(),{},true);
+    Pixel pixel;
+    bool refused=false;
+    try{raster.read(7,std::span(&pixel,1));}
+    catch(const std::runtime_error &error){refused=std::string_view(error.what())=="MToon UV overflow";}
+    check(refused,"MToon export must refuse an overflowing FLOAT coordinate");
   }
 }catch(const std::exception &error){std::cerr<<error.what()<<'\n';return 1;}

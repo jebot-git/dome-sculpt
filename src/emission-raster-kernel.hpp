@@ -32,7 +32,7 @@ struct DeviceInput {
   uint32_t background[3]{},strength=0,resolution=0,layer_count=0,tiles_per_layer=0;
 };
 
-inline constexpr uint32_t one32=0x3f800000, max32=0x7f7fffff, invalid=0x7fc00000;
+inline constexpr uint32_t one32=0x3f800000, max32=0x7f7fffff, invalid=0x7fc00000, invalid_uv=0x7fc00001;
 inline constexpr uint64_t one64=0x3ff0000000000000ull, sign64=1ull<<63;
 
 DOME_EMISSION_FN uint32_t magnitude(uint32_t value){return value&0x7fffffffu;}
@@ -98,7 +98,24 @@ DOME_EMISSION_FN bool apply_layer(const DeviceInput &input,size_t layer,Entry en
   }
   return true;
 }
-template<bool bake_only=false>
+DOME_EMISSION_FN bool typed_taps(const Source &source,uint32_t x,uint32_t y,paint_compute::SourcePixelTaps &taps){
+  const auto &job=source.coordinates;
+  const auto column=job.columns[x],row=job.rows[y];
+  const auto u=sum64(sum64(column.u,row.u),job.transform.offset_u);
+  const auto v=sum64(sum64(column.v,row.v),job.transform.offset_v);
+  if((u&~sign64)>widen(max32)||(v&~sign64)>widen(max32))return false;
+  // mtoon_uv returns float UVs before the independently retained image
+  // sampler applies its affine transform in binary64.
+  const auto uf=widen(narrow(u)),vf=widen(narrow(v));
+  const auto *m=source.sampler_affine;
+  const auto s=sum64(sum64(product64(widen(m[0]),uf),product64(widen(m[1]),vf)),widen(m[4]));
+  const auto t=sum64(sum64(product64(widen(m[2]),uf),product64(widen(m[3]),vf)),widen(m[5]));
+  taps={paint_compute::coordinates::axis(s,job.width,job.transform.wrap_s,job.nearest),
+        paint_compute::coordinates::axis(t,job.height,job.transform.wrap_t,job.nearest)};
+  return true;
+}
+
+template<bool bake_only=false,bool typed=false>
 DOME_EMISSION_FN void render(const DeviceInput &input,size_t at,uint32_t *destination){
   const auto owner=input.padding[at];
   const auto source=owner<0?at:size_t(owner);
@@ -117,7 +134,10 @@ DOME_EMISSION_FN void render(const DeviceInput &input,size_t at,uint32_t *destin
     }
     if(input.source.rgba){
       const auto &job=input.source.coordinates;
-      const auto taps=paint_compute::source_coordinates(job,x,y);
+      paint_compute::SourcePixelTaps taps;
+      if constexpr(typed){
+        if(!typed_taps(input.source,x,y,taps)){destination[0]=invalid_uv;return;}
+      }else taps=paint_compute::source_coordinates(job,x,y);
       float source_rgba[4];
       paint_compute::sample_source_taps(input.source.rgba,job.width,job.nearest,taps,true,*input.quantization,source_rgba);
       for(unsigned k=0;k<3;++k)background[k]=product(background[k],paint_compute::bits(source_rgba[k]));

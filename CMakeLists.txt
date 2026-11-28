@@ -44,7 +44,8 @@ elseif(DOME_COMPUTE_BACKEND STREQUAL "ONEAPI")
   endif()
   set(compute_source src/backend_sycl.cpp)
   set(paint_compute_source src/paint-composite-sycl.cpp src/paint-grid-sycl.cpp
-    src/paint-source-coordinate-sycl.cpp src/emission-raster-sycl.cpp src/emission-raster-bake-sycl.cpp)
+    src/paint-source-coordinate-sycl.cpp src/emission-raster-sycl.cpp
+    src/emission-raster-bake-sycl.cpp src/emission-raster-typed-sycl.cpp)
 else()
   message(FATAL_ERROR "Unknown DOME_COMPUTE_BACKEND=${DOME_COMPUTE_BACKEND}")
 endif()

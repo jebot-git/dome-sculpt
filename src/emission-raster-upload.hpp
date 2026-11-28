@@ -42,8 +42,8 @@ public:
     }
     stop();
     if(!input.source.empty()){
+      view_.source=input.source_sampler;
       view_.source.rgba=upload(input.source);
-      view_.source.coordinates=input.source_sampler;
       view_.source.coordinates.columns=upload(std::span(input.columns));
       view_.source.coordinates.rows=upload(std::span(input.rows));
     }
@@ -59,8 +59,11 @@ public:
       auto batch=rows.first(std::min(rows.size(),chunk_pixels));
       device_.render(view_,first,batch.size(),output_);
       device_.download(batch.data(),output_,batch.size_bytes());
-      for(const auto &pixel:batch)for(unsigned k=0;k<3;++k)if(!std::isfinite(pixel[k]))
-        throw std::invalid_argument("GPU emission produced an invalid native FLOAT coefficient or radiance");
+      for(const auto &pixel:batch){
+        if(std::bit_cast<uint32_t>(pixel[0])==invalid_uv)throw std::runtime_error("MToon UV overflow");
+        for(unsigned k=0;k<3;++k)if(!std::isfinite(pixel[k]))
+          throw std::invalid_argument("GPU emission produced an invalid native FLOAT coefficient or radiance");
+      }
       rows=rows.subspan(batch.size());
       first+=batch.size();
     }
