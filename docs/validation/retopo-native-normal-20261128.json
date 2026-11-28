@@ -1,0 +1,264 @@
+{
+  "date": "2026-11-28",
+  "product": "0818b4f1b05951afcbe3c80d5e7e27bfe0f6e8d8",
+  "preceding": "b4cbb9940f35fb5ad1985a6ec33f4d7486061590",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "GPU texel blending, Bake alpha preservation and continuous angular certification for aligned native MToon normal Bake exports. Standalone retopology and regular texture-set materials share the bounded raster.",
+  "arc_a770_release": {
+    "application_sha256": "26652327917d36a8140675f42bebc42683795f5135beb2703edca25bf7e17e2e",
+    "ctest": {
+      "cases": 83,
+      "log_sha256": "97b0877b692308672ed2a5a77b3f17b8d21ba8fd8ce106cbb6744ee9c7bdb69b"
+    },
+    "texture_set_renderer": {
+      "checks": 189,
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "fixtures": {
+        "ldr": {
+          "grid": 64,
+          "normal_error_bound_radians": 0.00626999,
+          "visible_pixels": 1094,
+          "maximum_rgb_error_in_byte_values": 1,
+          "alpha_differences": 0
+        },
+        "varying-ldr": {
+          "grid": 512,
+          "normal_error_bound_radians": 0.0101277,
+          "visible_pixels": 1093,
+          "maximum_rgb_error_in_byte_values": 1,
+          "alpha_differences": 0
+        },
+        "full-ldr": {
+          "grid": 64,
+          "normal_error_bound_radians": 0.0001,
+          "visible_pixels": 2576,
+          "maximum_rgb_error_in_byte_values": 0,
+          "alpha_differences": 0
+        },
+        "gain": {
+          "grid": 512,
+          "normal_error_bound_radians": 0.00626999,
+          "visible_pixels": 1093,
+          "maximum_rgb_error_in_byte_values": 1,
+          "alpha_differences": 0
+        },
+        "hdr": {
+          "grid": 512,
+          "normal_error_bound_radians": 0.00626999,
+          "visible_pixels": 1093,
+          "maximum_rgb_error_in_byte_values": 1,
+          "alpha_differences": 0
+        }
+      },
+      "raster_kernel_launches_in_suite": 132,
+      "gpu_trace_sha256": "ea0fa5802e5dccb5fd23f2492b8f1c1cf36f98b7a8fc8d84018662aaeeda7324"
+    },
+    "preceding_asset_comparison": {
+      "totals": {
+        "exact_dsculpt": 44,
+        "glb_certificate_metadata_only": 6,
+        "exact_glb": 56
+      },
+      "updated_proofs": {
+        "retopology-baked-mtoon-affine-openxr/mtoon-portable.glb": {
+          "binary_chunk_exact": true,
+          "only_json_changes": [
+            "maximumNormalErrorRadians",
+            "documentSha256"
+          ],
+          "preceding_maximum_radians": [
+            0.009546702831911405
+          ],
+          "current_maximum_radians": [
+            0.009547577006105885
+          ],
+          "sha256": "1c4e4fd66490dc5e06f47c827e3d9ecac27b7ea2ba07fda3c27553a7c6dc92fb"
+        },
+        "retopology-baked-mtoon-native/standalone-editable.glb": {
+          "binary_chunk_exact": true,
+          "only_json_changes": [
+            "maximumNormalErrorRadians",
+            "documentSha256"
+          ],
+          "preceding_maximum_radians": [
+            0.013399691942856982
+          ],
+          "current_maximum_radians": [
+            0.013400770406693144
+          ],
+          "sha256": "6a76a8c900f068e24b087e1ab33d7d7382d3f947d6070317a183fc687436fd88"
+        },
+        "retopology-baked-mtoon-native/standalone-standard.glb": {
+          "binary_chunk_exact": true,
+          "only_json_changes": [
+            "maximumNormalErrorRadians",
+            "documentSha256"
+          ],
+          "preceding_maximum_radians": [
+            0.013399691942856982
+          ],
+          "current_maximum_radians": [
+            0.013400770406693144
+          ],
+          "sha256": "691638569fa390b061867c927e988a5eae06987af1fe73019205bc8c70d08c09"
+        },
+        "retopology-float-mtoon-affine-openxr/mtoon-portable.glb": {
+          "binary_chunk_exact": true,
+          "only_json_changes": [
+            "maximumNormalErrorRadians",
+            "documentSha256"
+          ],
+          "preceding_maximum_radians": [
+            0.009546702831911405
+          ],
+          "current_maximum_radians": [
+            0.009547577006105885
+          ],
+          "sha256": "95ae1b1da8a0c7cc57632863c1795042a10ba7989cd05051ce2bdb5f83319458"
+        },
+        "retopology-float-mtoon-native/standalone-editable.glb": {
+          "binary_chunk_exact": true,
+          "only_json_changes": [
+            "maximumNormalErrorRadians",
+            "documentSha256"
+          ],
+          "preceding_maximum_radians": [
+            0.013399691942856982
+          ],
+          "current_maximum_radians": [
+            0.013400770406693144
+          ],
+          "sha256": "48f6607a691bfa2c19b7b6c00009f91dec273d1e45445540a1c551ba76918986"
+        },
+        "retopology-float-mtoon-native/standalone-standard.glb": {
+          "binary_chunk_exact": true,
+          "only_json_changes": [
+            "maximumNormalErrorRadians",
+            "documentSha256"
+          ],
+          "preceding_maximum_radians": [
+            0.013399691942856982
+          ],
+          "current_maximum_radians": [
+            0.013400770406693144
+          ],
+          "sha256": "2038f3aa72d0554eb7bb7667718f3ee795b19a8938839da0cec5307545c57d54"
+        }
+      }
+    },
+    "synthetic_openxr_aligned": {
+      "checks": 45,
+      "report_sha256": "ef990aa9fa41a6a621c23c576d1feef96610521fe7dede0255a30a8f7b1b509e"
+    },
+    "nested_domed_wayland_aligned": {
+      "checks": 10,
+      "dmabuf_render_node": "/dev/dri/renderD129",
+      "gpu_trace_sha256": "d1a459369e48c17b3e8da71d0b1971594532184c72d38ecd4ecd61f0c808a25b",
+      "report_sha256": "764803075f89f49ca3d11fc8ed96f3292a0862c2ae02ef35498c2ae7c65af39f"
+    }
+  },
+  "headless_numerical_test_reference": {
+    "cases": 29,
+    "log_sha256": "6634764718434225a3b8fe865fc91193026bff8de30ea94e67fd17ff8187e14d"
+  },
+  "arc_asan_ubsan": {
+    "instrumented_units": [
+      "texture-set-export.cpp",
+      "export.cpp",
+      "mtoon-normal-raster.cpp",
+      "texture-set-source-export.cpp"
+    ],
+    "aligned": {
+      "checks": 91,
+      "log_sha256": "d87555a1c35263e81a3c3dedf08f1658d954440ff4299e5217af8516df2e4c3b"
+    },
+    "independent": {
+      "checks": 106,
+      "log_sha256": "86ca4af99a5812b6d48ea552d776432c20ab8b5b415792ae59fa45ff37aee7b2"
+    }
+  },
+  "vendor_compile": {
+    "cuda": {
+      "compiled_translation_units": [
+        "texture-set-export.cpp",
+        "export.cpp",
+        "mtoon-normal-raster.cpp",
+        "paint-composite-gpu.cu"
+      ],
+      "log_sha256": "5c8d301d10aea8ea21922cf65c77b14412a3b2c4a9136cdf8407ae9d45bd2fa6"
+    },
+    "rocm": {
+      "compiled_translation_units": [
+        "texture-set-export.cpp",
+        "export.cpp",
+        "mtoon-normal-raster.cpp",
+        "paint-composite-gpu.cu"
+      ],
+      "log_sha256": "2cc3d36a6c82baa48e4d897d9d6aae86a411e22d501fb0900167093b74774987"
+    }
+  },
+  "khronos_zero_errors_or_warnings": {
+    "full-ldr-editable.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "045a0772d1b7c0cf84d59f57bc725140880d048e80a31d6003fae8ba61a28d1c"
+    },
+    "full-ldr-standard.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "c86b11c81f33dde9af58fdd8d1c229f9f3c6d17d6056c562cb4daf7e4e8cfe9c"
+    },
+    "gain-editable.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "6a744d6fb97d6213e60ba5153d23d4bb21ac6db457fa901b548b7023233de7eb"
+    },
+    "gain-standard.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "aba04961ef91be89bef3bd52b0499c5f72bf4e68a7a2bf4aa572c5d8426579d9"
+    },
+    "hdr-editable.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "546ea5fa0d9be40c87f8b36b7aa4b702474f69bba1832d063ff5115d0ea4e1e6"
+    },
+    "hdr-standard.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "4be6d3021e2572fd4922d6cee34915dbedc483f033f3554099706bb9b4bd88e9"
+    },
+    "ldr-editable.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "7204c6ab22d6f1d59978345ffb1f223b8a3cc0f2cccef0466f391d07fa078a8a"
+    },
+    "ldr-standard.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "69d0dcbc66b302f86c0cc12bc934a3de5fcf140054b00403b9557f655d072af7"
+    },
+    "mtoon-portable.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "be15e5aabccf246297a2898731f731b0a7c1565460e54f373253102737388086"
+    },
+    "standalone-editable.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "4d11c35af6736c32dd3912f64a3b853b80106d75854b274d798587eadb130050"
+    },
+    "standalone-standard.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "30ac5ad8bc99574fc633bbcdffc00ef8fd6f6563f6f45a95cc669d55feb320c9"
+    },
+    "varying-ldr-editable.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "eeb11e0ddc633f077cab98cd6ffad871e4120e78a71ee2cae9ed2b249333e0b9"
+    },
+    "varying-ldr-standard.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "fbe0f16e35b69707b93b6eaf7ecc664d1764408d8940cf04170665bf49c29c75"
+    },
+    "wayland-patch.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "18d9e7db6786dd36ab5a2149559417d8ef473b1d7b949713ce455f84d863a90a"
+    }
+  },
+  "vrm_official_schema_report_sha256": "869c94c8acd94b77e0c574ef9a0b88def24bf41c2f727f0ddb53377f4f6ca3e7",
+  "remaining_scope": [
+    "Broader normal sampler domains and production retopology assemblies",
+    "Positive CUDA and ROCm execution",
+    "Physical headset and full GPU-only Release qualification"
+  ]
+}

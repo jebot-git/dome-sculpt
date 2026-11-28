@@ -439,6 +439,12 @@ export worker budgets each resident input and the bounded scratch before
 dispatching. The 64² and 512² Arc texture-set cases include varying
 normals, full coverage, and HDR. Reimported Standard GLB matches the
 viewport within one RGB value with identical cutout alpha.
+Arc passes 83 selected regressions and 189 hardware graphics assertions.
+All 106 prior project and GLB binary payloads match. Six GLBs update their
+angular proof and associated document digest. Nested DomeD, synthetic
+OpenXR, aligned and independent sanitizer runs, and 14 Khronos and MToon
+validations pass. CUDA and ROCm compile the changed path.
+[Aligned MToon normal raster evidence](validation/retopo-native-normal-20261128.json)
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
