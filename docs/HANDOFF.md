@@ -127,8 +127,8 @@ use each role's retained UV set, transform, wrapping and filter. Baked maps use
 the original FLOAT texel-centre arithmetic. This also covers separate prepared
 PBR color and standalone tangent-normal image filtering. The worker reads
 bounded linear sample batches and shades in original atlas order. Arc matches
-16,384 independent baked-map
-samples bit for bit. The byte-identical 1024² original-material fixture drops
+16,384 independent baked-map samples bit for bit. The byte-identical 1024²
+original-material fixture drops
 from 0.73 to 0.42 seconds warm and rises from 6.09 to 7.11 seconds cold.
 [GPU Bake material evidence](validation/bake-material-gpu-20261128.json)
 
@@ -136,8 +136,12 @@ Raw Bake also uploads one material's immutable sparse paint tiles and existing
 baked coverage at a time. The selected GPU applies masks and opacity in layer
 order, resolves padding owners, and filters common color, separate PBR color,
 ORM and legacy emission over the sampled source maps. This covers paint-only
-materials without original role images. The worker retains raw normal-frame
+materials without original role images. Arc matched 3,556 samples against the
+native FLOAT reference. The five-layer 1024² fixture remained byte-identical.
+On that fixture, the warm Bake fell from 0.68 to 0.46 seconds and the first
+Bake rose from 7.23 to 9.76 seconds. The worker retains raw normal-frame
 evaluation, explicit FLOAT radiance resolvers and ordered publication.
+[GPU sparse Bake evidence](validation/bake-overlay-gpu-20261128.json)
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing

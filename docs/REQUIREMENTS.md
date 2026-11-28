@@ -46,6 +46,7 @@ device queue. It uses the original clamped FLOAT bilinear taps, padding owners,
 per-channel coverage and layer order, with distinct common/PBR color and
 independent baked AO. Explicit FLOAT radiance resolvers keep their existing
 authorship.
+[GPU sparse Bake evidence](validation/bake-overlay-gpu-20261128.json)
 
 Eligible 512–2048 current-grid RGB8 Bake materials now composite color, ORM
 and legacy emission on the selected GPU. Their ordered paint, coverage,

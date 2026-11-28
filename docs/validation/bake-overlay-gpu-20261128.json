@@ -1,0 +1,81 @@
+{
+  "date": "2026-11-28",
+  "product": "3fff9693283ac89c49f84aeec4ee2fbd02ee194e",
+  "preceding": "57004f855cb1a29588b15fb31c8f6b06df5d3da6",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Native Bake sparse paint composite and filtering on the build-selected GPU.",
+  "oneapi_arc_release": {
+    "application_sha256": "234aa06b9d076229f95c2c6f7e904ac16b3b33e8397eae51fcb9d901ef027c98",
+    "release_fltk_core_sha256": "35aa46ebf11f5f3a9772d926b05a24938572471d9dbcf3e2718e98376fadbdb3",
+    "regression": {
+      "passed": 27,
+      "junit_sha256": "ee06991967d2c1720f769645ee0b58ed5220a9de565f6aaf2dc0da7ca78ad019",
+      "full_log_sha256": "333a2c16d92fa5fbf24fcbf394744a5ca3373ccb9d4779ead80785dde32b624f",
+      "synthetic_openxr": 4
+    },
+    "sparse_samples": {
+      "count": 3556,
+      "exact_fields": [
+        "RGBA",
+        "prepared PBR RGBA",
+        "roughness",
+        "metallic",
+        "occlusion",
+        "legacy emission RGB"
+      ],
+      "variants": [
+        "unbaked",
+        "RGB8 bake",
+        "packed FLOAT bake",
+        "prepared PBR plus FLOAT bake"
+      ],
+      "immutable_owners_under_cancel": true,
+      "log_sha256": "18839835b41c6bdadf4627351e247b84559b93ebee810ba007d51b04321c85b9"
+    },
+    "benchmark_1024": {
+      "source_layers": 5,
+      "projected_texels": 1048576,
+      "projection_rays": 1048576,
+      "identical_native_project_sha256": "b5389445de56e410d5eed328ae9f46096dbdd217b056d3c65e791f83a53f5432",
+      "seconds_cold_then_warm": {
+        "preceding": [
+          7.22852,
+          0.679955
+        ],
+        "candidate": [
+          9.75744,
+          0.461001
+        ]
+      },
+      "log_sha256": "42341467a081b6241fe3202ba91029485406c09584d59e45a82f39d9d7ea6df8"
+    },
+    "wayland": {
+      "passed": 15,
+      "report_sha256": "3206993dcd5a5c556e4a8584dc324197fcbb72c60819d1efa07f2d98534a9aa7",
+      "runtime_maps_sha256": "959e91085c2c377082a4646bdd023ab3618d1d7b87f91dd8d0690631377c2905",
+      "log_sha256": "0acddefe1daf3a2bc8fff2f1d3645b2e0a2f8770970cea39ce08be444ec27253"
+    },
+    "no_device_refusal": "No device of requested type 'info::device_type::gpu' available."
+  },
+  "headless_reference": {
+    "passed": 4,
+    "log_sha256": "34f9c6123d960db259958ca2632b3948886ef2f563f18e8ba212b7502fc80799",
+    "bake_host_asan_ubsan_log_sha256": "28c18567cf614f71b7bec803c142703eea04ae5aa071ebe178f179667d87e85c"
+  },
+  "cuda_and_rocm": {
+    "cuda": {
+      "compiled_kernel_sha256": "6c0586ec8a35d09fdad31eee4270d8f89dbf4268b1f6a93840c911f58227df9f",
+      "no_device_refusal": "CUDA driver version is insufficient for CUDA runtime version"
+    },
+    "rocm": {
+      "compiled_kernel_sha256": "2e1509c10f954676f75745ae7988a191a27bbe724682e9b9194478f136ed08af",
+      "no_device_refusal": "no ROCm-capable device is detected"
+    }
+  },
+  "limits": [
+    "Raw normal-frame evaluation and explicit FLOAT radiance resolvers still run in the authoring worker.",
+    "The timing fixture has five sparse paint layers and no ambient rays. First-run time includes GPU program loading and compilation.",
+    "CUDA and ROCm compile and link the kernels. Positive AMD and NVIDIA execution and physical headset testing remain open.",
+    "Headless reference and sanitizer runs cover host code without the application frontends."
+  ]
+}
