@@ -8,6 +8,7 @@
 #include "gltf-document.hpp"
 #include "raw-source-emission.hpp"
 #include "emission-paint-access.hpp"
+#include "emission-raster-device.hpp"
 #include "paint-emission-sample.hpp"
 #include "native-paint-sampling.hpp"
 #include "native-grid-composite-work.hpp"
@@ -17,6 +18,7 @@
 #include <cstring>
 #include <tuple>
 #include "dome/color-paint-sampling.hpp"
+#include "dome/brush.hpp"
 #include <cmath>
 #include <set>
 #include <algorithm>
@@ -184,20 +186,36 @@ NativePhysicalField native_physical_field(const SculptObject &o,
     const float offset=-float(r/paint.resolution()-1)/(2*r);
     out.emission.texture_offset={offset,offset};
   }
-  std::vector<std::array<float,3>> radiance(pixels);std::array<float,3> peak{};
+  std::vector<EmissionRasterDevice::Radiance> radiance;
+  const auto *source_map=sampled_background?&maps->emission:nullptr;
+  if(compute_backend()!="CPU"){
+    const auto axis_bytes=r*(sizeof(SourceTextureAxis)+(sampled_background?2*sizeof(paint_compute::SourceTerms):0));
+    if(axis_bytes+emission_raster_staging_bytes(paint)>policy.max_working_bytes)
+      throw std::length_error("Native physical GPU staging exceeds working budget before allocation");
+    auto device=create_finite_emission_raster_device(paint,source_map,background,r,
+                                                    out.emission.texture_offset[0],cancelled);
+    radiance.resize(pixels);
+    device->read_finite(0,radiance,cancelled);
+  }else{
+    // Explicit headless numerical reference build.
+    radiance.resize(pixels);
+    for(size_t at=0;at<pixels;++at){if((at&1023)==0)stop();
+      const float u=(float(at%r)+.5f)/r-out.emission.texture_offset[0],
+                  v=(float(at/r)+.5f)/r-out.emission.texture_offset[1];
+      const auto overlay=sampler.sample(u,v);
+      const auto source=source_map?sample_source_texture(*source_map,u,v,true):std::array<float,4>{1,1,1,1};
+      for(size_t k=0;k<3;++k){
+        const double value=double(background[k])*source[k]*(1-overlay.coverage)+overlay.legacy[k]+overlay.absolute[k];
+        if(!std::isfinite(value)||value<0||value>30000)throw std::invalid_argument("Native physical radiance is outside its finite range");
+        radiance[at][k]=float(value);
+      }
+    }
+  }
+  std::array<float,3> peak{};
+  for(size_t at=0;at<pixels;++at){if((at&1023)==0)stop();
+    for(size_t k=0;k<3;++k)peak[k]=std::max(peak[k],radiance[at][k]);}
   auto linear=[](float v){return v<=.04045f?v/12.92f:std::pow((v+.055f)/1.055f,2.4f);};
   auto srgb=[](float v){return v<=.0031308f?v*12.92f:1.055f*std::pow(v,1/2.4f)-.055f;};
-  for(size_t at=0;at<pixels;++at){if((at&1023)==0)stop();
-    const float u=(float(at%r)+.5f)/r-out.emission.texture_offset[0],
-                v=(float(at/r)+.5f)/r-out.emission.texture_offset[1];
-    const auto overlay=sampler.sample(u,v);
-    std::array<float,4> source{1,1,1,1};
-    if(maps&&maps->emission.image&&!(o.material_bindings&&o.material_bindings->physical_emission))
-      source=sample_source_texture(maps->emission,u,v,true);
-    for(size_t k=0;k<3;++k){const double value=double(background[k])*source[k]*(1-overlay.coverage)+overlay.legacy[k]+overlay.absolute[k];
-      if(!std::isfinite(value)||value<0||value>30000)throw std::invalid_argument("Native physical radiance is outside its finite range");
-      radiance[at][k]=float(value);peak[k]=std::max(peak[k],float(value));}
-  }
   auto &entry=out.emission;entry.strength=std::max({1.f,peak[0],peak[1],peak[2]});
   for(size_t k=0;k<3;++k)entry.factor[k]=peak[k]/entry.strength;
   entry.image={r,r,std::vector<uint8_t>(pixels*4)};

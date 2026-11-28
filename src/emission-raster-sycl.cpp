@@ -6,6 +6,7 @@
 namespace dome::detail::emission_raster {
 void launch_bake(sycl::queue &,DeviceInput,size_t,size_t,uint32_t *);
 void launch_typed(sycl::queue &,DeviceInput,size_t,size_t,uint32_t *);
+void launch_finite(sycl::queue &,DeviceInput,FiniteGrid,size_t,size_t,uint32_t *);
 
 namespace {
 class Device {
@@ -38,6 +39,9 @@ public:
     queue_.parallel_for(sycl::range<1>{count},[=](sycl::id<1> id){
       emission_raster::render(input,first+id[0],out+10*id[0]);
     });
+  }
+  void render_finite(DeviceInput input,FiniteGrid grid,size_t first,size_t count,uint32_t *out){
+    launch_finite(queue_,input,grid,first,count,out);
   }
 private:
   sycl::queue queue_;

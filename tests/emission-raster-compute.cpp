@@ -4,6 +4,8 @@
 #include "dome/material-bindings.hpp"
 #include "dome/source-maps.hpp"
 #include "emission-export.hpp"
+#include "emission-raster-device.hpp"
+#include "paint-emission-sample.hpp"
 #include <chrono>
 #include <cstring>
 #include <iostream>
@@ -140,6 +142,48 @@ bool exact(std::span<const Pixel> a,std::span<const Pixel> b){
   }
   return true;
 }
+
+void compare_finite(Fixture fixture,uint32_t extent,bool original){
+  const auto scene=model(fixture);
+  const auto &object=scene.active();
+  const auto &paint=*object.painted;
+  const auto *source=original?&paint.source_maps()->emission:nullptr;
+  const float offset=!source&&extent>resolution?-float(extent/resolution-1)/(2*extent):0.f;
+  auto cancelled=false;
+  const auto stop=[&]{return cancelled;};
+  const auto begin=std::chrono::steady_clock::now();
+  auto device=detail::create_finite_emission_raster_device(paint,source,object.material.emissive,extent,offset,stop);
+  using Radiance=detail::EmissionRasterDevice::Radiance;
+  std::vector<Radiance> pixels(size_t(extent)*extent);
+  device->read_finite(0,pixels,stop);
+  const auto milliseconds=std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-begin).count();
+  const detail::PaintEmissionSampler sampler(paint);
+  for(size_t i=0;i<pixels.size();++i){
+    const float u=(float(i%extent)+.5f)/extent-offset,v=(float(i/extent)+.5f)/extent-offset;
+    const auto p=sampler.sample(u,v);
+    const auto s=source?sample_source_texture(*source,u,v,true):std::array<float,4>{1,1,1,1};
+    for(unsigned k=0;k<3;++k){
+      const float expected=float(double(object.material.emissive[k])*s[k]*(1-p.coverage)+p.legacy[k]+p.absolute[k]);
+      if(std::bit_cast<uint32_t>(expected)!=std::bit_cast<uint32_t>(pixels[i][k])){
+        std::cerr<<"Finite fixture "<<int(fixture)<<" resolution "<<extent<<" (source "<<original<<") pixel "<<i<<" channel "<<k
+                 <<": expected "<<std::hex<<std::bit_cast<uint32_t>(expected)<<" got "<<std::bit_cast<uint32_t>(pixels[i][k])<<std::dec<<'\n';
+        throw std::runtime_error("Selected device changed the finite FLOAT radiance");
+      }
+    }
+  }
+  const size_t first=19*extent+73;
+  std::vector<Radiance> stripe(2*extent+7);
+  cancelled=true;
+  bool refused=false;
+  try{device->read_finite(first,stripe,stop);}catch(const std::runtime_error &){refused=true;}
+  check(refused,"Cancellation must stop a finite GPU raster read");
+  cancelled=false;
+  device->read_finite(first,stripe,stop);
+  check(std::memcmp(pixels.data()+first,stripe.data(),stripe.size()*sizeof(Radiance))==0,
+        "Partial finite read after cancellation must preserve indexing");
+  std::cout<<"PASS finite fixture="<<int(fixture)<<" source="<<original<<" extent="<<extent<<' '
+           <<pixels.size()<<" exact RGB FLOAT pixels in "<<milliseconds<<" ms\n";
+}
 }
 
 std::string_view actual_backend() asm("__real__ZN4dome15compute_backendEv");
@@ -147,6 +191,31 @@ std::string_view wrapped_backend() asm("__wrap__ZN4dome15compute_backendEv");
 std::string_view wrapped_backend(){return host_reference?"CPU":actual_backend();}
 
 int main(int argc,char **argv)try{
+  if(argc>1&&std::string_view(argv[1])=="--finite"){
+    compare_finite(Fixture::BakeOnly,512,false);
+    compare_finite(Fixture::LegacyBake,256,false);
+    compare_finite(Fixture::Paint,512,true);
+    compare_finite(Fixture::DenseBake,1024,false);
+    compare_finite(Fixture::PackedBake,1024,true);
+    compare_finite(Fixture::DenseBake,256,true);
+    const auto scene=model(Fixture::BakeOnly);
+    auto device=detail::create_finite_emission_raster_device(*scene.active().painted,nullptr,{30001,0,0},512,0,{});
+    detail::EmissionRasterDevice::Radiance one;
+    bool refused=false;
+    try{device->read_finite(0,std::span(&one,1),{});}
+    catch(const std::invalid_argument &e){refused=std::string_view(e.what())=="Native physical radiance is outside its finite range";}
+    check(refused,"Finite GPU path must refuse above-range radiance before FLOAT rounding");
+    return 0;
+  }
+  if(argc>1&&std::string_view(argv[1])=="--missing-finite"){
+    const auto scene=model(Fixture::BakeOnly);
+    try{
+      auto finite=detail::create_finite_emission_raster_device(*scene.active().painted,nullptr,{2,0,0},512,0,{});
+      detail::EmissionRasterDevice::Radiance one;
+      finite->read_finite(0,std::span(&one,1),{});
+    }catch(const std::exception &e){std::cout<<"REFUSED "<<e.what()<<'\n';return 0;}
+    throw std::runtime_error("Missing selected device returned a finite FLOAT raster");
+  }
   if(argc>1&&std::string_view(argv[1]).starts_with("--missing")){
     const bool typed=std::string_view(argv[1])=="--missing-typed";
     auto scene=model(Fixture::Paint);

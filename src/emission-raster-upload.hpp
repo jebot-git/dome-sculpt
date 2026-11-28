@@ -22,7 +22,8 @@ public:
     view_.layers=upload(std::span(input.layers));
     view_.entries=upload(std::span(input.entries));
     view_.quantization=upload(std::span(&paint_compute::quantization(),1));
-    output_=allocate<uint32_t>(chunk_pixels*10);
+    finite_={upload(std::span(input.finite_axis)),uint32_t(input.finite_axis.size())};
+    output_=allocate<uint32_t>(chunk_pixels*(finite_.resolution?3:10));
     stop();
     upload_common(input.common,stop);
     upload_physical(input.physical,stop);
@@ -52,6 +53,7 @@ public:
 
   void read(size_t first,std::span<Pixel> rows,const std::function<bool()> &cancelled) override {
     static_assert(sizeof(Pixel)==10*sizeof(uint32_t));
+    if(finite_.resolution)throw std::logic_error("Expected an exact GPU emission raster");
     const auto size=size_t(view_.resolution)*view_.resolution;
     if(first>size||rows.size()>size-first)throw std::out_of_range("GPU emission read exceeds its owning grid");
     while(!rows.empty()){
@@ -65,6 +67,25 @@ public:
           throw std::invalid_argument("GPU emission produced an invalid native FLOAT coefficient or radiance");
       }
       rows=rows.subspan(batch.size());
+      first+=batch.size();
+    }
+    paint_compute::checkpoint(cancelled);
+  }
+
+  void read_finite(size_t first,std::span<Radiance> pixels,const std::function<bool()> &cancelled) override {
+    static_assert(sizeof(Radiance)==3*sizeof(uint32_t));
+    if(!finite_.resolution)throw std::logic_error("Expected a finite GPU emission raster");
+    const auto size=size_t(finite_.resolution)*finite_.resolution;
+    if(first>size||pixels.size()>size-first)throw std::out_of_range("GPU finite emission read exceeds its grid");
+    while(!pixels.empty()){
+      paint_compute::checkpoint(cancelled);
+      auto batch=pixels.first(std::min(pixels.size(),chunk_pixels));
+      device_.render_finite(view_,finite_,first,batch.size(),output_);
+      device_.download(batch.data(),output_,batch.size_bytes());
+      paint_compute::checkpoint(cancelled);
+      for(const auto &pixel:batch)if(std::bit_cast<uint32_t>(pixel[0])==invalid)
+        throw std::invalid_argument("Native physical radiance is outside its finite range");
+      pixels=pixels.subspan(batch.size());
       first+=batch.size();
     }
     paint_compute::checkpoint(cancelled);
@@ -128,6 +149,7 @@ private:
 
   Device device_;
   DeviceInput view_;
+  FiniteGrid finite_;
   uint32_t *output_=nullptr;
 };
 }

@@ -31,6 +31,10 @@ struct DeviceInput {
   Source source;
   uint32_t background[3]{},strength=0,resolution=0,layer_count=0,tiles_per_layer=0;
 };
+struct FiniteGrid {
+  const SourceTextureAxis *axis=nullptr;
+  uint32_t resolution=0;
+};
 
 inline constexpr uint32_t one32=0x3f800000, max32=0x7f7fffff, invalid=0x7fc00000, invalid_uv=0x7fc00001;
 inline constexpr uint64_t one64=0x3ff0000000000000ull, sign64=1ull<<63;
@@ -43,6 +47,9 @@ DOME_EMISSION_MATH uint64_t sum64(uint64_t a,uint64_t b){return paint_grid::add(
 DOME_EMISSION_FN uint32_t product(uint32_t a,uint32_t b){return narrow(product64(widen(a),widen(b)));}
 DOME_EMISSION_FN uint32_t sum(uint32_t a,uint32_t b){return narrow(sum64(widen(a),widen(b)));}
 DOME_EMISSION_FN uint64_t complement(uint32_t value){return sum64(one64,widen(value)^sign64);}
+DOME_EMISSION_MATH uint32_t finite_over(uint32_t below,uint32_t above,uint32_t coverage,uint32_t remaining){
+  return sum(product(below,remaining),product(above,coverage));
+}
 DOME_EMISSION_FN bool bounded(uint32_t value,uint32_t limit){
   return magnitude(value)==0||value<=limit;
 }
@@ -71,6 +78,7 @@ DOME_EMISSION_FN bool valid_coefficients(const uint32_t (&value)[7],bool physica
     if(!bounded(value[k],magnitude(value[6]))||!bounded(value[k+3],magnitude(limit)))return false;
   return true;
 }
+template<bool finite=false>
 DOME_EMISSION_FN bool apply_layer(const DeviceInput &input,size_t layer,Entry entry,size_t within,uint32_t (&value)[7]){
   if(entry.common==absent&&entry.physical==absent)return true;
   const CommonPixel common=entry.common==absent?CommonPixel{{0,0,0},0,255}:
@@ -84,18 +92,23 @@ DOME_EMISSION_FN bool apply_layer(const DeviceInput &input,size_t layer,Entry en
   }
   const auto opacity=product(input.layers[layer].opacity[common.mask],paint[6]);
   if(!magnitude(opacity))return true;
-  if(!valid_coefficients(value,input.bake.physical)||!bounded(opacity,one32))return false;
+  if constexpr(!finite)if(!valid_coefficients(value,input.bake.physical)||!bounded(opacity,one32))return false;
   const auto remaining=complement(opacity);
-  if(input.bake.physical){
-    for(unsigned k=0;k<7;++k){
-      const auto above=k==6?opacity:product(paint[k],opacity);
-      value[k]=narrow(sum64(sum64(0,widen(above)),product64(widen(value[k]),remaining)));
+  if constexpr(!finite){
+    if(input.bake.physical){
+      for(unsigned k=0;k<7;++k){
+        const auto above=k==6?opacity:product(paint[k],opacity);
+        value[k]=narrow(sum64(sum64(0,widen(above)),product64(widen(value[k]),remaining)));
+      }
+      return true;
     }
-  }else{
-    const auto residual=narrow(remaining);
-    for(unsigned k=0;k<6;++k)value[k]=sum(product(value[k],residual),product(paint[k],opacity));
-    value[6]=sum(product(value[6],residual),opacity);
   }
+  const auto residual=narrow(remaining);
+  for(unsigned k=0;k<6;++k){
+    if constexpr(finite)value[k]=finite_over(value[k],paint[k],opacity,residual);
+    else value[k]=sum(product(value[k],residual),product(paint[k],opacity));
+  }
+  value[6]=sum(product(value[6],residual),opacity);
   return true;
 }
 DOME_EMISSION_FN bool typed_taps(const Source &source,uint32_t x,uint32_t y,paint_compute::SourcePixelTaps &taps){
@@ -156,6 +169,64 @@ DOME_EMISSION_FN void render(const DeviceInput &input,size_t at,uint32_t *destin
     destination[k]=narrow(radiance);
   }
   for(unsigned k=0;k<7;++k)destination[3+k]=value[k];
+}
+
+// The finite view uses the editor's FLOAT over and bilinear filtering of
+// separately premultiplied roles, before resolving them against the material.
+DOME_EMISSION_FN void finite_texel(const DeviceInput &input,uint32_t x,uint32_t y,uint32_t (&value)[7]){
+  const auto owner=input.padding[size_t(y)*input.resolution+x];
+  if(owner<0)return;
+  base(input.bake,*input.quantization,size_t(owner),value);
+  x=uint32_t(owner)%input.resolution;
+  y=uint32_t(owner)/input.resolution;
+  const auto tile=(y/32)*(input.resolution/32)+x/32,within=(y%32)*32+x%32;
+  for(unsigned layer=0;layer<input.layer_count;++layer)
+    apply_layer<true>(input,layer,input.entries[size_t(layer)*input.tiles_per_layer+tile],within,value);
+}
+
+DOME_EMISSION_MATH uint32_t finite_lerp(uint32_t a,uint32_t b,uint32_t t){
+  // All seven coefficients are nonnegative. Match the reference lerp's
+  // zero endpoint formula and monotonic clamp for positive endpoints.
+  if(!magnitude(a)||!magnitude(b))return sum(product(t,b),product(narrow(complement(t)),a));
+  if(t==one32)return b;
+  const auto x=sum(a,product(t,sum(b,a^0x80000000u)));
+  return b>a?(x<b?x:b):(x>b?x:b);
+}
+
+DOME_EMISSION_FN void render_finite(const DeviceInput &input,FiniteGrid grid,size_t at,uint32_t *out){
+  const auto x=uint32_t(at%grid.resolution),y=uint32_t(at/grid.resolution);
+  const auto column=grid.axis[x],row=grid.axis[y];
+  const auto fx=paint_compute::bits(column.fraction),fy=paint_compute::bits(row.fraction);
+  const unsigned rows=fy&&row.first!=row.second?2:1,columns=fx&&column.first!=column.second?2:1;
+  uint32_t value[7]{};
+  for(unsigned j=0;j<rows;++j){
+    uint32_t filtered[7]{};
+    for(unsigned i=0;i<columns;++i){
+      uint32_t sample[7]{};
+      finite_texel(input,i?column.second:column.first,j?row.second:row.first,sample);
+      for(unsigned k=0;k<7;++k)filtered[k]=i?finite_lerp(filtered[k],sample[k],fx):sample[k];
+    }
+    for(unsigned k=0;k<7;++k)value[k]=j?finite_lerp(value[k],filtered[k],fy):filtered[k];
+  }
+
+  float source[4]{1,1,1,1};
+  if(input.source.rgba){
+    const auto &job=input.source.coordinates;
+    paint_compute::sample_source_taps(input.source.rgba,job.width,job.nearest,
+        paint_compute::source_coordinates(job,x,y),true,*input.quantization,source);
+  }
+  const auto residual=widen(narrow(complement(value[6])));
+  constexpr auto limit=std::bit_cast<uint64_t>(30000.0);
+  for(unsigned k=0;k<3;++k){
+    const auto background=product64(widen(input.background[k]),widen(paint_compute::bits(source[k])));
+    const auto shade=product64(background,residual);
+    const auto radiance=sum64(sum64(shade,widen(value[k])),widen(value[k+3]));
+    if((radiance&~sign64)>limit||(radiance>sign64)){
+      out[0]=invalid;
+      return;
+    }
+    out[k]=narrow(radiance);
+  }
 }
 }
 #undef DOME_EMISSION_MATH

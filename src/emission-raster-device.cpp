@@ -4,6 +4,7 @@
 #include "emission-paint-access.hpp"
 #include "dome/mtoon.hpp"
 #include "paint-composite-backend.hpp"
+#include "dome/source-maps.hpp"
 #include "source-texture-grid.hpp"
 #include <algorithm>
 #include <bit>
@@ -74,9 +75,11 @@ size_t emission_raster_staging_bytes(const PaintedMesh &paint) noexcept {
   return bytes;
 }
 
-std::unique_ptr<EmissionRasterDevice> create_emission_raster_device(
+namespace {
+std::unique_ptr<EmissionRasterDevice> create_raster(
     const PaintedMesh &paint,std::span<const int32_t> padding,const PaintSourceTexture *source,
-    const MToonTexture *typed,std::array<float,3> background,float strength,const std::function<bool()> &cancelled){
+    const MToonTexture *typed,std::array<float,3> background,float strength,
+    uint32_t finite_resolution,float offset,const std::function<bool()> &cancelled){
   using namespace emission_raster;
   const auto stop=[&]{paint_compute::checkpoint(cancelled);};
   stop();
@@ -86,6 +89,18 @@ std::unique_ptr<EmissionRasterDevice> create_emission_raster_device(
   Input input;
   input.padding=padding;
   input.resolution=paint.resolution();
+  if(finite_resolution){
+    if(finite_resolution>8192||!std::isfinite(offset)||(source&&offset!=0))
+      throw std::invalid_argument("Invalid GPU finite emission sampling grid");
+    input.finite_axis.reserve(finite_resolution);
+    const int last=int(input.resolution)-1;
+    for(uint32_t i=0;i<finite_resolution;++i){
+      const float uv=(float(i)+.5f)/finite_resolution-offset;
+      const float at=std::clamp(uv,0.f,1.f)*input.resolution-.5f;
+      const int first=int(std::floor(at));
+      input.finite_axis.push_back({std::clamp(first,0,last),std::clamp(first+1,0,last),at-first});
+    }
+  }
   for(unsigned k=0;k<3;++k)input.background[k]=std::bit_cast<uint32_t>(background[k]);
   input.strength=std::bit_cast<uint32_t>(strength);
   if(auto bake=paint.baked()){
@@ -98,8 +113,9 @@ std::unique_ptr<EmissionRasterDevice> create_emission_raster_device(
     }
   }
   if(source&&source->image){
+    const auto extent=finite_resolution?finite_resolution:input.resolution;
     auto products=typed?typed_products(*source,*typed,input.resolution,input.source_sampler.typed_transform):
-                        source_texture_products(*source,input.resolution,input.resolution);
+                        source_texture_products(*source,extent,extent);
     input.source=source->image->rgba;
     input.source_sampler.coordinates={nullptr,nullptr,nullptr,products.transform,
         source->image->width,source->image->height,source->mag_filter==9728};
@@ -118,8 +134,10 @@ std::unique_ptr<EmissionRasterDevice> create_emission_raster_device(
     const auto first_entry=input.entries.size();
     bool contributes=false;
     auto &scales=input.layers.emplace_back().opacity;
-    for(unsigned mask=0;mask<scales.size();++mask)
-      scales[mask]=std::bit_cast<uint32_t>((layer.opacity*float(mask))/255.f);
+    for(unsigned mask=0;mask<scales.size();++mask){
+      const float scale=finite_resolution?(float(mask)/255.f)*layer.opacity:(layer.opacity*float(mask))/255.f;
+      scales[mask]=std::bit_cast<uint32_t>(scale);
+    }
     for(size_t i=0;i<layer.tiles.size();++i){
       if((i&255)==0)stop();
       auto &entry=input.entries.emplace_back();
@@ -133,7 +151,7 @@ std::unique_ptr<EmissionRasterDevice> create_emission_raster_device(
         entry.common=found->second;
         if(inserted)input.common.push_back(tile);
       }
-      if(physical){
+      if(physical&&(!finite_resolution||tile)){
         contributes=true;
         const auto [found,inserted]=physical_ids.try_emplace(physical,input.physical.size());
         entry.physical=found->second;
@@ -153,5 +171,20 @@ std::unique_ptr<EmissionRasterDevice> create_emission_raster_device(
   }
   stop();
   return upload(input,cancelled);
+}
+}
+
+std::unique_ptr<EmissionRasterDevice> create_emission_raster_device(
+    const PaintedMesh &paint,std::span<const int32_t> padding,const PaintSourceTexture *source,
+    const MToonTexture *typed,std::array<float,3> background,float strength,const std::function<bool()> &cancelled){
+  return create_raster(paint,padding,source,typed,background,strength,0,0,cancelled);
+}
+
+std::unique_ptr<EmissionRasterDevice> create_finite_emission_raster_device(
+    const PaintedMesh &paint,const PaintSourceTexture *source,std::array<float,3> background,
+    uint32_t resolution,float offset,const std::function<bool()> &cancelled){
+  if(!resolution)throw std::invalid_argument("Missing GPU finite emission resolution");
+  return create_raster(paint,EmissionExportAccess::writable_padding(paint),source,nullptr,
+                       background,1,resolution,offset,cancelled);
 }
 }

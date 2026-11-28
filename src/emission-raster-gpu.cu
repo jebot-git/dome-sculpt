@@ -22,6 +22,10 @@ __global__ void render_pixels(DeviceInput input,size_t first,size_t count,uint32
   const size_t index=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
   if(index<count)emission_raster::render<false,typed>(input,first+index,out+10*index);
 }
+__global__ void render_finite_pixels(DeviceInput input,FiniteGrid grid,size_t first,size_t count,uint32_t *out){
+  const size_t index=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+  if(index<count)emission_raster::render_finite(input,grid,first+index,out+3*index);
+}
 class Device {
 public:
   Device(){
@@ -51,6 +55,11 @@ public:
     if(input.source.typed_transform)
       render_pixels<true><<<(count+block-1)/block,block,0,stream_>>>(input,first,count,out);
     else render_pixels<false><<<(count+block-1)/block,block,0,stream_>>>(input,first,count,out);
+    checked(DOME_DEVICE(GetLastError)());
+  }
+  void render_finite(DeviceInput input,FiniteGrid grid,size_t first,size_t count,uint32_t *out){
+    constexpr size_t block=128;
+    render_finite_pixels<<<(count+block-1)/block,block,0,stream_>>>(input,grid,first,count,out);
     checked(DOME_DEVICE(GetLastError)());
   }
 private:
