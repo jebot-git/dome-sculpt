@@ -112,9 +112,14 @@ Prepared-source HDR Editable GLB now resolves original emissive textures and
 layered FLOAT emission together on the selected GPU. Original UV sampling and
 the writable atlas retain their independent coordinates and filters. The
 worker reads final RGB radiance in budgeted batches for portable encoding.
-The remaining Core PBR overlay channels and physical headset qualification
-still require work.
 [Mapped source HDR evidence](validation/mapped-source-emission-gpu-20261128.json)
+
+The same prepared-source Editable GLB compiler now runs its Core PBR
+color, alpha, occlusion, roughness, metallic, and legacy emission overlay
+on the selected GPU. Original role samples stay on the device while the
+compositor resolves the sparse authored and baked layers. The work limit
+can stage a single original image without changing the compiled output.
+[Mapped source material evidence](validation/mapped-source-material-gpu-20261128.json)
 
 ## Current validation — 2026-11-27
 

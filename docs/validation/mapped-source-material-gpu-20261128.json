@@ -1,0 +1,211 @@
+{
+  "date": "2026-11-28",
+  "product": "4c925d71b2f98e3f8c258c48bdf2b674d62c7266",
+  "comparison": "056525880347db1cc0ae25a99ee9aa92b508106c",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Original Core PBR role samples and layered sparse color, opacity, ORM, coverage and byte-range emission compose on the selected GPU during prepared-source Editable GLB.",
+  "gpu": {
+    "device": "Intel Arc A770, oneAPI Level Zero, hardware EGL",
+    "exact_packed_samples": 16384,
+    "direct_sample_cases": [
+      {
+        "extent": 64,
+        "bake": false,
+        "budget_bytes": 6291456,
+        "capacity": 4096,
+        "samples": 4096
+      },
+      {
+        "extent": 64,
+        "bake": false,
+        "budget_bytes": 655360,
+        "capacity": 3397,
+        "samples": 4096
+      },
+      {
+        "extent": 128,
+        "bake": true,
+        "budget_bytes": 6291456,
+        "capacity": 16384,
+        "samples": 4096
+      },
+      {
+        "extent": 128,
+        "bake": true,
+        "budget_bytes": 655360,
+        "capacity": 2907,
+        "samples": 4096
+      }
+    ],
+    "bounded_working_bytes": 5734400,
+    "byte_identical_fixture_files": {
+      "ldr": {
+        "input0.glb": "538d68c53372fa8bef88ed05a9d52d2488fab0510816ebcfd33c7534b9fa8c5a",
+        "editable0.glb": "7a69618780daf06c6d35390f0e920030eff3e2e48774d7b9e1f6439b37a632c9",
+        "recovered0.dsculpt": "4463147ceb3456ce3285a245e3ff548253c403e7811a22eb29cfd503f0a23156",
+        "second0.glb": "7a69618780daf06c6d35390f0e920030eff3e2e48774d7b9e1f6439b37a632c9",
+        "input1.glb": "f8ed337a8dabbded960d65440a61934462937c1c3736baaf44c408061bd9097c",
+        "editable1.glb": "0613c213e2f7b9e869b19c3bae5c45742f2757ed937525d1a8fd000bcd164856",
+        "recovered1.dsculpt": "830aeb6c471d432d0a1a3cca2853cad15f06691ce532e8f1519d6acfeb438e60",
+        "second1.glb": "0613c213e2f7b9e869b19c3bae5c45742f2757ed937525d1a8fd000bcd164856",
+        "input2.glb": "0e42c382215736a049da88170f5d1af3715bdd4ad1ca307112bedd042fa85d97",
+        "editable2.glb": "d98c4d45f7b75a2f63f5665ab2ab5d3d497ab69a76c48605ddb6f2f81345e761",
+        "recovered2.dsculpt": "1c919ef488030cd7a4c603f4115a507cbe2132d92261e0075057d593237a2ebd",
+        "second2.glb": "d98c4d45f7b75a2f63f5665ab2ab5d3d497ab69a76c48605ddb6f2f81345e761",
+        "input3.glb": "afcea7c409cbf502ecdae1f1297d6ba1337514dfd8f022649f02519d0c88001a",
+        "editable3.glb": "e61e1aa214530b4296e8924837bc659496ddd503d1dd8c01a6538850ba7b405f",
+        "recovered3.dsculpt": "33ac1ab68bf9b2e41d61a3090b6f22bc43bfc0a02474c3773455e3f05b6de5ce",
+        "second3.glb": "e61e1aa214530b4296e8924837bc659496ddd503d1dd8c01a6538850ba7b405f",
+        "input4.glb": "06b9832715bbcd51ea70ebacf70429efeae5f5d15eea8e2f68a0d8eccdda7c55",
+        "editable4.glb": "a81a3ff21ee5f935bd920eb0b393af25c9f284ca38a734eaf61784480b890045",
+        "recovered4.dsculpt": "d3447d76f6aba48c5683248ba9af1fc9b9d66fd2796f30eb1d4f3dd49d7ed3fa",
+        "second4.glb": "a81a3ff21ee5f935bd920eb0b393af25c9f284ca38a734eaf61784480b890045",
+        "cancel-running.glb": "a81a3ff21ee5f935bd920eb0b393af25c9f284ca38a734eaf61784480b890045",
+        "cancel-queued.glb": "7581822007bf037c4c63973a5df7fe71bcc40e29add597f69b60615761f2eb90",
+        "cancel-ordered.dsculpt": "d3447d76f6aba48c5683248ba9af1fc9b9d66fd2796f30eb1d4f3dd49d7ed3fa",
+        "input5.glb": "c5ef788ec9d75d4ac553c9fade0144a7686f2c8de636c95801793d0594fffc13",
+        "editable5.glb": "e766b44c1a5d2a869d684191a3b4fa522006d1f658f04070f85a11f59fa9b9fb",
+        "recovered5.dsculpt": "da28c1f58667b524b16e74e4233dc5217357509c397cec468d521a309dfa38fc",
+        "second5.glb": "e766b44c1a5d2a869d684191a3b4fa522006d1f658f04070f85a11f59fa9b9fb",
+        "input6.glb": "2b407a16a07b4290249a3478148b2d8a976112330282d950815763f0feaaef0e",
+        "editable6.glb": "ad1d984541bb429726d3c2014308a5265f0228d73168afe558ce989c6955db33",
+        "recovered6.dsculpt": "467caaef417b09af976d6bdd621d0af52717aec3857a106e5448b1b40d9e820b",
+        "second6.glb": "ad1d984541bb429726d3c2014308a5265f0228d73168afe558ce989c6955db33",
+        "input7.glb": "9599d0905c3b65ecd32c2c0b467aa771ae2b6424e4d102105ee520f5892913b2",
+        "editable7.glb": "261f1fb365171b6c99a34500229c4cfca214c216eb666baaa3cb68b163058032",
+        "recovered7.dsculpt": "79ffa2d087dc3f74379a49aa203fbeeb627ee9e749597dddb0e477a7dd368152",
+        "second7.glb": "261f1fb365171b6c99a34500229c4cfca214c216eb666baaa3cb68b163058032",
+        "minification-input.glb": "a070661d5f7d33bf75190cbdeb6daaddd72a2014259c4b9096bb035cb3f6cf6b",
+        "minification-editable.glb": "2f864109fef9e69547bb3157e036b54d21e71c14ee470bf71def619502080499"
+      },
+      "hdr": {
+        "input0.glb": "1ad7e86a80cb40daf8c5053e7e669d8c10412a11abb7244e57b6206db0d90082",
+        "physical0.glb": "b789241a6dcd49c5727dab37c9efdd0e05df5c6666cc19b20a552f7f9c036752",
+        "recovered0.dsculpt": "4daaadf85dddfcf920893515d18b8cb184fc1214baa1c65c83496768cee3b58b",
+        "second0.glb": "b789241a6dcd49c5727dab37c9efdd0e05df5c6666cc19b20a552f7f9c036752",
+        "input1.glb": "4222d7a6129c4f07325c8924323f5f941f6b11ccc286da3865af1e5376563cde",
+        "physical1.glb": "b89cb6e7e023331552c42e0ab91e52e9de58880bd9312e9369483fba65bc2566",
+        "recovered1.dsculpt": "28d7b756b181df8a2c57e0f0de3003f6deb1e43368095c3cecad38a96c6bf109",
+        "second1.glb": "b89cb6e7e023331552c42e0ab91e52e9de58880bd9312e9369483fba65bc2566",
+        "input2.glb": "43da0935941e1cedfa505859c87529a9fc77185baeda8e961c40746aa9ab6630",
+        "physical2.glb": "9f461745dd1e556320dd51b7aa1d9eaaabc28a5d34a70136b443a63911724892",
+        "recovered2.dsculpt": "baba8b1ffd41264e33e40f1f6cd65cc3ecd19e7178f4050b563fe22e2813680c",
+        "second2.glb": "9f461745dd1e556320dd51b7aa1d9eaaabc28a5d34a70136b443a63911724892",
+        "input3.glb": "a7a49b922a2e2162cdd653ec40ce8992b5327cbe82ab0e69f02e93d07b4ce9af",
+        "physical3.glb": "4a142291ca4b5cf75281facfba3a0aa8ff53d177e778e5d997cbed6a4eb9b329",
+        "recovered3.dsculpt": "907c6960d7251cf40e9d9b58457f888e31b8a85bcb2cb06767ae8ed2aca074a7",
+        "second3.glb": "4a142291ca4b5cf75281facfba3a0aa8ff53d177e778e5d997cbed6a4eb9b329",
+        "input4.glb": "1ad7e86a80cb40daf8c5053e7e669d8c10412a11abb7244e57b6206db0d90082",
+        "physical4.glb": "40fc41036c7c3371519adf5c783e8c184ccffcf1d07ea040789b9d9926a917dc",
+        "recovered4.dsculpt": "0f1d9f552678b7f1e21b5826b94e4e717972eccc19f36128332913558aea9b5f",
+        "second4.glb": "40fc41036c7c3371519adf5c783e8c184ccffcf1d07ea040789b9d9926a917dc",
+        "input5.glb": "599562df2339151c950c4f3ffcc08f642d15d529b93dd351045461997cc48013",
+        "physical5.glb": "446ed1d79eb08f8b40cea0aefea45236c0e5da37ec87651a3c9745fa7600a036",
+        "recovered5.dsculpt": "d0eb9a92f97b14869c2ea9bf61b8bcffa6619093d2de913c43931acdee7a858d",
+        "second5.glb": "446ed1d79eb08f8b40cea0aefea45236c0e5da37ec87651a3c9745fa7600a036",
+        "input6.glb": "6df7da9f89c56a4cef168f36139d9a58548a86485b9eab420a4bfff40f7d94c1",
+        "physical6.glb": "88fc099dd8af1f99c37473c87ebaace1596748b9924b64a83c9a80a41ea69788",
+        "recovered6.dsculpt": "fe89a255474f32d4cd1df805a95537bfd4cfe9cea28e3fbaa973c0219d28c231",
+        "second6.glb": "88fc099dd8af1f99c37473c87ebaace1596748b9924b64a83c9a80a41ea69788"
+      }
+    }
+  },
+  "release_ctest": [
+    "emission-raster-finite-compute",
+    "source-material-raster-compute",
+    "emission-raster-mapped-compute",
+    "emission-raster-mapped-missing-gpu",
+    "emission-raster-texture-set-compute",
+    "source-paint-export",
+    "source-paint-bake",
+    "source-paint-authoring",
+    "source-paint-physical-authoring",
+    "vrm1-source-export",
+    "raw-hdr-authoring",
+    "xr-editable-export"
+  ],
+  "khronos_validator": {
+    "validator": "2.0.0-dev.3.10",
+    "bytes": 406620,
+    "sha256": "ad1d984541bb429726d3c2014308a5265f0228d73168afe558ce989c6955db33",
+    "errors": 0,
+    "warnings": 0
+  },
+  "asan_ubsan": {
+    "mode": "headless CPU reference",
+    "checks": {
+      "source-paint-authoring": 131,
+      "source-paint-physical-authoring": 128
+    }
+  },
+  "native_wayland": {
+    "checks": 8,
+    "artifact_sha256": "ad1d984541bb429726d3c2014308a5265f0228d73168afe558ce989c6955db33"
+  },
+  "openxr": {
+    "checks": 10,
+    "synthetic_tracking": true,
+    "artifact_sha256": "ad1d984541bb429726d3c2014308a5265f0228d73168afe558ce989c6955db33",
+    "before_and_after_native_sha256": "467caaef417b09af976d6bdd621d0af52717aec3857a106e5448b1b40d9e820b"
+  },
+  "device_admission": {
+    "oneapi": "Present Arc A770 executes both new kernels.",
+    "cuda": "Kernels compiled. No usable CUDA driver.",
+    "rocm": "Kernels compiled. No ROCm-capable device."
+  },
+  "timing": {
+    "workload": "512-pixel UV1 Core PBR Editable GLB export on Arc A770. Three alternating fresh processes per build with disk SYCL cache disabled. Each process opens once and exports four times.",
+    "before": {
+      "runs_ms": [
+        [
+          2376.56,
+          357.854,
+          377.554,
+          353.409
+        ],
+        [
+          2426.34,
+          352.02,
+          431.054,
+          379.441
+        ],
+        [
+          2462.01,
+          393.188,
+          383.145,
+          388.553
+        ]
+      ],
+      "median_first_ms": 2426.34,
+      "median_warm_ms": 379.44
+    },
+    "after": {
+      "runs_ms": [
+        [
+          6680.87,
+          315.327,
+          310.772,
+          306.051
+        ],
+        [
+          6658.04,
+          261.679,
+          250.958,
+          261.807
+        ],
+        [
+          6733.6,
+          412.267,
+          353.969,
+          406.224
+        ]
+      ],
+      "median_first_ms": 6680.87,
+      "median_warm_ms": 310.77
+    }
+  },
+  "open": [
+    "General direct Standard GLB for varying paint on independent UV sets.",
+    "Physical headset and positive AMD and NVIDIA hardware validation."
+  ]
+}

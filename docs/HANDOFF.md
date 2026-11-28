@@ -407,9 +407,29 @@ tracking export the same 512-pixel UV1 HDR project as the worker and preserve
 the native project. On that project, median repeat-export time fell from
 665 to 586 milliseconds. Median first-export time rose from 2.86 to 8.90
 seconds with the disk kernel cache disabled. CUDA and ROCm compile the new
-kernel, and all three backends reject missing GPU hardware. Physical headset
-validation and the remaining ordinary source overlay computation are open.
+kernel, and all three backends reject missing GPU hardware.
 [Mapped source HDR evidence](validation/mapped-source-emission-gpu-20261128.json)
+
+The selected GPU now also composites prepared-source Core PBR color, alpha,
+occlusion, roughness, metallic, and legacy emission in Editable GLB. Each
+source role keeps its own sampler. Roles sharing a UV set reuse the geometry
+coordinate upload. Source samples stay on the GPU across the sample and
+composite passes. When the budget is tight, one source image is staged at
+a time. The worker reads encoded material bytes and coverage in batches.
+
+On Arc, 16,384 packed results match the scalar reference across native and
+resampled grids, visible and hidden layers, Bake, and bounded image staging.
+All 65 ordinary and HDR fixture files match the previous build byte for
+byte. Twelve focused Release tests and both headless sanitizer suites pass.
+The independent Khronos validator reports zero errors or warnings for the
+UV1 Editable GLB fixture. Nested DomeD Wayland and synthetic OpenXR produce
+the same 512-pixel export as the worker. In that fixture the median repeat
+export went from 379 to 311 milliseconds. The median first export rose
+from 2.43 to 6.68 seconds with the disk kernel cache disabled. CUDA and
+ROCm compile the kernels and refuse missing devices. Physical headset
+qualification and general direct Standard GLB for varying independent-UV
+paint remain open.
+[Mapped source material evidence](validation/mapped-source-material-gpu-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
