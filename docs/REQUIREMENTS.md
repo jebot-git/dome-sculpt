@@ -53,8 +53,7 @@ scanlines on the selected GPU for eligible writable rasters. The device reads
 legacy Bake bytes and dense or compact FLOAT Bake, applies masked layers in
 order and resolves the original UV0 background. Legacy and physical Bake
 retain their binary32 and binary64 rounding rules. The host reads bounded
-chunks for OpenEXR and portable GLB encoding. Finite authoring resampling
-still needs a GPU adapter.
+chunks for OpenEXR and portable GLB encoding.
 [FLOAT emission raster evidence](validation/float-emission-raster-gpu-20261128.json)
 
 The same native HDR package path samples eligible authored MToon UV0
@@ -65,6 +64,16 @@ bilinear filtering, and material-relative versus absolute energy remain
 independent. Animated and alternate-coordinate roles still require their
 own export preparation.
 [Typed emission raster evidence](validation/typed-emission-raster-gpu-20261128.json)
+
+Editable GLB now resamples native FLOAT emission on the selected device in
+admitted writable paint domains. It composites the native coefficients in
+layer order, filters them independently, samples an eligible original UV0
+background and returns bounded RGB radiance for the existing PNG encoder.
+The authored FLOAT project stays embedded in the file. Arc validates exact
+radiance across six raster cases and exact worker output at the 256, 512 and
+1024 controller policies. Finite texture-set and alternate-coordinate
+sampling still need their own GPU adapters.
+[Editable emission evidence](validation/editable-emission-gpu-20261128.json)
 
 ## Current validation — 2026-11-27
 

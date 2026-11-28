@@ -1,0 +1,191 @@
+{
+  "date": "2026-11-28",
+  "product_commit": "8f7b2b26fb3688152659c5f401e956941deb4b12",
+  "previous_published_commit": "bd5def52c33345d05af65a24fee3d833b32ce22e",
+  "domed_toolkit_commit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "device": "Intel Arc A770 / PCI 0000:03:00.0 / renderD129",
+  "scope": "Native writable paint domains admitted to finite physical Editable GLB. Includes coupled original UV0 background sampling, legacy and physical paint and dense or compact FLOAT Bake. Independent texture-set and alternate-coordinate branches remain open.",
+  "app": {
+    "file": "artifacts/editable-emission-gpu-20261128/evidence/oneapi/dome-sculpt",
+    "sha256": "50c3a6f732b5c548f7f17a919897d52a1db6dd7f4d4dde9b50cc98a9e6428651"
+  },
+  "exact_gpu_raster": {
+    "trace": {
+      "file": "artifacts/editable-emission-gpu-20261128/finite.log",
+      "sha256": "1a747aa38e8d415909518de1143580744cbb7fbb57570fc1590152a6b17c5c7b"
+    },
+    "binary32_values_per_pixel": 3,
+    "pixel_cases": [
+      {
+        "fixture": "FLOAT Bake without paint",
+        "sampled_uv0_image": false,
+        "extent": 512,
+        "pixels": 262144,
+        "elapsed_ms": 8174
+      },
+      {
+        "fixture": "legacy Bake",
+        "sampled_uv0_image": false,
+        "extent": 256,
+        "pixels": 65536,
+        "elapsed_ms": 5
+      },
+      {
+        "fixture": "paint",
+        "sampled_uv0_image": true,
+        "extent": 512,
+        "pixels": 262144,
+        "elapsed_ms": 8
+      },
+      {
+        "fixture": "dense FLOAT Bake",
+        "sampled_uv0_image": false,
+        "extent": 1024,
+        "pixels": 1048576,
+        "elapsed_ms": 44
+      },
+      {
+        "fixture": "packed FLOAT Bake",
+        "sampled_uv0_image": true,
+        "extent": 1024,
+        "pixels": 1048576,
+        "elapsed_ms": 26
+      },
+      {
+        "fixture": "dense FLOAT Bake",
+        "sampled_uv0_image": true,
+        "extent": 256,
+        "pixels": 65536,
+        "elapsed_ms": 5
+      }
+    ],
+    "checks": [
+      "Partial read after cancellation",
+      "Radiance range refusal before FLOAT rounding"
+    ],
+    "max_readback_pixels": 65536
+  },
+  "release": {
+    "passed": 12,
+    "junit": {
+      "file": "artifacts/editable-emission-gpu-20261128/evidence/oneapi/editable-emission-tests.xml",
+      "sha256": "36781c1acc089f61bb6cef7ec4aa25445818d4220946dd5319794d344511216d"
+    }
+  },
+  "synthetic_controller_worker": {
+    "retained_native_paint": {
+      "checks_per_build": 69,
+      "equal_files": 20,
+      "distinct_file_sha256_manifest": "f908c682a12421c4097bbd67c70bc8cebcf5fae76640f79022de0deea748e5fc",
+      "log_before": {
+        "file": "artifacts/editable-emission-gpu-20261128/xr-before.log",
+        "sha256": "e66748fca6ec1c6a7995a006ad6e886eb2507ebce6be2055f31562373f17dc8c"
+      },
+      "log_after": {
+        "file": "artifacts/editable-emission-gpu-20261128/xr-after.log",
+        "sha256": "244361a00fab8390c4293eca1edbb2f83e78089858c4e5f6137b2a09970e7024"
+      },
+      "input": {
+        "file": "artifacts/editable-emission-gpu-20261128/evidence/input.dsculpt",
+        "sha256": "8239128110c7d210dbe15dc2c3e603d590c881069b959b4d0de6e9d4f59ea871"
+      },
+      "timing_before": {
+        "elapsed_seconds": 8.82,
+        "peak_rss_kib": 338124
+      },
+      "timing_after": {
+        "elapsed_seconds": 14.86,
+        "peak_rss_kib": 343220
+      },
+      "editable_glb_sha256": {
+        "editable1024.glb": "de22ec61a0f24f2d805a0f54d1b4aa3b6b0dab772860f02c9ec17b0bdfaf96a6",
+        "editable256.glb": "8690abbe7eb7c8476ad9c9974065563070847cf44bc64945901888c864849a8e",
+        "editable512.glb": "ba874944ce181dff956e4fde2c2eeb7575cf3b58e6d96b6c4261d429803e461e"
+      }
+    },
+    "coupled_original_uv0": {
+      "checks_per_build": 69,
+      "equal_files": 20,
+      "distinct_file_sha256_manifest": "74343c352c9b54560b0b8e82feba40f887caa00d25fe3b70705fb18357f66c30",
+      "log_before": {
+        "file": "artifacts/editable-emission-gpu-20261128/xr-source-before.log",
+        "sha256": "382b7070360fbc4c07cbcf8548e22a739b4e090dd7ffcb833285746b88b8ccf1"
+      },
+      "log_after": {
+        "file": "artifacts/editable-emission-gpu-20261128/xr-source-after.log",
+        "sha256": "7ef7dcbac770535494beb2d6685b56980f8ba0b49eb73944f59fa6f75a913641"
+      },
+      "input": {
+        "file": "artifacts/editable-emission-gpu-20261128/evidence/source-input.dsculpt",
+        "sha256": "af0c2b20df1b5f3090509563284f1633dad4cbf46e00a3867bd36a0db5013056"
+      },
+      "timing_before": {
+        "elapsed_seconds": 14.68,
+        "peak_rss_kib": 849468
+      },
+      "timing_after": {
+        "elapsed_seconds": 21.37,
+        "peak_rss_kib": 813536
+      },
+      "editable_glb_sha256": {
+        "editable1024.glb": "0b0b9050791b9b4afea368d97169000f98e89df023a87038d57e5505d0b63e0e",
+        "editable256.glb": "d593869fcf005594676a3ae5846d6394194de33a55bba77fef88bbe34524907c",
+        "editable512.glb": "70e4aaf4fdb131ddf33d2b883a3fe36922604e57afc785097fa298049a7c6f29"
+      }
+    }
+  },
+  "independent_hardware_consumer": {
+    "checks_per_build": 412,
+    "equal_files": 65,
+    "distinct_file_sha256_manifest": "500d3e1b29685ac6f69bf7ed85681cec097e758a0b1f90ebd24b6eb1f80c1023",
+    "log_before": {
+      "file": "artifacts/editable-emission-gpu-20261128/consumer-before.log",
+      "sha256": "6913ad35c5f993a8fd1547940db45e8a9d5ebb7229a8d4443ad68e448d7235dc"
+    },
+    "log_after": {
+      "file": "artifacts/editable-emission-gpu-20261128/consumer-after.log",
+      "sha256": "6913ad35c5f993a8fd1547940db45e8a9d5ebb7229a8d4443ad68e448d7235dc"
+    }
+  },
+  "sanitizers": {
+    "mode": "Scoped ASan and UBSan with explicit headless CPU reference. Includes native FLOAT archive, Bake and the controller worker.",
+    "logs": [
+      {
+        "file": "artifacts/editable-emission-gpu-20261128/evidence/asan/emission-raster-compute.cpp.log",
+        "sha256": "6ca8e86b20e1de46a35c692e7f7665036d8b9f4bf6d747c8b7afde4a0cc4cd5a"
+      },
+      {
+        "file": "artifacts/editable-emission-gpu-20261128/evidence/asan/baked-emission-workflow.cpp.log",
+        "sha256": "536147bd07f4599ce084da08c68ff6a90df3f2f2bffc3968db5dbe39fc3606c3"
+      },
+      {
+        "file": "artifacts/editable-emission-gpu-20261128/evidence/asan/xr-editable-export.cpp.log",
+        "sha256": "94d291443e8dd29f653f00dc8af62828b22d388da0b97148d4616e689b251a27"
+      }
+    ]
+  },
+  "missing_device": {
+    "ONEAPI": {
+      "reason": "No device of requested type 'info::device_type::gpu' available.",
+      "log": {
+        "file": "artifacts/editable-emission-gpu-20261128/missing-device.log",
+        "sha256": "df977c1d37da2e1f6b8b345f9f29500647b4997d32099c1cdb7ce648eeba24cc"
+      }
+    },
+    "CUDA": {
+      "reason": "CUDA driver version is insufficient for CUDA runtime version",
+      "log": {
+        "file": "artifacts/editable-emission-gpu-20261128/cuda-missing.log",
+        "sha256": "a1226c57076d81ad04cf659c3f09fe278084633b2f80045ab0e9bb5ef3014a37"
+      }
+    },
+    "ROCm": {
+      "reason": "no ROCm-capable device is detected",
+      "log": {
+        "file": "artifacts/editable-emission-gpu-20261128/rocm-missing.log",
+        "sha256": "0dcc286c4560818f3337f687966941fffad091d1b2707e8a2b2a2042ea76b50f"
+      }
+    }
+  },
+  "limits": "First dispatch includes oneAPI compilation with its persistent cache disabled in the raster trace. Each controller time records one whole process per case. No positive AMD or NVIDIA execution and no physical headset run."
+}

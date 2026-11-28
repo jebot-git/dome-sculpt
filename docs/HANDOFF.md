@@ -194,7 +194,6 @@ first compilation. The 2048² Standard GLB matches byte for byte across the
 previous build, the current file worker, nested DomeD Wayland and synthetic
 OpenXR. Across three fresh process pairs, the median complete export took
 13.95 seconds on the new path and 10.84 seconds on the preceding revision.
-Finite Editable resampling remains open.
 [FLOAT emission raster evidence](validation/float-emission-raster-gpu-20261128.json)
 
 Typed native HDR export and replay now sample the original MToon emission
@@ -207,9 +206,27 @@ shared UV rule. The rotated oneAPI program still takes several seconds to
 compile on its first use. Twelve focused Arc Release tests pass. The native
 VRM suite passes 163 checks, with all 26 generated projects and exports
 matching the preceding revision. The trace records the rotated device
-kernel on the actual VRM output. Finite Editable resampling and source-aware
-animated and alternate-UV authoring remain open.
+kernel on the actual VRM output. Source-aware animated and alternate-UV
+authoring remain open.
 [Typed emission raster evidence](validation/typed-emission-raster-gpu-20261128.json)
+
+Editable GLB now resamples native FLOAT emission on the selected GPU in
+eligible writable paint domains. It keeps the finite view's binary32 layer
+over and texel-centre correction, independently filters legacy and absolute
+coefficients and coverage, and samples the original coupled UV0 background
+where the paint domain permits it. The host reads RGB in blocks of 65,536
+pixels and determines the PNG strength and error measures. The existing
+native project encoding, worker cancellation and file ordering still pass.
+Arc matches 2,752,512 reference texels across six raster cases. Two
+controller workflows at 256, 512 and 1024 plus the independent hardware
+consumer reproduce 105 output files byte for byte. Twelve focused Arc
+Release cases and the scoped headless sanitizer reference pass. The first
+oneAPI launch took about 8.2 seconds in the focused trace, including device
+compilation. The two subsequent 1024-pixel rasters including upload and
+readback took 26–44 milliseconds. CUDA and ROCm compile and refuse missing
+devices. Finite texture sets, alternate-coordinate backgrounds and positive
+AMD/NVIDIA and physical headset validation remain open.
+[Editable emission evidence](validation/editable-emission-gpu-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
