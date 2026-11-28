@@ -50,6 +50,7 @@
 #include "export-corner-coordinates.hpp"
 #include "dome/paint-sampling.hpp"
 #include "dome/normal-preview.hpp"
+#include "key-material-preview.hpp"
 #include "current-colors.hpp"
 #include "prepared-color-state.hpp"
 #include "sculpt-ui-values.hpp"
@@ -1960,6 +1961,7 @@ void Document::mesh_loop() {
       }
       std::shared_ptr<const geometry_detail::Identity> identity=geometry_identity&&geometry_identity->matches(*dependencies)?geometry_identity:std::move(dependencies);
       auto snapshot = std::make_shared<MeshSnapshot>();
+      const auto preceding=mesh_.load();
       snapshot->geometry_identity=identity;
       snapshot->sculpt_chunks=sculpt_preview.chunks;
       snapshot->sculpt_meshing=meshing;
@@ -2199,12 +2201,21 @@ void Document::mesh_loop() {
           if(packed->overlay)packed->overlay=detail::PaintOverlayFactory::pack_source_maps(packed->overlay,packed->source_maps,overlay_vertices,cancelled);
           textures=std::move(packed);}
         snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, std::move(textures), std::move(appearance), offset, o.material_bindings, bool(retained), bool(retained && canonical), bool(retained && retained_pose->tangents[source_role].empty()),world,!affine});
-        snapshot->ranges.back().paint_sampling_attachment=paint_attachment;
-        if(o.normal_preview_proof&&o.normal_preview_proof->matches(o.material_bindings,snapshot->ranges.back().textures))snapshot->ranges.back().normal_preview_proof=o.normal_preview_proof;
-        snapshot->ranges.back().paint_winding_reversed=reflected;
-        snapshot->ranges.back().pbr_view=job->pbr_view;
-        if(polygon_field){snapshot->ranges.back().source_frame=true;snapshot->ranges.back().canonical_frame=false;snapshot->ranges.back().source_normal_only=polygon_field->model()==detail::PolygonSurfaceNormalModel::NativeNOnly;}
-        if(frame)snapshot->ranges.back().affine_world=frame->world();
+        auto &range=snapshot->ranges.back();
+        range.paint_sampling_attachment=paint_attachment;
+        if(o.normal_preview_proof&&o.normal_preview_proof->matches(o.material_bindings,range.textures))range.normal_preview_proof=o.normal_preview_proof;
+        if(o.material_bindings&&o.material_bindings->key_derivation&&!range.normal_preview_proof){
+          if(preceding->generation==job->generation){
+            const auto prior=std::ranges::find(preceding->ranges,o.id,&SurfaceRange::object);
+            if(prior!=preceding->ranges.end()&&prior->key_material_preview&&prior->key_material_preview->matches(range))
+              range.key_material_preview=prior->key_material_preview;
+          }
+          if(!range.key_material_preview)range.key_material_preview=detail::KeyMaterialPreview::prepare(range,cancelled);
+        }
+        range.paint_winding_reversed=reflected;
+        range.pbr_view=job->pbr_view;
+        if(polygon_field){range.source_frame=true;range.canonical_frame=false;range.source_normal_only=polygon_field->model()==detail::PolygonSurfaceNormalModel::NativeNOnly;}
+        if(frame)range.affine_world=frame->world();
       }
       for(auto it=frame_layouts.begin();it!=frame_layouts.end();)if(!frame_objects.contains(it->first) || it->second.mesh.expired() || (it->second.frames.expired()&&it->second.paint.expired())){frame_layout_bytes-=it->second.bytes;it=frame_layouts.erase(it);}else ++it;
       for(auto it=texture_layouts.begin();it!=texture_layouts.end();)if(!texture_objects.contains(it->first)){texture_layout_bytes-=it->second->owned_bytes();it=texture_layouts.erase(it);}else ++it;

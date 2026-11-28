@@ -12,6 +12,7 @@
 #include "source-paint-pairing.hpp"
 #include "key-mirror-correspondence.hpp"
 #include "key-mirror-relative.hpp"
+#include "key-material-preview.hpp"
 #include "key-archive-preflight.hpp"
 #include <set>
 #include <cstring>
@@ -194,7 +195,7 @@ std::shared_ptr<const NormalFrameSet> SourceKeyDerivation::replay(
   out->pbr=role(before.pbr,ShapeFrameRole::Pbr);out->mtoon=role(before.mtoon,ShapeFrameRole::MToon);out->canonical=role(before.canonical,ShapeFrameRole::Canonical);out->validate();stop(cancelled);return out;
 }
 void SourceKeyDerivation::validate(bool deep,const std::function<bool()> &cancelled) const {
-  validate_impl(deep,false,cancelled);
+  validate_impl(deep,false,cancelled?cancelled:KeyMaterialPreview::validation_cancellation());
 }
 MorphNormalBasis SourceKeyDerivation::validate_impl(bool deep,bool read_archive,
     const std::function<bool()> &cancelled) const {

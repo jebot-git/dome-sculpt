@@ -32,7 +32,7 @@
 namespace dome {
 namespace detail {class SculptSceneChunks;}
 class MaterialSurfaceQuery;
-namespace detail {class TextureSetRangeProof;class TextureSetStrokeLease;}
+namespace detail {class TextureSetRangeProof;class TextureSetStrokeLease;class KeyMaterialPreview;}
 namespace detail {struct AvatarAttachmentView;}
 struct SpatialHand {
   TrackedHand tracked;
@@ -214,6 +214,7 @@ struct SurfaceRange {
   bool pbr_view = false;
   uint32_t texture_set=0; // Object-local persistent material slot, not a raw material table index.
   std::shared_ptr<const detail::TextureSetRangeProof> texture_set_proof;
+  std::shared_ptr<const detail::KeyMaterialPreview> key_material_preview{};
 };
 struct SculptMeshingStats {
   size_t objects_reused=0,local_updates=0,full_rebuilds=0,history_fallbacks=0,capacity_fallbacks=0;

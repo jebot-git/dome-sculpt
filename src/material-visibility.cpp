@@ -11,6 +11,7 @@
 #include "source-colors.hpp"
 #include "dome/paint-sampling.hpp"
 #include "dome/normal-preview.hpp"
+#include "key-material-preview.hpp"
 #include "dome/color-paint-sampling.hpp"
 #include "prepared-color-state.hpp"
 #include "paint-overlay-alpha.hpp"
@@ -144,7 +145,8 @@ struct Visibility {
     const bool sealed24=r.paint_sampling_attachment&&r.normal_preview_proof&&r.normal_preview_proof->matches(r.material_bindings,maps)&&r.normal_preview_proof->metadata_domain()==r.paint_sampling_attachment->domain()&&
       !r.normal_preview_proof->metadata_domain().owner_before(r.paint_sampling_attachment->domain())&&!r.paint_sampling_attachment->domain().owner_before(r.normal_preview_proof->metadata_domain());
     if(r.normal_preview_proof&&r.paint_sampling_attachment&&!sealed24)throw std::invalid_argument("Visibility normal and paint metadata have different owning coordinate domains");
-    const bool sealed=sealed24||detail::native_frame_preview_metadata(r.material_bindings,r.paint_sampling_attachment);
+    if(r.key_material_preview)r.key_material_preview->authenticate(r);
+    const bool sealed=sealed24||r.key_material_preview||detail::native_frame_preview_metadata(r.material_bindings,r.paint_sampling_attachment);
     const bool prepared=detail::prepared_color_state(r.material_bindings.get(),maps.get(),!sealed);
     if (maps) {
       if(maps->current_grid_preview){current_grid=maps->current_grid_preview;current_grid->authenticate_range(mesh,r,true);factor=1;}
