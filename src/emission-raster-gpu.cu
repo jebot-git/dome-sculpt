@@ -44,6 +44,27 @@ __global__ void render_bake_radiance_pixels(DeviceInput input,MappedSourceImage 
   const size_t index=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
   if(index<count)render_bake_radiance(input,image,samples[index],out+3*index);
 }
+inline constexpr unsigned summary_lanes=128;
+__global__ void summarize_bake_radiance_pixels(const uint32_t *radiance,size_t count,BakeRadianceSummary *summary){
+  __shared__ uint32_t common[3][summary_lanes],seen[3][summary_lanes];
+  const auto lane=threadIdx.x;
+  uint32_t every[3]{UINT32_MAX,UINT32_MAX,UINT32_MAX},any[3]{};
+  for(size_t i=lane;i<count;i+=summary_lanes)for(unsigned c=0;c<3;++c){
+    const auto word=radiance[i*3+c];
+    every[c]&=word;
+    any[c]|=word;
+  }
+  for(unsigned c=0;c<3;++c){common[c][lane]=every[c];seen[c][lane]=any[c];}
+  __syncthreads();
+  for(unsigned stride=summary_lanes/2;stride;stride/=2){
+    if(lane<stride)for(unsigned c=0;c<3;++c){
+      common[c][lane]&=common[c][lane+stride];
+      seen[c][lane]|=seen[c][lane+stride];
+    }
+    __syncthreads();
+  }
+  if(!lane)for(unsigned c=0;c<3;++c){summary->common[c]=common[c][0];summary->seen[c]=seen[c][0];}
+}
 __global__ void filter_bake_uv_pixels(Bake bake,const EmissionRasterDevice::BakeUvSample *samples,
                                       size_t count,uint32_t *out){
   const size_t index=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
@@ -136,6 +157,10 @@ public:
       const EmissionRasterDevice::BakeRadianceSample *samples,size_t count,uint32_t *out){
     constexpr size_t block=128;
     render_bake_radiance_pixels<<<(count+block-1)/block,block,0,stream_>>>(input,image,samples,count,out);
+    checked(DOME_DEVICE(GetLastError)());
+  }
+  void summarize_bake_radiance(const uint32_t *radiance,size_t count,BakeRadianceSummary *summary){
+    summarize_bake_radiance_pixels<<<1,summary_lanes,0,stream_>>>(radiance,count,summary);
     checked(DOME_DEVICE(GetLastError)());
   }
   void filter_bake_uv(Bake bake,const EmissionRasterDevice::BakeUvSample *samples,size_t count,uint32_t *out){

@@ -506,9 +506,10 @@ void bake_radiance_device_sampling(){
   const std::array<float,3> background{4.77f,9.63f,3.54e-12f};
   constexpr float strength=3.71f;
   for(const bool textured:{false,true}){
-    auto device=raster::create_bake_radiance_device(packet.get(),textured?&image:nullptr,background,strength,samples.size(),{});
+    auto device=raster::create_bake_radiance_device(packet.get(),textured?&image:nullptr,background,strength,samples.size(),{},{},true);
     std::vector<Device::Radiance> actual(samples.size());
-    device->read_bake_radiance(samples,actual,{});
+    raster::BakeRadianceSummary gpu,expected;
+    device->read_bake_radiance(samples,actual,{},&gpu);
     for(size_t i=0;i<samples.size();++i){
       const auto &sample=samples[i];
       const auto overlay=raster::sample_overlay_values(*packet,sample.paint_uv[0],sample.paint_uv[1],false);
@@ -520,7 +521,10 @@ void bake_radiance_device_sampling(){
       for(unsigned c=0;c<3;++c)original_light[c]=float(double(background[c])*texel[c]);
       if(sample_value.resolve(original_light,strength)!=actual[i])
         throw std::runtime_error("GPU Bake radiance differs from native ordered arithmetic at "+std::to_string(i));
+      expected.include(actual[i]);
     }
+    check(std::ranges::equal(gpu.common,expected.common)&&std::ranges::equal(gpu.seen,expected.seen),
+          "GPU radiance summary matches the exact bit intersection and union across an irregular batch");
     check(rejects([&]{device->read_bake_radiance(samples,actual,[]{return true;});})&&paint->encode()==original,
           "Cancelled HDR sampling preserves the captured sparse source");
   }
@@ -533,15 +537,49 @@ void bake_radiance_device_sampling(){
   const auto edge_packet=raster::PaintOverlayFactory::capture(*edge);
   const std::array<Device::BakeRadianceSample,1> point{{{{.43f,.64f},{}}}};
   std::array<Device::Radiance,1> result{};
-  auto bound=raster::create_bake_radiance_device(edge_packet.get(),nullptr,{-0.f,0.f,0.f},0,1,{});
-  bound->read_bake_radiance(point,result,{});
+  auto bound=raster::create_bake_radiance_device(edge_packet.get(),nullptr,{-0.f,0.f,0.f},0,1,{},{},true);
+  raster::BakeRadianceSummary endpoint;
+  bound->read_bake_radiance(point,result,{},&endpoint);
   check(result[0]==Device::Radiance{maximum,0,std::numeric_limits<float>::denorm_min()},
         "GPU radiance preserves the FLOAT endpoints above and below normal intensity");
+  check(std::ranges::equal(endpoint.common,endpoint.seen)&&endpoint.common[2]==1,
+        "A single projected HDR texel keeps its exact subnormal constant in the GPU summary");
   auto overflow=raster::create_bake_radiance_device(edge_packet.get(),nullptr,{},maximum,1,{});
   bool rejected=false;
   try{overflow->read_bake_radiance(point,result,{});}catch(const std::overflow_error &){rejected=true;}
   check(rejected,"GPU recognizes overflow during the ordered HDR resolve");
   check(true,"GPU Bake radiance exactly matches the native masked mixed HDR oracle with and without an original image");
+}
+
+void resolved_bake_storage(){
+  constexpr uint32_t n=9;
+  const std::array constant{-0.f,std::numeric_limits<float>::max(),std::numeric_limits<float>::denorm_min()};
+  for(unsigned variant=0;variant<3;++variant){
+    std::vector<std::array<float,3>> radiance(n*n,constant);
+    std::vector<uint8_t> coverage(n*n,1);
+    if(variant)radiance[7][0]=0.f;
+    if(variant==2){
+      coverage[0]=4;coverage[31]=3;coverage[32]=0;coverage[33]=2;
+      radiance[0]=radiance[31]=radiance[32]={};
+    }
+    detail::BakeRadianceSummary summary;
+    size_t covered=0;
+    for(size_t at=0;at<coverage.size();++at){
+      if(coverage[at]==1)summary.include(radiance[at]);
+      if(coverage[at]==1||coverage[at]==2)++covered;
+    }
+    const auto samples=[&](size_t at){return BakedEmissionSample{{},radiance[at],float(coverage[at]==1||coverage[at]==2)};};
+    for(const auto [compact,limit]:{std::pair{true,size_t(4096)},std::pair{false,size_t(4096)},std::pair{false,size_t(1024)}}){
+      const auto generate=compact?BakedEmissionField::generate_compact:BakedEmissionField::generate;
+      const BakedEmissionLimits limits{limit,{}};
+      const auto actual=detail::BakeEmissionAccess::seal(n,radiance,coverage,covered,summary,compact,limits);
+      check(actual->encode()==generate(n,samples,limits)->encode(),
+            "Resolved HDR Bake seals the exact dense or compact archive across FLOAT endpoints and binary coverage");
+    }
+    radiance[7][1]=-1;
+    check(rejects([&]{detail::BakeEmissionAccess::seal(n,radiance,coverage,covered,summary,true,{});}),
+          "Invalid resolved radiance cannot publish a native field");
+  }
 }
 
 void sampler_cache_pressure() {
@@ -640,6 +678,7 @@ int main()try {
   original_material_device_sampling();
   sparse_material_device_sampling();
   bake_radiance_device_sampling();
+  resolved_bake_storage();
   sampler_cache_pressure();
   padding_device_ownership();
 #endif

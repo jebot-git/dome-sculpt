@@ -8,6 +8,7 @@
 #include "bake-raster-device.hpp"
 #include "bake-padding-device.hpp"
 #include "bake-material-input.hpp"
+#include "bake-emission-storage.hpp"
 #include "bake-sampler-cache.hpp"
 #include "bake-ray-query.hpp"
 #include "bake-paint-coordinates.hpp"
@@ -467,6 +468,9 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   BakeResult result; result.coverage.resize(pixels);
   std::vector<std::array<float,3>> emission;if(float_emission)emission.resize(pixels);
 #ifndef DOME_BAKE_RAY_REFERENCE
+  const bool summarize_radiance=float_emission&&(!target_triangles.empty()||
+      pixels*sizeof(BakedEmissionSample)>emission_budget);
+  detail::BakeRadianceSummary radiance_summary;
   // Each sampler cache retains up to 32 MiB of tracked device buffers. An
   // individual larger job can use the original single-sampler path.
   constexpr size_t sampler_cache_bytes=32u*1024*1024;
@@ -503,15 +507,15 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       auto &radiance=radiance_cache.get(slot,[&](const auto &reserve){
         if(!source_fields.empty()&&source_fields[slot].emission_background){
           return detail::create_bake_radiance_device(material.maps->overlay.get(),nullptr,
-              *source_fields[slot].emission_background,1,emission_capacity,o.cancelled,reserve);
+              *source_fields[slot].emission_background,1,emission_capacity,o.cancelled,reserve,summarize_radiance);
         }
         const auto &batch=*material.emission_batch;
         return detail::create_bake_radiance_device(batch.overlay.get(),batch.source.image?&batch.source:nullptr,
-            batch.background,batch.legacy_strength,emission_capacity,o.cancelled,reserve);
+            batch.background,batch.legacy_strength,emission_capacity,o.cancelled,reserve,summarize_radiance);
       },[&]{return material_cache.trim_idle();});
       const size_t count=end-first;
       radiance.read_bake_radiance(std::span(emission_samples).first(count),
-          std::span(emission_values).first(count),o.cancelled);
+          std::span(emission_values).first(count),o.cancelled,summarize_radiance?&radiance_summary:nullptr);
       cancel(o);
       for(size_t i=0;i<count;++i)emission[pending[first+i].texel]=emission_values[i];
       first=end;
@@ -595,8 +599,12 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
 #ifndef DOME_BAKE_RAY_REFERENCE
       else if(m.emission_batch)queue_emission(material_id,at,m.emission_batch->sample(hit->triangle,hit->barycentric));
 #endif
-      else if(m.resolved_emission)emission[at]=m.resolved_emission(hit->triangle,hit->barycentric);
-      else emission[at]=channels.emission;
+      else{
+        emission[at]=m.resolved_emission?m.resolved_emission(hit->triangle,hit->barycentric):channels.emission;
+#ifndef DOME_BAKE_RAY_REFERENCE
+        if(summarize_radiance)radiance_summary.include(emission[at]);
+#endif
+      }
     }
     auto pbr_color=channels.color;
     const bool resolved_source=m.maps&&!m.maps->pbr_color.rgba.empty();
@@ -1007,11 +1015,16 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   if(o.progress)o.progress(.9f);
   cancel(o); if (o.padding) pad(result,o,emission); cancel(o);
   if(float_emission){
+#ifdef DOME_BAKE_RAY_REFERENCE
     const auto generate=target_triangles.empty()?BakedEmissionField::generate:BakedEmissionField::generate_compact;
     result.emission_field=generate(o.resolution,[&](size_t i){
       const bool covered=result.coverage[i]==1||result.coverage[i]==2;
       return BakedEmissionSample{{},emission[i],covered?1.f:0.f};
     },{emission_budget,o.cancelled});
+#else
+    result.emission_field=detail::BakeEmissionAccess::seal(o.resolution,emission,result.coverage,
+        result.projected+result.padded,radiance_summary,!target_triangles.empty(),{emission_budget,o.cancelled});
+#endif
   }
   cancel(o);
   if(o.progress)o.progress(1);

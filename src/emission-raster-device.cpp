@@ -470,7 +470,7 @@ std::unique_ptr<EmissionRasterDevice> create_mapped_emission_field_device(
 
 std::unique_ptr<EmissionRasterDevice> create_bake_radiance_device(const PaintOverlayPacket *packet,
     const PaintSourceTexture *source,std::array<float,3> background,float legacy_strength,size_t capacity,
-    const std::function<bool()> &cancelled,const std::function<void(size_t)> &reserve){
+    const std::function<bool()> &cancelled,const std::function<void(size_t)> &reserve,bool summarize){
   if(!capacity||capacity>EmissionRasterDevice::mapped_batch)
     throw std::invalid_argument("Invalid GPU Bake radiance capacity");
   if(packet&&packet->empty())packet=nullptr;
@@ -479,6 +479,7 @@ std::unique_ptr<EmissionRasterDevice> create_bake_radiance_device(const PaintOve
   auto input=describe_raster(layers,packet?packet->baked().get():nullptr,packet?packet->resolution():0,
       padding,background,legacy_strength,true,cancelled,nullptr,true,false);
   input.bake_radiance_capacity=capacity;
+  input.summarize_bake_radiance=summarize;
   if(source){
     source->validate(8);
     if(!source->image)throw std::invalid_argument("GPU Bake radiance needs its actual source image");

@@ -9,4 +9,23 @@ void launch_bake_radiance(sycl::queue &queue,DeviceInput input,MappedSourceImage
     render_bake_radiance(input,image,samples[id[0]],out+3*id[0]);
   });
 }
+
+void launch_bake_radiance_summary(sycl::queue &queue,const uint32_t *radiance,size_t count,BakeRadianceSummary *summary){
+  constexpr size_t lanes=128;
+  queue.parallel_for(sycl::nd_range<1>{{lanes},{lanes}},[=](sycl::nd_item<1> item){
+    const auto lane=item.get_local_linear_id();
+    const auto group=item.get_group();
+    uint32_t common[3]{UINT32_MAX,UINT32_MAX,UINT32_MAX},seen[3]{};
+    for(size_t i=lane;i<count;i+=lanes)for(unsigned c=0;c<3;++c){
+      const auto word=radiance[i*3+c];
+      common[c]&=word;
+      seen[c]|=word;
+    }
+    for(unsigned c=0;c<3;++c){
+      const auto every=sycl::reduce_over_group(group,common[c],sycl::bit_and<uint32_t>{});
+      const auto any=sycl::reduce_over_group(group,seen[c],sycl::bit_or<uint32_t>{});
+      if(!lane){summary->common[c]=every;summary->seen[c]=any;}
+    }
+  });
+}
 } // namespace dome::detail::emission_raster

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/baked-emission.hpp"
+#include "bake-emission-storage.hpp"
 #include <algorithm>
 #include <bit>
 #include <cmath>
@@ -164,6 +165,62 @@ std::shared_ptr<const BakedEmissionField> BakedEmissionField::generate_compact(u
     const std::function<BakedEmissionSample(size_t)> &source,const BakedEmissionLimits &limits){
   return generate_storage(r,source,limits,true);
 }
+std::shared_ptr<const BakedEmissionField> detail::BakeEmissionAccess::seal(uint32_t r,
+    std::span<const std::array<float,3>> radiance,std::span<const uint8_t> coverage,size_t covered,
+    BakeRadianceSummary summary,bool prefer_compact,const BakedEmissionLimits &limits){
+  const auto count=checked_count(r,limits);
+  if(radiance.size()!=count||coverage.size()!=count||covered>count)
+    throw std::invalid_argument("Bake radiance does not match its output grid");
+  const auto dense_bytes=count*sizeof(BakedEmissionSample);
+  const auto valid=[&](size_t i){
+    const bool hit=coverage[i]==1||coverage[i]==2;
+    for(const float channel:radiance[i])
+      if(!std::isfinite(channel)||channel<0||(!hit&&channel!=0))
+        throw std::invalid_argument("Invalid premultiplied baked emission coefficient");
+    return hit;
+  };
+  auto result=std::unique_ptr<BakedEmissionField>(new BakedEmissionField(r));
+  if(!prefer_compact&&dense_bytes<=limits.max_bytes){
+    result->values_.resize(count);
+    for(size_t i=0;i<count;++i){
+      if((i&4095)==0)stop(limits);
+      result->values_[i]={{},radiance[i],float(valid(i))};
+    }
+  }else{
+    // Gutters inherit existing samples. Unfilled texels add zero radiance
+    // and the second binary coverage value to the finished field.
+    if(covered<count)summary.include({});
+    PackedLayout layout;
+    layout.binary=covered&&covered<count;
+    layout.constants[6]=float(covered==count);
+    for(unsigned c=0;c<3;++c){
+      if(summary.common[c]==summary.seen[c])layout.constants[c+3]=std::bit_cast<float>(summary.common[c]);
+      else layout.mask|=1u<<(c+3);
+    }
+    if(layout.retained(count)>limits.max_bytes)
+      throw std::length_error("Exact FLOAT baked emission exceeds the available paint budget");
+    result->varying_mask_=layout.mask;
+    result->constants_=layout.constants;
+    result->varying_.resize(layout.coefficient_words(count));
+    if(layout.binary)result->coverage_words_.resize(coverage_words(count));
+    size_t next=0,written=0;
+    for(size_t i=0;i<count;++i){
+      if((i&4095)==0)stop(limits);
+      const bool hit=valid(i);
+      written+=hit;
+      for(unsigned c=0;c<3;++c){
+        if(layout.mask&(1u<<(c+3)))result->varying_[next++]=radiance[i][c];
+        else if(bits(radiance[i][c])!=summary.common[c])
+          throw std::invalid_argument("Bake radiance differs from its constant coefficient");
+      }
+      if(layout.binary&&hit)result->coverage_words_[i/32]|=1u<<(i%32);
+    }
+    if(written!=covered)throw std::invalid_argument("Bake radiance differs from its binary coverage");
+  }
+  stop(limits);
+  return std::shared_ptr<const BakedEmissionField>(std::move(result));
+}
+
 std::shared_ptr<const BakedEmissionField> BakedEmissionField::generate_storage(uint32_t r,
     const std::function<BakedEmissionSample(size_t)> &source,const BakedEmissionLimits &limits,
     bool prefer_compact){

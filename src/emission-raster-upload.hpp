@@ -74,6 +74,7 @@ private:
       bake_radiance_capacity_=input.bake_radiance_capacity;
       output_=allocate<uint32_t>(3*bake_radiance_capacity_);
       bake_radiance_coordinates_=allocate<BakeRadianceSample>(bake_radiance_capacity_);
+      if(input.summarize_bake_radiance)bake_summary_=allocate<BakeRadianceSummary>(1);
     }else if(!material)output_=allocate<uint32_t>(mapped_capacity_?mapped_capacity_*(mapped_field_?10:3):chunk_pixels*(finite_.resolution?3:10));
     if(mapped_capacity_)coordinates_=allocate<MappedSample>(mapped_capacity_);
     stop();
@@ -154,8 +155,8 @@ public:
   }
 
   void read_bake_radiance(std::span<const BakeRadianceSample> samples,std::span<Radiance> pixels,
-                          const std::function<bool()> &cancelled) override {
-    if(samples.empty()||samples.size()!=pixels.size()||samples.size()>bake_radiance_capacity_)
+                          const std::function<bool()> &cancelled,BakeRadianceSummary *summary) override {
+    if(samples.empty()||samples.size()!=pixels.size()||samples.size()>bake_radiance_capacity_||(summary&&!bake_summary_))
       throw std::invalid_argument("Invalid GPU Bake radiance batch");
     paint_compute::checkpoint(cancelled);
     for(const auto &sample:samples)
@@ -163,9 +164,16 @@ public:
         throw std::invalid_argument("Invalid Bake radiance sample coordinate");
     device_.upload(bake_radiance_coordinates_,samples.data(),samples.size_bytes());
     device_.render_bake_radiance(view_,mapped_source_,bake_radiance_coordinates_,samples.size(),output_);
+    if(summary)device_.summarize_bake_radiance(output_,samples.size(),bake_summary_);
     device_.download(pixels.data(),output_,pixels.size_bytes());
     paint_compute::checkpoint(cancelled);
     validate_exact(std::span<const Radiance>(pixels));
+    if(summary){
+      BakeRadianceSummary result;
+      device_.download(&result,bake_summary_,sizeof(result));
+      paint_compute::checkpoint(cancelled);
+      summary->merge(result);
+    }
   }
 
   void read_bake_uv(std::span<const BakeUvSample> samples,std::span<BakedEmissionSample> output,
@@ -409,6 +417,7 @@ private:
   MappedSourceImage mapped_source_{};
   MappedSample *coordinates_=nullptr;
   BakeRadianceSample *bake_radiance_coordinates_=nullptr;
+  BakeRadianceSummary *bake_summary_=nullptr;
   BakeUvSample *bake_uv_samples_=nullptr;
   BakeUvPoint *bake_uv_points_=nullptr;
   BakeUvGeometry bake_uv_geometry_{};
