@@ -226,6 +226,15 @@ owner pairs, plus 128 bytes of frontier counts. Median repeat time was
 padding and 7.15 seconds with the preceding FIFO.
 [GPU Bake padding evidence](validation/bake-padding-gpu-20261128.json)
 
+Compact HDR Bake now reduces each resolved radiance batch to a 24-byte
+summary on the selected GPU. The worker uses those summaries to choose the
+native field layout and seals it in one atlas pass. The 2048² HDR fixture
+saved a byte-identical 50,855,968-byte field with 131,072 binary coverage
+words. The Arc trace records 106 summaries, totaling 2,544 bytes. Median
+repeat time was 2.15 seconds with the summary and 2.14 seconds with the
+preceding writer in one paired trial.
+[GPU HDR Bake storage evidence](validation/bake-hdr-storage-20261128.json)
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.
