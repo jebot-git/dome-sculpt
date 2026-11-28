@@ -166,6 +166,7 @@ public:
   Pixels expand() const noexcept;
 
 private:
+  friend struct detail::EmissionExportAccess;
   PaintEmissionTile() = default;
   std::array<float,7> constants_{};
   std::unique_ptr<float[]> values_;

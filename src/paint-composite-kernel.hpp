@@ -89,6 +89,23 @@ DOME_PC_FN uint8_t srgb_byte(float v,const Quantization &q){
  return uint8_t(lo);
 }
 DOME_PC_FN float blend(float base,float paint,float a){return add(mul(base,sub(1,a)),mul(paint,a));}
+DOME_PC_FN void sample_source_taps(const uint8_t *image,uint32_t width,bool nearest,SourcePixelTaps taps,bool srgb,
+                                   const Quantization &q,float (&result)[4]){
+ const auto column=taps.column,row=taps.row;
+ const auto decode=[&](const uint8_t *rgba,unsigned c){return srgb&&c<3?q.srgb[rgba[c]]:q.unit[rgba[c]];};
+ if(nearest){
+  const auto *rgba=image+(size_t(row.first)*width+column.first)*4;
+  for(unsigned c=0;c<4;++c)result[c]=decode(rgba,c);
+  return;
+ }
+ for(auto &channel:result)channel=0;
+ for(unsigned tap=0;tap<4;++tap){
+  const bool right=tap&1,bottom=tap&2;
+  const auto *rgba=image+(size_t(bottom?row.second:row.first)*width+(right?column.second:column.first))*4;
+  const float weight=mul(right?column.fraction:sub(1,column.fraction),bottom?row.fraction:sub(1,row.fraction));
+  for(unsigned c=0;c<4;++c)result[c]=add(result[c],mul(weight,decode(rgba,c)));
+ }
+}
 DOME_PC_FN void sample_source(SourceTexture texture,uint32_t x,uint32_t y,uint32_t index,bool srgb,
                               const Quantization &q,float (&result)[4]){
  if(!texture.rgba){
@@ -96,20 +113,7 @@ DOME_PC_FN void sample_source(SourceTexture texture,uint32_t x,uint32_t y,uint32
   return;
  }
  const auto taps=texture.mapped?texture.mapped[index]:SourcePixelTaps{texture.columns[x],texture.rows[y]};
- const auto column=taps.column,row=taps.row;
- const auto decode=[&](const uint8_t *rgba,unsigned c){return srgb&&c<3?q.srgb[rgba[c]]:q.unit[rgba[c]];};
- if(texture.nearest){
-  const auto *rgba=texture.rgba+(size_t(row.first)*texture.width+column.first)*4;
-  for(unsigned c=0;c<4;++c)result[c]=decode(rgba,c);
-  return;
- }
- for(auto &channel:result)channel=0;
- for(unsigned tap=0;tap<4;++tap){
-  const bool right=tap&1,bottom=tap&2;
-  const auto *rgba=texture.rgba+(size_t(bottom?row.second:row.first)*texture.width+(right?column.second:column.first))*4;
-  const float weight=mul(right?column.fraction:sub(1,column.fraction),bottom?row.fraction:sub(1,row.fraction));
-  for(unsigned c=0;c<4;++c)result[c]=add(result[c],mul(weight,decode(rgba,c)));
- }
+ sample_source_taps(texture.rgba,texture.width,texture.nearest,taps,srgb,q,result);
 }
 // Native normals normalize in two separate binary32 steps. Fast device
 // reciprocals can cross a final byte-rounding boundary even one ULP away.

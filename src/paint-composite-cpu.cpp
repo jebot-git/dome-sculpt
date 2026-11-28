@@ -1,7 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "paint-composite-backend.hpp"
+#include "emission-raster-device.hpp"
 #include "paint-source-coordinate-kernel.hpp"
 #include "paint-grid-filter.hpp"
+namespace dome::detail::emission_raster {
+std::unique_ptr<EmissionRasterDevice> upload(const Input &,const std::function<bool()> &){
+ throw std::logic_error("Select a GPU backend for device emission compositing");
+}
+}
 namespace dome::paint_compute {
 Result composite(const Input &in,const std::function<bool()> &cancelled){
  validate(in,cancelled);const auto &q=quantization();

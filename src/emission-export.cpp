@@ -2,6 +2,7 @@
 #include "emission-export.hpp"
 #include "baked-emission-write-scope.hpp"
 #include "emission-paint-access.hpp"
+#include "emission-raster-device.hpp"
 #include "emission-linear.hpp"
 #include "baked-emission-access.hpp"
 #include "emission-fallback-metrics.hpp"
@@ -20,6 +21,7 @@
 #include "dome/humanoid-creator.hpp"
 #include <nlohmann/json.hpp>
 #include <bit>
+#include <mutex>
 #include <set>
 #include <tuple>
 namespace dome::detail {namespace {
@@ -62,6 +64,32 @@ EmissionExportRaster raster(const SculptObject &object,const std::function<bool(
  const auto baked=paint.baked();
  const bool baked_float=baked&&baked->emission_field;
  EmissionRgb original=toon?typed_background:object.material.emissive;if(binding&&binding->physical_emission)original=*binding->physical_emission;
+ const bool source_overridden=binding&&binding->physical_emission;
+ const bool typed_sampler=toon&&typed_emission.image&&!source_overridden;
+ if(compute_backend()!="CPU"&&!typed_sampler){
+  struct State {
+   std::mutex mutex;
+   std::unique_ptr<EmissionRasterDevice> device;
+  };
+  auto state=std::make_shared<State>();
+  PaintSourceTexture source;
+  if(!toon&&!source_overridden&&maps)source=maps->emission;
+  // Metadata-only qualification does not allocate an upload. Scanline
+  // readers retain the same immutable, device-resident grid across passes.
+  auto read=[state,owner=paint.snapshot(),padding,source=std::move(source),original,legacy_strength,r,cancelled]
+            (uint32_t y0,std::span<EmissionExrPixel> rows){
+    const size_t first=size_t(y0)*r;
+    if(first>padding.size()||rows.size()>padding.size()-first)
+      throw std::logic_error("HDR field read exceeds its owning raster");
+    stop(cancelled);
+    if(rows.empty())return;
+    std::lock_guard lock(state->mutex);
+    if(!state->device)
+      state->device=create_emission_raster_device(*owner,padding,&source,original,legacy_strength,cancelled);
+    state->device->read(first,rows,cancelled);
+  };
+  return {r,baked_float?2u:1u,storage+emission_raster_staging_bytes(paint),std::move(read)};
+ }
  auto read=[padding,baked,&paint,cancelled,maps,binding,
             toon=std::move(toon),typed_emission=std::move(typed_emission),legacy_strength,original,baked_float,r,count]
            (uint32_t y0,std::span<EmissionExrPixel> rows){

@@ -1,0 +1,139 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#pragma once
+
+#include "emission-raster-device.hpp"
+#include "paint-composite-kernel.hpp"
+#include "paint-source-coordinate-kernel.hpp"
+
+#if defined(__CUDACC__) || defined(__HIPCC__)
+#define DOME_EMISSION_FN __host__ __device__ inline
+#else
+#define DOME_EMISSION_FN inline
+#endif
+#if defined(__SYCL_DEVICE_ONLY__)
+// Keep the integer binary64 implementation shared between the many blend
+// and resolve operations in the Arc program instead of cloning its body.
+#define DOME_EMISSION_MATH [[clang::noinline]] inline
+#else
+#define DOME_EMISSION_MATH DOME_EMISSION_FN
+#endif
+
+namespace dome::detail::emission_raster {
+struct DeviceInput {
+  const int32_t *padding=nullptr;
+  const Layer *layers=nullptr;
+  const Entry *entries=nullptr;
+  const CommonPixel *common=nullptr;
+  const PackedField *physical=nullptr;
+  const uint32_t *physical_values=nullptr;
+  const paint_compute::Quantization *quantization=nullptr;
+  Bake bake;
+  Source source;
+  uint32_t background[3]{},strength=0,resolution=0,layer_count=0,tiles_per_layer=0;
+};
+
+inline constexpr uint32_t one32=0x3f800000, max32=0x7f7fffff, invalid=0x7fc00000;
+inline constexpr uint64_t one64=0x3ff0000000000000ull, sign64=1ull<<63;
+
+DOME_EMISSION_FN uint32_t magnitude(uint32_t value){return value&0x7fffffffu;}
+DOME_EMISSION_FN uint64_t widen(uint32_t value){return paint_grid::widen_float_bits(value);}
+DOME_EMISSION_FN uint32_t narrow(uint64_t value){return paint_grid::narrow_float_bits(value);}
+DOME_EMISSION_MATH uint64_t product64(uint64_t a,uint64_t b){return paint_grid::mul(a,b);}
+DOME_EMISSION_MATH uint64_t sum64(uint64_t a,uint64_t b){return paint_grid::add(a,b);}
+DOME_EMISSION_FN uint32_t product(uint32_t a,uint32_t b){return narrow(product64(widen(a),widen(b)));}
+DOME_EMISSION_FN uint32_t sum(uint32_t a,uint32_t b){return narrow(sum64(widen(a),widen(b)));}
+DOME_EMISSION_FN uint64_t complement(uint32_t value){return sum64(one64,widen(value)^sign64);}
+DOME_EMISSION_FN bool bounded(uint32_t value,uint32_t limit){
+  return magnitude(value)==0||value<=limit;
+}
+DOME_EMISSION_FN void unpack(PackedField field,const uint32_t *data,size_t index,uint32_t (&result)[7]){
+  size_t next=field.offset+index*field.stride;
+  for(unsigned k=0;k<7;++k)result[k]=field.mask&(1u<<k)?data[next++]:field.constants[k];
+}
+DOME_EMISSION_FN void base(const Bake &bake,const paint_compute::Quantization &q,size_t at,uint32_t (&value)[7]){
+  if(bake.physical){
+    if(bake.dense){
+      for(unsigned k=0;k<7;++k)value[k]=bake.dense[at*7+k];
+    }else{
+      unpack(bake.packed,bake.varying,at,value);
+      if(bake.coverage_bits)value[6]=((bake.coverage_bits[at/32]>>(at%32))&1u)?one32:0;
+    }
+  }else if(bake.coverage){
+    value[6]=paint_compute::bits(q.unit[bake.coverage[at]]);
+    for(unsigned k=0;k<3;++k)
+      value[k]=product(paint_compute::bits(q.srgb[bake.legacy[at*4+k]]),value[6]);
+  }
+}
+DOME_EMISSION_FN bool valid_coefficients(const uint32_t (&value)[7],bool physical){
+  if(!bounded(value[6],one32))return false;
+  const auto limit=product(physical?max32:std::bit_cast<uint32_t>(maximum_native_emission),value[6]);
+  for(unsigned k=0;k<3;++k)
+    if(!bounded(value[k],magnitude(value[6]))||!bounded(value[k+3],magnitude(limit)))return false;
+  return true;
+}
+DOME_EMISSION_FN bool apply_layer(const DeviceInput &input,size_t layer,Entry entry,size_t within,uint32_t (&value)[7]){
+  if(entry.common==absent&&entry.physical==absent)return true;
+  const CommonPixel common=entry.common==absent?CommonPixel{{0,0,0},0,255}:
+    input.common[size_t(entry.common)*tile_pixels+within];
+  uint32_t paint[7]{};
+  const auto &q=*input.quantization;
+  if(entry.physical!=absent)unpack(input.physical[entry.physical],input.physical_values,within,paint);
+  else{
+    for(unsigned k=0;k<3;++k)paint[k]=paint_compute::bits(q.srgb[common.legacy[k]]);
+    paint[6]=paint_compute::bits(q.unit[common.coverage]);
+  }
+  const auto opacity=product(input.layers[layer].opacity[common.mask],paint[6]);
+  if(!magnitude(opacity))return true;
+  if(!valid_coefficients(value,input.bake.physical)||!bounded(opacity,one32))return false;
+  const auto remaining=complement(opacity);
+  if(input.bake.physical){
+    for(unsigned k=0;k<7;++k){
+      const auto above=k==6?opacity:product(paint[k],opacity);
+      value[k]=narrow(sum64(sum64(0,widen(above)),product64(widen(value[k]),remaining)));
+    }
+  }else{
+    const auto residual=narrow(remaining);
+    for(unsigned k=0;k<6;++k)value[k]=sum(product(value[k],residual),product(paint[k],opacity));
+    value[6]=sum(product(value[6],residual),opacity);
+  }
+  return true;
+}
+DOME_EMISSION_FN void render(const DeviceInput &input,size_t at,uint32_t *destination){
+  const auto owner=input.padding[at];
+  const auto source=owner<0?at:size_t(owner);
+  if(source>=size_t(input.resolution)*input.resolution){destination[0]=invalid;return;}
+  const auto x=uint32_t(source%input.resolution),y=uint32_t(source/input.resolution);
+  const auto tile=(y/32)*(input.resolution/32)+x/32,within=(y%32)*32+x%32;
+  uint32_t value[7]{};
+  base(input.bake,*input.quantization,source,value);
+  for(unsigned layer=0;layer<input.layer_count;++layer){
+    if(!apply_layer(input,layer,input.entries[size_t(layer)*input.tiles_per_layer+tile],within,value)){
+      destination[0]=invalid;
+      return;
+    }
+  }
+  if(!valid_coefficients(value,input.bake.physical)){
+    destination[0]=invalid;
+    return;
+  }
+  uint32_t background[]{input.background[0],input.background[1],input.background[2]};
+  if(input.source.rgba){
+    const auto &job=input.source.coordinates;
+    const auto taps=paint_compute::source_coordinates(job,x,y);
+    float source_rgba[4];
+    paint_compute::sample_source_taps(input.source.rgba,job.width,job.nearest,taps,true,*input.quantization,source_rgba);
+    for(unsigned k=0;k<3;++k)background[k]=product(background[k],paint_compute::bits(source_rgba[k]));
+  }
+  const auto residual=input.bake.physical?complement(value[6]):widen(narrow(complement(value[6])));
+  for(unsigned k=0;k<3;++k){
+    const auto shade=product64(widen(background[k]),residual);
+    const auto legacy=product64(widen(value[k]),widen(input.strength));
+    const auto radiance=sum64(sum64(shade,legacy),widen(value[k+3]));
+    if((radiance&~sign64)>widen(max32)&&input.bake.physical){destination[0]=invalid;return;}
+    destination[k]=narrow(radiance);
+  }
+  for(unsigned k=0;k<7;++k)destination[3+k]=value[k];
+}
+}
+#undef DOME_EMISSION_MATH
+#undef DOME_EMISSION_FN
