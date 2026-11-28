@@ -196,12 +196,26 @@ exactly. The native Save reopens with an editable mirrored key, and one
 Undo or Redo moves between the original and refined projects. Native DomeD
 Wayland and synthetic OpenXR pass on Arc A770. The 10,000-triangle fixture
 matches the headless oracle at every ordered corner and barycentric record.
-CUDA and ROCm compile the device code and refuse absent devices. The mode
-currently admits native unskinned meshes with plain strict UV0 paint and
-representable native frames. Refined Mirror for imported, skinned and
-retained materials and Bake, physical headset and positive AMD and NVIDIA
-execution remain open.
+CUDA and ROCm compile the device code and refuse absent devices.
 [Refined surface Mirror evidence](validation/key-mirror-refinement-gpu-20261128.json)
+
+Refined surface also works on native rigged meshes with plain strict UV0
+paint and representable native frames. The editor keeps exact joint rows at
+old corners and interpolates new rows from the original face without
+pruning. Shared vertices retain their indexed topology when both source
+fields agree. Independently weighted seams remain split. A row requiring
+more than 32 influences refuses atomically. Native rig and shapekey Restore
+remain available after Save and Open. A posed Smooth stroke uses the shared
+neighbors. The independent cgltf check reads the authored morphs, joint
+weights, inverse binds and expression bindings. Its evaluated pose matches
+the native mesh within 6.7e-8 metres for the test fixture. All 16 selected
+Arc Release tests pass, including 52 synthetic OpenXR assertions. The
+separate nested DomeD Wayland run passes. The native project and exported GLB
+match the headless reference byte for byte. The focused ASan/UBSan runs pass.
+Imported rigs, linked source rigs, retained materials, baked textures and
+varying frames outside the native direction contract remain open. Positive
+AMD and NVIDIA execution and physical headset testing are still pending.
+[Native rigged Mirror evidence](validation/key-mirror-rigged-20261128.json)
 
 Ambient occlusion in Bake now traces the biased hemisphere on the selected
 GPU against the existing immutable source BVH. The device returns one

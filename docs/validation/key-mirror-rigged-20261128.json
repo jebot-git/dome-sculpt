@@ -1,0 +1,110 @@
+{
+  "date": "2026-11-28",
+  "product": "8c3a303e05826d3db2c9aa4739d03f9cadf387b5",
+  "preceding": "6bed87eb86b01d26633150d986ee9e6c91be2192",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Refined Surface Mirror on native skinned meshes with strict writable UV0 and representable native frames. GPU overlap search, host common-refinement topology and sparse skin interpolation.",
+  "arc_a770": {
+    "application_sha256": "98289395f8d8585941dd836ea8590b0481afd68fd7967830d0482047d840866c",
+    "render_node": "/dev/dri/renderD129",
+    "release": {
+      "tests": [
+        "key-mirror-refinement-rigged",
+        "key-mirror-vertex",
+        "key-mirror-refinement",
+        "weight-authoring",
+        "xr-mirror-control-faults",
+        "key-mirror-refinement-authoring",
+        "weight-edit",
+        "xr-mirror-controls",
+        "skin-authoring",
+        "application-missing-gpu",
+        "key-mirror-relative-owning",
+        "skin-normal-transport",
+        "skin-affine-export",
+        "key-mirror-correspondence",
+        "key-mirror-refinement-missing-gpu",
+        "shapekey-mirror-openxr"
+      ],
+      "log_sha256": "ba0910abb1f97070b0fda5de88cf1b693d8b1fce128ba109c67277d1e932a33c"
+    },
+    "native_authoring": {
+      "archives": {
+        "source.dsculpt": "ff59490dc12e1dfc1a5d2a5c48680d2276e4829e182136d5116194a50eab545f",
+        "refined-mirror.dsculpt": "f826c2d323f4b98270d6eab1af7ebbfc564b3659b8738e75c5409dd670d097bd",
+        "refined-skin.glb": "6baa61288f0fa429cfe30ed9dcd054ff37063cdb104160cb85aa4db6f597aa6b"
+      },
+      "headless_reference_outputs_identical": true,
+      "preserves_sparse_weight_field_and_original_corner_rows": true,
+      "preserves_continuous_topology_and_independent_skin_seams": true,
+      "influence_overflow_leaves_native_scene_exact": true,
+      "smooth_weight_stroke_uses_shared_triangle_neighbors": true,
+      "independent_glb": {
+        "vertices": 9,
+        "maximum_posed_position_error": 6.664e-08,
+        "validates_hierarchy_and_inverse_binds": true,
+        "analytical_morph_and_skin_accessor_fields": true,
+        "humanoid_joints_and_expressions_in_glb_extras": true
+      }
+    },
+    "nested_domed_wayland": {
+      "driver_checks": 9,
+      "saved_project_checks": 9,
+      "report_sha256": "89664fb52d4a6e790276be95b58f914db4adae3f16dbc22a7632e49da0a4bd1d",
+      "full_log_sha256": "f0555676f31cc15d99312fbf3ee3dd40696930f28f0095388514979f12a34a67",
+      "compute_trace_sha256": "ec133e7edbd0ca76903146c3b909dcd030b3eb8dc6dcd78c28e88ef335b39826",
+      "saved_projects": {
+        "mirror-before.dsculpt": "ff59490dc12e1dfc1a5d2a5c48680d2276e4829e182136d5116194a50eab545f",
+        "mirror-after.dsculpt": "94589a7022ce907001595f7c19f97642e5dbdf7bad0bc5653f6060dcb1ccac08"
+      }
+    },
+    "synthetic_openxr": {
+      "checks": 52,
+      "physical_headset": false,
+      "report_sha256": "aa0d34c97f69348a7fd95219b59860158d34f7feb1fb76a075dad6c3599e03dd",
+      "new_rigged_projects": {
+        "refined-source-rigged.dsculpt": "9f89bb6ff21e692de351404d6471f6c14e11b8a803fda9c1a0cef28903b7e950",
+        "accept-3-rigged.dsculpt": "dc20f2f37bbb8bbcf37be7fd0986049816f3eb67e501fd9e939b659df0d19d88"
+      },
+      "unchanged_preceding_captures": {
+        "accept-0.dsculpt": "cf3a4871e1d88af8e8313ba2772e406fef16e5c9bbbf2129b9be5347437e3992",
+        "accept-1.dsculpt": "6a5ce46bca85bcde074bc2251b1ddf69684d6a3b1336aeb83ff2b0db3b481080",
+        "accept-2.dsculpt": "16ea54370d05fb55095be502ff9926c03c06e953f724b123304b080f361b0451",
+        "cancel-0.dsculpt": "8e16ca54b46ba261d92562c5aa0667c14121df4db80cd233367e66799910d23d",
+        "focus-0.dsculpt": "8e16ca54b46ba261d92562c5aa0667c14121df4db80cd233367e66799910d23d",
+        "source.dsculpt": "8e16ca54b46ba261d92562c5aa0667c14121df4db80cd233367e66799910d23d"
+      }
+    }
+  },
+  "headless_reference": {
+    "tests": [
+      "cpu-reference-install-refused",
+      "key-mirror-refinement",
+      "key-mirror-refinement-authoring",
+      "key-mirror-refinement-rigged",
+      "xr-mirror-controls"
+    ],
+    "log_sha256": "ced298fcc6e2b90cfa9a41cd2dc4236a434aa41567203146cb2d34c9777e4b12"
+  },
+  "scoped_asan_ubsan": {
+    "instrumented": [
+      "src/shapekey-refinement.cpp",
+      "src/key-mirror-refinement.cpp",
+      "tests/key-mirror-refinement.cpp"
+    ],
+    "geometry_log_sha256": "71b281c74dc9ecdd2f6d29c16321f7b5e915468d87a098096f543e52c621d21a",
+    "rigged_authoring_log_sha256": "c1b9b7f84fa7bfa263d9a400d2216312b95fa97bfa7d9a0ed374394c6605f828",
+    "leak_detection": false
+  },
+  "positive_vendor_execution": {
+    "oneapi": true,
+    "cuda": false,
+    "rocm": false
+  },
+  "remaining_domains": [
+    "imported and original-node linked rigs",
+    "retained materials and Bake",
+    "nonrepresentable interpolated frames",
+    "physical headset"
+  ]
+}
