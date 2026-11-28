@@ -1,0 +1,88 @@
+{
+  "date": "2026-11-28",
+  "product": "1988ad0170db61ee4557a4b7a6c9057f3e2922a8",
+  "preceding": "8c4ffdc4f56b91f978319aa1338fd00ed4b2abf4",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Native Bake original tangent-normal image and covered canonical baked normal filtering on the selected GPU.",
+  "oneapi_arc_release": {
+    "application_sha256": "cffcaf7b5213750f4e064ff7ceaa350ff7696a4eeba78a494f22321c033c5a21",
+    "release_fltk_core_sha256": "35aa46ebf11f5f3a9772d926b05a24938572471d9dbcf3e2718e98376fadbdb3",
+    "regression": {
+      "passed": 27,
+      "junit_sha256": "9f3aff6c8dcd5554cebb9d6b4b6d4722887bda5117be2ea699a2b7c020d7cc40",
+      "full_log_sha256": "d4a539b5673cb2692a3e8beaf1adbc6189fb09ffe085cdf990e3d1e8622d214b",
+      "synthetic_openxr": 4
+    },
+    "retained_and_prepared_normal_regression": {
+      "passed": 3,
+      "junit_sha256": "890daa149f791968918d2eb0851c56d51b91b4b26e36fd17e25e3e0451b4ab0c",
+      "full_log_sha256": "0cb7e2eb43f50cdee3c82506a14330c651da8886e01fba2630795809570adaa6",
+      "synthetic_openxr": 0
+    },
+    "exact_samples": {
+      "original_normal_image": 703,
+      "covered_normal": 2667,
+      "log_sha256": "5ea8ad73f1c75c54d7b62bc681f11ae2b2844c7201cb39d93551cf8101dbf2b0"
+    },
+    "benchmark_1024_derivative_basis": {
+      "projected_texels": 1048576,
+      "projection_rays": 1048576,
+      "native_project_sha256": "6c65f381e723e23b3052e5b808c047650a51de0ae83499b26f6c6713ba484ff3",
+      "seconds_cold_then_warm": {
+        "preceding": [
+          11.397,
+          0.617699
+        ],
+        "candidate": [
+          11.3137,
+          0.540639
+        ]
+      },
+      "log_sha256": "19911f3cc8ac4690cc9d129bbbc28b25d1fddab6857d008fa313672e0d222955"
+    },
+    "benchmark_512_supplied_basis": {
+      "projected_texels": 262144,
+      "projection_rays": 262144,
+      "native_project_sha256": "93f16b88d9e0f2b829a54616c039d7524fd105353dea4ebc835e34916a3c72c9",
+      "seconds_cold_then_warm": {
+        "preceding": [
+          9.46197,
+          0.144023
+        ],
+        "candidate": [
+          9.83755,
+          0.129611
+        ]
+      },
+      "log_sha256": "317d06c58538735584844ca6c1965d5966c60c234e241f6feeac7d72f7bce33f"
+    },
+    "wayland": {
+      "passed": 15,
+      "report_sha256": "3206993dcd5a5c556e4a8584dc324197fcbb72c60819d1efa07f2d98534a9aa7",
+      "runtime_maps_sha256": "e94ccca7559b6233526d587cce8a64a0c1928953beee6fb5e546ae95b33f2c85",
+      "log_sha256": "7da9cfce96520b667aa0ea96b0e11d228d31e03745f6d6777fc0e0fb2531ea26"
+    },
+    "no_device_refusal": "No device of requested type 'info::device_type::gpu' available."
+  },
+  "headless_reference": {
+    "passed": 4,
+    "log_sha256": "1ea44428a645179127deb092b237eebd8a9ea6716ad1601b1b4a9e3238499afd",
+    "asan_ubsan_bake_source_maps_mesh_processing_sha256": "28c18567cf614f71b7bec803c142703eea04ae5aa071ebe178f179667d87e85c"
+  },
+  "cuda_and_rocm": {
+    "cuda": {
+      "compiled_kernel_sha256": "40d40234b9a38d50a5226827bb9e3d3dcc627687fb946ea15aef8dd04a32ce21",
+      "no_device_refusal": "CUDA driver version is insufficient for CUDA runtime version"
+    },
+    "rocm": {
+      "compiled_kernel_sha256": "3943cb45077e3916c7c41ead5e76c70f444295890545512a4cfe96bd2ffdf839",
+      "no_device_refusal": "no ROCm-capable device is detected"
+    }
+  },
+  "limits": [
+    "The worker still evaluates tangent frames, authored normal resolvers and explicit FLOAT radiance.",
+    "The timing fixtures use a reflected affine source normal, partial canonical coverage and five paint layers without ambient rays.",
+    "CUDA and ROCm compile and link the kernels. Positive AMD and NVIDIA execution and physical headset testing remain open.",
+    "Headless reference and sanitizer runs cover host code without the application frontends."
+  ]
+}

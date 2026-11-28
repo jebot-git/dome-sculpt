@@ -149,7 +149,10 @@ affine transform, wrapping and filter. Canonical detail uses current UV0,
 independent baked coverage and the immutable padding owner. The worker
 uses the resulting samples with the original or supplied tangent basis and
 the canonical Mikk frame. Explicit prepared and retained normal resolvers
-still own their frame evaluation.
+still own their frame evaluation. The 1024² derivative-frame fixture and the
+512² supplied-frame fixture both produced byte-identical native projects.
+Warm Arc Bake took 0.54 and 0.13 seconds, down from 0.62 and 0.14 seconds.
+[GPU Bake normal evidence](validation/bake-normal-gpu-20261128.json)
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing

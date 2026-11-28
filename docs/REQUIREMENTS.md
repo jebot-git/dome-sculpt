@@ -53,6 +53,7 @@ The original sampler retains independent coordinates and affine addressing.
 Canonical detail reads the current UV0, the baked coverage and its padding
 owners. Raw tangent-frame evaluation and explicit prepared normal resolvers
 remain on the worker.
+[GPU Bake normal evidence](validation/bake-normal-gpu-20261128.json)
 
 Eligible 512–2048 current-grid RGB8 Bake materials now composite color, ORM
 and legacy emission on the selected GPU. Their ordered paint, coverage,
