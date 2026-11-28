@@ -121,6 +121,15 @@ compositor resolves the sparse authored and baked layers. The work limit
 can stage a single original image without changing the compiled output.
 [Mapped source material evidence](validation/mapped-source-material-gpu-20261128.json)
 
+Standard GLB can emit spatially varying paint in its own texture
+coordinate set when the affected role's original contribution is
+constant or fully covered across the sampled surface. Untouched roles
+preserve their original sampling. The selected GPU encodes the native
+atlas and the exporter verifies masked alpha before changing its
+binding. General mixed independent sampling and physical headset
+qualification remain open.
+[Spatial Standard GLB evidence](validation/spatial-source-paint-glb-20261128.json)
+
 ## Current validation — 2026-11-27
 
 The [current handoff](HANDOFF.md) records the exact combined Release, Arc,

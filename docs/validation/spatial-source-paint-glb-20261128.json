@@ -1,0 +1,74 @@
+{
+  "date": "2026-11-28",
+  "product": "377e06c2ef22f6f7eb2709f6243d4c9adf3772c2",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Role-specific writable atlas for spatially varying Core PBR paint in Standard GLB.",
+  "admission": {
+    "proof": "Each rewritten channel has a constant original contribution or complete authored coverage through all reachable bilinear texels.",
+    "textures": "Generated color, packed metallic-roughness and emission use the writable grid and clamp/linear filtering. Untouched roles keep original image, sampler, transform and UV.",
+    "masked_alpha": "Exact texel alpha or constant material factor. Refusal preserves the prior output and native ownership.",
+    "resolution_for_test": 64
+  },
+  "arc": {
+    "device": "Intel Arc A770, oneAPI Level Zero and hardware EGL",
+    "checks": 433
+  },
+  "release_ctest": [
+    "emission-raster-finite-compute",
+    "source-material-raster-compute",
+    "emission-raster-mapped-compute",
+    "emission-raster-mapped-missing-gpu",
+    "emission-raster-texture-set-compute",
+    "source-paint-export",
+    "source-paint-bake",
+    "source-paint-authoring",
+    "source-paint-physical-authoring",
+    "vrm1-source-export",
+    "raw-hdr-authoring",
+    "xr-editable-export"
+  ],
+  "asan_ubsan": {
+    "mode": "opt-in headless CPU reference",
+    "checks": 433
+  },
+  "fixtures": {
+    "spatial-color": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 9788,
+      "sha256": "e68f51a66633e6f97b50b960578072e9968b38851e87419a4027ff42e54824a0",
+      "errors": 0,
+      "warnings": 0,
+      "arc_render_error_bytes": 1
+    },
+    "spatial-orm": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 6052,
+      "sha256": "9b48b8c432f9c434719b7399d0be6f33958908b6c6ec7eb772dbfdf3f4eb9cd8",
+      "errors": 0,
+      "warnings": 0,
+      "arc_render_error_bytes": 1
+    },
+    "spatial-cover": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 6712,
+      "sha256": "4d01f02d33a75905bf9cb660bf8f13d30082955de757d6eea742348503eb9f34",
+      "errors": 0,
+      "warnings": 0,
+      "arc_render_error_bytes": 1
+    }
+  },
+  "native_wayland": {
+    "checks": 7,
+    "artifact_sha256": "e68f51a66633e6f97b50b960578072e9968b38851e87419a4027ff42e54824a0"
+  },
+  "openxr": {
+    "checks": 10,
+    "synthetic_tracking": true,
+    "artifact_sha256": "e68f51a66633e6f97b50b960578072e9968b38851e87419a4027ff42e54824a0",
+    "before_and_after_native_sha256": "3d300e161a38a31ea8f4065e802c58f9a0995442fe104d1fcff1bece0c261773"
+  },
+  "open": [
+    "General mixed varying independent-UV radiance requires the explicit portable bake.",
+    "Typed materials and physical headset testing remain separate requirements."
+  ]
+}

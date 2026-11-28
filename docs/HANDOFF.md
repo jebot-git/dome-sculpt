@@ -385,9 +385,8 @@ The Arc export fixture and the headless ASan/UBSan reference each pass
 ORM, and partial coverage over a constant source image. Seven focused
 Release tests pass. Nested DomeD Wayland and the native OpenXR loader with
 synthetic input produce the same Standard GLB as the file worker.
-Unrepresentable mixtures still require explicit portable baking,
-including spatially varying paint and partial paint over a varying
-source with a nonzero added color. The refusal controls preserve the
+Partial paint over a varying source with a nonzero added color still
+requires explicit portable baking. The refusal controls preserve the
 previous file and execute the following native Save.
 [Standard GLB source paint evidence](validation/strict-source-paint-glb-20261128.json)
 
@@ -430,6 +429,26 @@ ROCm compile the kernels and refuse missing devices. Physical headset
 qualification and general direct Standard GLB for varying independent-UV
 paint remain open.
 [Mapped source material evidence](validation/mapped-source-material-gpu-20261128.json)
+
+Standard GLB can now carry spatially varying Core PBR paint when the
+rewritten role's background is constant or proved fully covered. The
+worker checks the reachable bilinear taps, including chart padding, and
+uses the selected GPU to encode the writable atlas at its native
+resolution. Color, metallic-roughness and emission can share the atlas.
+Untouched images and their transforms use their original coordinates.
+Masked color requires exact alpha at the source taps or a constant alpha
+factor. Mixed independently varying backgrounds still require the
+explicit portable export.
+
+On Arc, the independent consumer matches all three new rendered cases
+within one output byte. They cover color and emission with original
+normal and ORM, painted metal and roughness with original color and
+normal, and full coverage over a varying color texture with MASK alpha.
+All three files pass Khronos validation with zero errors and warnings.
+Twelve focused Release tests pass. The Arc and headless sanitizer runs
+each pass 433 checks. The Standard GLB file worker, native menu, and
+synthetic OpenXR controller selection preserve the exact editable project.
+[Spatial Standard GLB evidence](validation/spatial-source-paint-glb-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
