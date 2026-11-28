@@ -1,0 +1,148 @@
+{
+  "date": "2026-11-28",
+  "product": "755635ae6bfd0e1329a39480f95222ccbc5f4e6e",
+  "preceding": "2d6437c7173afb8d75b469f055d2cfbdae9c672b",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Bake target atlas coverage, writable mask, ownership, and overlap counting on the selected GPU.",
+  "oneapi_arc_release": {
+    "application_sha256": "f1586f56ebd43b93b13921a3b68492f8dc7649d197d4a6876a22063a619ed854",
+    "focused": {
+      "passed": 15,
+      "junit_sha256": "a93fcbd2cce1555ef27b1a69b7a2ca2918084b2af8c90f9b62ca335aafd23fa5"
+    },
+    "focused_full_log_sha256": "85db413130a9c6bdb29630733bf0f409eb06bb1f8d4f6dd2b1f0de763638dec9",
+    "material_authoring": {
+      "passed": 6,
+      "junit_sha256": "3c71be5fb6416677820ac568eea3a185150863a9e8ae9346aa2c635097a417ec"
+    },
+    "material_full_log_sha256": "7fb0047e8329df01ac9444af5b2412f386600681ed98ad5f1f2b3fe122dc7d1f",
+    "dense_2048_retained_bake": {
+      "passed": 1,
+      "junit_sha256": "9a1efc547f314c82b687793b0c3b3970eb2492f447d60618b5b2df3ee8d4d964",
+      "workflow_checks": 13,
+      "full_log_sha256": "59ad651deb439ce5f84e9d4bf40d4692196337c92f10ac1bf10f041738075098"
+    },
+    "no_device_refusal": "No device of requested type 'info::device_type::gpu' available.",
+    "atlas_oracle": {
+      "resolution": 389,
+      "candidates": 573467,
+      "batches": 18,
+      "ordered_bit_exact_winners": 137608,
+      "overlaps": 39311,
+      "kernel_launches": {
+        "target_raster": 18,
+        "stable_compaction": 18
+      },
+      "traced_log_sha256": "67987c69b57d00ac1292549d43211543432bd4168975fdf9efcf4f9946da2727"
+    },
+    "benchmarks": {
+      "512_combined_cold": {
+        "exact_native_archive_sha256": "1062add51b001620d6b2655bcf682c4e942dfceb7988d89ca197519b55d59b00",
+        "projected_texels": 262144,
+        "total_rays": 17039360,
+        "distinct_ao_bytes": 53,
+        "seconds": {
+          "preceding": [
+            8.20152
+          ],
+          "candidate": [
+            8.51302
+          ]
+        },
+        "log_sha256": "48f4e3d240c542fd7e6ede03deedad019f753ad8fac311fee98813da35be1bc6"
+      },
+      "1024_projection_cold_then_warm": {
+        "exact_native_archive_sha256": "3e091457d8f7f62aeed1bdf48e4cfdf3cc608956285df5853ac22a9c7583348c",
+        "projected_texels": 1048576,
+        "total_rays": 1048576,
+        "distinct_ao_bytes": 1,
+        "seconds": {
+          "candidate": [
+            5.46279,
+            0.577549,
+            0.593281
+          ],
+          "preceding": [
+            5.05787,
+            0.58225,
+            0.578685
+          ]
+        },
+        "log_sha256": "40e04178df94d50fb300837f87ab9c4bf55d15d8ea36dd279e5710642eeff869"
+      }
+    }
+  },
+  "nested_wayland": {
+    "checks": 15,
+    "report_sha256": "3206993dcd5a5c556e4a8584dc324197fcbb72c60819d1efa07f2d98534a9aa7",
+    "dma_buf_render_node": "/dev/dri/renderD129",
+    "trace_sha256": "2c33d1be271bbdef6cff36ff83918730b3ebf0a9b22c64ea38b3517667d964e0",
+    "kernel_launches": {
+      "target_raster": 1,
+      "stable_compaction": 1
+    },
+    "exact_active_set_save_clear_and_undo": true
+  },
+  "synthetic_openxr": {
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "suites": {
+      "bake-cage-xr": {
+        "checks": 21,
+        "report_sha256": "7e8949de5105428d14cf8e2622a4a7e9dc383648aea4783a7307d96be63d48ff",
+        "native_project_sha256": "ad45bc1cb2727b0bd42ba47a86ad3b44bf06c347406a43efbb240e781055ba89",
+        "stereo_submissions": 86,
+        "images_acquired_waited_and_released": 172
+      },
+      "bake-recipes-xr": {
+        "checks": 22,
+        "report_sha256": "f48e8a4a93ca396c1595859d68ea0c7b859f811f300db398dbcbc98c32e823b9",
+        "native_project_sha256": "c497a7a385907bb3cbe0d7901b0a6aaba2b2a342fe45a1bdb4fd78fc24581b8d",
+        "stereo_submissions": 86,
+        "images_acquired_waited_and_released": 172
+      },
+      "texture-set-active-bake-openxr": {
+        "checks": 19,
+        "report_sha256": "adabf84b795df8d36f9ed533335dab271845709f2d8d68cbd0741d595311b18b",
+        "native_project_sha256": "4391b246e47412949b07eebd2e969ddec55ae4e35552259cf0a172f1846412ef",
+        "stereo_submissions": 86,
+        "images_acquired_waited_and_released": 172
+      },
+      "mtoon-texture-set-bake-openxr": {
+        "checks": 19,
+        "report_sha256": "adabf84b795df8d36f9ed533335dab271845709f2d8d68cbd0741d595311b18b",
+        "native_project_sha256": "3840bb393dceb07f022228961663763fb333d2aac9dfb5876104b85ca0e1494a",
+        "stereo_submissions": 86,
+        "images_acquired_waited_and_released": 172
+      }
+    }
+  },
+  "headless_reference": {
+    "focused": {
+      "passed": 4,
+      "junit_sha256": "c7198bf79bbe8fab5af3f305dd8d11f790230e401b6cd18690e69d343d930b37"
+    },
+    "scoped_asan_ubsan": {
+      "sources": [
+        "src/bake.cpp",
+        "src/mesh-processing.cpp",
+        "tests/bake.cpp"
+      ],
+      "log_sha256": "28c18567cf614f71b7bec803c142703eea04ae5aa071ebe178f179667d87e85c"
+    }
+  },
+  "cuda_and_rocm": {
+    "cuda": {
+      "compiled_kernel_sha256": "5ce7bd1cfbcb0108caa97b3a644f9da52492bb40cb0af0e71c464a6e84ae0a6c",
+      "no_device_refusal": "CUDA driver version is insufficient for CUDA runtime version"
+    },
+    "rocm": {
+      "compiled_kernel_sha256": "165caa6eab41c20f70440201546978bf3ba0c33b3ca32d9f85e8fad061617a1f",
+      "no_device_refusal": "no ROCm-capable device is detected"
+    }
+  },
+  "limits": [
+    "The host prepares triangle bounds and cage frames and resolves materials. Readback contains each batch\u2019s winning barycentrics, ordered range metadata and overlap count.",
+    "The paired benchmarks cover one synthetic donor. Warm 1024 projection is near parity and cold startup includes the new raster program.",
+    "CUDA and ROCm compile and link the kernels and refuse missing hardware. Positive runs on those backends and physical headset testing remain open."
+  ]
+}
