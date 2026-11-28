@@ -372,6 +372,25 @@ headless sanitizer suites pass. The small end-to-end Arc suites take
 slightly longer after moving the image sampling to the device.
 [Editable GLB role sampling evidence](validation/source-paint-export-gpu-20261128.json)
 
+Standard GLB can now carry prepared-source paint when its contributions
+reduce to constant Core PBR factors across the complete writable surface.
+The file worker checks every reachable bilinear tap, including chart
+padding. It keeps untouched images, transforms, and UV sets in the
+original source coordinates. A shared metallic-roughness image can keep
+every original roughness sample while a uniform metallic coat becomes a
+material factor. Mask-only changes preserve the pristine GLB bytes.
+
+The Arc export fixture and the headless ASan/UBSan reference each pass
+404 checks, including uniform paint over an active morph, UV1 normals and
+ORM, and partial coverage over a constant source image. Seven focused
+Release tests pass. Nested DomeD Wayland and the native OpenXR loader with
+synthetic input produce the same Standard GLB as the file worker.
+Unrepresentable mixtures still require explicit portable baking,
+including spatially varying paint and partial paint over a varying
+source with a nonzero added color. The refusal controls preserve the
+previous file and execute the following native Save.
+[Standard GLB source paint evidence](validation/strict-source-paint-glb-20261128.json)
+
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
 their hashes verified and their workspace paths preserved. The same sweep

@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-28",
+  "product": "b0813e37254e39ed7daaea30f479fc7f140ec241",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Direct Standard GLB Core PBR factors for certified uniform independent source paint and effect-free layers.",
+  "proof": {
+    "paint_footprint": "Conservative triangle and bilinear support bounds; deduplicated actual padding owners; constant premultiplied overlay and coverage.",
+    "source_material": "Untreated images, settings and original UVs remain paired. Fully covered channels or constant source channels can become factors. Shared ORM keeps its unaffected channel.",
+    "resolution": 64,
+    "arc_suite_checks": 404,
+    "certified_render_bound_bytes": 2,
+    "mask_only_and_pristine_sha256": "aaa46fe3a471e370fbe3a79faebfdf12883642ccee98d75fe892ee9886f7c244"
+  },
+  "actual_gpu": "Intel Arc A770 hardware EGL and oneAPI Release",
+  "release_ctest": [
+    "source-paint-export",
+    "source-paint-bake",
+    "source-paint-authoring",
+    "source-paint-physical-authoring",
+    "vrm1-source-export",
+    "raw-hdr-authoring",
+    "xr-editable-export"
+  ],
+  "asan_ubsan": {
+    "suite": "source-paint-export",
+    "checks": 404,
+    "mode": "headless CPU reference and software EGL consumer"
+  },
+  "nested_domed_wayland": {
+    "checks": 7,
+    "artifact_sha256": "41d7b80eab1fa1bc7b4adead9bc31ae2f1cd9637f3e0697ef6757c632ed7bf53"
+  },
+  "openxr": {
+    "checks": 10,
+    "synthetic_tracking": true,
+    "artifact_sha256": "41d7b80eab1fa1bc7b4adead9bc31ae2f1cd9637f3e0697ef6757c632ed7bf53",
+    "before_and_after_native_sha256": "b6e242454f5c19dae837f368bbdad30610889abcdc21fbc622b1d18b0929b285"
+  },
+  "refusals": [
+    "Spatially varying contributions, combinations of partial paint with varying source samples and nonzero additions, and unsupported typed or baked contributions retain the explicit portable export requirement."
+  ],
+  "open": [
+    "General alternate-UV Standard GLB paint export remains incomplete.",
+    "Physical headset validation remains open."
+  ]
+}
