@@ -34,9 +34,12 @@ public:
   using Precision=surface_ray::SoftPrecision;
   using Progress=ProjectionProgress<Precision::Scalar>;
   void *allocate(size_t bytes){
-    auto *pointer=sycl::malloc_device(bytes,queue_);
-    if(!pointer)throw std::bad_alloc();
-    return pointer;
+    try{
+      if(auto *pointer=sycl::malloc_device(bytes,queue_))return pointer;
+    }catch(const sycl::exception &error){
+      if(error.code()!=sycl::errc::memory_allocation)throw;
+    }
+    throw std::bad_alloc();
   }
   void release(void *pointer) noexcept {try{sycl::free(pointer,queue_);}catch(...){}}
   void wait(){queue_.wait_and_throw();}
@@ -116,7 +119,8 @@ std::unique_ptr<bake_raster::Raster> bake_raster::create(std::span<const float> 
   return create_device<bake_rays::SyclApi>(axis,writable);
 }
 std::unique_ptr<bake_material::Sampler> bake_material::upload(const ImageInput (&roles)[RoleCount],Parameters parameters,
-    const PaintOverlayPacket *overlay,const std::function<bool()> &cancelled,const paint_compute::MaterialAtlas *atlas){
-  return std::make_unique<DeviceSampler<bake_rays::SyclApi>>(roles,parameters,overlay,cancelled,atlas);
+    const PaintOverlayPacket *overlay,const std::function<bool()> &cancelled,const paint_compute::MaterialAtlas *atlas,
+    const std::function<void(size_t)> &reserve){
+  return std::make_unique<DeviceSampler<bake_rays::SyclApi>>(roles,parameters,overlay,cancelled,atlas,reserve);
 }
 } // namespace dome::detail

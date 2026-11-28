@@ -70,7 +70,8 @@ std::unique_ptr<Raster> upload(const Image &,const std::function<bool()> &){
 }
 }
 namespace dome::detail::emission_raster {
-std::unique_ptr<EmissionRasterDevice> upload(const Input &,const std::function<bool()> &){
+std::unique_ptr<EmissionRasterDevice> upload(const Input &,const std::function<bool()> &,
+    const std::function<void(size_t)> &){
  throw std::logic_error("Select a GPU backend for device emission compositing");
 }
 std::unique_ptr<SourceMaterialRaster> upload_material(const Input &,const MaterialInput &,

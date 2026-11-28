@@ -12,7 +12,14 @@ namespace dome::detail::emission_raster {
 template<class Device>
 class Raster final : public EmissionRasterDevice, public SourceMaterialRaster {
 public:
-  Raster(const Input &input,const std::function<bool()> &cancelled,const MaterialInput *material=nullptr){
+  Raster(const Input &input,const std::function<bool()> &cancelled,const MaterialInput *material=nullptr,
+         const std::function<void(size_t)> &reserve={}):reserve_(reserve){
+    load(input,cancelled,material);
+    reserve_={};
+  }
+
+private:
+  void load(const Input &input,const std::function<bool()> &cancelled,const MaterialInput *material){
     const auto stop=[&]{paint_compute::checkpoint(cancelled);};
     view_.resolution=input.resolution;
     bake_uv_capacity_=input.bake_uv_capacity;
@@ -89,6 +96,7 @@ public:
     stop();
   }
 
+public:
   void read(size_t first,std::span<Pixel> rows,const std::function<bool()> &cancelled) override {
     static_assert(sizeof(Pixel)==10*sizeof(uint32_t));
     if(finite_.resolution||mapped_capacity_||bake_uv_capacity_||bake_radiance_capacity_)
@@ -372,7 +380,10 @@ private:
   }
 
   template<class T>T *allocate(size_t count){
-    return count?static_cast<T *>(device_.allocate(count*sizeof(T))):nullptr;
+    if(!count)return nullptr;
+    const auto bytes=count*sizeof(T);
+    if(reserve_)reserve_(bytes);
+    return static_cast<T *>(device_.allocate(bytes));
   }
   template<class T,size_t Extent> const T *upload(std::span<const T,Extent> data){
     auto *buffer=allocate<T>(data.size());
@@ -392,6 +403,7 @@ private:
   }
 
   Device device_;
+  std::function<void(size_t)> reserve_;
   DeviceInput view_;
   FiniteGrid finite_;
   MappedSourceImage mapped_source_{};

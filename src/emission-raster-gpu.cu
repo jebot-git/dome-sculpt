@@ -92,7 +92,12 @@ public:
   }
   void *allocate(size_t bytes){
     memory_.push_back(nullptr);
-    checked(DOME_DEVICE(Malloc)(&memory_.back(),bytes));
+    const auto status=DOME_DEVICE(Malloc)(&memory_.back(),bytes);
+    if(status==DOME_DEVICE(ErrorMemoryAllocation)){
+      (void)DOME_DEVICE(GetLastError)();
+      throw std::bad_alloc();
+    }
+    checked(status);
     return memory_.back();
   }
   void upload(void *device,const void *host,size_t bytes){
@@ -174,8 +179,9 @@ private:
   std::vector<void *> memory_;
 };
 }
-std::unique_ptr<EmissionRasterDevice> upload(const Input &input,const std::function<bool()> &cancelled){
-  return std::make_unique<Raster<Device>>(input,cancelled);
+std::unique_ptr<EmissionRasterDevice> upload(const Input &input,const std::function<bool()> &cancelled,
+    const std::function<void(size_t)> &reserve){
+  return std::make_unique<Raster<Device>>(input,cancelled,nullptr,reserve);
 }
 std::unique_ptr<SourceMaterialRaster> upload_material(const Input &input,const MaterialInput &material,
     const std::function<bool()> &cancelled){

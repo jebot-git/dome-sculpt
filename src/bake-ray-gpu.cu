@@ -118,7 +118,12 @@ public:
   ~GpuApi(){(void)DOME_GPU(StreamDestroy)(stream_);}
   void *allocate(size_t bytes){
     void *pointer=nullptr;
-    checked(DOME_GPU(Malloc)(&pointer,bytes));
+    const auto status=DOME_GPU(Malloc)(&pointer,bytes);
+    if(status==DOME_GPU(ErrorMemoryAllocation)){
+      (void)DOME_GPU(GetLastError)();
+      throw std::bad_alloc();
+    }
+    checked(status);
     return pointer;
   }
   void release(void *pointer) noexcept {(void)DOME_GPU(Free)(pointer);}
@@ -202,8 +207,9 @@ std::unique_ptr<bake_raster::Raster> bake_raster::create(std::span<const float> 
   return create_device<bake_rays::GpuApi>(axis,writable);
 }
 std::unique_ptr<bake_material::Sampler> bake_material::upload(const ImageInput (&roles)[RoleCount],Parameters parameters,
-    const PaintOverlayPacket *overlay,const std::function<bool()> &cancelled,const paint_compute::MaterialAtlas *atlas){
-  return std::make_unique<DeviceSampler<bake_rays::GpuApi>>(roles,parameters,overlay,cancelled,atlas);
+    const PaintOverlayPacket *overlay,const std::function<bool()> &cancelled,const paint_compute::MaterialAtlas *atlas,
+    const std::function<void(size_t)> &reserve){
+  return std::make_unique<DeviceSampler<bake_rays::GpuApi>>(roles,parameters,overlay,cancelled,atlas,reserve);
 }
 } // namespace dome::detail
 #undef DOME_GPU

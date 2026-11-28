@@ -42,6 +42,7 @@ public:
 };
 
 std::unique_ptr<Sampler> upload(const ImageInput (&)[RoleCount],Parameters,const PaintOverlayPacket *overlay=nullptr,
-                                const std::function<bool()> &cancelled={},const paint_compute::MaterialAtlas *atlas=nullptr);
+    const std::function<bool()> &cancelled={},const paint_compute::MaterialAtlas *atlas=nullptr,
+    const std::function<void(size_t)> &reserve={});
 } // namespace detail::bake_material
 } // namespace dome

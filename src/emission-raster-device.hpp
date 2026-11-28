@@ -83,7 +83,8 @@ std::unique_ptr<EmissionRasterDevice> create_mapped_emission_field_device(
     const PaintedMesh &,const PaintSourceTexture &,std::array<float,3> background,float legacy_strength,size_t capacity,
     const std::function<bool()> &);
 std::unique_ptr<EmissionRasterDevice> create_bake_radiance_device(const PaintOverlayPacket *,const PaintSourceTexture *,
-    std::array<float,3> background,float legacy_strength,size_t capacity,const std::function<bool()> &);
+    std::array<float,3> background,float legacy_strength,size_t capacity,const std::function<bool()> &,
+    const std::function<void(size_t)> &reserve={});
 std::unique_ptr<EmissionRasterDevice> create_bake_uv_emission_device(const BakedEmissionField &,size_t capacity,
     const std::function<bool()> &);
 std::unique_ptr<EmissionRasterDevice> create_bake_uv_maps_device(const BakedTextures &,uint32_t resolution,
@@ -191,7 +192,8 @@ struct Input {
 };
 Input describe_bake_overlay(const PaintOverlayPacket &,MaterialInput &,bool separate_pbr,bool include_emission,
                             const std::function<bool()> &cancelled);
-std::unique_ptr<EmissionRasterDevice> upload(const Input &,const std::function<bool()> &);
+std::unique_ptr<EmissionRasterDevice> upload(const Input &,const std::function<bool()> &,
+    const std::function<void(size_t)> &reserve={});
 std::unique_ptr<SourceMaterialRaster> upload_material(const Input &,const MaterialInput &,
                                                         const std::function<bool()> &);
 }

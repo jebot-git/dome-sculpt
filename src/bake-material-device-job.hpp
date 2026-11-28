@@ -13,7 +13,7 @@ template<class Api> class DeviceSampler final:public Sampler {
     size_t offset[RoleCount]{},bytes=0;
     bool upload[RoleCount]{};
   };
-  static ImageLayout layout(const ImageInput (&inputs)[RoleCount]) {
+  static ImageLayout layout(const ImageInput (&inputs)[RoleCount],const std::function<void(size_t)> &reserve) {
     ImageLayout result;
     for(unsigned i=0;i<RoleCount;++i){
       if(!inputs[i].image)continue;
@@ -26,6 +26,7 @@ template<class Api> class DeviceSampler final:public Sampler {
         result.upload[i]=true;
       }
     }
+    if(reserve)reserve(result.bytes+sizeof(paint_compute::Quantization)+batch_capacity*(sizeof(Coordinates)+sizeof(Values)));
     return result;
   }
 
@@ -42,7 +43,8 @@ template<class Api> class DeviceSampler final:public Sampler {
   };
   std::vector<std::unique_ptr<void,ReleaseAllocation>> overlay_storage_;
 
-  void load_overlay(const PaintOverlayPacket &packet,const Parameters &parameters,const std::function<bool()> &cancelled){
+  void load_overlay(const PaintOverlayPacket &packet,const Parameters &parameters,const std::function<bool()> &cancelled,
+                    const std::function<void(size_t)> &reserve){
     using namespace emission_raster;
     emission_raster::MaterialInput material;
     const auto input=describe_bake_overlay(packet,material,parameters.separate_pbr,
@@ -50,7 +52,9 @@ template<class Api> class DeviceSampler final:public Sampler {
     const auto stop=[&]{poll(cancelled);};
     const auto allocate=[&]<class T>(size_t count)->T *{
       if(!count)return nullptr;
-      std::unique_ptr<void,ReleaseAllocation> storage(api_.allocate(count*sizeof(T)),{&api_});
+      const auto bytes=count*sizeof(T);
+      if(reserve)reserve(bytes);
+      std::unique_ptr<void,ReleaseAllocation> storage(api_.allocate(bytes),{&api_});
       auto *pointer=static_cast<T *>(storage.get());
       overlay_storage_.push_back(std::move(storage));
       return pointer;
@@ -111,7 +115,8 @@ template<class Api> class DeviceSampler final:public Sampler {
   }
 
   DeviceSampler(const ImageInput (&roles)[RoleCount],Parameters parameters,const PaintOverlayPacket *overlay,
-                const std::function<bool()> &cancelled,const paint_compute::MaterialAtlas *atlas,ImageLayout layout)
+                const std::function<bool()> &cancelled,const paint_compute::MaterialAtlas *atlas,
+                const std::function<void(size_t)> &reserve,ImageLayout layout)
       :api_(atlas),images_(api_,layout.bytes),table_(api_,1),coordinates_(api_,batch_capacity),results_(api_,batch_capacity) {
     if(!layout.bytes&&!overlay&&!atlas)throw std::logic_error("Missing Bake material images or paint");
     view_.parameters=parameters;
@@ -141,7 +146,7 @@ template<class Api> class DeviceSampler final:public Sampler {
       const auto &table=paint_compute::quantization();
       api_.upload(table_.data,&table,sizeof(table));
       api_.wait();
-      if(overlay)load_overlay(*overlay,parameters,cancelled);
+      if(overlay)load_overlay(*overlay,parameters,cancelled,reserve);
     }catch(...){api_.drain();throw;}
   }
   static void poll(const std::function<bool()> &cancelled){
@@ -149,8 +154,9 @@ template<class Api> class DeviceSampler final:public Sampler {
   }
 public:
   DeviceSampler(const ImageInput (&roles)[RoleCount],Parameters parameters,const PaintOverlayPacket *overlay,
-                const std::function<bool()> &cancelled,const paint_compute::MaterialAtlas *atlas)
-      :DeviceSampler(roles,parameters,overlay,cancelled,atlas,layout(roles)){}
+                const std::function<bool()> &cancelled,const paint_compute::MaterialAtlas *atlas,
+                const std::function<void(size_t)> &reserve)
+      :DeviceSampler(roles,parameters,overlay,cancelled,atlas,reserve,layout(roles,reserve)){}
 
   void read(std::span<const Coordinates> coordinates,std::span<Values> values,
             const std::function<bool()> &cancelled) override {

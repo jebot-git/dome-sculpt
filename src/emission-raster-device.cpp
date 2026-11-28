@@ -470,7 +470,7 @@ std::unique_ptr<EmissionRasterDevice> create_mapped_emission_field_device(
 
 std::unique_ptr<EmissionRasterDevice> create_bake_radiance_device(const PaintOverlayPacket *packet,
     const PaintSourceTexture *source,std::array<float,3> background,float legacy_strength,size_t capacity,
-    const std::function<bool()> &cancelled){
+    const std::function<bool()> &cancelled,const std::function<void(size_t)> &reserve){
   if(!capacity||capacity>EmissionRasterDevice::mapped_batch)
     throw std::invalid_argument("Invalid GPU Bake radiance capacity");
   if(packet&&packet->empty())packet=nullptr;
@@ -485,7 +485,7 @@ std::unique_ptr<EmissionRasterDevice> create_bake_radiance_device(const PaintOve
     input.mapped_source=source;
     input.source=source->image->rgba;
   }
-  return emission_raster::upload(input,cancelled);
+  return emission_raster::upload(input,cancelled,reserve);
 }
 
 std::unique_ptr<EmissionRasterDevice> create_texture_set_emission_device(

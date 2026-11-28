@@ -7,6 +7,7 @@
 #include "bake-ray-device.hpp"
 #include "bake-raster-device.hpp"
 #include "bake-material-input.hpp"
+#include "bake-sampler-cache.hpp"
 #include "bake-ray-query.hpp"
 #include "bake-paint-coordinates.hpp"
 #include "emission-bake-source.hpp"
@@ -446,6 +447,9 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   BakeResult result; result.coverage.resize(pixels);
   std::vector<std::array<float,3>> emission;if(float_emission)emission.resize(pixels);
 #ifndef DOME_BAKE_RAY_REFERENCE
+  // Each sampler cache retains up to 32 MiB of tracked device buffers. An
+  // individual larger job can use the original single-sampler path.
+  constexpr size_t sampler_cache_bytes=32u*1024*1024;
   using RadianceDevice=detail::EmissionRasterDevice;
   struct EmissionHit {
     uint32_t material,texel;
@@ -459,8 +463,8 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   pending.reserve(emission_capacity);
   std::vector<RadianceDevice::BakeRadianceSample> emission_samples(emission_capacity);
   std::vector<RadianceDevice::Radiance> emission_values(emission_capacity);
-  uint32_t resident_material=UINT32_MAX;
-  std::unique_ptr<RadianceDevice> resident_radiance;
+  detail::BakeSamplerCache<RadianceDevice> radiance_cache(sampler_cache_bytes);
+  detail::BakeSamplerCache<detail::bake_material::Sampler> material_cache(sampler_cache_bytes);
   auto flush_emission=[&]{
     if(pending.empty())return;
     cancel(o);
@@ -476,22 +480,17 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
         emission_samples[end-first]=pending[end].sample;
         ++end;
       }
-      if(slot!=resident_material){
-        // Hold one emission image and its sparse field at a time across
-        // material sets. Neighboring batches can reuse those device owners.
-        resident_radiance.reset();
+      auto &radiance=radiance_cache.get(slot,[&](const auto &reserve){
         if(!source_fields.empty()&&source_fields[slot].emission_background){
-          resident_radiance=detail::create_bake_radiance_device(material.maps->overlay.get(),nullptr,
-              *source_fields[slot].emission_background,1,emission_capacity,o.cancelled);
-        }else{
-          const auto &batch=*material.emission_batch;
-          resident_radiance=detail::create_bake_radiance_device(batch.overlay.get(),
-              batch.source.image?&batch.source:nullptr,batch.background,batch.legacy_strength,emission_capacity,o.cancelled);
+          return detail::create_bake_radiance_device(material.maps->overlay.get(),nullptr,
+              *source_fields[slot].emission_background,1,emission_capacity,o.cancelled,reserve);
         }
-        resident_material=slot;
-      }
+        const auto &batch=*material.emission_batch;
+        return detail::create_bake_radiance_device(batch.overlay.get(),batch.source.image?&batch.source:nullptr,
+            batch.background,batch.legacy_strength,emission_capacity,o.cancelled,reserve);
+      },[&]{return material_cache.trim_idle();});
       const size_t count=end-first;
-      resident_radiance->read_bake_radiance(std::span(emission_samples).first(count),
+      radiance.read_bake_radiance(std::span(emission_samples).first(count),
           std::span(emission_values).first(count),o.cancelled);
       cancel(o);
       for(size_t i=0;i<count;++i)emission[pending[first+i].texel]=emission_values[i];
@@ -735,8 +734,6 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   material_order.reserve(material_capacity);
   std::vector<shade_device::Coordinates> material_coordinates(material_capacity);
   std::vector<shade_device::Values> material_sampled(material_capacity),material_results(material_capacity);
-  uint32_t resident_input=UINT32_MAX;
-  std::unique_ptr<shade_device::Sampler> material_sampler;
   auto flush_materials=[&]{
     if(material_points.empty())return;
     cancel(o);
@@ -756,13 +753,11 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
           material_coordinates[i-first]=input.coordinates(source.mesh,point.hit.triangle,point.hit.barycentric,
               point.paint_uv,point.high_uv,point.retained?point.retained->normal_uv:std::array<float,2>{});
         }
-        if(resident_input!=material_id){
-          material_sampler.reset();
-          material_sampler=shade_device::upload(input.images,input.parameters,input.overlay,o.cancelled,input.atlas);
-          resident_input=material_id;
-        }
+        auto &sampler=material_cache.get(material_id,[&](const auto &reserve){
+          return shade_device::upload(input.images,input.parameters,input.overlay,o.cancelled,input.atlas,reserve);
+        },[&]{return radiance_cache.trim_idle();});
         const auto count=end-first;
-        material_sampler->read(std::span(material_coordinates).first(count),std::span(material_sampled).first(count),o.cancelled);
+        sampler.read(std::span(material_coordinates).first(count),std::span(material_sampled).first(count),o.cancelled);
         for(size_t i=first;i<end;++i)material_results[material_order[i]]=material_sampled[i-first];
       }
       first=end;
@@ -975,7 +970,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   flush_raster();
   atlas.reset();
   flush_materials();
-  material_sampler.reset();
+  material_cache.clear();
 #endif
   if (result.overlapping&&o.fail_on_overlap) throw std::runtime_error("Overlapping low UV coverage: "+std::to_string(result.overlapping)+" texels");
   if (result.missed&&o.fail_on_miss) throw std::runtime_error("Projection missed "+std::to_string(result.missed)+" low UV texels");
@@ -984,7 +979,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   flush_ambient();
   device_query.reset();
   flush_emission();
-  resident_radiance.reset();
+  radiance_cache.clear();
 #endif
   if(o.progress)o.progress(.9f);
   cancel(o); if (o.padding) pad(result,o,emission); cancel(o);

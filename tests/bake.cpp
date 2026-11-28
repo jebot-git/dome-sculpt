@@ -5,6 +5,7 @@
 #include "bake-raster-device.hpp"
 #include "bake-ray-device.hpp"
 #include "bake-ray-query.hpp"
+#include "bake-sampler-cache.hpp"
 #include "dome/color-preparation.hpp"
 #include "emission-raster-device.hpp"
 #include "paint-overlay-sample.hpp"
@@ -527,6 +528,44 @@ void bake_radiance_device_sampling(){
   check(rejected,"GPU recognizes overflow during the ordered HDR resolve");
   check(true,"GPU Bake radiance exactly matches the native masked mixed HDR oracle with and without an original image");
 }
+
+void sampler_cache_pressure() {
+  struct Sampler {
+    bool &alive;
+    explicit Sampler(bool &flag):alive(flag){alive=true;}
+    ~Sampler(){alive=false;}
+  };
+  bool alive[4]{};
+  detail::BakeSamplerCache<Sampler> cache(8);
+  const auto no_other_cache=[] {return false;};
+  const auto load=[&](unsigned material,size_t bytes){
+    return &cache.get(material,[&](const auto &reserve){
+      reserve(bytes/2);
+      reserve(bytes-bytes/2);
+      return std::make_unique<Sampler>(alive[material]);
+    },no_other_cache);
+  };
+  const auto *first=load(0,4);
+  load(1,4);
+  const bool reused=load(0,4)==first;
+  load(2,4);
+  check(reused&&alive[0]&&!alive[1]&&alive[2],"Bake reuses the recent sampler and evicts the least recent under its byte limit");
+  load(3,9);
+  check(!alive[0]&&!alive[2]&&alive[3]&&!cache.trim_idle(),"An oversized Bake source gets the original single-sampler workspace");
+  load(0,4);
+  unsigned retries=0;
+  cache.get(1,[&](const auto &reserve){
+    reserve(4);
+    if(++retries==1)throw std::bad_alloc();
+    return std::make_unique<Sampler>(alive[1]);
+  },no_other_cache);
+  check(retries==2&&!alive[0]&&alive[1]&&!alive[3],"Device allocation pressure discards cached samplers and retries the same source once");
+  unsigned cancelled=0;
+  check(rejects([&]{cache.get(2,[&](const auto &) -> std::unique_ptr<Sampler>{
+    ++cancelled;
+    throw std::runtime_error("Mesh baking cancelled");
+  },no_other_cache);})&&cancelled==1&&alive[1],"Cancellation leaves the admitted sampler alone and never retries");
+}
 #endif
 } // namespace
 int main()try {
@@ -539,6 +578,7 @@ int main()try {
   original_material_device_sampling();
   sparse_material_device_sampling();
   bake_radiance_device_sampling();
+  sampler_cache_pressure();
 #endif
   auto low=quad();BakeSource source;source.mesh=quad();
   BakeOptions options;options.resolution=32;options.padding=0;options.ao_samples=0;
