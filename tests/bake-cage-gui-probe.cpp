@@ -2,6 +2,7 @@
 // Test-only read-only observer of actual FLTK widgets after the real wait.
 // Input still goes through X events and the client's normal callbacks.
 #include <FL/Fl.H>
+#include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Scroll.H>
@@ -19,6 +20,7 @@ Json widget(Fl_Widget *w){
     {"visible",bool(w->visible_r())},{"active",bool(w->active_r())},{"focused",Fl::focus()==w},
     {"label_size",w->labelsize()}};
   if(auto *choice=dynamic_cast<Fl_Choice*>(w)){j["choice"]=choice->value();j["selected"]=choice->mvalue()&&choice->mvalue()->label()?choice->mvalue()->label():"";}
+  if(auto *check=dynamic_cast<Fl_Check_Button*>(w))j["checked"]=bool(check->value());
   if(auto *value=dynamic_cast<Fl_Valuator*>(w))j["value"]=value->value();
   if(auto *scroll=dynamic_cast<Fl_Scroll*>(w))j["scroll_y"]=scroll->yposition();
   if(auto *group=dynamic_cast<Fl_Group*>(w)){j["children"]=Json::array();for(int i=0;i<group->children();++i)j["children"].push_back(widget(group->child(i)));}

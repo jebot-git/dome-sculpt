@@ -648,6 +648,7 @@ struct App {
     menu.add("&Scene/Delete object", FL_Delete, command, this);
     menu.add("&Scene/Previous object", FL_CTRL + FL_Page_Up, command, this);
     menu.add("&Scene/Next object", FL_CTRL + FL_Page_Down, command, this);
+    menu.add("&Scene/Select objects...", 0, command, this);
     menu.add("&Scene/&Visible", 0, command, this,
              FL_MENU_TOGGLE | FL_MENU_VALUE);
     menu.add("&Scene/&Locked", 0, command, this, FL_MENU_TOGGLE);
@@ -901,6 +902,7 @@ struct App {
     enable("&Paint/Image projection/Use projection image",s->projection&&s->projection->image&&!s->native_pending&&!s->stroking&&!s->shape_sculpt&&s->mesh_active);
     enable("&Paint/Image projection/Cancel image load",s->projection&&(s->projection->loading||s->projection->browsing));
     checked("&Scene/VR selection mode",s->selection_mode);checked("&Scene/XR object hierarchy",s->hierarchy_open);checked("&Scene/Focus selected objects",s->selection_focus);
+    enable("&Scene/Select objects...", !modal && s->can_select_objects && s->objects.size() > 1);
     enable("&Scene/VR selection mode",s->can_select_objects);
     enable("&Scene/Focus selected objects",s->can_select_objects);
     checked("&Scene/Object grab mode",s->object_grab_mode);checked("&Scene/Ghost other objects",s->isolate_held);
@@ -1156,6 +1158,7 @@ struct App {
       }
     }
     if(!native_commands.empty())text<<" | Pending "<<native_commands.size()<<": "<<native_commands.front();
+    if(info->selected_objects.size()>1)text<<" | "<<info->selected_objects.size()<<" selected";
     if(info->native_pending)text<<(info->native_accepting?" | Painting ":" | Finishing stroke ")<<info->native_samples<<" samples";
     if(info->asset_busy) {
       const auto work=canvas.document.asset_status();
@@ -1377,6 +1380,7 @@ struct App {
     } else if(label=="VR selection mode"){canvas.document.configure_selection(!canvas.document.frame().state->selection_mode);
     } else if(label=="XR object hierarchy"){canvas.document.show_object_hierarchy(!canvas.document.frame().state->hierarchy_open);
     } else if(label=="Focus selected objects"){canvas.document.focus_selection(!canvas.document.frame().state->selection_focus);
+    } else if(label=="Select objects..."){edit_object_selection(canvas.document);
     } else if(label=="Object grab mode"){
       auto s=canvas.document.frame().state;canvas.document.configure_object_grab(!s->object_grab_mode,s->isolate_held);
     } else if(label=="Ghost other objects"){

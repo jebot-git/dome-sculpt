@@ -43,6 +43,7 @@ void edit_skin_dialog(Document &doc) {
   falloff.bounds(1,8);falloff.step(.1);falloff.value(options.falloff);
   cap.bounds(1,32);cap.step(1);cap.value(options.limits.max_influences);
   prune.bounds(0,.99);prune.step(.0001);prune.value(options.limits.prune);
+  Fl_Check_Button selected(20,y,width-50,row,"Bind explicitly selected meshes");y+=row;
   Fl_Check_Button keep(20,y,width-50,row,"Preserve checked influences");y+=row;
   Fl_Check_Browser locks(20,y,width-64,row*6);y+=row*6;
   if(target.deformation && target.deformation->skeleton && target.deformation->skin) {
@@ -51,7 +52,6 @@ void edit_skin_dialog(Document &doc) {
     for(size_t i=0;i<bones.size();++i)
       locks.add(bones[i].name.c_str(),state->weights.locks.size()==bones.size() && state->weights.locks[i]);
   } else {keep.value(0);keep.deactivate();locks.deactivate();}
-  Fl_Check_Button selected(20,y,width-50,row,"Bind explicitly selected meshes");y+=row;
   Fl_Value_Input work(label,y,width-label-40,row-4,"Work (millions)");y+=row;
   Fl_Value_Input workspace(label,y,width-label-40,row-4,"Working data (MiB)");y+=row;
   Fl_Value_Input total(label,y,width-label-40,row-4,"Owning request total (MiB)");y+=row;

@@ -5,6 +5,7 @@
 #include "dome/material-bindings.hpp"
 #include "appearance.h"
 #include "ui-conventions.hpp"
+#include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Check_Button.H>
@@ -45,6 +46,66 @@ bool recover_project(Document &document) {
     return true;
   }
   return false;
+}
+void edit_object_selection(Document &document) {
+  const auto draft = document.draft_scene();
+  const auto state = document.frame().state;
+  const auto rows = object_hierarchy(draft.scene, state->selected_objects, {});
+  const auto active = draft.source.object;
+
+  int sx, sy, sw, sh;
+  Fl::screen_work_area(sx, sy, sw, sh);
+  const int row = std::max(28, dx::size + 12);
+  const int width = std::min(std::max(480, dx::size * 34), sw - 40);
+  const int height = std::min(row * (int(rows.size()) + 2), sh - 40);
+  DomeDialog window(width, height, "Select objects");
+  Fl_Scroll scroll(0, 0, width, height - row * 2);
+  scroll.type(Fl_Scroll::VERTICAL);
+  std::vector<std::pair<uint64_t, Fl_Check_Button *>> choices;
+  choices.reserve(draft.scene.objects().size());
+  int y = 0;
+  for (const auto &item : rows) {
+    const int left = 12 + int(std::min(item.depth, 6u)) * row / 2;
+    if (item.group) {
+      auto *heading = new Fl_Box(left, y, width - left - 24, row);
+      heading->copy_label(item.name.c_str());
+      heading->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT | FL_ALIGN_CLIP);
+    } else {
+      auto *choice = new Fl_Check_Button(left, y, width - left - 24, row);
+      const auto label = item.name + (item.visible ? "" : " [hidden]") + (item.locked ? " [locked]" : "");
+      choice->copy_label(label.c_str());
+      choice->value(item.selected || (state->selected_objects.empty() && item.id == active));
+      choices.emplace_back(item.id, choice);
+    }
+    y += row;
+  }
+  scroll.end();
+  const int button_width = std::min(width / 2 - 24, std::max(140, dx::size * 8));
+  Fl_Button cancel(width / 2 - button_width - 10, height - row * 2 + 8, button_width, row, "Cancel"),
+      select(width / 2 + 10, height - row * 2 + 8, button_width, row, "Select");
+  bool accepted = false;
+  cancel.callback([](Fl_Widget *widget, void *) { widget->window()->hide(); });
+  select.callback([](Fl_Widget *widget, void *result) {
+    *static_cast<bool *>(result) = true;
+    widget->window()->hide();
+  }, &accepted);
+  window.end();
+  window.set_modal();
+  dx::style(&window);
+  window.show();
+  cancel.take_focus();
+  while (window.shown()) Fl::wait();
+  if (!accepted) return;
+
+  std::vector<uint64_t> selected;
+  bool keep_active = false;
+  for (const auto &[id, choice] : choices) {
+    if (!choice->value()) continue;
+    if (id == active) keep_active = true;
+    else selected.push_back(id);
+  }
+  if (keep_active) selected.push_back(active);
+  document.select_objects(selected, ObjectSelection::Replace, draft.source);
 }
 void edit_visibility(Document &document){
  auto state=document.frame().state;int row=std::max(28,dx::size+12),sx,sy,sw,sh;Fl::screen_work_area(sx,sy,sw,sh);

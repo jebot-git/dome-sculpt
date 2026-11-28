@@ -89,6 +89,11 @@ normal frames and static vertex colors are supported for the documented subset;
 complete material authoring remains in the requirements. Layered color, metallic, roughness, emission
 and mask painting use a stable mesh and persisted UVs; see [painting](docs/PAINTING.md).
 
+On desktop, **Scene → Select objects** opens the shared scene hierarchy with
+checkboxes. Apply the selection, then open **Bind or transfer skin**. Choose
+**Automatic (surface heat)** and check **Bind explicitly selected meshes** to
+bind the selection to the reference rig in one Undo step.
+
 The sparse signed-distance field supports swept capsule strokes, pressure,
 soft unions/subtraction, smoothing and flattening. Transactions retain exact
 sample values for undo/redo. The mesher welds exact representable intersections and preserves valid small

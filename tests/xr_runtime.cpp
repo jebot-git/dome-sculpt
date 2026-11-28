@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <cstdio>
 #include <cstring>
 #include <fstream>
 #include <filesystem>
@@ -111,6 +112,8 @@ bool lost = false, regained = false, reference_event = false;
 bool ink() { return getenv("DOME_XR_FIXTURE_STYLUS") != nullptr; }
 std::string bake_mode(){auto mode=getenv("DOME_XR_FIXTURE_BAKE");return mode?mode:"";}
 std::string skin_mode(){auto mode=getenv("DOME_XR_FIXTURE_SKIN");return mode?mode:"";}
+bool mixed_skin(){return skin_mode()=="mixed-surface-heat";}
+unsigned skin_step(){return mixed_skin()?(frame>=40?frame-40:0):frame;}
 std::string affine_weight_mode(){const auto *mode=getenv("DOME_XR_FIXTURE_AFFINE_WEIGHT");return mode?mode:"";}
 std::string retopo_mode(){auto mode=getenv("DOME_XR_FIXTURE_RETOPO");return mode?mode:"";}
 bool retopo_history(){return retopo_mode().starts_with("history-");}
@@ -815,6 +818,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
   if(!resolution_mode().empty())focus_at=resolution_mode()=="focus"?20:90;
   if(!corner_uv_mode().empty()){focus_frame=frame;focus_at=corner_uv_mode()=="focus"?24:90;}
   if(selection_fixture()||pbr_preview_fixture())focus_at=90;
+  if(mixed_skin())focus_at=1000;
   if(!expression_mode().empty())focus_at=expression_mode()=="focus"?88:1000;
   if(!cage_mode().empty())focus_at=cage_mode()=="focus"?60:1000;
   if(!canonical_conversion_mode().empty())focus_at=canonical_conversion_mode()=="focus"?36:1000;
@@ -851,7 +855,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     e->referenceSpaceType=XR_REFERENCE_SPACE_TYPE_STAGE;e->changeTime=1000000000+(physical_frame+1)*18000000;
     e->poseValid=XR_TRUE;e->poseInPreviousSpace={{0,0,0,1},{0,0,0}};count("reference_changes");return XR_SUCCESS;
   }
-  if (attachment_mode().empty() && editable_avatar_mode().empty() && (cage_mode().empty()&&(mirror_mode().empty()&&expression_mode().empty())&&import_atlas_mode().empty()&&projection_mode().empty()&&rig_fit_mode().empty()) && !pbr_preview_fixture() && !selection_fixture() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && retopo.empty() && mask_mode().empty() && cut_mode().empty() && frame >= 35 && !reference_event) {
+  if (attachment_mode().empty() && editable_avatar_mode().empty() && (cage_mode().empty()&&(mirror_mode().empty()&&expression_mode().empty())&&import_atlas_mode().empty()&&projection_mode().empty()&&rig_fit_mode().empty()) && !pbr_preview_fixture() && !selection_fixture() && !mixed_skin() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && retopo.empty() && mask_mode().empty() && cut_mode().empty() && frame >= 35 && !reference_event) {
     reference_event = true;
     auto e = reinterpret_cast<XrEventDataReferenceSpaceChangePending *>(out);
     e->type = XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING;
@@ -1096,8 +1100,9 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
     out->changedSinceLastSync=button;
   }
   if(auto mode=skin_mode();!mode.empty()) {
-    out->currentState=button && (frame==8 || frame==10 || frame==12 || frame==14 || frame==16 || frame==18 || frame==20 ||
-      (mode!="focus" && (frame==24 || frame==26)));
+    const auto step=skin_step();
+    out->currentState=button && (step==8 || step==10 || step==12 || step==14 || step==16 || step==18 || step==20 ||
+      (mode!="focus" && (step==24 || step==26)) || (mixed_skin() && (frame==8 || frame==12)));
     out->changedSinceLastSync=button;
   }
   if (auto mode = retopo_mode(); !mode.empty()) {
@@ -1170,6 +1175,13 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
   if(!mirror_mode().empty()){if(right(p->subactionPath)&&a->name=="paint_pressure"&&(frame==40||frame==50||frame==60||(frame==78&&mirror_mode()!="focus")))out->currentState=.9f;return XR_SUCCESS;}
   if(!import_atlas_mode().empty())return XR_SUCCESS;
   if(selection_fixture()){if(right(p->subactionPath)){if(a->name=="paint_pressure"&&(frame==18||frame==22||frame==26||frame==36))out->currentState=.9f;if(a->name=="canvas_grab"&&frame>=25&&frame<=27)out->currentState=1;}return XR_SUCCESS;}
+  if(mixed_skin()){
+    if(right(p->subactionPath)){
+      if(a->name=="paint_pressure"&&(frame==34||skin_step()==22))out->currentState=.9f;
+      if(a->name=="canvas_grab"&&frame>=33&&frame<=35)out->currentState=1.f;
+    }
+    return XR_SUCCESS;
+  }
   if (right(p->subactionPath)) {
     bool stroke =
         (frame >= 2 && frame <= 5) ||
@@ -1378,12 +1390,14 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
   }
   if(!skin_mode().empty() && right(p->subactionPath) && a->name=="right_stick") {
     out->currentState={0,0};
-    if(frame==9 || frame==10)out->currentState={-.5f,-.8660254f};
-    if(frame==11 || frame==12 || frame==15 || frame==16)out->currentState={.5f,-.8660254f};
-    if(frame==13 || frame==14)out->currentState={-.8660254f,.5f};
-    if(frame==17 || frame==18)out->currentState={.8660254f,-.5f};
-    if(frame==19 || frame==20)out->currentState={.8660254f,.5f};
-    if(frame==25 || frame==26)out->currentState={-.8660254f,-.5f};
+    const auto step=skin_step();
+    if(step==9 || step==10)out->currentState={-.5f,-.8660254f};
+    if(step==11 || step==12 || step==15 || step==16)out->currentState={.5f,-.8660254f};
+    if(step==13 || step==14)out->currentState={-.8660254f,.5f};
+    if(step==17 || step==18)out->currentState={.8660254f,-.5f};
+    if(step==19 || step==20)out->currentState={.8660254f,.5f};
+    if(step==25 || step==26)out->currentState={-.8660254f,-.5f};
+    if(mixed_skin()&&frame>=9&&frame<=12)out->currentState={.8660254f,-.5f};
   }
   if (!retopo_mode().empty() && right(p->subactionPath) && a->name=="right_stick") {
     auto step=retopo_stage();
@@ -1545,6 +1559,19 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
     else if(frame>=16&&frame<=19)p->pose.position={.602f,1.844f,-.7f};
     else if(frame>=34)p->pose.position={.34f,1.824f,-.61f};
     else p->pose.position={frame>=25?.16f:-.16f,1.48f,-.83f};
+    return XR_SUCCESS;
+  }
+  if(mixed_skin()){
+    p->pose.orientation={0,0,0,1};
+    p->pose.position=s->action?XrVector3f{right(s->hand)?.045f:-.3f,1.48f,-.48f}:XrVector3f{0,1.6f,0};
+    if(s->action&&right(s->hand)&&frame>=31&&frame<=37){
+      const auto *point=getenv("DOME_XR_FIXTURE_ACCESSORY_POINT");
+      float x=0,y=0,z=0;
+      if(!point||std::sscanf(point,"%f %f %f",&x,&y,&z)!=3)return XR_ERROR_VALIDATION_FAILURE;
+      p->pose.position={x,1.48f+y,-.85f+z};
+    }
+    if(s->action&&right(s->hand)&&s->action->name=="aim_pose"&&skin_step()==22)
+      p->pose.position={.045f+(520.f/640-.5f)*.6f,1.56f+(.5f-300.f/640)*.6f,-.3f};
     return XR_SUCCESS;
   }
   if (frame == (getenv("DOME_XR_FIXTURE_SCENE")?29:22) && editable_avatar_mode().empty() && !pbr_preview_fixture() && !getenv("DOME_XR_FIXTURE_NORMAL_DOMAIN") && affine_contact_mode().empty() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && s->action && voxel_mode() != "focus" && bake_mode().empty() && skin_mode().empty() && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty()) {

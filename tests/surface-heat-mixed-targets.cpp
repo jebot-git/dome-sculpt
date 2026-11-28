@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/skin-authoring.hpp"
+#include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
 
@@ -93,6 +94,7 @@ int main(int argc, char **argv) try {
   document.select_objects(selected);
   require(document.wait_mesh(std::chrono::seconds(120)), "mixed selection reaches the current Document surface");
   const auto before_document = document.copy_scene();
+  before_document.save(output / "unbound.dsculpt");
   expected.select(before_document.active().id);
   const auto file = output / "bound.dsculpt";
   document.bind_skin_selected(options);
@@ -105,6 +107,15 @@ int main(int argc, char **argv) try {
           "one Undo restores the complete pre-bind scene");
   document.redo();
   require(document.copy_scene().encode() == expected.encode(), "Redo restores both bound recipients");
+  // The XR controller makes the newly added member active. The desktop chooser
+  // keeps the current reference active, so publish both independent endpoints.
+  expected.select(accessory);
+  expected.save(output / "bound-active-accessory.dsculpt");
+  const auto &patch = scene.object(accessory).painted->mesh().positions;
+  const auto center = (patch[0] + patch[2]) * .5f;
+  const auto contact = scene.world_matrix(accessory).point({center.x, center.y, center.z});
+  std::ofstream contact_file(output / "accessory-contact.json");
+  contact_file << nlohmann::json(contact) << '\n';
   return 0;
 } catch (const std::exception &error) {
   std::cerr << "FAIL " << error.what() << '\n';
