@@ -286,6 +286,23 @@ Nested DomeD Wayland and synthetic OpenXR exercised the regular Retopology
 controls through Save and acceptance or cancellation.
 [GPU Retopology projection evidence](validation/retopo-projection-gpu-20261128.json)
 
+First Retopology Apply now transfers the single-material native guide's
+editable paint, hidden masks, FLOAT emission, Bake maps and saved recipe to
+the new atlas. The patch uses the source paint resolution and preserves layer
+IDs, order, names, properties and active layer. The original guide keeps its
+paint and any live rig or pose, and the patch captures the evaluated geometry.
+Incomplete single-material correspondence fails before publication. Clearing
+Bake before Apply keeps its pixels cleared and preserves the saved recipe.
+
+The 64- and 1024-pixel tests cover editable FLOAT layers independently of
+FLOAT Bake data. DomeD Wayland covers native pointer placement, Apply, Save,
+Undo, Redo and standard GLB. Synthetic OpenXR verifies that the accepted
+patch has writable FLOAT paint and a hidden mask after the first Apply from
+a reflected, posed guide. Prepared native normal fields currently require
+the source rest pose for first transfer. Moving the filtered texel
+correspondence and layer sampling to the selected device remains open.
+[Native first-patch material evidence](validation/retopo-native-material-20261128.json)
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.

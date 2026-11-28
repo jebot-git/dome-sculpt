@@ -1,0 +1,103 @@
+{
+  "date": "2026-11-28",
+  "product": "d87ade80383e0f881d440d58ec2e40be5fa0e81a",
+  "preceding": "7073a3cbf3365383321075ab3af2e625f8ee922e",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "First Apply to a painted single-material native guide. Editable layers, Bake and producer provenance are projected to the new atlas under the existing material-transfer budgets.",
+  "oneapi_arc_release": {
+    "application_sha256": "c70fe8c68d1d7146ccd5ecd884788e18f8bd06060f4e33069f27c19947bcef2f",
+    "ctest_passed": 42,
+    "ctest_cases": [
+      "retopology-affine-ui-fixture",
+      "retopology-reapply-plain",
+      "retopology-affine-openxr",
+      "retopology-imported-pbr",
+      "retopology-prepared-detached-affine",
+      "retopology-reapply-affine",
+      "retopology-imported-prior-bake",
+      "retopology-affine",
+      "retopology-imported-mtoon-painted",
+      "retopology-imported-mtoon-resize",
+      "retopology-authoring",
+      "retopology-imported-bake-resize",
+      "retopology-held-admission",
+      "retopo",
+      "bake-recipes",
+      "retopology-save-handoff",
+      "retopology-history-openxr-apply",
+      "retopology-worker-faults",
+      "retopology-imported-mtoon-mixed-hdr",
+      "retopology-history-openxr-cancel",
+      "texture-set-retained-retopology-affine",
+      "retopology-worker-reporter-recovery",
+      "retopology-imported-mtoon-mixed-ldr",
+      "retopology-prepared-color-normal-uv-plain",
+      "retopology-prepared-color-normal-uv-affine",
+      "retopology-prepared-color-normal-affine",
+      "retopology-prepared-color-normal-plain",
+      "retopology-prepared-color-normal-first",
+      "texture-set-retained-retopology-plain",
+      "retopology-prepared-color-affine",
+      "retopology-prepared-color-plain",
+      "retopology-first-material-plain",
+      "retopology-imported-mtoon-tinted",
+      "retopology-imported-mtoon-unprepared",
+      "retopology-first-material-posed-affine",
+      "retopology-first-material-affine",
+      "retopo-edges",
+      "application-missing-gpu",
+      "retopology-worker-accepted-publication",
+      "retopo-cancellation-boundaries",
+      "retopology-mixed-material",
+      "retopology-first-material-posed-plain"
+    ],
+    "ctest_log_sha256": "604baccc7d9ac64c87950edfbe16c72437684478de22ce8d2ac525e0f0ace1fe",
+    "1024_atlas": {
+      "checks_passed": 10,
+      "accepted_project_sha256": "1fbafeb0c630be391128c7c74ecc9ce9afa816857e94489b9eb488c035e55424",
+      "source_project_sha256": "1b8c90a469c3a1f6ec6b64bbda6d1fb97ae8ff2616b3fad59d06f5e311d7baa6",
+      "log_sha256": "82978e06e6177d4a94f5378cb499642d65eb48ae7b60ed1748108a735feedaa4",
+      "covers": "Layer and mask metadata, editable pigment and FLOAT emission, independent FLOAT Bake, saved recipe, missing correspondence, Clear Bake and historical layer ID allocation."
+    },
+    "wayland": {
+      "checks_passed": 10,
+      "report_sha256": "6811b7e50dc8c6e104385da6fdf566dfe56a57c88bcfc0cf7947a0cd86b85bec",
+      "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+      "renderer": "Zink Vulkan on Intel Arc A770",
+      "project_sha256": "1d1d39ea9e02ad45aff01b9c4dae7ad7e8dbaa28712dc90cf023258334471738",
+      "standard_glb_sha256": "5143b31b057be81f85acc542dd94742d18ead901084d1371301f24e666dec9e2",
+      "validator_version": "2.0.0-dev.3.10",
+      "validator_errors": 0,
+      "validator_warnings": 0,
+      "validator_report_sha256": "bab856345e0f7125dad5cc093ac6b0959e755b8a260db0e627b27877638b10ce"
+    },
+    "synthetic_openxr": {
+      "checks_passed": 33,
+      "report_sha256": "71c3790a457ecc20e40c329175e3fa488f8970c6aeb712bfb11fd0324e40520c",
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "accept_and_focus_project_sha256": "5bac118a5f2ab0e77b790264f8f989d47908b58c59eab20ed5de9b47d90fdee1",
+      "committed_prefix_and_unconfirmed_project_sha256": "7c144d1709705c59fd8713876fd9600fa8ee0b7f2ddcf5009380bce1071263ec"
+    },
+    "regression_fixture_changes": "Reapply resolves masks and pigment by stable layer IDs. The prepared-normal oracle uses a denser stride on the smaller inherited atlas and keeps its original sample thresholds."
+  },
+  "sanitizers": {
+    "scope": "ASan and UBSan on paint transfer, retopology authoring and the affine fixture, linked to the matching oneAPI Release core and exercised on Arc. Leak detection was disabled.",
+    "assertions_passed": 426,
+    "log_sha256": "2d2532823abdae18a22f7a3db527c11dc1aa631729fc6b0d646ca4526dff8070"
+  },
+  "cuda_and_rocm": {
+    "cuda": {
+      "scope": "Compiled the changed host authoring and paint units for the GPU profile. Hardware execution was unavailable.",
+      "log_sha256": "12cf347374f9e8355ad67a281a525e4a47d379c58f7d87181b2c5e94327dd9b4"
+    },
+    "rocm": {
+      "scope": "Compiled the changed host authoring and paint units for the GPU profile. Hardware execution was unavailable.",
+      "log_sha256": "0ea865ad96835c285ea0fca4dff5b30a40ce1caa41af6376e1037556859a67e2"
+    }
+  },
+  "open_work": [
+    "GPU filtered texel correspondence and layer sampling",
+    "First transfer of posed prepared native normal fields",
+    "Physical headset acceptance"
+  ]
+}
