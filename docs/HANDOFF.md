@@ -348,6 +348,7 @@ Standard GLB now keeps the MToon material variant on a static unpainted
 native patch whose typed roles have no separate Core PBR source maps. The
 variant carries its own base color, shade, normal and emission maps and the
 certified tangent stream.
+[Original material GPU sampling and export evidence](validation/retopo-original-material-gpu-20261128.json)
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
