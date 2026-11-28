@@ -4,9 +4,10 @@ Desktop and OpenXR authoring require hardware-accelerated OpenGL and an
 available GPU for the build-selected oneAPI, ROCm or CUDA compute backend.
 OneAPI is the default. This decision supersedes the CPU authoring option in
 the original goal and historical checkpoints. CPU numerical and sanitizer
-references remain opt-in headless test targets. Command-line export also
-requires the selected compute device. GPU coverage and data-transfer efficiency
-across the remaining workflows still require qualification.
+references remain opt-in headless test targets and refuse installation.
+Command-line export also requires the selected compute device. GPU coverage
+and data-transfer efficiency across the remaining workflows still require
+qualification.
 
 Bake traces ambient occlusion on the selected GPU through the native
 source BVH. It preserves the original biased cosine hemisphere, inclusive

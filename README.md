@@ -50,7 +50,8 @@ The application's default FLTK backend follows its environment.
 Desktop and OpenXR authoring require a working device for the selected
 compute backend and a hardware-accelerated OpenGL context. Command-line
 export also requires the selected compute device. CPU numerical and
-sanitizer references are headless test builds. Configure them with
+sanitizer references are available as headless test targets only. Installation
+requires a GPU build. Configure the test reference with
 `-DDOME_CPU_REFERENCE_TESTS=ON
 -DDOME_COMPUTE_BACKEND=CPU -DDOME_BUILD_UI=OFF -DDOME_BUILD_XR=OFF
 -DBUILD_TESTING=ON` in a fresh build directory.

@@ -5,7 +5,18 @@ Desktop and OpenXR authoring require both hardware OpenGL and a working GPU for
 the selected compute backend. Command-line export requires the selected compute
 GPU. Startup refuses a missing device or software OpenGL where graphics is
 required. CPU builds require the explicit headless reference-test configuration
-documented in the [README](../README.md).
+documented in the [README](../README.md) and refuse installation. The
+`application-missing-gpu` test exercises the desktop, OpenXR and both command-line
+export entry points with GPU devices hidden. The `cpu-reference-install-refused`
+test verifies that the reference build rejects ordinary and component installs
+before staging files.
+
+The November 28 check rejected CPU configuration with either frontend enabled,
+with testing disabled, and without explicit reference-test opt-in. The staged
+oneAPI Release exported a GLB and saved a three-frame synthetic OpenXR session
+on Intel Arc A770. With real Arc compute still available, forcing llvmpipe
+rejected both frontends before they wrote a capture or project. This check used
+a synthetic runtime and did not exercise a physical headset.
 
 The [current handoff](HANDOFF.md) tracks the latest hardware results and the
 remaining work. The evidence below preserves the source and scope of the

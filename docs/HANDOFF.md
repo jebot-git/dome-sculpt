@@ -16,7 +16,9 @@ Dome Sculpt now requires hardware OpenGL and an available GPU for the
 selected compute backend. ONEAPI is the default. CUDA and ROCm remain
 explicit build choices. Desktop and OpenXR refuse software OpenGL or missing
 compute hardware. Command-line export also requires the selected compute GPU.
-CPU numerical and sanitizer references build as opt-in headless tests.
+CPU numerical and sanitizer references build as opt-in headless tests and
+refuse installation. CTest verifies that the application refuses desktop,
+OpenXR and both export entry points when the selected GPU is unavailable.
 Production CPU configuration was rechecked at `5440467a` and refused for
 desktop, OpenXR and headless builds. Volume Geodesic now propagates closed-mesh
 bone fields on the selected GPU. The Arc A770 results differ from the headless

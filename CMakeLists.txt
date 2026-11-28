@@ -12,6 +12,10 @@ if(DOME_COMPUTE_BACKEND STREQUAL "CPU")
   if(NOT DOME_CPU_REFERENCE_TESTS OR NOT BUILD_TESTING OR DOME_BUILD_UI OR DOME_BUILD_XR)
     message(FATAL_ERROR "Dome Sculpt requires a GPU backend (ONEAPI, CUDA or ROCM). CPU is available only for headless reference tests with DOME_CPU_REFERENCE_TESTS=ON, BUILD_TESTING=ON, DOME_BUILD_UI=OFF and DOME_BUILD_XR=OFF.")
   endif()
+  install(CODE [[message(FATAL_ERROR "The headless CPU reference build is for tests and cannot be installed. Configure Dome Sculpt with ONEAPI, CUDA or ROCM to install it.")]]
+    ALL_COMPONENTS)
+  add_test(NAME cpu-reference-install-refused
+    COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/cpu-reference-install.cmake")
   set(compute_source src/backend_cpu.cpp src/sparse-resample-cpu.cpp)
   set(paint_compute_source src/paint-composite-cpu.cpp)
 elseif(DOME_COMPUTE_BACKEND STREQUAL "CUDA")
@@ -1464,6 +1468,13 @@ if(DOME_BUILD_UI)
   de_xr_desktop_menu(dome-sculpt)
   set_target_properties(dome-sculpt PROPERTIES BUILD_RPATH "$<TARGET_FILE_DIR:fltk::fltk-shared>" INSTALL_RPATH /opt/fltk-vr/toolkit/lib)
   if(BUILD_TESTING)
+    add_test(NAME application-missing-gpu
+      COMMAND "${CMAKE_COMMAND}" "-DAPP=$<TARGET_FILE:dome-sculpt>"
+        "-DBACKEND=${DOME_COMPUTE_BACKEND}" "-DWITH_XR=${DOME_BUILD_XR}"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/application-missing-gpu.cmake")
+    set_tests_properties(application-missing-gpu PROPERTIES TIMEOUT 120
+      ENVIRONMENT "ONEAPI_DEVICE_SELECTOR=opencl:cpu;CUDA_VISIBLE_DEVICES=-1;HIP_VISIBLE_DEVICES=-1;ROCR_VISIBLE_DEVICES=-1"
+      ENVIRONMENT_MODIFICATION "LD_LIBRARY_PATH=path_list_prepend:$<TARGET_FILE_DIR:fltk::fltk-shared>;LD_LIBRARY_PATH=path_list_prepend:${dome_bitmap_prefix}/lib")
     # The fixture includes actual App/Canvas code under a renamed main, sharing
     # its final source/link inputs rather than duplicating lifecycle logic.
     get_target_property(dome_native_fixture_sources dome-sculpt SOURCES)
