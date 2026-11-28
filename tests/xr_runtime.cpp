@@ -59,7 +59,8 @@ std::string cage_mode(){auto p=getenv("DOME_XR_FIXTURE_CAGE");return p?p:canonic
 bool canonical_conversion_click(){return frame==8||frame==14||frame==20||frame==26||frame==32;}
 int canonical_conversion_sector(){if(frame>=12&&frame<=14)return 8;if(frame>=18&&frame<=20)return 9;if(frame>=24&&frame<=26)return 6;if(frame>=30&&frame<=32)return 0;return -1;}
 bool bake_recipe_fixture(){return getenv("DOME_XR_FIXTURE_RECIPE")!=nullptr;}
-bool bake_sampling_fixture(){return getenv("DOME_XR_FIXTURE_BAKE_SAMPLING")&&cage_mode()=="accept";}
+bool bake_mask_fixture(){return getenv("DOME_XR_FIXTURE_BAKE_MASK")&&cage_mode()=="accept";}
+bool bake_sampling_fixture(){return (getenv("DOME_XR_FIXTURE_BAKE_SAMPLING")||bake_mask_fixture())&&cage_mode()=="accept";}
 bool bake_cage_trigger(){return frame==38||frame==56||(frame==62&&cage_mode()=="cancel")||
                                (frame==74&&bake_sampling_fixture());}
 
@@ -1531,7 +1532,7 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
     if(s->action&&right(s->hand)&&s->action->name=="aim_pose"&&bake_cage_trigger()){
       float x=frame==38?100+420*float(dome::bake_distance_to_unit(bake_recipe_fixture()?40:100)):frame==56?(bake_recipe_fixture()?320:520):170;
       float y=frame==38?240:frame==56?(bake_recipe_fixture()?432:320):609;
-      if(frame==74){x=520;y=400;}
+      if(frame==74){x=520;y=bake_mask_fixture()?420:350;}
       p->pose.position={(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
     }
     return XR_SUCCESS;

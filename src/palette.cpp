@@ -364,6 +364,12 @@ void SpatialPalette::raster(const EditorState &s) {
       }
       else if(c.parameter==VrParameter::BakeQuality){
         if(row==2)label=value>=.5f?"Sampling: 4 per texel":"Sampling: 1 per texel";
+        else if(row==3){
+          const auto count=s.bake_mask_layers.empty()?0:s.bake_mask_layers.size()-1;
+          const auto index=size_t(std::clamp(std::lround(value*float(count)),0l,long(count)));
+          label=index==0?"Mask: whole field":index<=s.paint_layers.size()?
+              "Mask: "+s.paint_layers[index-1]:"Mask layer unavailable";
+        }
         else label+=std::to_string(int(std::lround(value*(row==0?256:64))))+(row==1?" px":"");
       }
       else if(c.parameter==VrParameter::BakeDistances){char size[48];snprintf(size,sizeof(size),value>0&&value<.01f?"%.3g mm":"%.2f mm",double(value));label+=size;}

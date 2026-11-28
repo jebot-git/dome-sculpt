@@ -2,6 +2,7 @@
 #include "cut-color.hpp"
 #include "dome/document.hpp"
 #include "dome/bake-recipe.hpp"
+#include "bake-mask.hpp"
 #include "dome/polygon-scene.hpp"
 #include "texture-set-bake.hpp"
 #include "texture-set-stroke.hpp"
@@ -90,6 +91,10 @@ void Document::queue_bake_locked(uint64_t source,ObjectBakeSettings settings,Ass
   if(!bake_target_ready_locked() || !bake_source_eligible_locked(source) || std::find(ids.begin(),ids.end(),source)==ids.end())
     throw std::logic_error("Choose a prepared, visible, unlocked target and a different nonempty source");
   const auto &target=scene_.active();
+  if(!detail::has_bake_mask_layer(*active_texture_set(target).painted,settings.mask_layer))
+    throw std::invalid_argument("The saved Bake mask layer is unavailable; select another layer or Whole field");
+  if(settings.mask_layer&&(settings.prepare_colors||settings.prepare_normals))
+    throw std::invalid_argument("Choose Whole field for color or normal preparation, or turn off preparation for masked Bake");
   if((target.texture_sets||(target.material_bindings&&target.material_bindings->native_paint_sampling))&&
       (settings.prepare_colors||settings.prepare_normals))
     throw std::invalid_argument("Bake uses the existing material and normal basis for this target");
@@ -98,6 +103,7 @@ void Document::queue_bake_locked(uint64_t source,ObjectBakeSettings settings,Ass
   queue_scene_operation_locked("Bake surface",[source,settings,report,work](Scene &scene,const auto &cancelled){
     auto result=bake_object(scene,source,settings,cancelled,[work](float p){work->progress.store(p);});
     *report=std::to_string(result.projected)+" projected, "+std::to_string(result.missed)+" missed ("+std::to_string(result.preserved_misses)+" kept from prior bake)";
+    if(result.protected_texels)*report+=", "+std::to_string(result.protected_texels)+" protected by mask";
     if(result.color_prepared){char quality[96];snprintf(quality,sizeof(quality),"; color error bound %.4f",double(*std::max_element(result.color_error_bound.begin(),result.color_error_bound.end())));*report+=quality;}
     if(result.canonical_captured)*report+="; verified normal frame captured";
     if(result.normal_prepared){char quality[128];snprintf(quality,sizeof(quality),"; portable normal attributes authored (rest quantization %.3f deg)",result.normal_initial_error*57.29577951308232);*report+=quality;}

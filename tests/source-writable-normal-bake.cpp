@@ -167,6 +167,82 @@ bool same_layers(const PaintedMesh &a,const PaintedMesh &b){
   return true;
 }
 
+void masked_canonical_recipient(const std::filesystem::path &out){
+  std::filesystem::create_directories(out);
+  auto scene=source(true);
+  rasterize_canonical_paint(scene);
+  auto high=scene.active().painted->mesh();
+  for(auto &p:high.positions)p.z=.02f;
+  high.normals.assign(high.positions.size(),normalized(Vec3{-.25f,.31f,1}));
+  const auto donor=scene.add("Masked normal donor",Volume{});
+  auto &source=scene.active();
+  source.mesh_active=true;source.visible=false;source.locked=true;
+  source.painted=std::make_shared<PaintedMesh>(std::move(high),64);
+  source.material.color={.85f,.15f,.6f,1};
+  scene.select(1);
+  auto &paint=*scene.active().painted;
+  paint.add_layer("Protect central normal detail");
+  const auto layer=paint.active_layer();
+  Brush brush;brush.from=brush.to={0,0,0};brush.normal={0,0,1};brush.radius=.38f;
+  PaintSettings mask;mask.channel=PaintChannel::Mask;mask.mask=0;
+  paint.begin_stroke();paint.stamp(brush,mask);
+  require(paint.end_stroke(),"Real writable-domain stroke supplies the Bake mask");
+  paint.layer_properties("Protect central normal detail",false,.35f);
+  uv(scene,true,true);
+  const auto before=scene.active().painted;
+  const auto binding=scene.active().material_bindings;
+  const auto prior=before->baked()->normal_field;
+  const auto &mesh=before->mesh();
+  const auto &domain=*before->paint_sampling_domain();
+  const auto &normal_uv=binding->canonical_uv->coordinates();
+  const auto &paint_mesh=*domain.basis();
+  require(bool(prior)&&normal_uv[mesh.indices[0]]!=
+          paint_mesh.uv[paint_mesh.indices[domain.source_corners()[0]]],
+          "The recipient uses distinct retained normal and paint coordinates");
+
+  auto options=settings();options.prepare_normals=false;options.mask_layer=layer;
+  const auto report=bake_object(scene,donor,options);
+  const auto &after=*scene.active().painted;
+  const auto next=after.baked()->normal_field;
+  require(next&&next->prior()==prior&&same_layers(*before,after)&&report.protected_texels>0,
+          "Masked Bake keeps the original normal field and editable paint owners");
+  size_t protected_normals=0,changed_normals=0;
+  const uint32_t n=prior->resolution(),p=after.resolution();
+  for(uint32_t y=0;y<n;++y)for(uint32_t x=0;x<n;++x){
+    const double u=(x+.5)/n,v=(y+.5)/n;
+    const size_t at=(size_t(y)*n+x)*4;
+    for(size_t t=0;t<mesh.indices.size();t+=3){
+      const auto a=normal_uv[mesh.indices[t]],b=normal_uv[mesh.indices[t+1]],c=normal_uv[mesh.indices[t+2]];
+      const double den=(b[1]-c[1])*(a[0]-c[0])+(c[0]-b[0])*(a[1]-c[1]);
+      const double f=((b[1]-c[1])*(u-c[0])+(c[0]-b[0])*(v-c[1]))/den;
+      const double g=((c[1]-a[1])*(u-c[0])+(a[0]-c[0])*(v-c[1]))/den;
+      const std::array bary{f,g,1-f-g};
+      if(std::ranges::min(bary)<.01)continue;
+      std::array<double,2> q{};
+      for(size_t k=0;k<3;++k){
+        const auto uv=paint_mesh.uv[paint_mesh.indices[domain.source_corners()[t+k]]];
+        for(size_t d=0;d<2;++d)q[d]+=bary[k]*uv[d];
+      }
+      const auto xx=std::clamp(int(q[0]*p),0,int(p)-1),yy=std::clamp(int(q[1]*p),0,int(p)-1);
+      const auto same=[&](const Image &old,const Image &current){
+        return std::equal(old.rgba.data()+at,old.rgba.data()+at+4,current.rgba.data()+at);
+      };
+      const bool identical=same(*prior->pbr(),*next->pbr())&&same(*prior->mtoon(),*next->mtoon());
+      // Stay well inside the black mask so grid rounding cannot choose a
+      // different side of the threshold in this independent double oracle.
+      if(after.pixel(layer,xx,yy).data[13]<64){
+        require(identical,"Protected retained texels keep both normal roles byte for byte");
+        ++protected_normals;
+      }else if(!identical)++changed_normals;
+      break;
+    }
+  }
+  require(protected_normals>100&&changed_normals>100,"The independent normal atlas has protected and updated regions");
+  const auto file=out/"masked-independent-normal.dsculpt";
+  scene.save(file);
+  require(Scene::load(file).encode()==scene.encode(),"Masked independent normal and recipe round-trip exactly");
+}
+
 void canonical_recipient(bool physical,bool partial,const std::filesystem::path &out){
   auto seed=source(true);
   rasterize_canonical_paint(seed);
@@ -1095,6 +1171,11 @@ void dense_hdr_first_key(const std::filesystem::path &out,bool varied){
 }
 }
 int main(int argc,char **argv) try {
+ if(argc==3&&std::string_view(argv[1])=="--masked-recipient"){
+   writable_source::masked_canonical_recipient(argv[2]);
+   std::cout<<"PASS "<<writable_source::checks<<" masked independent normal checks\n";
+   return 0;
+ }
  if(argc==3&&std::string_view(argv[1])=="--sources"){
    auto scene=Scene::load(argv[2]);
    scene.erase(scene.active().id);

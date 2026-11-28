@@ -82,6 +82,19 @@ void edit_bake_dialog(Document &doc){
   }
   for(auto &name:cage_names){Fl_Menu_Item item{};item.label(name.c_str());cage_choices.push_back(item);}cage_choices.emplace_back();cage.copy(cage_choices.data());cage.value(int(selected_cage));
   Fl_Button recall(label,y,width-label-40,row-6,"Use last bake");y+=row;
+  Fl_Choice mask(label,y,width-label-40,row-6,"Target mask");y+=row;
+  const auto &mask_ids=state->bake_mask_layers;
+  std::vector<std::string> mask_names{"Whole field"};
+  mask_names.insert(mask_names.end(),state->paint_layers.begin(),state->paint_layers.end());
+  mask_names.resize(mask_ids.size(),"Unavailable mask layer");
+  std::vector<Fl_Menu_Item> mask_choices;
+  for(auto &name:mask_names){
+    Fl_Menu_Item item{};item.label(name.c_str());mask_choices.push_back(item);
+  }
+  mask_choices.emplace_back();mask.copy(mask_choices.data());
+  const auto mask_index=std::ranges::find(mask_ids,state->bake_settings.mask_layer);
+  mask.value(mask_index==mask_ids.end()?0:int(mask_index-mask_ids.begin()));
+  mask.tooltip("For a selected paint layer, mask values below 50% protect texels from projection and padding.");
   BakeSlider front(label,y,width-label-40,row-6,"Front (mm)");y+=row;
   BakeSlider back(label,y,width-label-40,row-6,"Back (mm)");y+=row;
   BakeSlider ao(label,y,width-label-40,row-6,"AO radius (mm)");y+=row;
@@ -117,14 +130,17 @@ void edit_bake_dialog(Document &doc){
   Fl_Box status(16,y,width-48,row*2);status.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);y+=row*2;
   content.size(width-24,y);content.end();scroll.end();
   Fl_Button close(24,height-row*2+8,width/2-36,row,"Cancel"),bake(width/2+12,height-row*2+8,width/2-36,row,"Bake");
-  struct Run {Document *doc;Fl_Window *window;Fl_Choice *source,*cage;std::array<BakeSlider*,7> fields;std::vector<uint64_t>*ids,*cage_ids;AssetSource *expected;Fl_Check_Button *partial,*backfaces,*corresponding,*sampling,*colors,*normals;std::shared_ptr<const ObjectBakeRecipe> recipe;bool running=false,ever_ran=false;} run{&doc,&window,&source,&cage,sliders,&ids,&cage_ids,&expected,&partial,&backfaces,&corresponding,&sampling,&colors,&normals,state->bake_recipe};
+  struct Run {Document *doc;Fl_Window *window;Fl_Choice *source,*cage,*mask;std::array<BakeSlider*,7> fields;const std::vector<uint64_t>*ids,*cage_ids,*mask_ids;AssetSource *expected;Fl_Check_Button *partial,*backfaces,*corresponding,*sampling,*colors,*normals;std::shared_ptr<const ObjectBakeRecipe> recipe;bool running=false,ever_ran=false;} run{&doc,&window,&source,&cage,&mask,sliders,&ids,&cage_ids,&mask_ids,&expected,&partial,&backfaces,&corresponding,&sampling,&colors,&normals,state->bake_recipe};
   recall.callback([](Fl_Widget*,void *p){auto &r=*static_cast<Run*>(p);try{
     if(!r.recipe)throw std::logic_error("No successful bake has been saved for this target");
     r.recipe->validate();const auto &v=r.recipe->settings;
     auto source=std::find(r.ids->begin(),r.ids->end(),r.recipe->source.object);
     auto cage=std::find(r.cage_ids->begin(),r.cage_ids->end(),v.cage_object);
-    if(source==r.ids->end()||cage==r.cage_ids->end())throw std::logic_error("Saved bake dependencies changed; reopen the options");
+    auto mask=std::ranges::find(*r.mask_ids,v.mask_layer);
+    if(source==r.ids->end()||cage==r.cage_ids->end()||mask==r.mask_ids->end())
+      throw std::logic_error("Saved bake dependencies changed; reopen the options");
     r.source->value(int(source-r.ids->begin()));r.cage->value(int(cage-r.cage_ids->begin()));
+    r.mask->value(int(mask-r.mask_ids->begin()));
     const double values[]{v.front_mm,v.back_mm,v.ao_distance_mm,double(v.ao_samples),double(v.padding),v.color_error,v.normal_error*57.29577951308232};
     for(size_t i=0;i<r.fields.size();++i){r.fields[i]->physical(values[i]);r.fields[i]->redraw();}
     r.partial->value(v.allow_partial);r.backfaces->value(v.allow_backfaces);
@@ -140,6 +156,9 @@ void edit_bake_dialog(Document &doc){
     s.allow_partial=r.partial->value();s.allow_backfaces=r.backfaces->value();
     s.corresponding_topology=r.corresponding->value();
     s.supersample=r.sampling->value();
+    s.mask_layer=r.mask_ids->at(size_t(r.mask->value()));
+    if(s.mask_layer&&(s.prepare_colors||s.prepare_normals))
+      throw std::invalid_argument("Choose Whole field for color or normal preparation, or turn off preparation for masked Bake");
     if(!s.corresponding_topology)s.cage_object=r.cage_ids->at(size_t(r.cage->value()));
     r.doc->bake_from_object(r.ids->at(size_t(r.source->value())),s,*r.expected);r.running=r.ever_ran=true;
   }catch(const std::exception&e){r.doc->report_error(e.what());}},&run);
@@ -153,13 +172,14 @@ void edit_bake_dialog(Document &doc){
       if(s->active_object==target && s->generation==expected.generation)expected=doc.draft_scene().source;
     }
     if(s->active_object!=target || s->generation!=expected.generation){window.hide();break;}
-    if(run.running){normals.deactivate();colors.deactivate();partial.deactivate();backfaces.deactivate();corresponding.deactivate();sampling.deactivate();source.deactivate();cage.deactivate();for(auto f:sliders)f->deactivate();bake.deactivate();if(work.cancellable)close.activate();else close.deactivate();close.copy_label(work.cancelling?"Cancelling...":"Cancel bake");progress.value(std::min(99.f,work.progress*100));}
-    else {partial.activate();backfaces.activate();corresponding.activate();sampling.activate();source.activate();
+    if(run.running){normals.deactivate();colors.deactivate();partial.deactivate();backfaces.deactivate();corresponding.deactivate();sampling.deactivate();source.deactivate();cage.deactivate();mask.deactivate();for(auto f:sliders)f->deactivate();bake.deactivate();if(work.cancellable)close.activate();else close.deactivate();close.copy_label(work.cancelling?"Cancelling...":"Cancel bake");progress.value(std::min(99.f,work.progress*100));}
+    else {partial.activate();backfaces.activate();corresponding.activate();sampling.activate();source.activate();mask.activate();
       if(corresponding.value())cage.deactivate();else cage.activate();bake.activate();
       for(size_t i=0;i<(existing_basis?5:sliders.size());++i)sliders[i]->activate();
       if(!existing_basis){colors.activate();normals.activate();}
       if(ids.at(size_t(source.value()))==unavailable_bake_object||
-         (!corresponding.value()&&cage_ids.at(size_t(cage.value()))==unavailable_bake_object))bake.deactivate();
+         (!corresponding.value()&&cage_ids.at(size_t(cage.value()))==unavailable_bake_object)||
+         size_t(mask.value())>state->paint_layers.size())bake.deactivate();
       close.activate();close.copy_label(run.ever_ran?"Close":"Cancel");if(run.ever_ran && s->error.empty() && s->message.find("complete")!=std::string::npos)progress.value(100);}
     std::string title="Bake surface";
     if(run.running)title+=work.cancelling?" - Cancelling...":" - Baking "+std::to_string(std::min(99,int(work.progress*100)))+"%";

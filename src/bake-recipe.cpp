@@ -35,6 +35,9 @@ void ObjectBakeRecipe::validate()const{
     throw std::invalid_argument("Bake recipe lost its explicit cage binding");
   if(settings.corresponding_topology&&cage)
     throw std::invalid_argument("Matching source triangles requires a bake without a cage");
+  if(settings.mask_layer==UINT64_MAX||
+     (settings.mask_layer&&(settings.prepare_colors||settings.prepare_normals)))
+    throw std::invalid_argument("Invalid Bake mask layer or incompatible whole-surface preparation");
   for(float mm:{settings.front_mm,settings.back_mm,settings.ao_distance_mm})
     if(!std::isfinite(mm)||mm<0||mm>100'000)
       throw std::invalid_argument("Invalid bake recipe distance");
@@ -45,7 +48,8 @@ void ObjectBakeRecipe::validate()const{
 }
 nlohmann::json ObjectBakeRecipe::encode()const{
   validate();const auto &s=settings;
-  nlohmann::json out={{"version",s.supersample?3:(s.corresponding_topology?2:1)},{"source",encode_reference(source)},
+  const int version=s.mask_layer?4:s.supersample?3:s.corresponding_topology?2:1;
+  nlohmann::json out={{"version",version},{"source",encode_reference(source)},
     {"cage",cage?nlohmann::json(encode_reference(*cage)):nlohmann::json(nullptr)},
     {"settings",{{"front_mm",s.front_mm},{"back_mm",s.back_mm},{"ao_distance_mm",s.ao_distance_mm},
       {"ao_samples",s.ao_samples},{"padding",s.padding},{"allow_partial",s.allow_partial},
@@ -53,18 +57,20 @@ nlohmann::json ObjectBakeRecipe::encode()const{
       {"color_error",s.color_error},{"prepare_normals",s.prepare_normals},{"normal_error",s.normal_error}}}};
   if(s.corresponding_topology)out["settings"]["corresponding_topology"]=true;
   if(s.supersample)out["settings"]["supersample"]=true;
+  if(s.mask_layer)out["settings"]["mask_layer"]=s.mask_layer;
   return out;
 }
 std::shared_ptr<const ObjectBakeRecipe> ObjectBakeRecipe::decode(const nlohmann::json &j){
   if(!j.is_object()||j.size()!=4||!j.at("version").is_number_integer()||
-      (j.at("version")!=1&&j.at("version")!=2&&j.at("version")!=3))
+      (j.at("version")!=1&&j.at("version")!=2&&j.at("version")!=3&&j.at("version")!=4))
     throw std::invalid_argument("Invalid bake recipe record");
-  const bool supersampled=j.at("version")==3;
+  const auto version=j.at("version").get<int>();
   auto result=std::make_shared<ObjectBakeRecipe>();result->source=decode_reference(j.at("source"));
   if(!j.at("cage").is_null())result->cage=decode_reference(j.at("cage"));
   const auto &v=j.at("settings");auto &s=result->settings;
-  const bool corresponding=j.at("version")==2||(supersampled&&v.contains("corresponding_topology"));
-  if(!v.is_object()||v.size()!=11u+unsigned(corresponding)+unsigned(supersampled))
+  const bool corresponding=version==2||(version>=3&&v.contains("corresponding_topology"));
+  const bool supersampled=version==3||(version==4&&v.contains("supersample"));
+  if(!v.is_object()||v.size()!=11u+unsigned(corresponding)+unsigned(supersampled)+unsigned(version==4))
     throw std::invalid_argument("Incomplete bake recipe settings");
   auto real=[&](const char *key){if(!v.at(key).is_number())throw std::invalid_argument("Invalid bake recipe scalar");return v.at(key).get<float>();};
   auto flag=[&](const char *key){if(!v.at(key).is_boolean())throw std::invalid_argument("Invalid bake recipe flag");return v.at(key).get<bool>();};
@@ -81,6 +87,10 @@ std::shared_ptr<const ObjectBakeRecipe> ObjectBakeRecipe::decode(const nlohmann:
     throw std::invalid_argument("Invalid four-sample bake recipe");
   s.corresponding_topology=corresponding;
   s.supersample=supersampled;
+  if(version==4){
+    s.mask_layer=number(v.at("mask_layer"));
+    if(!s.mask_layer)throw std::invalid_argument("Version four Bake recipe needs a specific target mask layer");
+  }
   s.cage_object=result->cage?result->cage->object:0;
   result->validate();return result;
 }

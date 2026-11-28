@@ -122,6 +122,7 @@ struct EditorState {
   uint64_t bake_source = 0;
   std::vector<uint64_t> bake_sources;
   std::vector<uint64_t> bake_cages; // First entry0 = normal-offset projection.
+  std::vector<uint64_t> bake_mask_layers; // First 0 = whole field, then paint layers and unavailable saved IDs.
   ObjectBakeSettings bake_settings;
   std::shared_ptr<const ObjectBakeRecipe> bake_recipe{};
   uint64_t bake_settings_object=0;

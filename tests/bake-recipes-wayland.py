@@ -13,7 +13,9 @@ if os.environ.get('DOME_PROJECTION_WL_BUS')!='1':os.execvpe('dbus-run-session',[
 root=Path(__file__).resolve().parents[1];build=Path(os.environ.get('DOME_SCULPT_TEST_BUILD',root/'build'));compositor=Path(os.environ['DOME_COMPOSITOR']);out=Path(os.environ['DOME_CAGE_WL_OUT']);out.mkdir(parents=True,exist_ok=True);checks=[];processes=[]
 texture_set=os.environ.get('DOME_CAGE_TEXTURE_SET')=='1'
 supersample=os.environ.get('DOME_CAGE_SUPERSAMPLE')=='1'
+masked=os.environ.get('DOME_CAGE_MASK')=='1'
 if texture_set and supersample:raise ValueError('Use the primary cage fixture for supersampling')
+if masked and (supersample or texture_set):raise ValueError('Use the primary cage fixture for the mask')
 def check(ok,label):
  checks.append({'passed':bool(ok),'check':label});(out/'report.json').write_text(json.dumps({'checks':checks,'complete':False},indent=2)+'\n');print(('PASS ' if ok else 'FAIL ')+label,flush=True);assert ok,label
 async def wait(fn,seconds=60):
@@ -41,6 +43,7 @@ async def main():
   await wait(lambda:scene()['source']=='wayland');wayland=re.search(r'Dome Wayland socket: (\S+)',(out/'compositor.log').read_text())[1]
   helper=Path(os.environ['DOME_CAGE_HELPER']);project=Path(home,'cage.dsculpt');reference=Path(home,'reference.dsculpt')
   fixture=['--texture-set-xr-fixture',str(project),str(reference)] if texture_set else ['--ui-fixture',str(project)]
+  if masked:fixture=['--ui-mask-fixture',str(project),str(reference)]
   subprocess.run([str(helper),*fixture],env=env,check=True)
   if supersample:subprocess.run([str(helper),'--ui-supersample-reference',str(project),str(reference)],env=env,check=True)
   original_bytes=project.read_bytes()
@@ -118,16 +121,27 @@ async def main():
    recalled=await wait(lambda:widget(label) if not widget(label)['checked'] else None)
    check(not recalled['checked'],'Recall restores the saved sampling mode')
    await focus_widget(label);await key('space');await wait(lambda:widget(label)['checked'])
-  if texture_set or supersample:
+  if masked:
+   label='Target mask'
+   async def select_mask():
+    await focus_widget(label);await key('space');await key('Down');await key('Down');await key('Return')
+    await wait(lambda:widget(label)['selected']=='Keep editable mask')
+   check(widget(label)['selected']=='Whole field','An unmasked recipe opens with the whole field')
+   await select_mask()
+   await focus_widget('Use last bake');await key('space')
+   await wait(lambda:widget(label)['selected']=='Whole field')
+   check(widget(label)['choice']==0,'Recall restores the saved mask choice')
+   await select_mask()
+  if texture_set or supersample or masked:
    await focus_widget('Bake')
    await key('space');await wait(lambda:named('Bake surface - complete'))
    await chord('Control_L','w');await wait(lambda:named('Bake surface') is None);await command('Save')
    check(project.read_bytes()==reference.read_bytes(),'FLTK Bake and ordered Save match the entire expected native project')
-   if supersample:
+   if supersample or masked:
     await command('Undo');await command('Save')
     check(project.read_bytes()==original_bytes,'Universal Undo restores the exact pre-bake project and recipe')
     await command('Redo');await command('Save')
-    check(project.read_bytes()==reference.read_bytes(),'Universal Redo reproduces the entire four-sample project')
+    check(project.read_bytes()==reference.read_bytes(),'Universal Redo reproduces the entire Bake project')
    else:
     await command('Clear baked surface');await command('Save')
     check(project.read_bytes()==original_bytes,'Universal Clear and ordered Save restore the original paint and preserve the selected recipe')

@@ -11,6 +11,7 @@
 #include "bake-emission-storage.hpp"
 #include "bake-sampler-cache.hpp"
 #include "bake-supersample.hpp"
+#include "bake-mask.hpp"
 #include "bake-ray-query.hpp"
 #include "bake-paint-coordinates.hpp"
 #include "emission-bake-source.hpp"
@@ -174,6 +175,54 @@ double edge(std::array<float,2> a,std::array<float,2> b,std::array<float,2> p) {
 }
 bool top_left(std::array<float,2> a,std::array<float,2> b) {
   return b[1]>a[1]||(b[1]==a[1]&&b[0]<a[0]);
+}
+struct BakeUvFace {
+  std::array<std::array<float,2>,3> uv;
+  double area;
+  int left,right,bottom,top;
+
+#ifndef DOME_BAKE_RAY_REFERENCE
+  detail::bake_raster::Span span() const {
+    detail::bake_raster::Span out{std::bit_cast<uint64_t>(area),{},0,uint32_t(left),
+        uint32_t(bottom),uint32_t(right-left+1),0,0};
+    for(unsigned k=0;k<3;++k){
+      out.uv[k][0]=uv[k][0];out.uv[k][1]=uv[k][1];
+      auto a=uv[(k+1)%3],b=uv[(k+2)%3];
+      if(area<0)std::swap(a,b);
+      if(top_left(a,b))out.top_left_edges|=1u<<k;
+    }
+    return out;
+  }
+#else
+  std::optional<std::array<float,3>> sample(int x,int y,uint32_t resolution,bool exact) const {
+    const std::array<float,2> pixel{(x+.5f)/resolution,(y+.5f)/resolution};
+    std::array<float,3> bary{};
+    for(size_t k=0;k<3;++k){
+      auto a=uv[(k+1)%3],b=uv[(k+2)%3];
+      const double side=edge(a,b,pixel);
+      bary[k]=float(side/area);
+      if(area<0)std::swap(a,b);
+      const double oriented=area<0?-side:side;
+      if(exact?(oriented<0||(oriented==0&&!top_left(a,b))):
+          (bary[k]<-1e-7f||(std::abs(bary[k])<=1e-7f&&!top_left(a,b))))
+        return {};
+    }
+    return bary;
+  }
+#endif
+};
+BakeUvFace bake_uv_face(const Mesh &mesh,size_t triangle,uint32_t resolution){
+  std::array<std::array<float,2>,3> uv;
+  for(size_t k=0;k<3;++k)uv[k]=mesh.uv[mesh.indices[triangle*3+k]];
+  const double area=edge(uv[0],uv[1],uv[2]);
+  const double scale=std::hypot(double(uv[1][0])-uv[0][0],double(uv[1][1])-uv[0][1])*
+      std::hypot(double(uv[2][0])-uv[0][0],double(uv[2][1])-uv[0][1]);
+  if(!scale||std::abs(area)<=scale*1e-12)throw std::runtime_error("Low mesh contains a degenerate UV triangle");
+  const auto [minx,maxx]=std::ranges::minmax({uv[0][0],uv[1][0],uv[2][0]});
+  const auto [miny,maxy]=std::ranges::minmax({uv[0][1],uv[1][1],uv[2][1]});
+  const auto first=[=](float low){return std::max(0,int(std::ceil(low*resolution-.5f)));};
+  const auto last=[=](float high){return std::min(int(resolution)-1,int(std::floor(high*resolution-.5f)));};
+  return {uv,area,first(minx),last(maxx),first(miny),last(maxy)};
 }
 void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o,
     std::span<const detail::RetainedSourceBakeField> retained,
@@ -387,6 +436,101 @@ void pad(BakeResult &result,const BakeOptions &o,std::vector<std::array<float,3>
 #endif
 }
 } // namespace
+std::vector<uint8_t> detail::map_bake_writability(const Mesh &paint,const Mesh &normal,
+    uint32_t paint_resolution,std::span<const uint8_t> writable,const BakeOptions &o,
+    std::span<const uint32_t> faces,uint64_t &raster_samples){
+  raster_samples=0;
+  if(writable.empty())return {};
+  if(!paint_resolution||paint_resolution>4096||o.resolution<8||o.resolution>4096||
+     uint64_t(o.resolution)*o.resolution*(o.supersample?4u:1u)>o.max_texels)
+    throw std::invalid_argument("Invalid retained Bake mask resolution");
+  if(paint.indices.size()!=normal.indices.size()||
+     writable.size()!=size_t(paint_resolution)*paint_resolution)
+    throw std::invalid_argument("Bake mask needs corresponding paint and retained normal corners");
+  if(paint_resolution==o.resolution&&paint.indices==normal.indices&&paint.uv==normal.uv)
+    return {writable.begin(),writable.end()};
+
+  normal.validate();
+  for(const auto uv:normal.uv)
+    if(uv[0]<0||uv[0]>1||uv[1]<0||uv[1]>1)
+      throw std::invalid_argument("Retained Bake mask UVs must fit the unit texture tile");
+  if(normal.uv.size()!=normal.positions.size()||paint.uv.size()!=paint.positions.size())
+    throw std::invalid_argument("Invalid retained Bake mask UV layout");
+  const auto scale=o.supersample?2u:1u;
+  const auto resolution=o.resolution*scale;
+  std::vector<uint8_t> mapped(size_t(o.resolution)*o.resolution);
+  const auto visit=[&](uint32_t pixel,uint32_t triangle,const std::array<float,3> &bary){
+    const auto uv=texcoord(paint,triangle,bary);
+    const auto cell=[=](float value){
+      return std::min(paint_resolution-1,uint32_t(std::clamp(value,0.f,1.f)*paint_resolution));
+    };
+    const auto dst=size_t(pixel/resolution/scale)*o.resolution+(pixel%resolution)/scale;
+    mapped[dst]|=writable[size_t(cell(uv[1]))*paint_resolution+cell(uv[0])]?1:2;
+  };
+#if defined(DOME_BAKE_RAY_REFERENCE)
+  std::vector<uint8_t> claimed(size_t(resolution)*resolution);
+#else
+  using namespace bake_raster;
+  std::vector<float> axis(resolution);
+  for(uint32_t i=0;i<resolution;++i)axis[i]=(i+.5f)/resolution;
+  auto atlas=create(axis,{});
+  std::vector<Span> spans;
+  std::vector<uint32_t> ids;
+  spans.reserve(span_capacity);ids.reserve(span_capacity);
+  uint32_t pending=0;
+  const auto flush=[&]{
+    if(!pending)return;
+    const auto batch=atlas->rasterize(spans,pending,o.cancelled);
+    if(batch.overlaps)throw std::runtime_error("Overlapping retained UVs cannot authorize a Bake mask");
+    for(const auto &block:batch.blocks){
+      cancel(o);
+      for(uint32_t i=block.offset;i<block.offset+block.count;++i){
+        const auto &sample=batch.samples[i];
+        visit(sample.pixel,ids[sample.span],{sample.barycentric[0],sample.barycentric[1],sample.barycentric[2]});
+      }
+    }
+    pending=0;spans.clear();ids.clear();
+  };
+#endif
+  const size_t count=faces.empty()?normal.indices.size()/3:faces.size();
+  for(size_t i=0;i<count;++i){
+    cancel(o);
+    const uint32_t triangle=faces.empty()?uint32_t(i):faces[i];
+    if(triangle>=normal.indices.size()/3)throw std::invalid_argument("Invalid retained Bake mask face");
+    const auto face=bake_uv_face(normal,triangle,resolution);
+    if(face.left>face.right||face.bottom>face.top)continue;
+    const auto size=uint32_t(face.right-face.left+1)*uint32_t(face.top-face.bottom+1);
+    if(size>o.max_raster_samples-raster_samples)throw std::length_error("Retained Bake mask raster budget exceeded");
+    raster_samples+=size;
+#ifdef DOME_BAKE_RAY_REFERENCE
+    for(int y=face.bottom;y<=face.top;++y){
+      cancel(o);
+      for(int x=face.left;x<=face.right;++x)if(auto bary=face.sample(x,y,resolution,o.supersample)){
+        const auto pixel=uint32_t(y)*resolution+uint32_t(x);
+        if(claimed[pixel]++)throw std::runtime_error("Overlapping retained UVs cannot authorize a Bake mask");
+        visit(pixel,triangle,*bary);
+      }
+    }
+#else
+    auto span=face.span();
+    for(uint32_t first=0;first<size;){
+      span.first=pending;span.rectangle_offset=first;
+      spans.push_back(span);ids.push_back(triangle);
+      const auto accepted=std::min(size-first,candidate_capacity-pending);
+      first+=accepted;pending+=accepted;
+      if(pending==candidate_capacity||spans.size()==span_capacity)flush();
+    }
+#endif
+  }
+#ifndef DOME_BAKE_RAY_REFERENCE
+  flush();
+#endif
+  for(size_t i=0;i<mapped.size();++i){
+    if((i&4095)==0)cancel(o);
+    mapped[i]=mapped[i]==1; // No authorization for gutters or mixed sample coverage.
+  }
+  return mapped;
+}
 static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const BakeOptions &o,
     const detail::SourceBakeNormalResolver &source_normals,
     std::span<const uint32_t> target_triangles = {},
@@ -1022,49 +1166,27 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     const double rounding_radius=ray_projection?
         projection_rounding_radius(low,triangle,source_placement.target_rounding_origin):0;
     if(o.progress && face%64==0)o.progress(.05f+.85f*float(face)/float(triangle_count));
-    cancel(o); std::array<std::array<float,2>,3> uv;
-    for (int i=0;i<3;++i) uv[i]=low.uv[low.indices[triangle*3+i]];
-    double area=edge(uv[0],uv[1],uv[2]),uvscale=std::hypot(double(uv[1][0])-uv[0][0],double(uv[1][1])-uv[0][1])*std::hypot(double(uv[2][0])-uv[0][0],double(uv[2][1])-uv[0][1]);
-    if (!uvscale||std::abs(area)<=uvscale*1e-12) throw std::runtime_error("Low mesh contains a degenerate UV triangle");
-    float minx=std::min({uv[0][0],uv[1][0],uv[2][0]}),maxx=std::max({uv[0][0],uv[1][0],uv[2][0]}),
-          miny=std::min({uv[0][1],uv[1][1],uv[2][1]}),maxy=std::max({uv[0][1],uv[1][1],uv[2][1]});
-    int left=std::max(0,int(std::ceil(minx*raster_resolution-.5f))),right=std::min(int(raster_resolution)-1,int(std::floor(maxx*raster_resolution-.5f))),
-        bottom=std::max(0,int(std::ceil(miny*raster_resolution-.5f))),top=std::min(int(raster_resolution)-1,int(std::floor(maxy*raster_resolution-.5f)));
+    cancel(o);
+    const auto uv=bake_uv_face(low,triangle,raster_resolution);
 #ifdef DOME_BAKE_RAY_REFERENCE
-    for (int y=bottom;y<=top;++y) for (int x=left;x<=right;++x) {
+    for(int y=uv.bottom;y<=uv.top;++y)for(int x=uv.left;x<=uv.right;++x){
       if (!(result.raster_samples++%64)) cancel(o);
       if (result.raster_samples>o.max_raster_samples) throw std::length_error("Bake UV raster budget exceeded");
-      std::array<float,2> pixel{(x+.5f)/raster_resolution,(y+.5f)/raster_resolution};
-      const std::array edges{edge(uv[1],uv[2],pixel),edge(uv[2],uv[0],pixel),edge(uv[0],uv[1],pixel)};
-      std::array<float,3> bary{float(edges[0]/area),float(edges[1]/area),float(edges[2]/area)};
-      bool inside=true;
-      for (int i=0;i<3;++i) {
-        auto a=uv[(i+1)%3],b=uv[(i+2)%3]; if (area<0) std::swap(a,b);
-        if(o.supersample){
-          const double side=area<0?-edges[i]:edges[i];
-          if(side<0||(side==0&&!top_left(a,b)))inside=false;
-        }else if(bary[i]<-1e-7f||(std::abs(bary[i])<=1e-7f&&!top_left(a,b)))inside=false;
-      }
-      if (!inside) continue;
+      const auto bary=uv.sample(x,y,raster_resolution,o.supersample);
+      if(!bary)continue;
       auto at=size_t(y)*raster_resolution+x;
       if(result.coverage[o.supersample?sample_texel(at):at]==4)continue;
       if (owner[at]!=UINT32_MAX) { ++result.overlapping; continue; }
       owner[at]=uint32_t(triangle);
-      project_texel(at,triangle,bary,rounding_radius);
+      project_texel(at,triangle,*bary,rounding_radius);
     }
 #else
-    if(left>right||bottom>top)continue;
-    const auto width=uint32_t(right-left+1),count=width*uint32_t(top-bottom+1);
+    if(uv.left>uv.right||uv.bottom>uv.top)continue;
+    const auto count=uint32_t(uv.right-uv.left+1)*uint32_t(uv.top-uv.bottom+1);
     if(count>o.max_raster_samples-result.raster_samples)
       throw std::length_error("Bake UV raster budget exceeded");
     result.raster_samples+=count;
-    raster::Span descriptor{std::bit_cast<uint64_t>(area),{},0,uint32_t(left),uint32_t(bottom),width,0,0};
-    for(unsigned i=0;i<3;++i){
-      descriptor.uv[i][0]=uv[i][0];descriptor.uv[i][1]=uv[i][1];
-      auto a=uv[(i+1)%3],b=uv[(i+2)%3];
-      if(area<0)std::swap(a,b);
-      if(top_left(a,b))descriptor.top_left_edges|=1u<<i;
-    }
+    auto descriptor=uv.span();
     raster::ProjectionFace projection{};
     if(ray_projection){
       projection.radius_bits=std::bit_cast<uint64_t>(rounding_radius);
@@ -1105,7 +1227,8 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   const auto validate_coverage=[&]{
     if(result.missed&&o.fail_on_miss)
       throw std::runtime_error("Projection missed "+std::to_string(result.missed)+" low UV texels");
-    if(!result.projected)throw std::runtime_error("No low UV texels projected onto the high source");
+    if(!result.projected)throw std::runtime_error(o.writable.empty()?"No low UV texels projected onto the high source":
+                                                "No writable Bake texels projected onto the high source");
   };
   if(!o.supersample)validate_coverage();
 #ifndef DOME_BAKE_RAY_REFERENCE

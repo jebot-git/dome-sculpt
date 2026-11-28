@@ -10,6 +10,7 @@ struct ObjectBakeReport {
   std::array<float,4> color_error_bound{};
   bool normal_prepared=false;
   double normal_initial_error=0;
+  uint64_t protected_texels=0;
 };
 // Bake the displayed source into the active target's rest UVs beneath its
 // existing editable paint layers. Hidden sources are valid; all source data

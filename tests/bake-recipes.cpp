@@ -7,12 +7,99 @@
 #include "dome/native-authoring.hpp"
 #include <fstream>
 #include <cstdlib>
+#include <bit>
 #include "polygon-conversion.hpp"
 #include "dome/shapekey-authoring.hpp"
 #include "dome/texture-sets.hpp"
 #include "texture-set-paint-access.hpp"
 
 namespace {
+Scene masked_cage_scene(){
+  auto scene=cage_scene(128);
+  bake_object(scene,2,cage_settings());
+  auto &paint=*scene.active().painted;
+  auto baked=*paint.baked();
+  const auto resolution=paint.resolution();
+  baked.maps.emission={};
+  baked.emission_field=BakedEmissionField::generate(resolution,[](size_t i){
+    return BakedEmissionSample{{},{-0.f,std::numeric_limits<float>::denorm_min(),4.f+float(i%5)},1};
+  });
+  paint.install_bake(std::move(baked));
+  paint.layer_properties("Keep editable mask",true,1);
+  Brush brush;brush.from=brush.to={-.0007f,0,0};brush.normal={0,0,1};brush.radius=.005f;
+  PaintSettings mask;mask.channel=PaintChannel::Mask;mask.mask=0;
+  paint.begin_stroke();paint.stamp(brush,mask);
+  require_cage(paint.end_stroke(),"The hidden target layer carries an authored protection mask");
+  paint.layer_properties("Keep editable mask",false,0);
+  scene.object(2).material.color={1,0,0,1};
+  scene.object(2).material.emissive={.9f,.3f,.2f};
+  return scene;
+}
+
+void verify_masked_cage(const Scene &input,const Scene &output,const ObjectBakeReport &report){
+  const auto &paint=*input.active().painted;
+  const auto layer=paint.active_layer();
+  const auto &before=*paint.baked(),&after=*output.active().painted->baked();
+  size_t protected_count=0,updated=0;
+  for(size_t at=0;at<before.coverage.size();++at){
+    const auto pixel=after.maps.color.rgba.data()+4*at;
+    if(paint.pixel(layer,at%paint.resolution(),at/paint.resolution()).data[13]>=128){
+      updated+=pixel[0]==255&&pixel[2]==0;
+      continue;
+    }
+    ++protected_count;
+    for(auto images:{std::pair{&before.maps.color,&after.maps.color},
+                    std::pair{&before.maps.normal,&after.maps.normal},
+                    std::pair{&before.maps.metal_rough,&after.maps.metal_rough}})
+      if(!std::equal(images.first->rgba.data()+4*at,images.first->rgba.data()+4*at+4,
+                     images.second->rgba.data()+4*at))
+        throw std::runtime_error("Protected texel changed");
+    const auto old=before.emission_field->texel(at),next=after.emission_field->texel(at);
+    for(size_t c=0;c<3;++c)
+      if(std::bit_cast<uint32_t>(old.absolute[c])!=std::bit_cast<uint32_t>(next.absolute[c]))
+        throw std::runtime_error("Protected FLOAT emission word changed");
+    if(before.coverage[at]!=after.coverage[at]||old.coverage!=next.coverage||old.legacy!=next.legacy)
+      throw std::runtime_error("Protected baked coverage changed");
+  }
+  require_cage(protected_count>0&&updated>0&&protected_count==report.protected_texels&&
+      updated==report.projected&&!report.missed,
+      "Masked rebake changes only writable texels and preserves protected channels and exact HDR bits");
+  require_cage(output.active().bake_recipe&&output.active().bake_recipe->settings.mask_layer==layer&&
+      cage_sources(input)==cage_sources(output)&&
+      input.encode()["objects"][0]["painted"]["layers"]==output.encode()["objects"][0]["painted"]["layers"],
+      "Mask recipe preserves the stable layer ID, editable layers and readonly sources");
+}
+
+void bake_mask_regression(const std::filesystem::path &out){
+  auto scene=masked_cage_scene();
+  const auto original=scene.encode();
+  auto settings=cage_settings();
+  settings.mask_layer=scene.active().painted->active_layer();
+  settings.supersample=true;
+  auto direct=scene.snapshot();
+  const auto report=bake_object(direct,2,settings);
+  verify_masked_cage(scene,direct,report);
+  const auto baked=direct.encode();
+  const auto file=out/"masked.dsculpt";
+  Document doc;doc.replace(scene);ready_cage(doc);
+  doc.bake_from_object(2,settings);
+  doc.save_async(file).get();ready_cage(doc);
+  require_cage(Scene::load(file).encode()==baked&&doc.copy_scene().encode()==baked&&
+      doc.undo()&&doc.copy_scene().encode()==original&&doc.redo()&&doc.copy_scene().encode()==baked,
+      "Masked Bake uses ordered Save and a single exact Undo/Redo transaction");
+  doc.replace(doc.copy_scene());ready_cage(doc);
+  require_cage(doc.frame().state->bake_settings.mask_layer==settings.mask_layer,
+      "Replacing the document with the same saved project restores its mask binding");
+  auto removed=direct.snapshot();
+  removed.active().painted->delete_layer();
+  removed.active().painted->add_layer("Keep editable mask");
+  const auto before=removed.encode();
+  require_cage(rejected_cage([&]{bake_object(removed,2,settings);})&&removed.encode()==before,
+      "A deleted mask layer never rebinds to a newly created layer with the same name");
+  auto bad=direct.active().bake_recipe->encode();bad["settings"]["mask_layer"]=0;
+  require_cage(rejected_cage([&]{ObjectBakeRecipe::decode(bad);}),"A masked recipe requires a real nonzero layer identity");
+}
+
 Mesh material_quads(float height) {
   Mesh mesh;
   for(float x : {0.f,3.f}) {
@@ -212,10 +299,22 @@ int main(int argc,char **argv)try{
     scene.save(argv[3]);
     return 0;
   }
+  if(argc==4&&std::string_view(argv[1])=="--ui-mask-fixture"){
+    auto input=masked_cage_scene();
+    input.save(argv[2]);
+    auto output=Scene::load(argv[2]);
+    auto settings=output.active().bake_recipe->settings;
+    settings.mask_layer=output.active().painted->active_layer();
+    const auto report=bake_object(output,2,settings);
+    verify_masked_cage(input,output,report);
+    output.save(argv[3]);
+    return 0;
+  }
   if(argc==3&&std::string_view(argv[1])=="--inspect"){
     auto scene=Scene::load(argv[2]);std::cout<<nlohmann::json{{"scene",scene.encode()},{"sources",cage_sources(scene)},{"baked",bool(scene.active().painted->baked())}}.dump()<<'\n';return 0;
   }
   const auto out=std::filesystem::path(argc>1?argv[1]:"bake-recipes");std::filesystem::create_directories(out);
+  bake_mask_regression(out);
   auto scene=cage_scene();const auto source=scene.object(2).painted,cage=scene.object(3).painted;
   const auto options=cage_settings();bake_object(scene,2,options);
   const auto recipe=scene.active().bake_recipe;

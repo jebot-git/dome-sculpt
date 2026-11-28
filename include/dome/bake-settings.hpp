@@ -16,5 +16,8 @@ struct ObjectBakeSettings {
   // Zero uses the ordinary normal-offset projection. Session configuration;
   // cage geometry is an ordinary editable/persistent scene mesh.
   uint64_t cage_object=0;
+  // Layer identity in the target's selected paint field. Zero writes the full
+  // atlas. A deleted layer remains unavailable until explicitly reselected.
+  uint64_t mask_layer=0;
 };
 } // namespace dome

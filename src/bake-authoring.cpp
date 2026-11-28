@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake-authoring.hpp"
+#include "bake-mask.hpp"
 #include "dome/bake-recipe.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/color-preparation.hpp"
@@ -252,6 +253,15 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     target.material_bindings=recipient->material_bindings;
   }
   const auto native_writable=target.material_bindings?target.material_bindings->native_paint_sampling:nullptr;
+  if(settings.mask_layer){
+    if(!target.painted||!detail::has_bake_mask_layer(*target.painted,settings.mask_layer))
+      throw std::invalid_argument("The saved Bake mask layer is unavailable; select another layer or Whole field");
+    if(settings.prepare_colors||settings.prepare_normals)
+      throw std::invalid_argument("Prepare the whole surface before limiting Bake to a paint mask");
+    if(target.material_bindings&&target.material_bindings->normal_preparation&&
+       target.material_bindings->normal_preparation->canonical_conversion)
+      throw std::invalid_argument("Convert the target's whole normal basis before using a Bake mask");
+  }
   if(native_writable&&(settings.prepare_colors||settings.prepare_normals))
     throw std::invalid_argument("Native retained paint Bake uses the existing writable tangent basis");
   if(target.material_bindings&&target.material_bindings->normal_preparation&&target.material_bindings->normal_preparation->canonical_conversion){
@@ -475,6 +485,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   options.ray_bias = .0001f / target_world.scale;
   options.ao_samples = settings.ao_samples;
   options.padding = settings.padding;
+  options.writable=detail::bake_layer_writability(*target.painted,settings.mask_layer,check);
   options.supersample = settings.supersample;
   if(options.supersample)options.max_texels=16'777'216; // Four samples across the largest 2048² paint atlas.
   options.fail_on_miss = !settings.allow_partial;options.allow_backfaces=settings.allow_backfaces;
@@ -664,18 +675,28 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
       settings.corresponding_topology,absolute_emission,
       paired_canonical?std::optional(settings.normal_error):std::nullopt);
   std::optional<BakeResult> retained_normal_write;
+  const auto normal_pass_options=[&](const Mesh &normal_low,uint32_t resolution,
+                                     std::span<const uint32_t> faces){
+    auto pass=options;
+    pass.resolution=resolution;
+    pass.ao_samples=0;
+    if(result.rays>=pass.max_rays||result.raster_samples>=pass.max_raster_samples)
+      throw std::length_error("Retained normal bake lacks aggregate projection/raster budget");
+    pass.max_rays-=result.rays;
+    pass.max_raster_samples-=result.raster_samples;
+    uint64_t mask_work=0;
+    pass.writable=detail::map_bake_writability(low_mesh,normal_low,options.resolution,options.writable,pass,faces,mask_work);
+    if(mask_work>=pass.max_raster_samples)
+      throw std::length_error("Retained normal bake lacks projection work after mapping its mask");
+    pass.max_raster_samples-=mask_work;
+    if(progress)pass.progress=[&](float value){progress(.5f+.4f*value);};
+    return pass;
+  };
   if(split_recipient){
-    auto normal_options=options;
-    normal_options.resolution=normal_resolution;
-    normal_options.ao_samples=0;
-    if(result.rays>=options.max_rays||result.raster_samples>=options.max_raster_samples)
-      throw std::length_error("Retained texture-set normal bake lacks aggregate projection/raster budget");
-    normal_options.max_rays-=result.rays;
-    normal_options.max_raster_samples-=result.raster_samples;
-    if(progress)normal_options.progress=[&](float value){progress(.5f+.4f*value);};
-    encode_retained(normal_options);
     Mesh normal_low=low_mesh;
     if(!native_recipient)normal_low.uv=retained_recipient->normal_coordinates();
+    auto normal_options=normal_pass_options(normal_low,normal_resolution,target_triangles);
+    encode_retained(normal_options);
     retained_normal_write=detail::bake_mesh_source_normals(normal_low,high,normal_options,
         source_normals,target_triangles,source_fields,source_placement,target_metric_corners,
         settings.corresponding_topology);
@@ -691,12 +712,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     Mesh normal_low=*low;
     for(size_t c=0;c<normal_low.uv.size();++c){if((c&1023)==0)check();
       normal_low.uv[c]=retained_uv->coordinates().at(target.painted->mesh().indices[c]);}
-    auto normal_options=options;
-    normal_options.ao_samples=0;
-    if(result.rays>=options.max_rays||result.raster_samples>=options.max_raster_samples)
-      throw std::length_error("Retained normal rebake lacks aggregate projection/raster budget");
-    normal_options.max_rays-=result.rays;normal_options.max_raster_samples-=result.raster_samples;
-    if(progress)normal_options.progress=[&](float value){progress(.5f+.4f*value);};
+    auto normal_options=normal_pass_options(normal_low,options.resolution,{});
     retained_normal_write=detail::bake_mesh_source_normals(normal_low,high,normal_options,
         source_normals,{},source_fields,source_placement,target_metric_corners,
         settings.corresponding_topology);
@@ -704,6 +720,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   check();
   if(!result.projected)throw std::runtime_error("No target texels project onto the selected source");
   ObjectBakeReport report{result.projected,result.padded,result.rays+(retained_normal_write?retained_normal_write->rays:0),result.missed};
+  report.protected_texels=std::ranges::count(result.coverage,uint8_t(4));
   report.color_prepared=converted;
   report.canonical_captured=canonical_captured;
   report.normal_prepared=normal_converted;

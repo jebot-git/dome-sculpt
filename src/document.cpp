@@ -726,7 +726,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
     }else if(active.texture_sets){
       state_.bake_source=0;
       state_.bake_settings={};
-    }
+    }else state_.bake_settings.mask_layer=0;
     state_.bake_settings_object=active.id;
     state_.bake_recipe=recipe;
   }
@@ -798,13 +798,18 @@ void Document::publish_locked(bool force,bool checkpoint) {
   }
   state_.active_layer = selected_field ? selected_field->painted->active_layer() : 0;
   state_.paint_layers.clear();
+  state_.bake_mask_layers.assign(1,0);
   state_.layer_visible = false;
   if (selected_field)
     for (auto &l : selected_field->painted->layers()) {
       state_.paint_layers.push_back(l.name);
+      state_.bake_mask_layers.push_back(l.id);
       if (l.id == state_.active_layer)
         state_.layer_visible = l.visible;
     }
+  for(const auto id:{state_.bake_settings.mask_layer,recipe?recipe->settings.mask_layer:0})
+    if(id&&std::ranges::find(state_.bake_mask_layers,id)==state_.bake_mask_layers.end())
+      state_.bake_mask_layers.push_back(id);
   state_.native_pending=bool(native_stroke_);
   state_.native_gesture=native_stroke_?native_stroke_->epoch:0;
   state_.native_accepting=native_stroke_&&!native_stroke_->accepted.load()&&!(transaction_&&transaction_->native_ending());
@@ -949,7 +954,9 @@ void Document::replace_locked(Scene next,bool clean,std::filesystem::path adopte
   state_.selection_pressed={true,true};state_.selection_release={true,true};
   bind_locked();transaction.clear_history();path_=std::move(adopted_path);
   ++state_.generation;
+  state_.bake_settings_object=0;
   state_.bake_settings.cage_object=0; // Object references never alias a new document.
+  state_.bake_settings.mask_layer=0;
   transaction.invalidate_import();
   transaction.invalidate_projection();
   if(recovery_){recovery_source_={new_recovery_id(),state_.generation,path_};recovery_content_=0;}
@@ -2627,9 +2634,16 @@ void Document::finish_control_locked(bool accept) {
         if(state_.bake_settings.corresponding_topology)state_.bake_settings.cage_object=0;
       }
       else {
+        require_authority_locked(control_source_);
+        if(control_source_.generation!=state_.generation||control_source_.revision!=state_.revision||
+           control_source_.object!=scene_.active().id)
+          throw std::logic_error("Bake target changed; reopen quality controls");
+        const auto &masks=state_.bake_mask_layers;
+        const auto mask=masks.at(size_t(std::lround(c.value[3]*float(masks.size()-1))));
         state_.bake_settings.ao_samples=uint32_t(std::lround(c.value[0]*256));
         state_.bake_settings.padding=uint32_t(std::lround(c.value[1]*64));
         state_.bake_settings.supersample=c.value[2]>=.5f;
+        state_.bake_settings.mask_layer=mask;
       }
     }
     control_before_.reset();control_changed_=false;state_.controls={};return;
@@ -2865,10 +2879,14 @@ void Document::control_event_locked(VrControlEvent event) {
       c.value={state_.bake_settings.allow_partial?1.f:0.f,
                state_.bake_settings.allow_backfaces?1.f:0.f,
                state_.bake_settings.corresponding_topology?1.f:0.f,0};break;
-    case VrParameter::BakeQuality:
-      c.title="AO, padding and sampling";c.components=3;
+    case VrParameter::BakeQuality: {
+      c.title="Bake quality and target mask";c.components=4;
+      const auto &masks=state_.bake_mask_layers;
+      const auto found=std::ranges::find(masks,state_.bake_settings.mask_layer);
+      const auto mask=masks.size()<2||found==masks.end()?0.f:float(found-masks.begin())/float(masks.size()-1);
       c.value={state_.bake_settings.ao_samples/256.f,state_.bake_settings.padding/64.f,
-               state_.bake_settings.supersample?1.f:0.f,0};break;
+               state_.bake_settings.supersample?1.f:0.f,mask};break;
+    }
     case VrParameter::WeightStrength:
       c.title = "Weight stroke strength"; c.value[0] = state_.weights.strength;
       break;
@@ -4162,6 +4180,9 @@ void Document::file_loop() {
                 "prepared; retry on the current object");
           Transaction transaction(*this);
           auto &o=scene_.object(job->object);o.painted=std::move(painted);o.mesh_active=true;
+          // A fresh paint stack has a different layer identity namespace.
+          if(o.bake_recipe&&o.bake_recipe->settings.mask_layer)o.bake_recipe.reset();
+          state_.bake_settings.mask_layer=0;
           state_.asset_busy=false;state_.message="Painting mesh ready";state_.error.clear();
           record_locked({{},transaction.before(),scene_});bind_locked();publish_locked(true,false);transaction.commit();
           asset_work_.store({});

@@ -4538,8 +4538,11 @@ void SourcePaintAccess::merge_bake(PaintedMesh &paint,BakedTextures incoming,Bak
         throw std::length_error("Merged FLOAT baked emission exceeds paint storage budget");
       const auto generate=paint.texture_set_domain_?BakedEmissionField::generate_compact:BakedEmissionField::generate;
       merged.emission_field=generate(paint.resolution(),[&](size_t i){
-        return BakedEmissionField::over(detail::baked_emission_texel(*paint.baked_,i),
-                                       detail::baked_emission_texel(incoming,i));
+        const auto prior=detail::baked_emission_texel(*paint.baked_,i);
+        const auto next=detail::baked_emission_texel(incoming,i);
+        if(next.coverage==0)return prior;
+        if(next.coverage==1)return next;
+        return BakedEmissionField::over(prior,next);
       },{maximum-other,cancelled});
       merged.maps.emission={};
     }

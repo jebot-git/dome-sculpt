@@ -411,13 +411,13 @@ int control_components(VrParameter parameter) {
   case VrParameter::ShapeMirror:
   case VrParameter::BakeProjection:
   case VrParameter::BakeDistances:
-  case VrParameter::BakeQuality:
   case VrParameter::SkinDistances:
   case VrParameter::RigRotation:
   case VrParameter::InkEmission:
   case VrParameter::MaterialEmission:
     return 3;
   case VrParameter::BakeColors:
+  case VrParameter::BakeQuality:
   case VrParameter::InkColor:
   case VrParameter::BaseColor:
   case VrParameter::CutCapColor:

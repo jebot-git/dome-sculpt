@@ -36,9 +36,9 @@ Accepted completion publishes maps and closes the spatial menu for inspection.
 Reopen the page to rebake/clear or use the normal Undo/Redo/save/export commands.
 
 Native projects store generated maps, retained editable sources and the last
-successful recipe. Bake quality includes the four-sample setting. Partial
-masks, multiple source selection and broader production-scale quality and
-performance are still open. [Saved bake recipes](BAKE-RECIPES.md)
+successful recipe. Bake quality includes four-sample projection and a target
+paint-mask choice. Multiple source selection and broader production-scale
+quality and performance are still open. [Saved bake recipes](BAKE-RECIPES.md)
 
 Worker and cancellation contract
 -------------------------------

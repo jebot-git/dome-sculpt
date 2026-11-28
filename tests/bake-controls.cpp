@@ -47,7 +47,7 @@ int main(int argc,char**argv)try{
   check(doc.frame().state->bake_settings.front_mm==50 && doc.copy_scene().encode()==before,"Ray Cancel discards staged projection bounds exactly");
   driver.sector(1);c=doc.frame().state->controls;driver.value(float(bake_distance_to_unit(20)));driver.confirm();
   check(std::abs(doc.frame().state->bake_settings.front_mm-20)<.01f,"Joystick confirmation retains the chosen world-millimetre bounds");
-  driver.sector(2);check(doc.frame().state->controls.components==3,"AO, padding and supersampling expose independent controller rows");
+  driver.sector(2);check(doc.frame().state->controls.components==4,"AO, padding, sampling and target mask expose independent controller rows");
   driver.value(1,2);driver.ray(.25f,.95f);
   check(!doc.frame().state->bake_settings.supersample,"Cancel discards a staged sampling change");
   driver.sector(2);driver.value(0);driver.value(.125f,1);driver.value(1,2);driver.confirm();

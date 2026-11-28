@@ -23,6 +23,28 @@ legacy fixtures. The published Scene29 readers explicitly reject Scene30;
 opening a new recipe-bearing project with an older binary is unsupported.
 The C++ object/control layouts change and require coherent consumer rebuilds.
 
+## Limit Bake with a paint-layer mask
+
+Paint the **Mask** channel on a target layer. Mask values below 50% protect
+texels. Choose the layer under **Target mask** in the desktop dialog or under
+**Bake quality** in OpenXR. **Whole field** uses the regular Bake. The mask
+uses the selected layer's raw texels, so hiding the layer or changing its
+opacity leaves the mask active. In a texture set, the choices are the layers
+owned by that field.
+
+The GPU excludes protected texels from projection and seam padding. Protected
+color, normal, AO and FLOAT emission samples keep their prior values. A retained
+normal atlas with independent UVs maps each normal sample into the paint atlas
+through the corresponding triangle corners. Its texels are writable when all
+covered sample positions are allowed by the mask. Unmapped gutters retain
+their previous normal data. Independent grids must contain some writable
+surface to complete the Bake. Prepare colors and portable normals on the
+whole field before using a mask.
+
+Recipe version 4 stores the target layer ID. Recall uses that layer's current
+mask, including later brush edits and renames. If the layer has been deleted,
+choose another layer or **Whole field**. Older recipes open with **Whole field**.
+
 ## Four samples per texel
 
 Enable **Four samples per texel** in the desktop Bake dialog. In OpenXR,
@@ -145,8 +167,7 @@ application/archive/SDK/evidence hashes, actual commands, original negatives and
 per-profile scope. CMake configuration registers the native recipe, persistent
 fault and loader tests; registration alone is not an execution result.
 
-Fresh current-main integration/full regression, multi-source/masked recipes,
-supersampling, broader deformations, portable tangent emission and GPU baking
-remain required. Every unfinished original/additional goal row and the later
-controller-drawer phase remain active. No system installation, headset launch or
-active-session restart occurred.
+Multi-source recipes, broader deformations and portable tangent emission
+remain required. Every unfinished original and additional goal row and the
+later controller-drawer phase remain active. No system installation, headset
+launch or active-session restart occurred.

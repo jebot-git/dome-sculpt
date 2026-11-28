@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake.hpp"
+#include "bake-mask.hpp"
 #ifdef DOME_TEST_BAKE_RAY_DEVICE
 #include "bake-material-input.hpp"
 #include "bake-padding-device.hpp"
@@ -49,6 +50,26 @@ std::array<uint8_t,4> pixel(const Image &image,int x,int y) {
   auto p=image.rgba.data()+(size_t(y)*image.width+x)*4;return {p[0],p[1],p[2],p[3]};
 }
 bool near(int a,int b,int tolerance=1) {return std::abs(a-b)<=tolerance;}
+void mapped_writability(){
+  auto paint=quad();
+  auto normal=paint;
+  for(auto &uv:normal.uv)uv[0]=1-uv[0];
+  std::vector<uint8_t> writable(64);
+  for(size_t i=0;i<writable.size();++i)writable[i]=i%8>=4;
+  BakeOptions options;options.resolution=9;options.supersample=true;
+  uint64_t work=0;
+  const auto mapped=detail::map_bake_writability(paint,normal,8,writable,options,{},work);
+  bool expected=mapped.size()==81;
+  for(size_t i=0;i<mapped.size();++i)expected&=bool(mapped[i])==(i%9<4);
+  check(expected&&work==18*18*2,
+        "Independent mirrored normal UVs map protection from the paint grid and refuse mixed footprints");
+  options.max_raster_samples=work-1;
+  check(rejects([&]{detail::map_bake_writability(paint,normal,8,writable,options,{},work);}),
+        "Mapped normal masks consume the shared raster budget");
+  options.resolution=8;
+  check(detail::map_bake_writability(paint,paint,8,writable,options,{},work)==writable&&!work,
+        "A shared normal and paint grid preserves the exact mask without rerasterizing");
+}
 void supersampling(){
   BakeOptions options;
   options.resolution=8;options.ao_samples=0;options.padding=0;options.supersample=true;
@@ -771,6 +792,7 @@ void padding_device_ownership(){
 #endif
 } // namespace
 int main()try {
+  mapped_writability();
   supersampling();
   edge_projection();
   ordered_raster_batches();

@@ -261,6 +261,10 @@ if(BUILD_TESTING)
   endforeach()
   add_test(NAME canonical-writable-bake-recipient
     COMMAND dome-sculpt-source-writable-normal-bake-test --recipient ${CMAKE_CURRENT_BINARY_DIR}/canonical-writable-bake-recipient)
+  add_test(NAME canonical-writable-bake-mask
+    COMMAND dome-sculpt-source-writable-normal-bake-test --masked-recipient
+      ${CMAKE_CURRENT_BINARY_DIR}/canonical-writable-bake-mask)
+  set_tests_properties(canonical-writable-bake-mask PROPERTIES TIMEOUT 300)
   set_tests_properties(canonical-writable-bake-recipient PROPERTIES TIMEOUT 180)
   add_test(NAME native-writable-bake-recipient
     COMMAND dome-sculpt-source-writable-normal-bake-test --native-recipient ${CMAKE_CURRENT_BINARY_DIR}/native-writable-bake-recipient)
@@ -1524,9 +1528,11 @@ if(BUILD_TESTING)
     if(component STREQUAL "authored-bind")
       target_include_directories(dome-sculpt-${component}-test PRIVATE src)
     endif()
-    if(component STREQUAL "bake" AND bake_ray_compute_source)
+    if(component STREQUAL "bake")
       target_include_directories(dome-sculpt-bake-test PRIVATE src)
-      target_compile_definitions(dome-sculpt-bake-test PRIVATE DOME_TEST_BAKE_RAY_DEVICE=1)
+      if(bake_ray_compute_source)
+        target_compile_definitions(dome-sculpt-bake-test PRIVATE DOME_TEST_BAKE_RAY_DEVICE=1)
+      endif()
     endif()
     if(component STREQUAL "triangle-remesh")
       target_sources(dome-sculpt-${component}-test PRIVATE tests/triangle-remesh-kernel.cpp)
@@ -4230,6 +4236,13 @@ if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
     $<TARGET_FILE:dome-sculpt-bake-recipes-test>
     ${CMAKE_CURRENT_BINARY_DIR}/bake-supersample-xr --supersample)
   set_tests_properties(bake-supersample-openxr PROPERTIES TIMEOUT 600
+    ENVIRONMENT_MODIFICATION "LD_LIBRARY_PATH=path_list_prepend:$<TARGET_FILE_DIR:fltk::fltk-shared>")
+  add_test(NAME bake-mask-openxr COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-recipes-xr.py
+    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    $<TARGET_FILE:dome-sculpt-bake-recipes-test>
+    ${CMAKE_CURRENT_BINARY_DIR}/bake-mask-xr --mask)
+  set_tests_properties(bake-mask-openxr PROPERTIES TIMEOUT 600
     ENVIRONMENT_MODIFICATION "LD_LIBRARY_PATH=path_list_prepend:$<TARGET_FILE_DIR:fltk::fltk-shared>")
   add_test(NAME texture-set-active-bake-openxr COMMAND ${Python3_EXECUTABLE}
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-recipes-xr.py
