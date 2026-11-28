@@ -1,0 +1,178 @@
+{
+  "date": "2026-11-28",
+  "product": "7138dd6cbf8261b0ed29e1fe5b5c0ef69dda4d1f",
+  "mtoon_fixture": "ada02d7460c6cbc3defcfd7575e855ab0f1e75aa",
+  "preceding": "4d14e94a0aadebb7cfaf1ff4aeb94825b63d4928",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "First Apply captures the posed guide and transports its independent prepared normal fields. Apply and reapply filter both original-coordinate linear fields using the selected GPU. The worker evaluates the posed tangent columns, checks the angular bound and publishes the detached atlas.",
+  "oneapi_arc_release": {
+    "application_sha256": "6a43c13f00a154ae81db9efe6ae011443c951a662e3bf925074ea61d4e40b089",
+    "fltk_prefix": "/opt/fltk-vr/toolkit",
+    "bitmap_runtime_prefix": "/opt/fltk-vr/bdf-runtime",
+    "ctest_passed": 60,
+    "ctest_cases": [
+      "retopology-prepared-affine-ui-fixture",
+      "retopology-affine-ui-fixture",
+      "retopology-imported-pbr",
+      "retopology-reapply-plain",
+      "retopology-prepared-affine-openxr",
+      "retopology-first-prepared-posed-affine",
+      "retopology-imported-mtoon-resize",
+      "retopology-first-prepared-posed-plain",
+      "retopo",
+      "retopology-authoring",
+      "retopology-surface-heat-plain",
+      "retopology-prepared-color-affine",
+      "retopology-surface-heat-affine",
+      "retopology-reapply-affine",
+      "retopology-affine",
+      "emission-raster-mapped-compute",
+      "retopology-held-admission",
+      "retopology-worker-faults",
+      "retopology-save-handoff",
+      "retopology-history-openxr-apply",
+      "emission-raster-finite-compute",
+      "retopology-affine-openxr",
+      "retopology-prepared-detached-affine",
+      "retopology-history-openxr-cancel",
+      "texture-set-retained-retopology-affine",
+      "retopology-imported-bake-resize",
+      "retopology-imported-mtoon-painted",
+      "retopology-prepared-color-normal-uv-plain",
+      "retopology-prepared-color-normal-uv-affine",
+      "retopology-imported-mtoon-mixed-hdr",
+      "retopology-imported-prior-bake",
+      "retopology-imported-mtoon-mixed-ldr",
+      "retopology-prepared-color-normal-plain",
+      "retopology-prepared-color-normal-affine",
+      "retopology-prepared-color-normal-first",
+      "retopology-worker-reporter-recovery",
+      "texture-set-retained-retopology-plain",
+      "retopology-prepared-color-plain",
+      "emission-raster-texture-set-compute",
+      "retopology-first-material-posed-affine",
+      "retopology-first-material-affine",
+      "retopology-imported-mtoon-tinted",
+      "retopology-imported-mtoon-unprepared",
+      "retopology-mtoon-affine",
+      "retopology-mtoon-plain",
+      "application-missing-gpu",
+      "retopo-edges",
+      "retopology-prepared-affine",
+      "retopology-first-material-plain",
+      "retopology-prepared-plain",
+      "retopology-first-material-posed-plain",
+      "retopology-prepared-detached",
+      "retopology-mtoon-detached",
+      "retopology-worker-accepted-publication",
+      "retopology-mtoon-v0",
+      "retopo-cancellation-boundaries",
+      "retopology-affine-wire",
+      "compute-missing-gpu",
+      "retopology-mixed-material",
+      "emission-raster-mapped-missing-gpu"
+    ],
+    "ctest_log_sha256": "e555d1774c941987e5592f97d8977248b3ba72998d740822271874226e63769a",
+    "sampler_trace_sha256": "0a37c6d8e6bd1d32f785f0a4d8400f1324d153758175b73ad9ff01011d4cdbf3",
+    "existing_archive_sha256_identical_to_preceding": {
+      "retopology-prepared-color-normal-uv-affine/before-bind.dsculpt": "2295e66832ff6077701b548bb8af5c2001da207b418329b0b5d07da99b160583",
+      "retopology-prepared-color-normal-uv-affine/color-after.dsculpt": "a4b2bb87c10babcd4eb5c2769b884384e7e6044391ca109feb7650ede1af8f20",
+      "retopology-prepared-color-normal-uv-affine/color-before.dsculpt": "e5654d557af9be130e58ff540547eb0fe00565bfd8a28caf41f8ffb3d17f9a56",
+      "retopology-prepared-color-normal-uv-affine/color-common-control.dsculpt": "139714b27fba3da6665d2a994f768965c971ab388e1c42d69f3349db64e9d18a",
+      "retopology-prepared-color-normal-uv-affine/color-normal-cleared.dsculpt": "679ad1f62a92ffa41c80a2d4500668fc06d146fa6fd844892c440aa401596f45",
+      "retopology-prepared-color-normal-uv-affine/color-normal-converted.dsculpt": "f9448c849b8f4cf4533d7b235c4db28eced12c4b0fafb8e7d1b6063d8428d5b3",
+      "retopology-prepared-color-normal-uv-affine/color-normal-flat-control.dsculpt": "7aacef120a638b071ff6f00126db6486a89a320292ba21e5a30dfb085b57c689",
+      "retopology-prepared-color-normal-uv-affine/color-normal-unconverted.dsculpt": "46f0210ed2ce77452ff2eb6fd0e03ec5c3debbb535f97ee789e6d0faba5939ba",
+      "retopology-prepared-color-normal-uv-affine/patch.dsculpt": "83d3e6d891b2307add0c04f604121140a2b095ce78c3cbb7756f77a49982ee84",
+      "retopology-prepared-color-normal-uv-affine/retained-uv-source.dsculpt": "e83a40e1149ca5b053807b795b095de1590b362d0bb29526663f35952eda21cc",
+      "retopology-prepared-color-normal-uv-affine/retained-uv.dsculpt": "e5654d557af9be130e58ff540547eb0fe00565bfd8a28caf41f8ffb3d17f9a56",
+      "retopology-prepared-detached-affine/before-bind.dsculpt": "2295e66832ff6077701b548bb8af5c2001da207b418329b0b5d07da99b160583",
+      "retopology-prepared-detached-affine/patch.dsculpt": "83d3e6d891b2307add0c04f604121140a2b095ce78c3cbb7756f77a49982ee84",
+      "retopology-prepared-detached-affine/prepared-before.dsculpt": "5d52cbd9fedb61e87765fb36e713ecf8edf8f241d9f8b7004f9a9a4f06146a11",
+      "retopology-prepared-detached-affine/prepared-reapplied.dsculpt": "737a3c965ab17bd551d6ca4f6c96e662d08babb357d8410d989b4214869df27e"
+    },
+    "wayland": {
+      "checks": 10,
+      "trace_sha256": "4028c1ba5b1a2eb98aee41f1fd711fa61513f8ed5db1725fa8efa3e2eb62a268",
+      "project_sha256": "71e0a90f94e1e952d68b4a293d81cfeda7d5a7f6c7312fee94ea28638792f9a4",
+      "glb_sha256": "7a7ad4a16ec2369cd702c78320d377522f78834c4e5adf6877444b9aa5e41489",
+      "validator_version": "2.0.0-dev.3.10",
+      "errors": 0,
+      "warnings": 0
+    },
+    "synthetic_openxr": {
+      "affine": {
+        "checks": 35,
+        "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "report_sha256": "8dd448f195c89dde27c2dd31453f0a2c4012f7825850347a670c5d9ac4754a2e",
+        "accepted_project_sha256": "acb258212f3e9f6f3f5a73c4ff871c5493be781c4e3ab4cd8e6914ed05568fb7"
+      },
+      "prepared-affine": {
+        "checks": 35,
+        "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "report_sha256": "8dd448f195c89dde27c2dd31453f0a2c4012f7825850347a670c5d9ac4754a2e",
+        "accepted_project_sha256": "7fb93708a48160845d6911b2f8a152082b263692c68141860efff3b7d2508c94"
+      }
+    }
+  },
+  "reference": {
+    "ctest_cases": [
+      "cpu-reference-install-refused",
+      "retopology-first-prepared-posed-plain",
+      "retopology-first-prepared-posed-affine",
+      "retopology-prepared-color-normal-plain",
+      "retopology-prepared-color-normal-affine",
+      "retopology-prepared-color-normal-first",
+      "retopology-prepared-color-normal-uv-plain",
+      "retopology-reapply-plain",
+      "retopology-reapply-affine",
+      "retopology-prepared-color-normal-uv-affine"
+    ],
+    "identical_arc_and_cpu_reference_projects": {
+      "retopology-first-prepared-posed-plain/posed-prepared-patch.dsculpt": "6d19bd61d8a3789d28bc5f1f9e48d11356a275ad87c8b80d10d9e1880562a955",
+      "retopology-first-prepared-posed-plain/posed-prepared-source.dsculpt": "bb6fff1bc84ecfc3f7aa0c15ead9fe00026d52f5108bd6f6d7ad6b990340bd73",
+      "retopology-first-prepared-posed-affine/posed-cleared-split.dsculpt": "f9417ca822d35281db2a5be7ee97325626f23c11194042603c3e2543f16ef2a9",
+      "retopology-first-prepared-posed-affine/posed-prepared-patch.dsculpt": "62720f81bc979c5843ed9ef3e4709db07d546be9d7e48d7abf50d9fe07cce50b",
+      "retopology-first-prepared-posed-affine/posed-prepared-source.dsculpt": "f5a590d398dd258aa1d33c7b1fb2e69b00ea9a1dae5bed2a7a92c98024794663"
+    },
+    "refused_cpu_configurations": {
+      "desktop": "67d4a1e372fda3c5dce61d5c5a4aa10448cdc675a06decd20e18231efe135ff8",
+      "desktop-opt-in": "67d4a1e372fda3c5dce61d5c5a4aa10448cdc675a06decd20e18231efe135ff8",
+      "xr": "67d4a1e372fda3c5dce61d5c5a4aa10448cdc675a06decd20e18231efe135ff8",
+      "headless": "67d4a1e372fda3c5dce61d5c5a4aa10448cdc675a06decd20e18231efe135ff8",
+      "headless-unopted": "67d4a1e372fda3c5dce61d5c5a4aa10448cdc675a06decd20e18231efe135ff8"
+    }
+  },
+  "scoped_arc_asan_ubsan": {
+    "cases": {
+      "plain": {
+        "probes": 196,
+        "max_world_direction_error": 0.00398817,
+        "difference_from_rest_directions": 0.276128,
+        "sanitizer_log_sha256": "ec1e5b1c61581983086795f98e6f0a480c7dc5d81f9dd265c09e4533c3fbdf74"
+      },
+      "affine": {
+        "probes": 234,
+        "max_world_direction_error": 0.00476866,
+        "difference_from_rest_directions": 0.298673,
+        "sanitizer_log_sha256": "caf907237fec3a0eedf5bed87d18c846aa847c2b9c3ba226444248c92fbbfd6d"
+      }
+    },
+    "scope": "Retopology and normal-field authoring objects with sanitizer instrumentation. The oneAPI runtime was used with leak detection disabled."
+  },
+  "other_gpu_backends": {
+    "cuda": {
+      "scope": "Updated application translation units and shared GPU texture sampler compile",
+      "log_sha256": "166e7988fbe234bf7620eac2997a995ecdec530baaa994695d88f504c4ee9c97"
+    },
+    "rocm": {
+      "scope": "Updated application translation units and shared GPU texture sampler compile",
+      "log_sha256": "043b25fa90bf772679b08b00db050ed33288859e4ca309933136b92e15690e05"
+    }
+  },
+  "notes": [
+    "The first concurrent cold OpenXR run stalled at the prepared fixture Apply readiness check. The isolated diagnostic, uninstrumented Release rerun and final Release suite with the persistent SYCL cache passed.",
+    "The old MToon fixtures assumed a 512-pixel first atlas and a blank inherited layer. The previous product reproduced all four failures. The revised tests retain the existing GPU product behavior and exercise both painted and independent unpainted export.",
+    "Positive AMD and NVIDIA hardware runs and physical headset validation remain open."
+  ]
+}

@@ -333,6 +333,7 @@ rules as viewport shading and checks the angular encoding budget for the
 new atlas. A cleared Bake retains its historical conversion lease through
 matching UV seam copies of the posed source. Physical headset and positive
 AMD and NVIDIA runs remain open.
+[Posed prepared normals and GPU sampling evidence](validation/retopo-posed-prepared-20261128.json)
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
