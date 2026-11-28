@@ -422,6 +422,12 @@ Resident uploads in those runs use 856,065 and 333,824 bytes respectively.
 The portable GLB binary chunks and native project are exact. Angular proof
 metadata gains a small binary32 margin, and its associated document digest
 updates. This path retains the existing clamp-linear UV0 admission.
+Arc passes all 83 selected regressions, nested DomeD Wayland and synthetic
+OpenXR. The headless oracle matches the GLB binary chunks with a maximum
+angular certificate difference below 0.00000005 radians. CUDA and ROCm
+compile the device path. Physical XR and positive vendor hardware tests
+remain open.
+[Resident MToon normal raster evidence](validation/retopo-gpu-normal-20261128.json)
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing

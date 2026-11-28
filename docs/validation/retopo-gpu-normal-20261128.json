@@ -1,0 +1,257 @@
+{
+  "date": "2026-11-28",
+  "product": "6e854354bb3aa0a9cf1acbfdf364d86180b37e7c",
+  "preceding": "3be61770ef0cc64458c447245973e10b4a337ff3",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Resident mixed-resolution normal Bake sampling, blend, texel encoding and continuous cell certification for static standalone MToon 1 retopology GLB.",
+  "arc_a770_release": {
+    "application_sha256": "816b004a222049f609c1f56cdf8c12e8275e9ba498a7775659ce10c696469898",
+    "ctest": {
+      "cases": 83,
+      "log_sha256": "9b2c3673ac1faffba7479c5d72d070154ed537e1d9213154e689296236e84bb2"
+    },
+    "transfer_comparison": {
+      "fixture": "512x512 aligned normal output after paint resize",
+      "preceding_from_two_sampler_api": {
+        "runtime_upload_bytes": 4194304,
+        "runtime_readback_bytes": 8388608,
+        "runtime_copy_calls": 64,
+        "kernel_dispatches": 32,
+        "resident_upload_bytes": 333824
+      },
+      "current_from_arc_trace": {
+        "runtime_upload_bytes": 0,
+        "runtime_readback_bytes": 1056768,
+        "runtime_copy_calls": 10,
+        "kernel_dispatches": 10,
+        "resident_upload_bytes": 856065
+      },
+      "current_stripe_readback_bytes": [
+        [
+          262144,
+          2048
+        ],
+        [
+          260096,
+          2032
+        ],
+        [
+          260096,
+          2032
+        ],
+        [
+          260096,
+          2032
+        ],
+        [
+          6144,
+          48
+        ]
+      ],
+      "current_resident_upload_sizes": [
+        65536,
+        262144,
+        262144,
+        263169,
+        3072
+      ]
+    },
+    "byte_identical_baseline_files": {
+      ".dsculpt": 43,
+      ".glb": 58
+    },
+    "comparison_with_preceding_mixed_grid_exports": {
+      "hidden-physical-standard.glb": {
+        "exact": true,
+        "sha256": "db86a98421ae0faf50a68a06a5c5947b3b8a629f4ce0fa49f0ddb939b8e35270"
+      },
+      "resized-physical-editable.glb": {
+        "binary_chunk_exact": true,
+        "only_json_changes": [
+          "maximumNormalErrorRadians",
+          "documentSha256"
+        ],
+        "preceding_maximum_error": [
+          0.006870941897579268
+        ],
+        "current_maximum_error": [
+          0.006871916888225514
+        ],
+        "sha256": "d344d6907165bcafb3cc8c6295b6719c1ea15367b30e57c08bc0fb7123b10862"
+      },
+      "standalone-editable.glb": {
+        "binary_chunk_exact": true,
+        "only_json_changes": [
+          "maximumNormalErrorRadians",
+          "documentSha256"
+        ],
+        "preceding_maximum_error": [
+          0.006875701153576319
+        ],
+        "current_maximum_error": [
+          0.006876630888818056
+        ],
+        "sha256": "6745dce4535e717d6f6d6f3a95a5a73f15c263466cc79e0bfea136642e4eba79"
+      },
+      "standalone-patch.dsculpt": {
+        "exact": true,
+        "sha256": "2b19b51b3cad4773b69bc1aad33d295110155d325e131597f5ae5ca5dc42dc6e"
+      },
+      "standalone-standard.glb": {
+        "binary_chunk_exact": true,
+        "only_json_changes": [
+          "maximumNormalErrorRadians",
+          "documentSha256"
+        ],
+        "preceding_maximum_error": [
+          0.006875701153576319
+        ],
+        "current_maximum_error": [
+          0.006876630888818056
+        ],
+        "sha256": "a6a85d16969d5c2241f5951aa33c0f295690ca04e6130deea9ced43f6b822d66"
+      }
+    },
+    "native": {
+      "checks": 106,
+      "normal_oracle": {
+        "standard": {
+          "partially_covered_fractional_samples": 11828,
+          "measured_maximum_radians": 0.00564997,
+          "certified_maximum_radians": 0.00687663,
+          "resolution": [
+            256,
+            256
+          ]
+        },
+        "editable": {
+          "partially_covered_fractional_samples": 11828,
+          "measured_maximum_radians": 0.00564997,
+          "certified_maximum_radians": 0.00687663,
+          "resolution": [
+            256,
+            256
+          ]
+        },
+        "resized_editable": {
+          "partially_covered_fractional_samples": 11540,
+          "measured_maximum_radians": 0.00572094,
+          "certified_maximum_radians": 0.00687192,
+          "resolution": [
+            512,
+            512
+          ]
+        }
+      },
+      "gpu_trace_sha256": "18ec6d21f4976be4051f5dfaeefffc0eec43ee549d868170c6f5f74cd2094748",
+      "headless_same_input_artifacts": {
+        "standalone-patch.dsculpt": {
+          "exact": true
+        },
+        "standalone-standard.glb": {
+          "binary_chunk_exact": true,
+          "only_json_changes": [
+            "maximumNormalErrorRadians",
+            "documentSha256"
+          ],
+          "absolute_bound_difference_radians": 4.656722975976413e-10
+        },
+        "standalone-editable.glb": {
+          "binary_chunk_exact": true,
+          "only_json_changes": [
+            "maximumNormalErrorRadians",
+            "documentSha256"
+          ],
+          "absolute_bound_difference_radians": 4.656722975976413e-10
+        },
+        "resized-physical-editable.glb": {
+          "binary_chunk_exact": true,
+          "only_json_changes": [
+            "maximumNormalErrorRadians",
+            "documentSha256"
+          ],
+          "absolute_bound_difference_radians": 3.445974891200243e-08
+        },
+        "hidden-physical-standard.glb": {
+          "exact": true
+        }
+      }
+    },
+    "synthetic_openxr": {
+      "checks": 47,
+      "report_sha256": "f8473c2983c0515fe189d409fd17a606996b1342ba8dc3d37111241ae2b751eb"
+    },
+    "nested_domed_wayland": {
+      "checks": 10,
+      "dmabuf_render_node": "/dev/dri/renderD129",
+      "gpu_trace_sha256": "9624dc717ba023161b507dc4412be2f5cce8cff1070f40d8f84a526d8a92f179",
+      "report_sha256": "0393becaead1dcf0aed3dcc7918400ec7f64484dcafa1dca691a03569d0df0b2"
+    }
+  },
+  "headless_numerical_test_reference": {
+    "cases": 29,
+    "log_sha256": "c5e141a8462c4341cdf200d3119f12606a31440fc449fc5c5c51a2e615f9cb00"
+  },
+  "arc_asan_ubsan": {
+    "instrumented_units": [
+      "texture-set-export.cpp",
+      "export.cpp",
+      "mixed-normal-raster.cpp",
+      "texture-set-source-export.cpp"
+    ],
+    "checks": 106,
+    "log_sha256": "86ca4af99a5812b6d48ea552d776432c20ab8b5b415792ae59fa45ff37aee7b2"
+  },
+  "vendor_compile": {
+    "cuda": {
+      "compiled_translation_units": [
+        "texture-set-export.cpp",
+        "export.cpp",
+        "mixed-normal-raster.cpp",
+        "paint-composite-gpu.cu"
+      ],
+      "log_sha256": "af46c8812f5fa12e019d1ae9ebf7a8f8ea9d32b17d847e3b896eb5319998f132"
+    },
+    "rocm": {
+      "compiled_translation_units": [
+        "texture-set-export.cpp",
+        "export.cpp",
+        "mixed-normal-raster.cpp",
+        "paint-composite-gpu.cu"
+      ],
+      "log_sha256": "6ac6a3dc51d19833ec94eca1057b0b74f335104271ee068a9d411e2c24a0c4e8"
+    }
+  },
+  "khronos_zero_errors_or_warnings": {
+    "hidden-physical-standard.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "03a3e641046332162c185441de5fb3584d17b74b01c5265ded6063efb6425f89"
+    },
+    "mtoon-portable.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "b42a380788e940bb8cd234a3ab5c2cc66531ea92c773c3c5d7752696aa9adcdf"
+    },
+    "resized-physical-editable.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "04b8786aaf5d4e9dc30e1c7ab9a68c1b541ce12bb4bfb8c5acc2cc540e4c8022"
+    },
+    "standalone-editable.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "e5e31d829be35d55ef247fcf2d7855a572c643ebff413a986cbd6c5b2ddc9401"
+    },
+    "standalone-standard.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "7aaf9e817fcee1681ccbbc9b725fc3b5b98b9394ab279d5ce4928e91cd03d524"
+    },
+    "wayland-patch.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "c22287d8bcde765059203495192b1f5d22bef144e5ad05bc76ad948b166e258b"
+    }
+  },
+  "vrm_official_schema_report_sha256": "32ba246ef760d0377f59d73f1da93bd3b575710c2a53edaa2addb6dd16e7b7e1",
+  "remaining_scope": [
+    "Broader normal sampler domains and production retopology assemblies",
+    "Positive CUDA and ROCm execution",
+    "Physical headset and full GPU-only Release qualification"
+  ]
+}
