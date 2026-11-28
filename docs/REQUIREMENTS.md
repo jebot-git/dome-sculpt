@@ -991,6 +991,11 @@ paint and morphs. Both VRM 1.0 export modes carry the independent accessory
 weights, inverse binds, material primitives and morphs while referencing the
 actual original rig. The native payload reopens exactly. Nested Wayland and
 synthetic OpenXR exercise weight transfer and Surface Heat with durable saves.
+Weight transfer finds the nearest source triangle on the selected GPU in
+bounded batches. It keeps the original world-distance test and selects the
+lowest source triangle ID on equal distance. Native normalization, locked
+influences and transactional publication use the returned barycentric hits.
+[GPU weight transfer evidence](validation/gpu-weight-transfer-20261128.json)
 Surface Heat accounts for native texture-set rasters, layers and canonical Bake
 data, including FLOAT emission. It preserves shared owners and rejects stale
 secondary paint edits, cancellation and insufficient memory before publication.

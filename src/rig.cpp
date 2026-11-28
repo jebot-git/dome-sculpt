@@ -4,6 +4,10 @@
 #include "dome/rig.hpp"
 #include "automatic-humanoid-support.hpp"
 #include "morph-normal-basis.hpp"
+#include "weight-transfer-device.hpp"
+#ifdef DOME_WEIGHT_TRANSFER_REFERENCE
+#include "weight-transfer-kernel.hpp"
+#endif
 #include <bitset>
 #include "dome/affine.hpp"
 #include <bit>
@@ -133,39 +137,6 @@ void normals(Mesh &m, const std::function<bool()> &cancelled = {}) {
     m.normals[v] = normalized(m.normals[v]);
   }
 }
-// Closest point on a triangle, expressed in its convex barycentric regions.
-std::array<float, 3> closest(Vec3 p, Vec3 a, Vec3 b, Vec3 c) {
-  auto ab = b - a, ac = c - a, ap = p - a;
-  float d1 = dot(ab, ap), d2 = dot(ac, ap);
-  if (d1 <= 0 && d2 <= 0)
-    return {1, 0, 0};
-  auto bp = p - b;
-  float d3 = dot(ab, bp), d4 = dot(ac, bp);
-  if (d3 >= 0 && d4 <= d3)
-    return {0, 1, 0};
-  float vc = d1 * d4 - d3 * d2;
-  if (vc <= 0 && d1 >= 0 && d3 <= 0) {
-    float v = d1 / (d1 - d3);
-    return {1 - v, v, 0};
-  }
-  auto cp = p - c;
-  float d5 = dot(ab, cp), d6 = dot(ac, cp);
-  if (d6 >= 0 && d5 <= d6)
-    return {0, 0, 1};
-  float vb = d5 * d2 - d1 * d6;
-  if (vb <= 0 && d2 >= 0 && d6 <= 0) {
-    float w = d2 / (d2 - d6);
-    return {1 - w, 0, w};
-  }
-  float va = d3 * d6 - d5 * d4;
-  if (va <= 0 && (d4 - d3) >= 0 && (d5 - d6) >= 0) {
-    float w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
-    return {0, 1 - w, w};
-  }
-  float inv = 1 / (va + vb + vc);
-  float v = vb * inv, w = vc * inv;
-  return {1 - v - w, v, w};
-}
 struct SurfaceIndex {
   const Mesh &mesh;
   const std::function<bool()> &cancelled;
@@ -177,10 +148,7 @@ struct SurfaceIndex {
     if ((work & 1023) < amount) stop(cancelled);
   }
   std::vector<uint32_t> triangles;
-  struct Node {
-    Vec3 lo, hi;
-    uint32_t first = 0, count = 0, left = 0, right = 0;
-  };
+  using Node=detail::weight_transfer::Node;
   std::vector<Node> nodes;
   explicit SurfaceIndex(const Mesh &m, const std::function<bool()> &c, size_t budget)
       : mesh(m), cancelled(c), maximum_work(budget) {
@@ -235,39 +203,15 @@ struct SurfaceIndex {
     nodes[idx] = n;
     return idx;
   }
-  float box(uint32_t i, Vec3 p) const {
-    auto &n = nodes[i];
-    return distance2(p, {std::clamp(p.x, n.lo.x, n.hi.x),
-                         std::clamp(p.y, n.lo.y, n.hi.y),
-                         std::clamp(p.z, n.lo.z, n.hi.z)});
+  detail::weight_transfer::Surface surface() const {
+    return {nodes,triangles,mesh.indices,mesh.positions};
   }
-  void query(uint32_t index, Vec3 p, float &best, uint32_t &triangle,
-             std::array<float, 3> &bary) const {
-    step();
-    auto &n = nodes[index];
-    if (box(index, p) > best)
-      return;
-    if (n.count) {
-      for (uint32_t k = n.first; k < n.first + n.count; k++) {
-        step();
-        auto t = triangles[k];
-        auto a = mesh.positions[mesh.indices[t * 3]],
-             b = mesh.positions[mesh.indices[t * 3 + 1]],
-             c = mesh.positions[mesh.indices[t * 3 + 2]];
-        auto w = closest(p, a, b, c);
-        float d = distance2(p, a * w[0] + b * w[1] + c * w[2]);
-        if (d < best || (d == best && t < triangle)) {
-          best = d;
-          triangle = t;
-          bary = w;
-        }
-      }
-    } else {
-      auto a = n.left, b = n.right;
-      if (box(a, p) > box(b, p))
-        std::swap(a, b);
-      query(a, p, best, triangle, bary);
-      query(b, p, best, triangle, bary);
+  void account_visits(size_t visits) const {
+    // Preserve cancellation checkpoints for each logical traversal quantum.
+    while(visits){
+      const auto chunk=std::min(visits,1024-(work&1023));
+      step(chunk);
+      visits-=chunk;
     }
   }
 };
@@ -736,17 +680,15 @@ SkinWeights transfer_weights(const Mesh &source, const SkinWeights &w,
   SurfaceIndex index(source, cancelled, maximum_work);
   SkinWeights out;
   out.vertices.reserve(dest.positions.size());
-  for (size_t v = 0; v < dest.positions.size(); v++) {
-    if ((v & 255) == 0)
-      stop(cancelled);
-    float best = maximum * maximum;
-    uint32_t t = UINT32_MAX;
-    std::array<float, 3> bary{};
-    index.query(0, dest.positions[v], best, t, bary);
+  using detail::weight_transfer::Hit;
+  const float squared_radius=maximum*maximum;
+  const auto emit=[&](const Hit &hit,size_t v){
+    const auto t=hit.triangle;
     if (t == UINT32_MAX)
       throw std::runtime_error(
           "No source triangle within weight transfer radius at vertex " +
           std::to_string(v));
+    const std::array bary{hit.weight.a,hit.weight.b,hit.weight.c};
     std::map<uint32_t, float> sum;
     for (int k = 0; k < 3; k++)
       for (auto i : w.vertices[source.indices[t * 3 + k]])
@@ -756,7 +698,48 @@ SkinWeights transfer_weights(const Mesh &source, const SkinWeights &w,
       row.push_back({joint, value});
     out.vertices.push_back(
         normalize_weights(std::move(row), bones, {}, limits));
+  };
+#ifdef DOME_WEIGHT_TRANSFER_REFERENCE
+  const auto surface=index.surface();
+  const detail::weight_transfer::SurfaceView view{surface.nodes.data(),surface.order.data(),
+                                                   surface.indices.data(),surface.vertices.data()};
+  auto charge=[&](uint32_t amount){index.step(amount);return true;};
+  for(size_t v=0;v<dest.positions.size();++v){
+    if((v&255)==0)stop(cancelled);
+    emit(detail::weight_transfer::search(view,dest.positions[v],squared_radius,charge),v);
   }
+#else
+  auto device=detail::weight_transfer::upload(index.surface());
+  const auto points=std::span<const Vec3>(dest.positions);
+  std::vector<Hit> hits(std::min(points.size(),detail::weight_transfer::batch_capacity));
+  const size_t dispatch_limit=std::max(size_t(1'000'000),index.nodes.size()+index.triangles.size());
+  size_t batch=hits.size();
+  for(size_t first=0;first<points.size();){
+    size_t count=std::min(batch,points.size()-first);
+    const size_t remaining=index.maximum_work-index.work;
+    if(!remaining)throw std::length_error("Weight transfer work budget exceeded");
+    const auto limit=uint32_t(std::min(remaining,dispatch_limit));
+    for(;;){
+      stop(cancelled);
+      const auto output=std::span<Hit>(hits).first(count);
+      const uint32_t visits=device->search(points.subspan(first,count),squared_radius,limit,output);
+      stop(cancelled);
+      if(visits<=limit){
+        index.account_visits(visits);
+        for(size_t row=0;row<count;++row){
+          if((row&255)==0)stop(cancelled);
+          emit(output[row],first+row);
+        }
+        first+=count;
+        if(visits<limit/4)batch=std::min(batch*2,hits.size());
+        break;
+      }
+      if(limit==remaining||count==1)throw std::length_error("Weight transfer work budget exceeded");
+      count/=2;
+      batch=count;
+    }
+  }
+#endif
   out.validate(dest.positions.size(), bones);
   stop(cancelled);
   return out;

@@ -57,6 +57,15 @@ across three alternating Arc trials, down from 9.08 seconds. All six saves
 match exactly, and the timing change is small.
 [Compact Surface Heat evidence](validation/gpu-surface-heat-domains-20261128.json)
 
+Weight transfer now traverses the source BVH on the selected GPU. The
+worker uploads the index once, then receives each batch's triangle IDs,
+barycentric weights and visit count. The original radius, triangle-ID tie
+rule and native weight normalization still apply. On Arc, native Wayland
+and synthetic OpenXR reproduce the preceding bind exactly. All 38 compared
+native projects and exports match byte for byte. CUDA and ROCm compile the
+new query and refuse unavailable devices.
+[GPU weight transfer evidence](validation/gpu-weight-transfer-20261128.json)
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.
