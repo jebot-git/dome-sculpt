@@ -23,8 +23,10 @@ public:
     view_.entries=upload(std::span(input.entries));
     view_.quantization=upload(std::span(&paint_compute::quantization(),1));
     texture_set_=input.texture_set;
+    mapped_capacity_=input.mapped_capacity;
     finite_={upload(std::span(input.finite_axis)),uint32_t(input.finite_axis.size())};
-    output_=allocate<uint32_t>(chunk_pixels*(finite_.resolution?3:10));
+    output_=allocate<uint32_t>(mapped_capacity_?mapped_capacity_*3:chunk_pixels*(finite_.resolution?3:10));
+    if(mapped_capacity_)coordinates_=allocate<MappedSample>(mapped_capacity_);
     stop();
     upload_common(input.common,stop);
     upload_physical(input.physical,stop);
@@ -43,7 +45,10 @@ public:
       bake.coverage=upload(input.bake_coverage);
     }
     stop();
-    if(!input.source.empty()){
+    if(input.mapped_source){
+      mapped_source_=mapped_source_image(*input.mapped_source,upload(input.source),true,
+          SourceUvSampler::Output::LinearRgba,SourceUvSampler::Transform::SourceAffine);
+    }else if(!input.source.empty()){
       view_.source=input.source_sampler;
       view_.source.rgba=upload(input.source);
       view_.source.coordinates.columns=upload(std::span(input.columns));
@@ -72,7 +77,7 @@ public:
 
   void read_finite(size_t first,std::span<Radiance> pixels,const std::function<bool()> &cancelled) override {
     static_assert(sizeof(Radiance)==3*sizeof(uint32_t));
-    if(!finite_.resolution)throw std::logic_error("Expected a finite GPU emission raster");
+    if(!finite_.resolution||mapped_capacity_)throw std::logic_error("Expected a contiguous finite GPU emission raster");
     const auto size=size_t(finite_.resolution)*finite_.resolution;
     if(first>size||pixels.size()>size-first)throw std::out_of_range("GPU finite emission read exceeds its grid");
     while(!pixels.empty()){
@@ -81,15 +86,35 @@ public:
       device_.render_finite(view_,finite_,first,batch.size(),output_);
       device_.download(batch.data(),output_,batch.size_bytes());
       paint_compute::checkpoint(cancelled);
-      for(const auto &pixel:batch)if(std::bit_cast<uint32_t>(pixel[0])==invalid)
-        throw std::invalid_argument("Native physical radiance is outside its finite range");
+      validate_finite(batch);
       pixels=pixels.subspan(batch.size());
       first+=batch.size();
     }
     paint_compute::checkpoint(cancelled);
   }
 
+  void read_mapped(std::span<const MappedSample> samples,std::span<Radiance> pixels,
+                   const std::function<bool()> &cancelled) override {
+    static_assert(sizeof(Radiance)==3*sizeof(uint32_t));
+    if(samples.size()!=pixels.size()||samples.empty()||samples.size()>mapped_capacity_)
+      throw std::invalid_argument("Invalid mapped GPU emission batch");
+    paint_compute::checkpoint(cancelled);
+    const auto size=size_t(finite_.resolution)*finite_.resolution;
+    for(const auto &sample:samples)
+      if(sample.texel>=size||!std::isfinite(sample.u)||!std::isfinite(sample.v))
+        throw std::invalid_argument("Invalid mapped GPU emission sample");
+    device_.upload(coordinates_,samples.data(),samples.size_bytes());
+    device_.render_mapped(view_,finite_,mapped_source_,coordinates_,samples.size(),output_);
+    device_.download(pixels.data(),output_,pixels.size_bytes());
+    paint_compute::checkpoint(cancelled);
+    validate_finite(pixels);
+  }
+
 private:
+  static void validate_finite(std::span<const Radiance> pixels){
+    for(const auto &pixel:pixels)if(std::bit_cast<uint32_t>(pixel[0])==invalid)
+      throw std::invalid_argument("Native physical radiance is outside its finite range");
+  }
   template<class Output,class Render>
   void read_exact(size_t first,std::span<Output> pixels,const std::function<bool()> &cancelled,Render render){
     const auto size=size_t(view_.resolution)*view_.resolution;
@@ -170,6 +195,9 @@ private:
   Device device_;
   DeviceInput view_;
   FiniteGrid finite_;
+  MappedSourceImage mapped_source_{};
+  MappedSample *coordinates_=nullptr;
+  size_t mapped_capacity_=0;
   bool texture_set_=false;
   uint32_t *output_=nullptr;
 };

@@ -4,6 +4,7 @@
 #include "emission-raster-device.hpp"
 #include "paint-composite-kernel.hpp"
 #include "paint-source-coordinate-kernel.hpp"
+#include "source-uv-sampler-kernel.hpp"
 
 #if defined(__CUDACC__) || defined(__HIPCC__)
 #define DOME_EMISSION_FN __host__ __device__ inline
@@ -193,12 +194,11 @@ DOME_EMISSION_MATH uint32_t finite_lerp(uint32_t a,uint32_t b,uint32_t t){
   return b>a?(x<b?x:b):(x>b?x:b);
 }
 
-DOME_EMISSION_FN void render_finite(const DeviceInput &input,FiniteGrid grid,size_t at,uint32_t *out){
-  const auto x=uint32_t(at%grid.resolution),y=uint32_t(at/grid.resolution);
+DOME_EMISSION_FN void filter_finite(const DeviceInput &input,FiniteGrid grid,uint32_t x,uint32_t y,
+    uint32_t (&value)[7]){
   const auto column=grid.axis[x],row=grid.axis[y];
   const auto fx=paint_compute::bits(column.fraction),fy=paint_compute::bits(row.fraction);
   const unsigned rows=fy&&row.first!=row.second?2:1,columns=fx&&column.first!=column.second?2:1;
-  uint32_t value[7]{};
   for(unsigned j=0;j<rows;++j){
     uint32_t filtered[7]{};
     for(unsigned i=0;i<columns;++i){
@@ -210,16 +210,14 @@ DOME_EMISSION_FN void render_finite(const DeviceInput &input,FiniteGrid grid,siz
     for(unsigned k=0;k<7;++k)value[k]=j?finite_lerp(value[k],filtered[k],fy):filtered[k];
   }
 
-  float source[4]{1,1,1,1};
-  if(input.source.rgba){
-    const auto &job=input.source.coordinates;
-    paint_compute::sample_source_taps(input.source.rgba,job.width,job.nearest,
-        paint_compute::source_coordinates(job,x,y),true,*input.quantization,source);
-  }
+}
+
+DOME_EMISSION_FN void resolve_finite(const DeviceInput &input,const uint32_t (&value)[7],
+    const uint32_t *source,uint32_t *out){
   const auto residual=widen(narrow(complement(value[6])));
   constexpr auto limit=std::bit_cast<uint64_t>(30000.0);
   for(unsigned k=0;k<3;++k){
-    const auto background=product64(widen(input.background[k]),widen(paint_compute::bits(source[k])));
+    const auto background=product64(widen(input.background[k]),widen(source[k]));
     const auto shade=product64(background,residual);
     const auto radiance=sum64(sum64(shade,widen(value[k])),widen(value[k+3]));
     if((radiance&~sign64)>limit||(radiance>sign64)){
@@ -228,6 +226,28 @@ DOME_EMISSION_FN void render_finite(const DeviceInput &input,FiniteGrid grid,siz
     }
     out[k]=narrow(radiance);
   }
+}
+
+DOME_EMISSION_FN void render_finite(const DeviceInput &input,FiniteGrid grid,size_t at,uint32_t *out){
+  const auto x=uint32_t(at%grid.resolution),y=uint32_t(at/grid.resolution);
+  uint32_t value[7]{},source[]{one32,one32,one32};
+  filter_finite(input,grid,x,y,value);
+  if(input.source.rgba){
+    const auto &job=input.source.coordinates;
+    float rgba[4];
+    paint_compute::sample_source_taps(input.source.rgba,job.width,job.nearest,
+        paint_compute::source_coordinates(job,x,y),true,*input.quantization,rgba);
+    for(unsigned k=0;k<3;++k)source[k]=paint_compute::bits(rgba[k]);
+  }
+  resolve_finite(input,value,source,out);
+}
+
+DOME_EMISSION_FN void render_mapped(const DeviceInput &input,FiniteGrid grid,MappedSourceImage image,
+    EmissionRasterDevice::MappedSample sample,uint32_t *out){
+  uint32_t value[7]{},source[4]{one32,one32,one32,one32};
+  filter_finite(input,grid,sample.texel%grid.resolution,sample.texel/grid.resolution,value);
+  if(image.rgba)sample_mapped_source(image,{sample.u,sample.v},*input.quantization,source,0);
+  resolve_finite(input,value,source,out);
 }
 
 template<bool mapped=false>

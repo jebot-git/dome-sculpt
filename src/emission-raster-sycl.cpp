@@ -7,6 +7,8 @@ namespace dome::detail::emission_raster {
 void launch_bake(sycl::queue &,DeviceInput,size_t,size_t,uint32_t *);
 void launch_typed(sycl::queue &,DeviceInput,size_t,size_t,uint32_t *);
 void launch_finite(sycl::queue &,DeviceInput,FiniteGrid,size_t,size_t,uint32_t *);
+void launch_mapped(sycl::queue &,DeviceInput,FiniteGrid,MappedSourceImage,
+    const EmissionRasterDevice::MappedSample *,size_t,uint32_t *);
 void launch_texture_set(sycl::queue &,DeviceInput,size_t,size_t,uint32_t *,bool coefficients);
 void launch_texture_set_source(sycl::queue &,DeviceInput,size_t,size_t,uint32_t *,bool coefficients);
 
@@ -44,6 +46,10 @@ public:
   }
   void render_finite(DeviceInput input,FiniteGrid grid,size_t first,size_t count,uint32_t *out){
     launch_finite(queue_,input,grid,first,count,out);
+  }
+  void render_mapped(DeviceInput input,FiniteGrid grid,MappedSourceImage image,
+      const EmissionRasterDevice::MappedSample *samples,size_t count,uint32_t *out){
+    launch_mapped(queue_,input,grid,image,samples,count,out);
   }
   void render_texture_set(DeviceInput input,size_t first,size_t count,uint32_t *out,bool coefficients){
     // Keep affine wrapping out of the first compilation for constant and

@@ -15,6 +15,8 @@
 #include "dome/source-paint-bake.hpp"
 #include "source-paint-physical.hpp"
 #include "source-uv-sampler.hpp"
+#include "emission-raster-device.hpp"
+#include "dome/brush.hpp"
 #include "mtoon-uv.hpp"
 #include "emission-paint-access.hpp"
 #include "normal-projection-identity.hpp"
@@ -855,20 +857,63 @@ detail::SourcePaintPhysicalResult detail::bake_source_paint_physical(
  auto background=material.emissive;
  if(input.current_material&&input.current_material->physical_emission)
   background=*input.current_material->physical_emission;
- const std::array roles_to_sample{RasterImageRole{background!=std::array<float,3>{}?&source.emission:nullptr,true}};
- sample_material_raster(input.paint->mesh(),source,layout,roles_to_sample,budget,
-    [&](size_t at,const auto &samples){
-  // Filtering follows layer composition; coverage is float, independent of
-  // the legacy byte plane. Source image coordinates/samplers are actual roles.
-  const auto overlay=material_overlay(*packet,r,at);
-  const auto &image=samples[0];
+ const auto *emission=source.emission.image&&background!=std::array<float,3>{}?&source.emission:nullptr;
+ const auto store=[&](size_t at,const std::array<float,3> &value){
   for(size_t k=0;k<3;++k){
-   budget.work();const double value=double(background[k])*image[k]*(1-overlay[3][3])+overlay[2][k]+overlay[4][k];
-   if(!std::isfinite(value)||value<0||value>30000)
-    throw std::invalid_argument("Physical portable radiance is outside its actual finite range");
-   radiance[at][k]=float(value);peak[k]=std::max(peak[k],float(value));
+   budget.work();
+   radiance[at][k]=value[k];
+   peak[k]=std::max(peak[k],value[k]);
   }
- });
+ };
+ if(compute_backend()!="CPU"){
+  using Device=detail::EmissionRasterDevice;
+  constexpr auto per_sample=sizeof(Device::MappedSample)+sizeof(Device::Radiance);
+  const auto staging=layout.hits.capacity()*sizeof(Hit)+layout.padding.capacity()*sizeof(int32_t)+
+      detail::emission_raster_staging_bytes(*input.paint)+r*sizeof(detail::SourceTextureAxis)+
+      (emission?emission->image->rgba.size():0);
+  if(staging>=raster_bounds.max_working_bytes)
+   throw std::length_error("Physical source emission exceeds raster sampling working budget");
+  const size_t capacity=std::min({Device::mapped_batch,layout.padding.size(),
+      (raster_bounds.max_working_bytes-staging)/(2*per_sample)});
+  if(!capacity)throw std::length_error("Physical source emission lacks raster sampler batch storage");
+  if(emission)emission->validate(source.coordinate_count());
+  auto device=detail::create_mapped_emission_raster_device(*input.paint,emission,background,r,capacity,options.cancelled);
+  std::vector<Device::MappedSample> samples;
+  samples.reserve(capacity);
+  std::vector<Device::Radiance> values(capacity);
+  const auto flush=[&]{
+   if(samples.empty())return;
+   device->read_mapped(samples,std::span(values).first(samples.size()),options.cancelled);
+   for(size_t i=0;i<samples.size();++i)store(samples[i].texel,values[i]);
+   samples.clear();
+  };
+  for(size_t at=0;at<layout.padding.size();++at){
+   if((at&1023)==0)budget.cancel();
+   if(layout.padding[at]!=int32_t(at))continue;
+   std::array<float,2> uv{};
+   if(emission){
+    const auto &hit=layout.hits[at];
+    uv=source_texture_uv(input.paint->mesh(),source,emission->texcoord,hit.face,hit.bary);
+   }
+   samples.push_back({uint32_t(at),uv[0],uv[1]});
+   if(samples.size()==capacity)flush();
+  }
+  flush();
+ }else{
+  const std::array roles_to_sample{RasterImageRole{emission,true}};
+  sample_material_raster(input.paint->mesh(),source,layout,roles_to_sample,budget,
+      [&](size_t at,const auto &samples){
+   const auto overlay=material_overlay(*packet,r,at);
+   std::array<float,3> value;
+   for(size_t k=0;k<3;++k){
+    const double channel=double(background[k])*samples[0][k]*(1-overlay[3][3])+overlay[2][k]+overlay[4][k];
+    if(!std::isfinite(channel)||channel<0||channel>30000)
+     throw std::invalid_argument("Physical portable radiance is outside its actual finite range");
+    value[k]=float(channel);
+   }
+   store(at,value);
+  });
+ }
  visit_material_padding(layout,budget,[&](size_t at,size_t owner){
   for(size_t k=0;k<3;++k)budget.work();
   radiance[at]=radiance[owner];

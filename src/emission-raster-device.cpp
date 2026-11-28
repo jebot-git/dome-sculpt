@@ -159,6 +159,17 @@ void describe_source(emission_raster::Input &input,const PaintSourceTexture *sou
   input.columns=std::move(products.columns);
   input.rows=std::move(products.rows);
 }
+
+void describe_finite_grid(emission_raster::Input &input,uint32_t resolution,float offset){
+  const int last=int(input.resolution)-1;
+  input.finite_axis.reserve(resolution);
+  for(uint32_t i=0;i<resolution;++i){
+    const float uv=(float(i)+.5f)/resolution-offset;
+    const float at=std::clamp(uv,0.f,1.f)*input.resolution-.5f;
+    const int first=int(std::floor(at));
+    input.finite_axis.push_back({std::clamp(first,0,last),std::clamp(first+1,0,last),at-first});
+  }
+}
 }
 
 std::unique_ptr<EmissionRasterDevice> create_emission_raster_device(
@@ -175,15 +186,25 @@ std::unique_ptr<EmissionRasterDevice> create_finite_emission_raster_device(
   if(!resolution||resolution>8192||!std::isfinite(offset)||(source&&offset!=0))
     throw std::invalid_argument("Invalid GPU finite emission sampling grid");
   auto input=describe_raster(paint,EmissionExportAccess::writable_padding(paint),background,1,true,cancelled);
-  input.finite_axis.reserve(resolution);
-  const int last=int(input.resolution)-1;
-  for(uint32_t i=0;i<resolution;++i){
-    const float uv=(float(i)+.5f)/resolution-offset;
-    const float at=std::clamp(uv,0.f,1.f)*input.resolution-.5f;
-    const int first=int(std::floor(at));
-    input.finite_axis.push_back({std::clamp(first,0,last),std::clamp(first+1,0,last),at-first});
-  }
+  describe_finite_grid(input,resolution,offset);
   describe_source(input,source,nullptr,resolution);
+  return emission_raster::upload(input,cancelled);
+}
+
+std::unique_ptr<EmissionRasterDevice> create_mapped_emission_raster_device(
+    const PaintedMesh &paint,const PaintSourceTexture *source,std::array<float,3> background,
+    uint32_t resolution,size_t capacity,const std::function<bool()> &cancelled){
+  if(!resolution||resolution>8192||!capacity||capacity>EmissionRasterDevice::mapped_batch)
+    throw std::invalid_argument("Invalid mapped GPU emission grid or batch capacity");
+  auto input=describe_raster(paint,EmissionExportAccess::writable_padding(paint),background,1,true,cancelled);
+  describe_finite_grid(input,resolution,0);
+  input.mapped_capacity=capacity;
+  if(source){
+    if(!source->image)throw std::invalid_argument("Mapped GPU emission needs an actual image");
+    source->image->validate();
+    input.source=source->image->rgba;
+    input.mapped_source=source;
+  }
   return emission_raster::upload(input,cancelled);
 }
 

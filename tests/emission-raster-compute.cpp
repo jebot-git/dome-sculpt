@@ -185,6 +185,48 @@ void compare_finite(Fixture fixture,uint32_t extent,bool original){
            <<pixels.size()<<" exact RGB FLOAT pixels in "<<milliseconds<<" ms\n";
 }
 
+void compare_mapped(Fixture fixture,uint32_t extent,bool original){
+  using Device=detail::EmissionRasterDevice;
+  const auto scene=model(fixture);
+  const auto &object=scene.active();
+  const auto &paint=*object.painted;
+  const auto *source=original?&paint.source_maps()->emission:nullptr;
+  auto device=detail::create_mapped_emission_raster_device(paint,source,object.material.emissive,extent,Device::mapped_batch,{});
+  std::vector<Device::MappedSample> requests(Device::mapped_batch);
+  std::vector<Device::Radiance> result(requests.size());
+  const detail::PaintEmissionSampler sampler(paint);
+  for(size_t i=0;i<requests.size();++i){
+    const auto at=uint32_t((i*541u+11)%(extent*extent));
+    // Donor coordinates are independent of the writable texel and cross
+    // the texture's repeat and mirrored-repeat seams.
+    requests[i]={at,float(int(i%149)-75)/64,float(int(i%173)-61)/64};
+  }
+  bool cancelled=false;
+  const auto stop=[&]{return cancelled;};
+  device->read_mapped(requests,result,stop);
+  for(size_t i=0;i<requests.size();++i){
+    const auto &q=requests[i];
+    const auto p=sampler.sample((float(q.texel%extent)+.5f)/extent,(float(q.texel/extent)+.5f)/extent);
+    const auto s=source?sample_source_texture(*source,q.u,q.v,true):std::array<float,4>{1,1,1,1};
+    for(unsigned k=0;k<3;++k){
+      const float expected=float(double(object.material.emissive[k])*s[k]*(1-p.coverage)+p.legacy[k]+p.absolute[k]);
+      check(std::bit_cast<uint32_t>(expected)==std::bit_cast<uint32_t>(result[i][k]),
+            "Mapped GPU emission changed binary32 radiance");
+    }
+  }
+  cancelled=true;
+  Device::Radiance sample;
+  bool refused=false;
+  try{device->read_mapped(std::span(requests).last(1),std::span(&sample,1),stop);}
+  catch(const std::runtime_error &){refused=true;}
+  check(refused,"Mapped emission must observe cancellation before submitting work");
+  cancelled=false;
+  device->read_mapped(std::span(requests).last(1),std::span(&sample,1),stop);
+  check(std::memcmp(&sample,&result.back(),sizeof(sample))==0,"Mapped emission changed on retry");
+  std::cout<<"PASS mapped fixture="<<int(fixture)<<" source="<<original<<" extent="<<extent<<' '
+           <<result.size()<<" exact RGB FLOAT samples\n";
+}
+
 enum class SetBackdrop { Constant, Core, MToon };
 void compare_texture_set(Fixture fixture,SetBackdrop backdrop){
   const auto scene=model(fixture);
@@ -240,6 +282,33 @@ std::string_view wrapped_backend() asm("__wrap__ZN4dome15compute_backendEv");
 std::string_view wrapped_backend(){return host_reference?"CPU":actual_backend();}
 
 int main(int argc,char **argv)try{
+  if(argc>1&&std::string_view(argv[1])=="--missing-mapped"){
+    const auto scene=model(Fixture::BakeOnly);
+    try{
+      auto device=detail::create_mapped_emission_raster_device(*scene.active().painted,nullptr,{2,0,0},512,1,{});
+      const detail::EmissionRasterDevice::MappedSample request{0,0,0};
+      detail::EmissionRasterDevice::Radiance one;
+      device->read_mapped(std::span(&request,1),std::span(&one,1),{});
+    }catch(const std::exception &error){std::cout<<"REFUSED "<<error.what()<<'\n';return 0;}
+    throw std::runtime_error("Missing selected device returned a mapped FLOAT raster");
+  }
+  if(argc>1&&std::string_view(argv[1])=="--mapped"){
+    compare_mapped(Fixture::Paint,512,true);
+    compare_mapped(Fixture::LegacyBake,256,true);
+    compare_mapped(Fixture::DenseBake,1024,true);
+    compare_mapped(Fixture::PackedBake,1024,true);
+    compare_mapped(Fixture::BakeOnly,512,false);
+    const auto scene=model(Fixture::BakeOnly);
+    const auto &paint=*scene.active().painted;
+    auto device=detail::create_mapped_emission_raster_device(paint,nullptr,{30001,0,0},512,1,{});
+    const detail::EmissionRasterDevice::MappedSample request{0,0,0};
+    detail::EmissionRasterDevice::Radiance one;
+    bool refused=false;
+    try{device->read_mapped(std::span(&request,1),std::span(&one,1),{});}
+    catch(const std::invalid_argument &e){refused=std::string_view(e.what())=="Native physical radiance is outside its finite range";}
+    check(refused,"Mapped GPU emission must refuse above-range radiance before FLOAT rounding");
+    return 0;
+  }
   if(argc>1&&std::string_view(argv[1])=="--texture-set"){
     compare_texture_set(Fixture::BakeOnly,SetBackdrop::Constant);
     compare_texture_set(Fixture::LegacyBake,SetBackdrop::Core);

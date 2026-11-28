@@ -26,6 +26,11 @@ __global__ void render_finite_pixels(DeviceInput input,FiniteGrid grid,size_t fi
   const size_t index=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
   if(index<count)emission_raster::render_finite(input,grid,first+index,out+3*index);
 }
+__global__ void render_mapped_pixels(DeviceInput input,FiniteGrid grid,MappedSourceImage image,
+    const EmissionRasterDevice::MappedSample *samples,size_t count,uint32_t *out){
+  const size_t index=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+  if(index<count)emission_raster::render_mapped(input,grid,image,samples[index],out+3*index);
+}
 template<bool mapped>
 __global__ void render_texture_set_pixels(DeviceInput input,size_t first,size_t count,uint32_t *out,bool coefficients){
   const size_t index=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
@@ -66,6 +71,12 @@ public:
   void render_finite(DeviceInput input,FiniteGrid grid,size_t first,size_t count,uint32_t *out){
     constexpr size_t block=128;
     render_finite_pixels<<<(count+block-1)/block,block,0,stream_>>>(input,grid,first,count,out);
+    checked(DOME_DEVICE(GetLastError)());
+  }
+  void render_mapped(DeviceInput input,FiniteGrid grid,MappedSourceImage image,
+      const EmissionRasterDevice::MappedSample *samples,size_t count,uint32_t *out){
+    constexpr size_t block=128;
+    render_mapped_pixels<<<(count+block-1)/block,block,0,stream_>>>(input,grid,image,samples,count,out);
     checked(DOME_DEVICE(GetLastError)());
   }
   void render_texture_set(DeviceInput input,size_t first,size_t count,uint32_t *out,bool coefficients){

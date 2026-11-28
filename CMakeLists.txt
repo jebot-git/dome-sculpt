@@ -46,7 +46,7 @@ elseif(DOME_COMPUTE_BACKEND STREQUAL "ONEAPI")
   set(paint_compute_source src/paint-composite-sycl.cpp src/paint-grid-sycl.cpp
     src/paint-source-coordinate-sycl.cpp src/emission-raster-sycl.cpp
     src/emission-raster-bake-sycl.cpp src/emission-raster-typed-sycl.cpp
-    src/emission-raster-finite-sycl.cpp src/emission-raster-texture-set-sycl.cpp
+    src/emission-raster-finite-sycl.cpp src/emission-raster-mapped-sycl.cpp src/emission-raster-texture-set-sycl.cpp
     src/emission-raster-texture-set-source-sycl.cpp src/portable-normal-raster-sycl.cpp
     src/portable-normal-certificate-sycl.cpp src/source-uv-sampler-sycl.cpp)
 else()
@@ -181,8 +181,16 @@ if(BUILD_TESTING)
   target_link_options(dome-sculpt-emission-raster-compute-test PRIVATE "LINKER:--wrap=_ZN4dome15compute_backendEv")
   add_test(NAME emission-raster-compute COMMAND dome-sculpt-emission-raster-compute-test)
   add_test(NAME emission-raster-finite-compute COMMAND dome-sculpt-emission-raster-compute-test --finite)
+  if(NOT DOME_COMPUTE_BACKEND STREQUAL "CPU")
+    add_test(NAME emission-raster-mapped-compute COMMAND dome-sculpt-emission-raster-compute-test --mapped)
+    set_tests_properties(emission-raster-mapped-compute PROPERTIES TIMEOUT 300)
+    add_test(NAME emission-raster-mapped-missing-gpu COMMAND dome-sculpt-emission-raster-compute-test --missing-mapped)
+    set_tests_properties(emission-raster-mapped-missing-gpu PROPERTIES TIMEOUT 90
+      ENVIRONMENT "ONEAPI_DEVICE_SELECTOR=opencl:cpu;CUDA_VISIBLE_DEVICES=-1;HIP_VISIBLE_DEVICES=-1;ROCR_VISIBLE_DEVICES=-1")
+  endif()
   add_test(NAME emission-raster-texture-set-compute COMMAND dome-sculpt-emission-raster-compute-test --texture-set)
-  set_tests_properties(emission-raster-compute emission-raster-finite-compute emission-raster-texture-set-compute PROPERTIES TIMEOUT 300)
+  set_tests_properties(emission-raster-compute emission-raster-finite-compute
+    emission-raster-texture-set-compute PROPERTIES TIMEOUT 300)
   add_executable(dome-sculpt-source-artist-normal-bake-test tests/source-artist-normal-bake.cpp)
   target_include_directories(dome-sculpt-source-artist-normal-bake-test PRIVATE src)
   target_link_libraries(dome-sculpt-source-artist-normal-bake-test PRIVATE dome-sculpt-core)
