@@ -818,7 +818,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
   if(!resolution_mode().empty())focus_at=resolution_mode()=="focus"?20:90;
   if(!corner_uv_mode().empty()){focus_frame=frame;focus_at=corner_uv_mode()=="focus"?24:90;}
   if(selection_fixture()||pbr_preview_fixture())focus_at=90;
-  if(mixed_skin())focus_at=1000;
+  if(mixed_skin()||skin_mode()=="volume")focus_at=1000;
   if(!expression_mode().empty())focus_at=expression_mode()=="focus"?88:1000;
   if(!cage_mode().empty())focus_at=cage_mode()=="focus"?60:1000;
   if(!canonical_conversion_mode().empty())focus_at=canonical_conversion_mode()=="focus"?36:1000;
@@ -1005,7 +1005,7 @@ FN(EndFrame, XrSession, const XrFrameEndInfo *p) {
 FN(LocateViews, XrSession, const XrViewLocateInfo *, XrViewState *state,
    uint32_t cap, uint32_t *n, XrView *p) {
   *n = 2;
-  state->viewStateFlags = frame == 27 && !getenv("DOME_XR_FIXTURE_FILES") && (cage_mode().empty()&&(mirror_mode().empty()&&expression_mode().empty())&&import_atlas_mode().empty()&&projection_mode().empty()&&rig_fit_mode().empty()) && !selection_fixture() && affine_contact_mode().empty() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && skin_mode()!="focus" && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty() ? 0
+  state->viewStateFlags = frame == 27 && !getenv("DOME_XR_FIXTURE_FILES") && (cage_mode().empty()&&(mirror_mode().empty()&&expression_mode().empty())&&import_atlas_mode().empty()&&projection_mode().empty()&&rig_fit_mode().empty()) && !selection_fixture() && affine_contact_mode().empty() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && skin_mode()!="focus" && skin_mode()!="volume" && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty() ? 0
                                       : XR_VIEW_STATE_POSITION_VALID_BIT |
                                             XR_VIEW_STATE_ORIENTATION_VALID_BIT;
   if (cap < 2)
@@ -1102,7 +1102,7 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
   if(auto mode=skin_mode();!mode.empty()) {
     const auto step=skin_step();
     out->currentState=button && (step==8 || step==10 || step==12 || step==14 || step==16 || step==18 || step==20 ||
-      (mode!="focus" && (step==24 || step==26)) || (mixed_skin() && (frame==8 || frame==12)));
+      (mode!="focus" && (step==24 || step==26)) || (mode=="volume"&&(step==30||step==32)) || (mixed_skin() && (frame==8 || frame==12)));
     out->changedSinceLastSync=button;
   }
   if (auto mode = retopo_mode(); !mode.empty()) {
@@ -1207,7 +1207,7 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
     if (auto mode = voxel_mode(); !mode.empty())
       stroke = frame == 16 || (mode == "cancel" && frame == 18);
     if(auto mode=bake_mode();!mode.empty())stroke=frame==18||(mode=="cancel"&&frame==20);
-    if(!skin_mode().empty())stroke=frame==22;
+    if(!skin_mode().empty())stroke=frame==22||(skin_mode()=="volume"&&frame==28);
     if (auto mode = retopo_mode(); !mode.empty()) {
       auto step = retopo_stage();
       stroke = color_slider_channel(retopo_step,14)>=0 ||
@@ -1397,6 +1397,10 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
     if(step==17 || step==18)out->currentState={.8660254f,-.5f};
     if(step==19 || step==20)out->currentState={.8660254f,.5f};
     if(step==25 || step==26)out->currentState={-.8660254f,-.5f};
+    if(skin_mode()=="volume"){
+      if(step==25||step==26)out->currentState={.5f,.8660254f};
+      if(step==31||step==32)out->currentState={-.8660254f,-.5f};
+    }
     if(mixed_skin()&&frame>=9&&frame<=12)out->currentState={.8660254f,-.5f};
   }
   if (!retopo_mode().empty() && right(p->subactionPath) && a->name=="right_stick") {
@@ -1571,7 +1575,7 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
       p->pose.position={x,1.48f+y,-.85f+z};
     }
     if(s->action&&right(s->hand)&&s->action->name=="aim_pose"&&skin_step()==22)
-      p->pose.position={.045f+(520.f/640-.5f)*.6f,1.56f+(.5f-300.f/640)*.6f,-.3f};
+      p->pose.position={.045f+(415.f/640-.5f)*.6f,1.56f+(.5f-300.f/640)*.6f,-.3f};
     return XR_SUCCESS;
   }
   if (frame == (getenv("DOME_XR_FIXTURE_SCENE")?29:22) && editable_avatar_mode().empty() && !pbr_preview_fixture() && !getenv("DOME_XR_FIXTURE_NORMAL_DOMAIN") && affine_contact_mode().empty() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && s->action && voxel_mode() != "focus" && bake_mode().empty() && skin_mode().empty() && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty()) {
@@ -1635,8 +1639,12 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
     p->pose.position={.045f+(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
   }
   if(auto mode=skin_mode();!mode.empty() && s->action && s->action->name=="aim_pose" && right(s->hand) && frame==22) {
-    const float t=mode=="fitted"?0.f:mode=="texture-set-heat"?1.f:1.f/3;
+    const float t=mode=="fitted"?0.f:mode=="texture-set-heat"?.75f:mode=="volume"?1.f:.25f;
     p->pose.position={.045f+((100+420*t)/640-.5f)*.6f,1.56f+(.5f-300.f/640)*.6f,-.3f};
+  }
+  if(skin_mode()=="volume"&&s->action&&s->action->name=="aim_pose"&&right(s->hand)&&frame==28){
+    const float t=std::log(400.f)/std::log(1e6f);
+    p->pose.position={.045f+((100+420*t)/640-.5f)*.6f,1.56f+(.5f-400.f/640)*.6f,-.3f};
   }
   if(!cut_mode().empty()&&s->action&&s->action->name=="aim_pose"&&right(s->hand)&&cut_stage()==24){
     p->pose.position={.045f+((100+420*.6f)/640-.5f)*.6f,1.56f+(.5f-300.f/640)*.6f,-.3f};

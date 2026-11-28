@@ -2,6 +2,7 @@
 #include "dome/document.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "anatomical-eligibility.hpp"
+#include "skin-methods.hpp"
 namespace dome {
 bool Document::skin_target_ready_locked() const {
   const auto &o=scene_.active();
@@ -23,7 +24,7 @@ std::vector<uint64_t> Document::skin_sources_locked(SkinAuthoringMode mode) cons
   return ids;
 }
 bool Document::selected_skin_ready_locked(SkinAuthoringMode mode)const{
- if((mode!=SkinAuthoringMode::Anatomical&&mode!=SkinAuthoringMode::SurfaceHeat)||!skin_target_ready_locked()||state_.shape_sculpt||state_.selected_objects.empty()||state_.selected_objects.size()>64)return false;
+ if((mode!=SkinAuthoringMode::Anatomical&&!detail::skin_binds_selection(mode))||!skin_target_ready_locked()||state_.shape_sculpt||state_.selected_objects.empty()||state_.selected_objects.size()>64)return false;
  for(auto id:state_.selected_objects){const auto it=std::find_if(scene_.objects().begin(),scene_.objects().end(),[&](const auto&o){return o.id==id;});if(it==scene_.objects().end()||!object_editable_locked(id)||!it->mesh_active||!it->painted||(mode==SkinAuthoringMode::Anatomical&&!detail::anatomical_source_target(*it)))return false;}
  return true;
 }
@@ -31,8 +32,8 @@ void Document::queue_bind_skin_locked(SkinAuthoringOptions options,AssetSource e
   options.validate();
   if(selected&&!expected_selection.empty()&&expected_selection!=state_.selected_objects)
     throw std::logic_error("Selected bind targets changed while choosing options");
-  if((options.mode==SkinAuthoringMode::Anatomical||options.mode==SkinAuthoringMode::SurfaceHeat)&&state_.shape_sculpt)
-    throw std::logic_error("Finish shape-key editing before binding anatomical REST weights");
+  if((options.mode==SkinAuthoringMode::Anatomical||detail::skin_binds_selection(options.mode))&&state_.shape_sculpt)
+    throw std::logic_error("Finish shape-key editing before binding rest weights");
   auto ids=skin_sources_locked(options.mode);
   if(!skin_target_ready_locked() || std::find(ids.begin(),ids.end(),options.reference)==ids.end())
     throw std::logic_error("Select an editable mesh and an eligible skeleton/skin reference");
@@ -41,10 +42,13 @@ void Document::queue_bind_skin_locked(SkinAuthoringOptions options,AssetSource e
   for(auto id:targets)require_object_editable_locked(id);
   SkinAdmission admission;admission.options=options;admission.options.locks.clear();admission.use_locks=!options.locks.empty();if(admission.use_locks)admission.locks=options.locks;
   auto changed=std::make_shared<bool>(false);auto report=std::make_shared<std::string>();
-  const std::string label=options.mode==SkinAuthoringMode::SurfaceHeat?(selected?"Automatic surface heat selected bind":"Automatic surface heat bind"):options.mode==SkinAuthoringMode::Anatomical?(selected?"Anatomical selected source bind":"Anatomical source bind"):options.mode==SkinAuthoringMode::Transfer?"Transfer skin weights":"Automatic skin bind";
+  const std::string label=options.mode==SkinAuthoringMode::VolumeGeodesic?(selected?"Volume geodesic selected bind":"Volume geodesic bind"):options.mode==SkinAuthoringMode::SurfaceHeat?(selected?"Automatic surface heat selected bind":"Automatic surface heat bind"):options.mode==SkinAuthoringMode::Anatomical?(selected?"Anatomical selected source bind":"Anatomical source bind"):options.mode==SkinAuthoringMode::Transfer?"Transfer skin weights":"Automatic skin bind";
   queue_scene_operation_locked(label,
     [targets,options,changed,report](Scene &scene,const auto &cancelled) {
-      *changed=options.mode==SkinAuthoringMode::SurfaceHeat?author_surface_heat_skin(scene,targets,options,cancelled):options.mode==SkinAuthoringMode::Anatomical?author_anatomical_skin(scene,targets,options,cancelled):author_skin(scene,targets.front(),options,cancelled);
+      if(options.mode==SkinAuthoringMode::VolumeGeodesic)*changed=author_volume_skin(scene,targets,options,cancelled);
+      else if(options.mode==SkinAuthoringMode::SurfaceHeat)*changed=author_surface_heat_skin(scene,targets,options,cancelled);
+      else if(options.mode==SkinAuthoringMode::Anatomical)*changed=author_anatomical_skin(scene,targets,options,cancelled);
+      else *changed=author_skin(scene,targets.front(),options,cancelled);
       *report=*changed?"Skin updated; rest geometry, paint, source and morphs retained":"No skin changes; original weights retained";
     },expected,report,{},changed,{},0,0,{},{},0,std::move(admission));
 }

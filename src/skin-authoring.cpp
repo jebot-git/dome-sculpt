@@ -33,7 +33,7 @@ void AnatomicalSkinOptions::validate() const {
     throw std::invalid_argument("Invalid anatomical work, workspace or owning-request bound");
 }
 void SkinAuthoringOptions::validate() const {
-  if(mode!=SkinAuthoringMode::Automatic && mode!=SkinAuthoringMode::Transfer && mode!=SkinAuthoringMode::Anatomical && mode!=SkinAuthoringMode::SurfaceHeat)
+  if(mode!=SkinAuthoringMode::Automatic && mode!=SkinAuthoringMode::Transfer && mode!=SkinAuthoringMode::Anatomical && mode!=SkinAuthoringMode::SurfaceHeat && mode!=SkinAuthoringMode::VolumeGeodesic)
     throw std::invalid_argument("Unknown skin authoring operation");
   if(!reference || !std::isfinite(seed_distance) || seed_distance<0 || seed_distance>10000 ||
      !std::isfinite(seed_margin) || seed_margin<0 || seed_margin>10000 ||
@@ -44,9 +44,12 @@ void SkinAuthoringOptions::validate() const {
      !std::isfinite(limits.prune) || limits.prune<0 || limits.prune>=1 || locks.size()>256 ||
      std::any_of(locks.begin(),locks.end(),[](uint8_t v){return v>1;}))
     throw std::invalid_argument("Invalid skin distance, falloff, influence, lock or work bounds");
-  if(mode==SkinAuthoringMode::Anatomical||mode==SkinAuthoringMode::SurfaceHeat)anatomical.validate();
-  if(((mode==SkinAuthoringMode::Automatic||mode==SkinAuthoringMode::SurfaceHeat) && seed_distance<=0) ||
-     (mode==SkinAuthoringMode::Automatic && seed_margin>seed_distance) ||
+  const bool volume=mode==SkinAuthoringMode::VolumeGeodesic;
+  if(mode==SkinAuthoringMode::Anatomical||mode==SkinAuthoringMode::SurfaceHeat||volume)anatomical.validate();
+  if(volume&&(!std::isfinite(volume_cell_size)||volume_cell_size<minimum_skin_cell_size||volume_cell_size>maximum_skin_cell_size))
+    throw std::invalid_argument("Volume bind requires a grid cell size from 0.01 to 10000 mm");
+  if(((mode==SkinAuthoringMode::Automatic||mode==SkinAuthoringMode::SurfaceHeat||volume) && seed_distance<=0) ||
+     ((mode==SkinAuthoringMode::Automatic||volume) && seed_margin>seed_distance) ||
      (mode==SkinAuthoringMode::Transfer && transfer_distance<=0))
     throw std::invalid_argument("Automatic seeds need a positive radius and contained margin; transfer needs a positive radius");
 }
@@ -64,6 +67,7 @@ bool author_skin(Scene &scene,uint64_t target_id,const SkinAuthoringOptions &opt
   stop(cancelled);
   options.validate();
   if(options.mode==SkinAuthoringMode::SurfaceHeat)return author_surface_heat_skin(scene,std::span<const uint64_t>(&target_id,1),options,cancelled);
+  if(options.mode==SkinAuthoringMode::VolumeGeodesic)return author_volume_skin(scene,std::span<const uint64_t>(&target_id,1),options,cancelled);
   if(options.mode==SkinAuthoringMode::Anatomical)return author_anatomical_skin(scene,std::span<const uint64_t>(&target_id,1),options,cancelled);
   const auto &target=scene.object(target_id), &reference=scene.object(options.reference);
   if(!target.visible || target.locked || !target.mesh_active || !target.painted)
