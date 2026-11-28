@@ -243,9 +243,26 @@ output files. Nested DomeD Wayland and the synthetic OpenXR loader both
 produce the same 1024-pixel Standard GLB. Initial oneAPI dispatches took
 1.37 seconds for a native backdrop and 6.95 seconds for coupled UV0 in
 the direct trace. Scoped ASan/UBSan and missing-device checks pass.
-Arbitrary typed backdrop resampling, alternate UVs and acceleration of
-other texture-set channels remain open.
+Arbitrary typed backdrop resampling and alternate UVs remain open.
 [Texture-set emission evidence](validation/texture-set-emission-gpu-20261128.json)
+
+Native and retained texture-set grids now share the selected GPU paint
+compositor for color, alpha, ORM and eligible legacy emission. It borrows
+the writable owner indices, deduplicates shared tiles and uploads at most
+sixteen 32×32 common tiles per staging batch. Only requested image planes
+and compact coverage metadata return from the device. Canonical Bake
+normals use the normalized GPU path. MToon uses raw Bake normal bytes and
+coverage from the same owner. The worker reserves transient storage before
+publishing a complete preview or compiling an export. Sixteen Arc Release
+regressions pass. The PBR and MToon workers reproduce 47 files byte for byte,
+and the 2048-pixel native Bake reproduces all three material maps. On that
+fixture, warm compositing fell from 288 to 146 milliseconds across three
+runs per build. Its first GPU run took 1.10 seconds including compilation.
+Nested DomeD Wayland and synthetic OpenXR both reproduce the exact retained
+Standard GLB. Scoped ASan/UBSan and CUDA, ROCm and oneAPI missing-device
+checks pass. Retained normal reprojection and source-dependent material
+proof still require separate GPU work.
+[Texture-set material evidence](validation/texture-set-material-gpu-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with

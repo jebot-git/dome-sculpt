@@ -83,6 +83,15 @@ reads radiance and all seven authored coefficients. Alternate-coordinate
 and arbitrary typed source resampling still require their own adapters.
 [Texture-set emission evidence](validation/texture-set-emission-gpu-20261128.json)
 
+The selected GPU also composites color, opacity, ORM, and legacy emission
+on admitted native and retained texture-set grids. Native Bake tangent
+normals use the existing normalization kernel. Typed MToon keeps its raw
+padded Bake normal and coverage, which its separate material evaluator uses.
+The compositor borrows the authenticated raster and uploads shared paint
+tiles once per field in bounded batches. Independent normal transport and
+portable reparameterization still have their own work paths.
+[Texture-set material evidence](validation/texture-set-material-gpu-20261128.json)
+
 ## Current validation — 2026-11-27
 
 The [current handoff](HANDOFF.md) records the exact combined Release, Arc,

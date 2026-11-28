@@ -1,0 +1,248 @@
+{
+  "date": "2026-11-28",
+  "product_commit": "05193e083b51e20a5359e5aed6b0c6b88de2c77a",
+  "previous_published_commit": "e5d0e1b530f0838b39377242aa4354b06daa95cf",
+  "domed_toolkit_commit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "device": "Intel Arc A770 / PCI 0000:03:00.0 / renderD129",
+  "scope": "Native and authenticated retained texture-set grid material compilation in preview and export. Includes color, alpha, ORM, LDR emission, normalized canonical Bake normals and raw MToon Bake normals and coverage. FLOAT emission stays in its separate GPU raster.",
+  "app": {
+    "file": "artifacts/texture-set-material-gpu-20261128/evidence/oneapi/dome-sculpt",
+    "sha256": "373b892d2889ffac1e343e74820df92802fab00fd37e913f0b5de1ff142aa97b"
+  },
+  "gpu_oracle": {
+    "checks": 497668,
+    "trace": {
+      "file": "artifacts/texture-set-material-gpu-20261128/native-raster.log",
+      "sha256": "d1dc76fb34a89c0441b6d865a9fc084a1f95c9368ede871d94eb02001dd92f3d"
+    },
+    "maximum_common_tiles_per_upload": 16,
+    "maximum_host_tile_upload_bytes": 229376
+  },
+  "regressions": {
+    "passed": 16,
+    "junit": {
+      "file": "artifacts/texture-set-material-gpu-20261128/evidence/oneapi/texture-set-material-tests.xml",
+      "sha256": "8c650fe3ebc80795db18c0fc8705c3e2cdb122d6a34666b5038a81d654677d5b"
+    }
+  },
+  "exact_pbr_and_mtoon_files": {
+    "equal_files": 45,
+    "file_sha256_manifest": "cc2e35c806d6935ba58151bddc7a4ab87cb21dada1d53294f3c1d2238266567c"
+  },
+  "exact_ldr_files": {
+    "equal_files": 2,
+    "file_sha256_manifest": "862ca27efdf9f4f3ec282bdfbfafed9514784d1fe72ce10469833a836a718e43"
+  },
+  "retained_1024_compositor_profile": {
+    "previous": {
+      "milliseconds": [
+        42.4687,
+        43.4589,
+        41.8266,
+        42.966,
+        41.809,
+        41.3839,
+        42.7835
+      ],
+      "warm_median_ms": 42.305049999999994,
+      "tracked_work": 10077968,
+      "log": {
+        "file": "artifacts/texture-set-material-gpu-20261128/profile-previous.log",
+        "sha256": "fcf3bbc0c3e0e2373c50af02192668d71d1cb0d94d29a9af72f94a8cfc878028"
+      }
+    },
+    "current": {
+      "milliseconds": [
+        39.9036,
+        51.7172,
+        33.5614,
+        27.5234,
+        43.1135,
+        42.4658,
+        42.6558
+      ],
+      "warm_median_ms": 42.5608,
+      "tracked_work": 10077968,
+      "log": {
+        "file": "artifacts/texture-set-material-gpu-20261128/profile-current.log",
+        "sha256": "f91ca1d68e58bae9453fb3f8c0984fc8317afdd9cf3f3cdf7c2d9d3fe664fa24"
+      }
+    }
+  },
+  "full_native_2048_bake": {
+    "equal_files": 3,
+    "file_sha256_manifest": "4e8a03ab5f6defec0c4e5a5869a5f5626bc5defe4cb9735d62372eb6d9792369",
+    "images": {
+      "color": {
+        "file": "artifacts/texture-set-material-gpu-20261128/evidence/full-current/color.rgba",
+        "sha256": "8da75a9d04f6391fde0da30215c8546e68085d3372b3ee845452415ca9dc1636"
+      },
+      "orm": {
+        "file": "artifacts/texture-set-material-gpu-20261128/evidence/full-current/orm.rgba",
+        "sha256": "c7e076d3bab9277b3309c7e51684c2351647888e93fe6461fcd70cdd41e27111"
+      },
+      "normal": {
+        "file": "artifacts/texture-set-material-gpu-20261128/evidence/full-current/normal.rgba",
+        "sha256": "23a52e8527f336f0cf357decbb4e3516c0d0ea548549378c05f133009d1612cf"
+      }
+    },
+    "profile": {
+      "previous": {
+        "milliseconds": [
+          302.182,
+          295.801,
+          284.698,
+          287.937
+        ],
+        "warm_median_ms": 287.937,
+        "tracked_work": 82588704,
+        "log": {
+          "file": "artifacts/texture-set-material-gpu-20261128/full-previous.log",
+          "sha256": "d5d1380d32fb392bde8692501fe1e91c16f54a2b46e757b47e6436ab9895e9cc"
+        }
+      },
+      "current": {
+        "milliseconds": [
+          1095.77,
+          185.097,
+          140.942,
+          146.134
+        ],
+        "warm_median_ms": 146.134,
+        "tracked_work": 82588704,
+        "log": {
+          "file": "artifacts/texture-set-material-gpu-20261128/full-current.log",
+          "sha256": "17e4e9436df953b206b97cddb3b51951350e843889ec8761700073468aab6e9f"
+        }
+      }
+    }
+  },
+  "selected_export_timings": {
+    "pbr-1024-standard": {
+      "before": {
+        "elapsed_seconds": 14.11,
+        "peak_rss_kib": 1452036,
+        "log": {
+          "file": "artifacts/texture-set-emission-gpu-20261128/after-pbr-1024-standard.log",
+          "sha256": "b908fc3be06a1f30a532c50c77368c6188284da3984875cfc31c13527f4eef40"
+        }
+      },
+      "after": {
+        "elapsed_seconds": 13.94,
+        "peak_rss_kib": 1461472,
+        "log": {
+          "file": "artifacts/texture-set-material-gpu-20261128/after-pbr-1024-standard.log",
+          "sha256": "e874f7c52aa6693e4c0cab04bdc6ef2d9f3038e6f099823269a610c9f5368d15"
+        }
+      }
+    },
+    "pbr-1024-editable": {
+      "before": {
+        "elapsed_seconds": 11.34,
+        "peak_rss_kib": 1390884,
+        "log": {
+          "file": "artifacts/texture-set-emission-gpu-20261128/after-pbr-1024-editable.log",
+          "sha256": "e9574cfde23db5e2ce7edb69e65680d3fe09a47ed06af5a94ad63b5c668ae8cc"
+        }
+      },
+      "after": {
+        "elapsed_seconds": 11.1,
+        "peak_rss_kib": 1395460,
+        "log": {
+          "file": "artifacts/texture-set-material-gpu-20261128/after-pbr-1024-editable.log",
+          "sha256": "9296b13c3d92e5b0d657e0f211d45763e5b3f0ed0a83623824bf02b5ccfd1f84"
+        }
+      }
+    },
+    "mtoon": {
+      "before": {
+        "elapsed_seconds": 17.04,
+        "peak_rss_kib": 771556,
+        "log": {
+          "file": "artifacts/texture-set-emission-gpu-20261128/after-mtoon.log",
+          "sha256": "e82c4d3da181fd49d0905a27b74ea892ed99d3eea1fbbcc6472394ef8cd0d055"
+        }
+      },
+      "after": {
+        "elapsed_seconds": 16.59,
+        "peak_rss_kib": 840516,
+        "log": {
+          "file": "artifacts/texture-set-material-gpu-20261128/after-mtoon.log",
+          "sha256": "9e1b954ea7c0b9200e00882f5a0998d6fb5fc02e6a571f2a4331b2152f89d291"
+        }
+      }
+    }
+  },
+  "nested_domed_wayland": {
+    "passed": 7,
+    "report": {
+      "file": "artifacts/texture-set-material-gpu-20261128/evidence/wayland/report.json",
+      "sha256": "1479f58dde45a6650ec4a86a27bfa78dbff2a7235cf3bac585efc465832f849d"
+    },
+    "log": {
+      "file": "artifacts/texture-set-material-gpu-20261128/wayland.log",
+      "sha256": "82f486d4effbba5a5f0ae3fed348e223e7f30af543db1a6e61e247141126eda3"
+    },
+    "compositor_log": {
+      "file": "artifacts/texture-set-material-gpu-20261128/evidence/wayland/compositor.log",
+      "sha256": "88b2084d5a71ce8ff6a5dba482cee5f7acd3ab3c2dc4dae82cdf09418279be88"
+    },
+    "package": {
+      "file": "artifacts/texture-set-material-gpu-20261128/evidence/wayland/standard.glb",
+      "sha256": "64b9f80beaa352525233f55c7e434ebc4972e35ca7efab89b1f8911738cab6cb"
+    }
+  },
+  "actual_loader_synthetic_openxr": {
+    "passed": 10,
+    "report": {
+      "file": "artifacts/texture-set-material-gpu-20261128/evidence/xr/report.json",
+      "sha256": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7"
+    },
+    "log": {
+      "file": "artifacts/texture-set-material-gpu-20261128/xr.log",
+      "sha256": "233217cc18de0f87dd23612778ae28df7d73c7e90f03fe9d12493fa4e92b1523"
+    },
+    "package": {
+      "file": "artifacts/texture-set-material-gpu-20261128/evidence/xr/accept/converted.glb",
+      "sha256": "64b9f80beaa352525233f55c7e434ebc4972e35ca7efab89b1f8911738cab6cb"
+    },
+    "physical_headset": false,
+    "accepted_graphics": {
+      "file": "artifacts/texture-set-material-gpu-20261128/evidence/xr/accept/graphics.json",
+      "sha256": "f5e95dd9e30ec72eea9479f466264871592da5c103ee4706bf37ac1cdda2751e"
+    },
+    "focus_loss_graphics": {
+      "file": "artifacts/texture-set-material-gpu-20261128/evidence/xr/focus/graphics.json",
+      "sha256": "c2aab908e287dec31eae3cfe0f90e5acdf389516960c600cc3335caad47390a8"
+    }
+  },
+  "sanitizers": {
+    "mode": "Scoped headless ASan/UBSan",
+    "retained_standard": {
+      "file": "artifacts/texture-set-material-gpu-20261128/evidence/asan/texture-set-source-export.cpp.log",
+      "sha256": "92a746abad94b9eadc1458b4f516db1bd39fb1099b7b17867f55c115c08ccafd"
+    },
+    "borrowed_packet": {
+      "file": "artifacts/texture-set-material-gpu-20261128/evidence/asan/paint-composite-compute.cpp.log",
+      "sha256": "8f85e3f3062f16703b32368cc71ebaad6567eccd9234ca39d800b67cd6e0d00e"
+    }
+  },
+  "missing_device": {
+    "ONEAPI": {
+      "file": "artifacts/texture-set-material-gpu-20261128/missing-device.log",
+      "sha256": "febf783a221b32ecbd6f65bdb44c027279e663ac73fe708bd78982e3bf50528c",
+      "reason": "No device of requested type 'info::device_type::gpu' available."
+    },
+    "CUDA": {
+      "file": "artifacts/texture-set-material-gpu-20261128/cuda-missing.log",
+      "sha256": "a0378a4fc400b5815d3c9741427b4de121ae8d6b52452bff15f8411ff5af1a06",
+      "reason": "CUDA driver version is insufficient for CUDA runtime version"
+    },
+    "ROCm": {
+      "file": "artifacts/texture-set-material-gpu-20261128/rocm-missing.log",
+      "sha256": "5ea73347f978dd0c3a5b3d4d06150f8b606793ceb4459e47741bf303730736f6",
+      "reason": "no ROCm-capable device is detected"
+    }
+  },
+  "limits": "Profiles are for the two named fixtures. The first 2048 dispatch includes oneAPI device compilation with persistent cache disabled. Positive CUDA and ROCm execution, physical XR, independent normal reprojection and alternate-coordinate material proof are unverified here."
+}
