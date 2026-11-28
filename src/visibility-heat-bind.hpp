@@ -128,7 +128,9 @@ inline Prepared prepare(const Mesh&m,const Skeleton&rig,BindOptions options,
   for(const auto&source:sources)for(const auto&p:{source.head,source.tail})for(double value:p){work.step();if(!std::isfinite(value)||std::abs(value)>10000)throw std::invalid_argument("Heat source exceeds exact bounded metric coordinates");}
   NearestWeightSources nearest(sources,work);Prepared out;
   out.system=weight_surface::assemble(m,work,HeatOperator::PositiveGraph,{},HeatNormals::AreaWeighted,HeatMass::MixedVoronoi,HeatEdges::IncidentMean);auto&s=out.system;
-  std::vector<uint8_t>supported(n);out.component_sources.resize(n);
+  enum class Support : uint8_t { None, Closest, Visible };
+  std::vector<Support>support(n);out.component_sources.resize(n);
+  size_t seeded_components=0;
   using Mask=std::array<uint64_t,4>;std::vector<Mask>permitted;std::vector<uint8_t>classified,interior;
   if(solid){bytes.add(n,sizeof(Mask)+2*sizeof(uint8_t));permitted.resize(n);classified.resize(n);interior.resize(n);out.closed_components=solid->closed_components;out.nonembedded_components=solid->nonembedded_components;
     for(uint32_t row=0;row<n;++row)if(solid->closed(row)){auto component=solid->component(row);if(classified[component])continue;classified[component]=1;
@@ -144,23 +146,74 @@ inline Prepared prepare(const Mesh&m,const Skeleton&rig,BindOptions options,
       interior[component]=permitted[component]!=Mask{};if(interior[component])++out.interior_components;else ++out.exterior_components;
     }
   }
-  for(uint32_t row=0;row<n;++row){work.stop();Mask allowed{UINT64_MAX,UINT64_MAX,UINT64_MAX,UINT64_MAX};if(solid&&solid->closed(row)&&interior[solid->component(row)])allowed=permitted[solid->component(row)];auto mask=nearest.nearest(points[row],allowed,work);double minimum=INFINITY;size_t ties=0;
-    for(size_t k=0;k<4;++k){auto bits=mask[k];while(bits){work.step(8);auto b=uint32_t(k*64+std::countr_zero(bits));bits&=bits-1;auto a=segments.at(b)[0],z=segments.at(b)[1];auto p=points[row];
-      const double d=visibility_geodesic::distance(p,{a.x,a.y,a.z},{z.x,z.y,z.z});if(d>options.maximum_seed_distance)continue;
-      if(policy==HeatDomainPolicy::ClosedMaterial&&solid&&solid->closed(row)&&interior[solid->component(row)]&&!solid->nearest_material_closure(row,{a.x,a.y,a.z},{z.x,z.y,z.z},scratch,work)){++out.membership_rejected;continue;}
-      if(!query->visible(row,{a.x,a.y,a.z},{z.x,z.y,z.z},scratch,work)){++out.occluded;continue;}
-      minimum=std::min(minimum,d);s.seeds[row][k]|=uint64_t(1)<<(b%64);++ties;++out.visible;
-    }}
-    if(ties){
-      // Pinned Blender varea accumulation is2*MixedVoronoi, then inverted as
-      //0.5/varea. Incident-mean stiffness therefore has row factor1/(4M).
-      // Multiplying that row by4M gives symmetric K +4M*H, H=ties/d^2.
-      const double d=std::max(minimum,1e-4);s.heat[row]=4*s.mass[row]*double(ties)/(d*d);s.ties[row]=double(ties);
-      if(!std::isfinite(s.heat[row])||!(s.heat[row]>0))throw std::runtime_error("Heat screen overflow");
-      s.diagonal[row]+=s.heat[row];supported[s.parent[row]]=1;for(size_t k=0;k<4;++k)out.component_sources[s.parent[row]][k]|=s.seeds[row][k];
+  const auto allowed=[&](uint32_t row)->Mask{
+    if(solid&&solid->closed(row)&&interior[solid->component(row)])return permitted[solid->component(row)];
+    return {UINT64_MAX,UINT64_MAX,UINT64_MAX,UINT64_MAX};
+  };
+  const auto distance=[&](uint32_t row,uint32_t joint){
+    const auto [a,b]=segments.at(joint);
+    return double(visibility_geodesic::distance(points[row],{a.x,a.y,a.z},{b.x,b.y,b.z}));
+  };
+  const auto admissible=[&](uint32_t row,uint32_t joint,double d){
+    if(d>options.maximum_seed_distance)return false;
+    const auto [a,b]=segments.at(joint);
+    const bone_shadow::Point from{a.x,a.y,a.z},to{b.x,b.y,b.z};
+    if(policy==HeatDomainPolicy::ClosedMaterial&&solid&&solid->closed(row)&&interior[solid->component(row)]&&
+       !solid->nearest_material_closure(row,from,to,scratch,work)){
+      ++out.membership_rejected;
+      return false;
+    }
+    if(query->visible(row,from,to,scratch,work))return true;
+    ++out.occluded;
+    return false;
+  };
+  const auto add_seeds=[&](uint32_t row,Mask mask,Support kind){
+    double minimum=INFINITY;
+    size_t ties=0;
+    for(size_t word=0;word<mask.size();++word){
+      for(auto bits=mask[word];bits;bits&=bits-1){
+        work.step(8);
+        const auto joint=uint32_t(word*64+std::countr_zero(bits));
+        const double d=distance(row,joint);
+        if(kind==Support::Closest&&!admissible(row,joint,d))continue;
+        minimum=std::min(minimum,d);
+        s.seeds[row][word]|=uint64_t(1)<<(joint%64);
+        ++ties;
+      }
+    }
+    if(!ties)return;
+    // Multiplying the reference row by four times the mixed Voronoi mass
+    // produces the symmetric K + 4M*H system, with H = ties / distance².
+    const double d=std::max(minimum,1e-4);
+    s.heat[row]=4*s.mass[row]*double(ties)/(d*d);
+    s.ties[row]=double(ties);
+    if(!std::isfinite(s.heat[row])||!(s.heat[row]>0))throw std::runtime_error("Heat screen overflow");
+    s.diagonal[row]+=s.heat[row];
+    out.visible+=ties;
+    const auto component=s.parent[row];
+    if(support[component]==Support::None)++seeded_components;
+    support[component]=kind;
+    for(size_t word=0;word<mask.size();++word)out.component_sources[component][word]|=s.seeds[row][word];
+  };
+  for(uint32_t row=0;row<n;++row){
+    work.stop();
+    add_seeds(row,nearest.nearest(points[row],allowed(row),work),Support::Closest);
+  }
+  if(policy==HeatDomainPolicy::ComponentHandleSupport&&seeded_components<s.components){
+    // Complete the support of initially unseeded diffusion components before
+    // assembly of any right-hand side. Every admitted candidate still passes
+    // the component handle mask, seed radius and exact closest-ray predicate.
+    for(uint32_t row=0;row<n;++row){
+      work.step();
+      if(support[s.parent[row]]==Support::Closest)continue;
+      const auto mask=nearest.nearest_if(points[row],allowed(row),work,[&](uint32_t joint){
+        work.step(8);
+        return admissible(row,joint,distance(row,joint));
+      });
+      add_seeds(row,mask,Support::Visible);
     }
   }
-  for(size_t row=0;row<n;++row){work.step();if(!supported[s.parent[row]])throw std::runtime_error("Positive heat component has no visible nearest source");}
+  for(size_t row=0;row<n;++row){work.step();if(support[s.parent[row]]==Support::None)throw std::runtime_error("Positive heat component has no admissible visible source within the seed radius");}
   return out;
 }
 }

@@ -95,6 +95,18 @@ public:
   std::array<uint64_t, 4> nearest(std::array<float, 3> point,
                                   std::array<uint64_t, 4> allowed,
                                   Budget &work) const {
+    auto mask = nearest_if(point, allowed, work, [](uint32_t) { return true; });
+    if (mask == std::array<uint64_t, 4>{})
+      throw std::invalid_argument("Nearest row has no permitted finite source");
+    return mask;
+  }
+
+  // The predicate only needs to certify candidates that can match or improve
+  // the best admissible distance. The exact comparison retains every tie.
+  template <class Budget, class Admissible>
+  std::array<uint64_t, 4> nearest_if(std::array<float, 3> point,
+                                     std::array<uint64_t, 4> allowed,
+                                     Budget &work, Admissible admissible) const {
     work.stop();
     volume_exact::Arithmetic exact(work);
     auto shift = source_shift_;
@@ -116,15 +128,14 @@ public:
         continue;
       auto value = distance(point, source, shift, exact);
       const int order = best ? exact.compare(value, *best) : -1;
+      if (order > 0 || !admissible(source.joint))
+        continue;
       if (order < 0) {
         best = value;
         mask = {};
       }
-      if (order <= 0)
-        mask[source.joint / 64] |= uint64_t(1) << (source.joint % 64);
+      mask[source.joint / 64] |= uint64_t(1) << (source.joint % 64);
     }
-    if (!best)
-      throw std::invalid_argument("Nearest row has no permitted finite source");
     return mask;
   }
 };

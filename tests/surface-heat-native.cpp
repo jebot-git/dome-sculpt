@@ -21,6 +21,77 @@ NativeInput native_fixture(bool reflected){
  if(relative.orientation()==AffineOrientation::Reversing)for(size_t c=0;c<t.indices.size();c+=3){std::swap(t.indices[c+1],t.indices[c+2]);if(!t.uv_seams.empty())std::swap(t.uv_seams[c],t.uv_seams[c+2]);}
  scene.object(target).painted=std::make_shared<PaintedMesh>(t,128);DeformationState shapes(t);shapes.morphs=MorphSet(t);auto edited=t.positions;for(auto&p:edited)p.z+=.0001f;shapes.morphs->set_target(t,"Actual authored native key",edited);shapes.morph_weights={.25f};scene.set_deformation(target,shapes);scene.select(target);scene.validate();return {std::move(scene),std::move(m),target};
 }
+
+void concave_sheet(const std::filesystem::path &out) {
+  Mesh sheet;
+  // Two open panels joined along the far edge. Only vertex zero is close
+  // enough to seed, and the opposite panel intersects its nearest bone ray.
+  sheet.positions = {{0,0,0}, {.09f,.08f,0}, {-.09f,.08f,0},
+                     {-.09f,-.08f,.012f}, {.09f,-.08f,.012f}, {0,.10f,.012f}};
+  sheet.indices = {0,1,2, 3,5,4, 1,4,5, 1,5,2};
+  sheet.normals.assign(sheet.positions.size(), {0,0,1});
+  sheet.uv = {{.1f,.5f}, {.2f,.15f}, {.2f,.85f}, {.9f,.45f}, {.75f,.15f}, {.75f,.85f}};
+
+  Skeleton rig;
+  auto add_bone = [&](const char *name, float x, float z, bool deform=true) {
+    Bone bone;
+    bone.name = name;
+    bone.rest.translation = {x,0,z};
+    bone.length = .004f;
+    bone.deform = deform;
+    rig.bones.push_back(bone);
+  };
+  add_bone("Occluded",0,.024f);
+  add_bone("Farther",0,-.041f);
+  add_bone("Left",-.02f,-.032f);
+  add_bone("Right",.02f,-.032f);
+  add_bone("Nondeform",0,-.006f,false);
+  Scene scene;
+  const auto reference = scene.active().id;
+  scene.active().painted = std::make_shared<PaintedMesh>(sheet,64);
+  scene.active().mesh_active = true;
+  DeformationState rest(sheet);
+  rest.skeleton = rig;
+  scene.set_deformation(reference, rest);
+  const auto target = scene.add("Concave accessory with an occluded handle", Volume{});
+  auto paint = std::make_shared<PaintedMesh>(sheet,64);
+  scene.object(target).painted = paint;
+  scene.object(target).mesh_active = true;
+  const auto before = scene.encode();
+
+  SkinAuthoringOptions options;
+  options.reference = reference;
+  options.mode = SkinAuthoringMode::SurfaceHeat;
+  options.seed_distance = .045f;
+  expect(author_skin(scene, target, options), "A concave sheet binds when the closest bone ray is blocked by its other panel");
+  const auto &object = scene.object(target);
+  for (const auto &row : object.deformation->skin->vertices) {
+    if (row.size()!=2 || row[0].joint!=2 || row[1].joint!=3 ||
+        std::abs(row[0].weight-.5f)>1e-6f || std::abs(row[1].weight-.5f)>1e-6f)
+      throw std::runtime_error("Exactly tied visible handles must split the heat equally");
+  }
+  expect(object.painted==paint && object.painted->mesh_owner()==paint->mesh_owner(),
+         "Tied visible handles preserve the original mesh and paint owners");
+
+  auto initial = Scene::decode(before);
+  initial.save(out/"concave-unbound.dsculpt");
+  auto limited = options;
+  limited.seed_distance = .03f;
+  expect(rejected([&]{author_skin(initial,target,limited);}) && initial.encode()==before,
+         "A seed radius shorter than every visible ray refuses without publishing weights");
+  auto single = Scene::decode(before);
+  rest.skeleton->bones[1].deform = false;
+  rest.skeleton->bones[3].deform = false;
+  single.set_deformation(reference, rest);
+  expect(author_skin(single,target,options) &&
+         std::ranges::all_of(single.object(target).deformation->skin->vertices, [](const auto &row) {
+           return row.size()==1 && row.front().joint==2 && row.front().weight==1.f;
+         }), "The only visible deform handle has unit weight at every vertex");
+
+  const auto path = out/"concave.dsculpt";
+  scene.save(path);
+  expect(Scene::load(path).encode()==scene.encode(), "Recovered concave weights reopen exactly");
+}
 }
 int main(int argc,char**argv)try{
  if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);expect(int(SkinAuthoringMode::Automatic)==0&&int(SkinAuthoringMode::Transfer)==1&&int(SkinAuthoringMode::Anatomical)==4&&int(SkinAuthoringMode::SurfaceHeat)==5,"Additive surface heat preserves all explicit legacy method identities");
@@ -36,5 +107,6 @@ int main(int argc,char**argv)try{
   size_t callbacks=0;expect(rejected([&]{author_skin(reject,target,options,[&]{return ++callbacks==64;});})&&callbacks==64&&reject.encode()==original,"Actual generic native preparation cancels deterministically without publication");
   results.push_back({{"reflected",reflected},{"foreign_weight",wrong},{"max_pose_m",error},{"mean_pose_m",mean}});
  }
+ concave_sheet(out);
  std::ofstream(out/"report.json")<<nlohmann::json{{"checks",native_checks},{"work_limit",500'000'000},{"workspace_limit",256u*1024u*1024u},{"owning_limit",512u*1024u*1024u},{"records",results}}.dump(2);std::cout<<"PASS native_surface_heat_checks="<<native_checks<<std::endl;return 0;
 }catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<std::endl;return 1;}
