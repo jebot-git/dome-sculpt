@@ -149,6 +149,73 @@ DOME_GRID_FN uint8_t quantize(uint64_t value,const uint64_t *threshold) {
   return uint8_t(lo);
 }
 
+struct MappedTaps {
+  uint64_t weights[4]{};
+  uint32_t texels[4]{};
+  bool covered=false;
+};
+
+struct FilterAccumulator {
+  uint64_t weighted[channels]{}, raw[channels]{}, coverage[4]{}, mask=0;
+  uint64_t emission_weighted[float_channels-1]{}, emission_raw[float_channels]{};
+  uint8_t present=0;
+
+  DOME_GRID_FN void tap(const Pixel &p,uint64_t weight,const Layout &layout,const Tables &tables,bool reduce) {
+    present |= p.present;
+    uint64_t group_weight[4]{};
+    for (unsigned g=0;g<layout.groups;++g) if(layout.coverage_mask&(1u<<g)) {
+      group_weight[g]=mul(weight,tables.unit[p.coverage[g]]);
+      coverage[g]=add(coverage[g],group_weight[g]);
+    }
+    const auto pbr_weight=layout.pbr&&!reduce?
+        div(mul(weight,integer(p.coverage[0])),integer(255)):0;
+    for (unsigned c=0;c<channels;++c) if (layout.active&(1u<<c)) {
+      const auto value=(layout.srgb&(1u<<c))?tables.srgb[p.values[c]]:tables.unit[p.values[c]];
+      const auto a=!reduce&&(layout.pbr&(1u<<c))?pbr_weight:group_weight[layout.group[c]];
+      weighted[c]=add(weighted[c],mul(a,value));
+      raw[c]=add(raw[c],mul(weight,value));
+    }
+    if (layout.mask)
+      mask=add(mask,reduce?mul(weight,tables.unit[p.mask]):
+               div(mul(weight,integer(p.mask)),integer(255)));
+    if (layout.floats!=FloatPlane::Absent) {
+      const auto a=mul(weight,widen_float_bits(p.emission[6]));
+      emission_raw[6]=add(emission_raw[6],a);
+      for (unsigned c=0;c<float_channels-1;++c) if (!(layout.fixed_emission&(1u<<c))) {
+        const auto value=widen_float_bits(p.emission[c]);
+        emission_raw[c]=add(emission_raw[c],mul(weight,value));
+        if(layout.floats==FloatPlane::UnassociatedPaint)
+          emission_weighted[c]=add(emission_weighted[c],mul(a,value));
+      }
+    }
+  }
+
+  DOME_GRID_FN Pixel finish(const Layout &layout,const Tables &tables) const {
+    Pixel out;
+    out.present=present;
+    for (unsigned g=0;g<layout.groups;++g) if(layout.coverage_mask&(1u<<g))
+      out.coverage[g]=quantize(coverage[g],tables.unit_threshold);
+    for (unsigned c=0;c<channels;++c) if (layout.active&(1u<<c)) {
+      const auto a=coverage[layout.group[c]];
+      const auto value=a?div(weighted[c],a):raw[c];
+      out.values[c]=quantize(value,(layout.srgb&(1u<<c))?tables.srgb_threshold:tables.unit_threshold);
+    }
+    for (unsigned c=0;c<6;++c) if (layout.fixed_common&(1u<<c))
+      out.values[c]=layout.common_constants[c];
+    if (layout.mask) out.mask=quantize(mask,tables.unit_threshold);
+    if (layout.floats!=FloatPlane::Absent) {
+      const auto a=emission_raw[6];
+      out.emission[6]=narrow_float_bits(a);
+      for (unsigned c=0;c<float_channels-1;++c) {
+        const auto value=layout.fixed_emission&(1u<<c)?layout.emission_constants[c]:
+            (a&&layout.floats==FloatPlane::UnassociatedPaint)?div(emission_weighted[c],a):emission_raw[c];
+        out.emission[c]=narrow_float_bits(value);
+      }
+    }
+    return out;
+  }
+};
+
 DOME_GRID_FN Pixel filter(size_t index,const Batch &batch,const Layout &layout,
                          const Tables &tables,const Pixel *input) {
   const auto x = axis(batch.from,batch.to,batch.target.x + uint32_t(index % batch.target.width));
@@ -156,9 +223,7 @@ DOME_GRID_FN Pixel filter(size_t index,const Batch &batch,const Layout &layout,
   const bool reduce = batch.from > batch.to;
   const auto denominator = integer(reduce ? int32_t(x.count*y.count) : int32_t(2*batch.to));
   const auto area = div(integer(1),denominator);
-  uint64_t weighted[channels]{}, raw[channels]{}, coverage[4]{}, mask=0;
-  uint64_t emission_weighted[float_channels-1]{}, emission_raw[float_channels]{};
-  Pixel out;
+  FilterAccumulator accumulator;
   for (uint32_t yi=0;yi<y.count;++yi) {
     const auto source_y = reduce ? y.first+yi : yi ? y.second : y.first;
     const auto wy = yi ? y.fraction : 2*batch.to-y.fraction;
@@ -168,55 +233,19 @@ DOME_GRID_FN Pixel filter(size_t index,const Batch &batch,const Layout &layout,
       if (!reduce && (!wx || !wy)) continue;
       const auto weight = reduce ? area : mul(mul(integer(int(wx)),area),mul(integer(int(wy)),area));
       const auto &p = input[size_t(source_y-batch.source.y)*batch.source.width+source_x-batch.source.x];
-      out.present |= p.present;
-      uint64_t group_weight[4]{};
-      for (unsigned g=0;g<layout.groups;++g) if(layout.coverage_mask&(1u<<g)) {
-        group_weight[g]=mul(weight,tables.unit[p.coverage[g]]);
-        coverage[g]=add(coverage[g],group_weight[g]);
-      }
-      const auto pbr_weight=layout.pbr&&!reduce?
-          div(mul(weight,integer(p.coverage[0])),integer(255)):0;
-      for (unsigned c=0;c<channels;++c) if (layout.active&(1u<<c)) {
-        const auto value=(layout.srgb&(1u<<c))?tables.srgb[p.values[c]]:tables.unit[p.values[c]];
-        const auto a=!reduce&&(layout.pbr&(1u<<c))?pbr_weight:group_weight[layout.group[c]];
-        weighted[c]=add(weighted[c],mul(a,value));
-        raw[c]=add(raw[c],mul(weight,value));
-      }
-      if (layout.mask)
-        mask=add(mask,reduce?mul(weight,tables.unit[p.mask]):
-                 div(mul(weight,integer(p.mask)),integer(255)));
-      if (layout.floats!=FloatPlane::Absent) {
-        const auto a=mul(weight,widen_float_bits(p.emission[6]));
-        emission_raw[6]=add(emission_raw[6],a);
-        for (unsigned c=0;c<float_channels-1;++c) if (!(layout.fixed_emission&(1u<<c))) {
-          const auto value=widen_float_bits(p.emission[c]);
-          emission_raw[c]=add(emission_raw[c],mul(weight,value));
-          if(layout.floats==FloatPlane::UnassociatedPaint)
-            emission_weighted[c]=add(emission_weighted[c],mul(a,value));
-        }
-      }
+      accumulator.tap(p,weight,layout,tables,reduce);
     }
   }
-  for (unsigned g=0;g<layout.groups;++g) if(layout.coverage_mask&(1u<<g))
-    out.coverage[g]=quantize(coverage[g],tables.unit_threshold);
-  for (unsigned c=0;c<channels;++c) if (layout.active&(1u<<c)) {
-    const auto a=coverage[layout.group[c]];
-    const auto value=a?div(weighted[c],a):raw[c];
-    out.values[c]=quantize(value,(layout.srgb&(1u<<c))?tables.srgb_threshold:tables.unit_threshold);
-  }
-  for (unsigned c=0;c<6;++c) if (layout.fixed_common&(1u<<c))
-    out.values[c]=layout.common_constants[c];
-  if (layout.mask) out.mask=quantize(mask,tables.unit_threshold);
-  if (layout.floats!=FloatPlane::Absent) {
-    const auto a=emission_raw[6];
-    out.emission[6]=narrow_float_bits(a);
-    for (unsigned c=0;c<float_channels-1;++c) {
-      const auto value=layout.fixed_emission&(1u<<c)?layout.emission_constants[c]:
-          (a&&layout.floats==FloatPlane::UnassociatedPaint)?div(emission_weighted[c],a):emission_raw[c];
-      out.emission[c]=narrow_float_bits(value);
-    }
-  }
-  return out;
+  return accumulator.finish(layout,tables);
+}
+
+DOME_GRID_FN Pixel filter_mapped(const MappedTaps &taps,const Layout &layout,
+                                const Tables &tables,const Pixel *input) {
+  if(!taps.covered)return {};
+  FilterAccumulator accumulator;
+  for(unsigned i=0;i<4;++i)if(taps.weights[i])
+    accumulator.tap(input[taps.texels[i]],taps.weights[i],layout,tables,false);
+  return accumulator.finish(layout,tables);
 }
 }
 #undef DOME_GRID_FN

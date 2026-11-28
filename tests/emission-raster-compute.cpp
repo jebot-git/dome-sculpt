@@ -7,6 +7,7 @@
 #include "emission-raster-device.hpp"
 #include "paint-emission-sample.hpp"
 #include "paint-overlay-sample.hpp"
+#include "texture-set-resample.hpp"
 #include <chrono>
 #include <cstring>
 #include <iostream>
@@ -331,6 +332,67 @@ void compare_bake_uv_maps(){
     check(bool(actual[i].invalid_normal)==(i<3),"Device accepted an invalid Bake UV tangent frame");
   }
   std::cout<<"PASS Bake UV maps exact RGBA/ORM/legacy/coverage, frame-transformed normals and fused FLOAT "<<count<<" texels\n";
+}
+
+void compare_uv_layers(){
+  constexpr uint32_t extent=128;
+  constexpr size_t tiles=16,capacity=513,probes=1950;
+  PaintLayer layer;
+  layer.tiles.resize(tiles);
+  for(size_t tile=0;tile<tiles;++tile){
+    if(tile%5==0)continue;
+    auto common=std::make_shared<PaintTile>();
+    for(size_t i=0;i<common->pixels.size();++i){
+      auto &p=common->pixels[i].data;
+      for(size_t c=0;c<p.size();++c)p[c]=uint8_t((i*(47+2*c)+tile*71)^(i/(11+c)));
+      if(i%13==0)std::fill_n(p.begin()+9,4,0);
+    }
+    layer.tiles[tile]=std::move(common);
+  }
+  std::vector<int32_t> padding(extent*extent);
+  for(size_t i=0;i<padding.size();++i)padding[i]=i%19?int32_t(i):-1;
+  detail::PaintLayerUvFilter gpu(capacity);
+  const auto footprint=[&](size_t i,detail::PaintLayerUvFilter::Taps &taps){
+    if(i%11==0)return false;
+    taps=detail::paint_bilinear_taps(extent,{float(i%317)/313,float((i*73)%311)/307},padding,true);
+    if(i%37==1)taps={};
+    return true;
+  };
+  const auto compare=[&]{
+    for(size_t first=0;first<probes;first+=capacity){
+      const auto count=std::min(capacity,probes-first);
+      const auto results=gpu.read(layer,extent,count,[&](size_t i,auto &taps){return footprint(first+i,taps);},{});
+      for(size_t i=0;i<count;++i){
+        detail::PaintLayerUvFilter::Taps taps;
+        const auto expected=footprint(first+i,taps)?detail::filter_paint_layer(layer,extent,taps):detail::FilteredPaintTexel{};
+        const auto &actual=results[i];
+        if(expected.common!=actual.common||std::memcmp(&expected.emission,&actual.emission,sizeof(actual.emission))||
+           expected.pbr!=actual.pbr||expected.pbr_present!=actual.pbr_present)
+          throw std::runtime_error("Mapped GPU paint differs from the native CPU oracle at "+std::to_string(first+i));
+      }
+    }
+  };
+  compare();
+  layer.emission_tiles.resize(tiles);
+  layer.pbr_tiles.resize(tiles);
+  for(const auto tile:{1u,3u,9u}){
+    PaintEmissionTile::Pixels light{};
+    auto colors=std::make_shared<PaintColorTile>();
+    for(size_t i=0;i<light.size();++i){
+      const auto small=float(i%117)/128;
+      light[i]={{small,.25f,0},{small*10000.f,small*1e-37f,small},i%23?small:0};
+      colors->pixels[i]={uint8_t(i),uint8_t(i*37),uint8_t(i*73),uint8_t(i*11)};
+    }
+    layer.emission_tiles[tile]=PaintEmissionTile::pack(light);
+    layer.pbr_tiles[tile]=std::move(colors);
+  }
+  compare();
+  bool cancelled=false;
+  try{gpu.read(layer,extent,1,footprint,[]{return true;});}
+  catch(const std::runtime_error &){cancelled=true;}
+  check(cancelled,"Mapped UV paint must respect worker cancellation");
+  compare();
+  std::cout<<"PASS mapped UV paint exact common bytes, coverage, masks, FLOAT and prepared color "<<3*probes<<" texels\n";
 }
 
 void compare_finite(Fixture fixture,uint32_t extent,bool original){
@@ -662,6 +724,7 @@ int main(int argc,char **argv)try{
   if(argc>1&&std::string_view(argv[1])=="--finite"){
     compare_bake_uv();
     compare_bake_uv_maps();
+    compare_uv_layers();
     compare_finite(Fixture::BakeOnly,512,false);
     compare_finite(Fixture::LegacyBake,256,false);
     compare_finite(Fixture::Paint,512,true);

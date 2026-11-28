@@ -259,7 +259,8 @@ Sample pixel(const StoredPixel &stored,bool read_pbr=true,bool read_emission=tru
   }
   return s;
 }
-paint_grid::Pixel grid_layer_pixel(const PaintLayer &layer,uint32_t r,uint32_t x,uint32_t y) {
+paint_grid::Pixel grid_layer_pixel(const PaintLayer &layer,uint32_t r,uint32_t x,uint32_t y,
+                                   bool read_legacy_emission=false) {
   const auto tile=size_t(y/32)*(r/32)+x/32,offset=size_t(y%32)*32+x%32;
   paint_grid::Pixel p;
   if(const auto &common=layer.tiles[tile]) {
@@ -276,8 +277,8 @@ paint_grid::Pixel grid_layer_pixel(const PaintLayer &layer,uint32_t r,uint32_t x
       p.present|=2;
     }else std::copy_n(p.values,4,p.values+9);
   }
-  if(!layer.emission_tiles.empty()) {
-    const auto &plane=layer.emission_tiles[tile];
+  if(read_legacy_emission||!layer.emission_tiles.empty()) {
+    const auto *plane=layer.emission_tiles.empty()?nullptr:layer.emission_tiles[tile].get();
     if(plane) {
       const auto light=plane->texel(offset);
       for(unsigned c=0;c<3;++c) {
@@ -945,6 +946,94 @@ FilteredPaintTexel filter_paint_layer(const PaintLayer &layer,uint32_t resolutio
     for (size_t k = 0; k < result.pbr.size(); ++k)
       result.pbr[k] = byte(k < 3 ? encoded(source.pbr[k]) : source.pbr[k]);
   return result;
+}
+
+struct PaintLayerUvFilter::Impl {
+  struct Entry { uint32_t texel=UINT32_MAX,staged=0; };
+  const size_t capacity;
+  paint_grid::Filter device;
+  std::vector<Entry> addresses;
+  std::vector<paint_grid::Pixel> input,output;
+  std::vector<paint_grid::MappedTaps> taps;
+  std::vector<FilteredPaintTexel> result;
+  explicit Impl(size_t count):capacity(count),device(grid_tables(),count),addresses(std::bit_ceil(8*count)){
+    input.reserve(count*4);
+    output.reserve(count);
+    taps.reserve(count);
+    result.reserve(count);
+  }
+};
+size_t PaintLayerUvFilter::staging_bytes(size_t capacity){
+  static_assert(max_batch==paint_grid::max_mapped_pixels);
+  if(!capacity||capacity>max_batch)throw std::invalid_argument("Invalid mapped UV paint staging capacity");
+  return sizeof(Impl)+sizeof(paint_grid::Tables)+
+      2*capacity*(5*sizeof(paint_grid::Pixel)+sizeof(paint_grid::MappedTaps))+
+      capacity*sizeof(FilteredPaintTexel)+std::bit_ceil(8*capacity)*sizeof(Impl::Entry);
+}
+PaintLayerUvFilter::PaintLayerUvFilter(size_t capacity){
+  staging_bytes(capacity);
+  impl_=std::make_unique<Impl>(capacity);
+}
+PaintLayerUvFilter::~PaintLayerUvFilter()=default;
+std::span<const FilteredPaintTexel> PaintLayerUvFilter::read(const PaintLayer &layer,uint32_t resolution,
+    size_t count,const Footprint &footprint,const std::function<bool()> &cancelled){
+  auto &state=*impl_;
+  if(!count||count>state.capacity||!footprint||resolution<64||resolution>2048||resolution%32||
+     layer.tiles.size()!=size_t(resolution/32)*(resolution/32))
+    throw std::invalid_argument("Invalid mapped UV paint footprint");
+  paint_grid::checkpoint(cancelled);
+  state.input.clear();
+  state.output.resize(count);
+  state.taps.resize(count);
+  state.result.resize(count);
+  std::fill(state.addresses.begin(),state.addresses.end(),Impl::Entry{});
+  const auto address_mask=state.addresses.size()-1;
+  const auto key_shift=32-std::countr_zero(state.addresses.size());
+  for(size_t i=0;i<count;++i){
+    if((i&255)==0)paint_grid::checkpoint(cancelled);
+    auto &mapped=state.taps[i];
+    mapped={};
+    Taps taps;
+    if(!footprint(i,taps))continue;
+    mapped.covered=true;
+    for(size_t tap=0;tap<taps.size();++tap){
+      if(taps[tap].weight==0)continue;
+      if(taps[tap].texel>=size_t(resolution)*resolution)throw std::invalid_argument("Mapped paint texel is outside the source atlas");
+      const auto texel=uint32_t(taps[tap].texel);
+      size_t slot=(texel*2654435761u)>>key_shift;
+      while(state.addresses[slot].texel!=UINT32_MAX&&state.addresses[slot].texel!=texel)
+        slot=(slot+1)&address_mask;
+      auto &entry=state.addresses[slot];
+      if(entry.texel==UINT32_MAX){
+        entry={texel,uint32_t(state.input.size())};
+        state.input.push_back(grid_layer_pixel(layer,resolution,texel%resolution,texel/resolution,true));
+      }
+      mapped.texels[tap]=entry.staged;
+      mapped.weights[tap]=word(taps[tap].weight);
+    }
+  }
+  auto layout=layer_layout(layer);
+  // The legacy FLOAT fallback participates in the original tile-presence
+  // test even when the archive has no independent FLOAT plane.
+  layout.floats=paint_grid::FloatPlane::UnassociatedPaint;
+  state.device.run_mapped(layout,state.input,state.taps,state.output,cancelled);
+  for(size_t i=0;i<count;++i){
+    if((i&255)==0)paint_grid::checkpoint(cancelled);
+    const auto &in=state.output[i];
+    auto &out=state.result[i];
+    std::copy_n(in.values,9,out.common.data.data());
+    std::copy_n(in.coverage,4,out.common.data.data()+9);
+    out.common.data[13]=in.mask;
+    std::copy_n(in.values+9,4,out.pbr.begin());
+    out.pbr_present=in.present&2;
+    out.emission.coverage=std::clamp(std::bit_cast<float>(in.emission[6]),0.f,1.f);
+    for(size_t k=0;k<3;++k){
+      out.emission.legacy[k]=std::clamp(std::bit_cast<float>(in.emission[k]),0.f,1.f);
+      out.emission.physical[k]=std::clamp(std::bit_cast<float>(in.emission[k+3]),0.f,maximum_native_emission);
+    }
+    out.emission.validate();
+  }
+  return state.result;
 }
 
 std::vector<PaintLayer> resample_texture_set_layers(

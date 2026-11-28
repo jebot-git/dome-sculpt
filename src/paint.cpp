@@ -4847,40 +4847,71 @@ std::shared_ptr<PaintedMesh> SourcePaintAccess::transfer_bake_uv(const PaintedMe
     result->layers_.reserve(source.layers_.size());
     const auto tile_count=surface.tiles.size();
     constexpr uint32_t side=PaintTile::size;
+    constexpr size_t tile_pixels=side*side;
+    const auto texel_at=[&](size_t tile,size_t within)->const auto &{
+      const size_t top=tile/surface.columns*side,left=tile%surface.columns*side;
+      return surface.texels[(top+within/side)*r+left+within%side];
+    };
+    std::unique_ptr<detail::PaintLayerUvFilter> layer_gpu;
+    size_t tiles_per_batch=1;
     for(const auto &layer:source.layers_){
       auto &destination=result->layers_.emplace_back(PaintLayer{layer.id,layer.name,layer.visible,layer.opacity,
           std::vector<std::shared_ptr<const PaintTile>>(tile_count),{}, {}});
       if(std::ranges::none_of(layer.tiles,[](const auto &tile){return bool(tile);}))continue;
       const bool physical=!layer.emission_tiles.empty();
       if(physical)destination.emission_tiles.resize(tile_count);
-      for(size_t tile=0;tile<tile_count;++tile){
+      if(!layer_gpu&&compute_backend()!="CPU"){
+        tiles_per_batch=std::min(tile_count,detail::PaintLayerUvFilter::max_batch/tile_pixels);
+        while(tiles_per_batch>1&&detail::PaintLayerUvFilter::staging_bytes(tiles_per_batch*tile_pixels)>remaining/2)
+          tiles_per_batch/=2;
+        reserve(detail::PaintLayerUvFilter::staging_bytes(tiles_per_batch*tile_pixels));
+        layer_gpu=std::make_unique<detail::PaintLayerUvFilter>(tiles_per_batch*tile_pixels);
+      }
+      for(size_t first=0;first<tile_count;first+=tiles_per_batch){
         stop();
-        std::shared_ptr<PaintTile> common;
-        PaintEmissionTile::Pixels floats{};
-        bool has_float=false;
-        const size_t top=tile/surface.columns*side,left=tile%surface.columns*side;
-        for(size_t n=0;n<side*side;++n){
-          const auto &texel=surface.texels[(top+n/side)*r+left+n%side];
-          if(!texel.covered())continue;
-          visit(16);
-          auto sample=detail::filter_paint_layer(layer,r,taps_at(texel));
-          if(physical){
-            sample.common.data[12]=byte(sample.emission.coverage);
-            for(size_t k=0;k<3;++k)sample.common.data[k+6]=byte(linear_to_srgb(sample.emission.legacy[k]));
-            floats[n]=sample.emission;
-            has_float|=sample.emission!=PaintEmissionValue{};
-          }
-          if(sample.common==PaintPixel{}&&sample.emission==PaintEmissionValue{})continue;
-          if(!common){reserve(sizeof(PaintTile));common=std::make_shared<PaintTile>();}
-          common->pixels[n]=sample.common;
+        const auto count=std::min(tiles_per_batch,tile_count-first);
+        std::span<const detail::FilteredPaintTexel> filtered;
+        if(layer_gpu){
+          filtered=layer_gpu->read(layer,r,count*tile_pixels,[&](size_t at,auto &taps){
+            const auto &texel=texel_at(first+at/tile_pixels,at%tile_pixels);
+            if(!texel.covered())return false;
+            visit(16);
+            taps=taps_at(texel);
+            return true;
+          },options.cancelled);
         }
-        destination.tiles[tile]=std::move(common);
-        if(has_float){
-          const auto largest=PaintEmissionTile::maximum_storage_bytes();
-          reserve(largest);
-          const auto field=PaintEmissionTile::pack(floats);
-          remaining+=largest-field->storage_bytes();
-          destination.emission_tiles[tile]=field;
+        for(size_t tile=first;tile<first+count;++tile){
+          stop();
+          std::shared_ptr<PaintTile> common;
+          PaintEmissionTile::Pixels floats{};
+          bool has_float=false;
+          for(size_t n=0;n<tile_pixels;++n){
+            const auto &texel=texel_at(tile,n);
+            if(!texel.covered())continue;
+            detail::FilteredPaintTexel sample;
+            if(layer_gpu)sample=filtered[(tile-first)*tile_pixels+n];
+            else{
+              visit(16);
+              sample=detail::filter_paint_layer(layer,r,taps_at(texel));
+            }
+            if(physical){
+              sample.common.data[12]=byte(sample.emission.coverage);
+              for(size_t k=0;k<3;++k)sample.common.data[k+6]=byte(linear_to_srgb(sample.emission.legacy[k]));
+              floats[n]=sample.emission;
+              has_float|=sample.emission!=PaintEmissionValue{};
+            }
+            if(sample.common==PaintPixel{}&&sample.emission==PaintEmissionValue{})continue;
+            if(!common){reserve(sizeof(PaintTile));common=std::make_shared<PaintTile>();}
+            common->pixels[n]=sample.common;
+          }
+          destination.tiles[tile]=std::move(common);
+          if(has_float){
+            const auto largest=PaintEmissionTile::maximum_storage_bytes();
+            reserve(largest);
+            const auto field=PaintEmissionTile::pack(floats);
+            remaining+=largest-field->storage_bytes();
+            destination.emission_tiles[tile]=field;
+          }
         }
       }
     }

@@ -278,25 +278,46 @@ __global__ void grid_pixels(Batch batch,Layout layout,const Tables *tables,
   const size_t i=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
   if(i<count)output[i]=filter(i,batch,layout,*tables,input);
 }
+__global__ void mapped_grid_pixels(Layout layout,const Tables *tables,const Pixel *input,
+                                   const MappedTaps *taps,Pixel *output,size_t count) {
+  const size_t i=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+  if(i<count)output[i]=filter_mapped(taps[i],layout,*tables,input);
+}
 }
 struct Filter::Impl {
   Buffer<Tables> tables{1};
-  Buffer<Pixel> input{max_input_pixels},output{max_output_pixels};
-  explicit Impl(const Tables &host) {
+  const size_t mapped;
+  Buffer<Pixel> input{mapped?mapped*4:max_input_pixels},output{mapped?mapped:max_output_pixels};
+  Buffer<MappedTaps> taps{mapped};
+  explicit Impl(const Tables &host,size_t count):mapped(mapped_capacity(count)) {
     checked(DS_COPY(tables.data,&host,sizeof(host),DS_TO_DEVICE));
   }
 };
-Filter::Filter(const Tables &tables):impl_(std::make_unique<Impl>(tables)){}
+Filter::Filter(const Tables &tables,size_t count):impl_(std::make_unique<Impl>(tables,count)){}
 Filter::~Filter()=default;
 void Filter::run(const Batch &batch,const Layout &layout,std::span<const Pixel> input,
                  std::span<Pixel> output,const std::function<bool()> &cancelled) {
   validate(batch,layout,input.size(),output.size());
+  if(impl_->mapped)throw std::logic_error("Expected a paint-grid rectangle filter");
   checkpoint(cancelled);
   auto &gpu=*impl_;
   checked(DS_COPY(gpu.input.data,input.data(),input.size_bytes(),DS_TO_DEVICE));
   constexpr unsigned block=128;
   grid_pixels<<<(output.size()+block-1)/block,block>>>(batch,layout,gpu.tables.data,
       gpu.input.data,gpu.output.data,output.size());
+  checked(DS_LAST_ERROR());
+  checked(DS_COPY(output.data(),gpu.output.data,output.size_bytes(),DS_TO_HOST));
+  checkpoint(cancelled);
+}
+void Filter::run_mapped(const Layout &layout,std::span<const Pixel> input,std::span<const MappedTaps> taps,
+                        std::span<Pixel> output,const std::function<bool()> &cancelled){
+  auto &gpu=*impl_;
+  validate_mapped(layout,taps,input.size(),output.size(),gpu.mapped,cancelled);
+  if(!input.empty())checked(DS_COPY(gpu.input.data,input.data(),input.size_bytes(),DS_TO_DEVICE));
+  checked(DS_COPY(gpu.taps.data,taps.data(),taps.size_bytes(),DS_TO_DEVICE));
+  constexpr unsigned block=128;
+  mapped_grid_pixels<<<(output.size()+block-1)/block,block>>>(layout,gpu.tables.data,
+      gpu.input.data,gpu.taps.data,gpu.output.data,output.size());
   checked(DS_LAST_ERROR());
   checked(DS_COPY(output.data(),gpu.output.data,output.size_bytes(),DS_TO_HOST));
   checkpoint(cancelled);

@@ -120,15 +120,25 @@ Result composite(const Input &in,const std::function<bool()> &cancelled){
 }
 
 namespace dome::paint_grid {
-struct Filter::Impl { Tables tables; };
-Filter::Filter(const Tables &tables):impl_(std::make_unique<Impl>(Impl{tables})){}
+struct Filter::Impl { Tables tables; size_t mapped=0; };
+Filter::Filter(const Tables &tables,size_t count):impl_(std::make_unique<Impl>(Impl{tables,mapped_capacity(count)})){}
 Filter::~Filter()=default;
 void Filter::run(const Batch &batch,const Layout &layout,std::span<const Pixel> input,
                  std::span<Pixel> output,const std::function<bool()> &cancelled) {
   validate(batch,layout,input.size(),output.size());
+  if(impl_->mapped)throw std::logic_error("Expected a paint-grid rectangle filter");
   for(size_t i=0;i<output.size();++i) {
     if((i&255)==0)checkpoint(cancelled);
     output[i]=filter(i,batch,layout,impl_->tables,input.data());
+  }
+  checkpoint(cancelled);
+}
+void Filter::run_mapped(const Layout &layout,std::span<const Pixel> input,std::span<const MappedTaps> taps,
+                        std::span<Pixel> output,const std::function<bool()> &cancelled){
+  validate_mapped(layout,taps,input.size(),output.size(),impl_->mapped,cancelled);
+  for(size_t i=0;i<output.size();++i){
+    if((i&255)==0)checkpoint(cancelled);
+    output[i]=filter_mapped(taps[i],layout,impl_->tables,input.data());
   }
   checkpoint(cancelled);
 }

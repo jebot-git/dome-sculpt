@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "dome/texture-set-resolution.hpp"
+#include <functional>
 namespace dome::detail {
 struct PaintBilinearTap {
   size_t texel = 0;
@@ -16,6 +17,19 @@ std::array<PaintBilinearTap,4> paint_bilinear_taps(uint32_t resolution,
     std::array<float,2> uv,std::span<const int32_t> padding,bool require_padding_owner=false);
 FilteredPaintTexel filter_paint_layer(const PaintLayer &,uint32_t resolution,
     const std::array<PaintBilinearTap,4> &);
+class PaintLayerUvFilter {
+  struct Impl;
+  std::unique_ptr<Impl> impl_;
+public:
+  using Taps=std::array<PaintBilinearTap,4>;
+  using Footprint=std::function<bool(size_t,Taps &)>;
+  static constexpr size_t max_batch=8192;
+  static size_t staging_bytes(size_t capacity);
+  explicit PaintLayerUvFilter(size_t capacity);
+  ~PaintLayerUvFilter();
+  std::span<const FilteredPaintTexel> read(const PaintLayer &,uint32_t resolution,size_t count,
+    const Footprint &,const std::function<bool()> &);
+};
 
 bool can_resize_native_texture_grid(const SculptObject &) noexcept;
 bool can_resize_retained_texture_grid(const TextureSetView &) noexcept;
