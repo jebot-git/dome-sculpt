@@ -153,10 +153,15 @@ The native package verifies retained triangle and writable UV ownership,
 replays FLOAT32 rows and preserves the original texture sampling for other
 roles. The GPU resolves varying original emission on the writable atlas
 using the original transform, wrap and level-zero filter. The static GLB
-fallback is bounded by the atlas resolution. Typed MToon and prepared
-source Bake HDR remain open.
+fallback is bounded by the atlas resolution.
 [Same-surface Standard HDR evidence](validation/single-surface-hdr-20261128.json)
 [Varying source HDR evidence](validation/varying-source-hdr-20261128.json)
+
+Prepared Core PBR HDR bakes compile color and ORM with GPU compositing
+and emit a rest-pose normal map in their retained tangent frame. The
+native package preserves the donor, exact FLOAT Bake and editable layers.
+Typed MToon and baked normals without a retained tangent frame remain open.
+[Prepared source Bake HDR evidence](validation/baked-source-hdr-20261128.json)
 
 ## Current validation — 2026-11-27
 

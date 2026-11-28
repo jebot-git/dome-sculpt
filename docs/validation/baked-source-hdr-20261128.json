@@ -1,0 +1,83 @@
+{
+  "date": "2026-11-28",
+  "product": "3aa1adb20ca61a76f7e12d12197849aa39fdd7f9",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Standard GLB for prepared Core PBR Bake with exact retained FLOAT emission and source tangent frames.",
+  "baseline": "The same genuine partial Bake produced a valid native scene and failed Standard GLB preparation before the fix.",
+  "real_bake_fixture": {
+    "partial_donor_projection": true,
+    "live_physical_touch_up": true,
+    "source_emission_and_normal_uv": 1,
+    "portable_material_uv": 2,
+    "emission_package": 7,
+    "float_interchange_version": 2,
+    "morph_preserved": true
+  },
+  "tangent_projection": "Resolve the original and baked normals in the rest pose and encode them in the tangent frame retained by the GLB.",
+  "exact_native_round_trip": true,
+  "arc": {
+    "device": "Intel Arc A770 with oneAPI Level Zero and hardware EGL",
+    "checks": 557,
+    "maximum_pixel_difference_bytes": 1,
+    "material_and_emission_kernels": true
+  },
+  "release_ctest": [
+    "baked-emission-native",
+    "emission-raster-finite-compute",
+    "source-material-raster-compute",
+    "emission-raster-mapped-compute",
+    "emission-raster-mapped-missing-gpu",
+    "emission-raster-texture-set-compute",
+    "baked-emission-workflow",
+    "baked-emission-source",
+    "baked-emission-uv1-worker",
+    "emission-export",
+    "emission-export-worker",
+    "source-paint-export",
+    "source-paint-bake",
+    "source-paint-authoring",
+    "source-paint-physical-authoring",
+    "vrm1-source-export",
+    "raw-hdr-authoring",
+    "xr-editable-export"
+  ],
+  "asan_ubsan": {
+    "mode": "opt-in headless CPU reference",
+    "checks": 557,
+    "glb_matches_arc": true
+  },
+  "missing_gpu": "Release CLI rejected the actual prepared Bake project and preserved the existing GLB.",
+  "additional_gpu_builds": {
+    "cuda": "backend and host adapter compiled",
+    "rocm": "backend and host adapter compiled"
+  },
+  "native_wayland": {
+    "checks": 7,
+    "artifact_sha256": "7a8d9dd3f41218ef527fe2fed9346a0607ca554d28ea1b10b2e328f939c95729"
+  },
+  "openxr": {
+    "checks": 10,
+    "synthetic_tracking": true,
+    "artifact_sha256": "7a8d9dd3f41218ef527fe2fed9346a0607ca554d28ea1b10b2e328f939c95729",
+    "native_sha256": "744117472142fa7d3a226793c4c0ea81076f332af910bfb4027d35085ecba981"
+  },
+  "khronos": {
+    "validator": "2.0.0-dev.3.10",
+    "bytes": 429584,
+    "sha256": "7a8d9dd3f41218ef527fe2fed9346a0607ca554d28ea1b10b2e328f939c95729",
+    "errors": 0,
+    "warnings": 0
+  },
+  "prior_glbs_byte_identical": {
+    "varying-source-hdr.glb": "497b70223ba5aeb39e6556950e824b471cc39714ff83de0966c42081cfaf9cc6",
+    "single-surface-hdr.glb": "54fe8dccaaf6fc0ba69ace992aade6199eaea18b60dc5aa19d6bd6a444527971",
+    "mixed-source.glb": "ff769fff8afebfb62309e67abf0bc5efc1843dc13151d909bb2d981ebe9c84fa",
+    "mixed-source-hidden.glb": "484678692c4aad88173eb79876d79241c09895fa3faf1a52c04020612a689f5d",
+    "spatial-color.glb": "e68f51a66633e6f97b50b960578072e9968b38851e87419a4027ff42e54824a0",
+    "uniform-mask-cross.glb": "98e526883365742fef5b60880641cb918d3f4b761424f88089ab9c3a948b1b9a"
+  },
+  "open": [
+    "Default GLB for typed MToon, source Bake normals without a retained tangent frame and unresolved varying MASK alpha.",
+    "Physical headset and CUDA and ROCm hardware qualification."
+  ]
+}

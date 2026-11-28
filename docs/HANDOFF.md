@@ -513,9 +513,19 @@ while composing the exact FLOAT paint planes. The exported PNG is a static
 view at the authored atlas resolution. The editable project keeps the full
 original texture and sampler. A mirrored UV1 fixture with rotation and
 partial paint matches an independent FLOAT sampler and renders within one
-output byte of the native preview on Arc. Typed MToon and prepared source
-Bake HDR remain open.
+output byte of the native preview on Arc.
 [Varying source HDR evidence](validation/varying-source-hdr-20261128.json)
+
+Standard GLB now supports prepared Core PBR HDR bakes with a retained
+tangent frame. A partial donor bake with source UV1 normal and emissive
+textures, baked PBR channels and a live physical touch-up exports through
+the same writable atlas. The GPU resolves the FLOAT rows and composites
+the other baked material maps. Rest-pose normal encoding uses the original
+emitted tangent frame. The native package preserves its exact donor,
+recipe, morph and layers. The independent consumer matches the native
+preview within one output byte on Arc. Prepared typed MToon, baked normals
+without a retained tangent frame and unproved MASK alpha remain open.
+[Prepared source Bake HDR evidence](validation/baked-source-hdr-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
