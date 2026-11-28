@@ -1,0 +1,184 @@
+{
+  "date": "2026-11-28",
+  "product": "62f053c9c7541ee761231bd89fd052f0021d6a87",
+  "preceding": "256a9d7858a6e518cba7035381788d93823c7323",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Strict authored corner matching for Exact authored reflection and Relative artist-frame conversion. Replays use one correspondence across preflight and the actual ordered role endpoints for the same basis, plane and tolerance.",
+  "intel_arc_a770": {
+    "render_node": "/dev/dri/renderD129",
+    "application_sha256": "f37be65ecca34ecae381357052c06f314453e6b644b78c3c0d35d852619c8b2c",
+    "release": {
+      "tests": [
+        "key-mirror-correspondence",
+        "independent-seam-key-mirror-retained",
+        "key-mirror-vertex",
+        "key-mirror-relative-kernel",
+        "xr-mirror-control-faults",
+        "xr-mirror-controls",
+        "independent-seam-key-mirror-prepared",
+        "key-mirror-relative-owning",
+        "application-missing-gpu",
+        "key-mirror-missing-gpu",
+        "key-mirror-correspondence-missing-gpu",
+        "key-mirror-refinement",
+        "shapekey-mirror-openxr"
+      ],
+      "log_sha256": "60ccbabd5be2daa93a14f52957ac9b56f888b9a50dfd9eeee3433ec5013afea7"
+    },
+    "nested_domed_wayland": {
+      "checks": 10,
+      "report_sha256": "f53780ad04c1573bf2950b1655d2385725cbdb1df6564cc6fa9383a08818e2e4",
+      "compute_trace_sha256": "278e4886355d97ed45a463050b8bf43746b94f9b113d712771a3aa6529be1083",
+      "kernel": "key_mirror::MirrorTriangles",
+      "explicit_selection_screenshot_sha256": "4d03c263afb9aa3bae1c5e06b31a39bf6f7ee38350224e92267f996e64bd3a7d",
+      "project_sha256": "7d498b501b9bbf2415bf1f46f1c0330929d349cabe355721cf98a5397c9d5140"
+    },
+    "openxr": {
+      "checks": 40,
+      "physical_headset": false,
+      "projects_identical_to_prior_release": {
+        "accept-0.dsculpt": "cf3a4871e1d88af8e8313ba2772e406fef16e5c9bbbf2129b9be5347437e3992",
+        "accept-1.dsculpt": "6a5ce46bca85bcde074bc2251b1ddf69684d6a3b1336aeb83ff2b0db3b481080",
+        "accept-2.dsculpt": "16ea54370d05fb55095be502ff9926c03c06e953f724b123304b080f361b0451",
+        "cancel-0.dsculpt": "8e16ca54b46ba261d92562c5aa0667c14121df4db80cd233367e66799910d23d",
+        "focus-0.dsculpt": "8e16ca54b46ba261d92562c5aa0667c14121df4db80cd233367e66799910d23d",
+        "source.dsculpt": "8e16ca54b46ba261d92562c5aa0667c14121df4db80cd233367e66799910d23d"
+      }
+    },
+    "relative_native_archive_sha256": "65787b17d6bd78403b4e599bd81b7beda1a4eb4b1e9d61f36a8335c14000a147",
+    "allocation_faults": {
+      "scope": "Persistent C++ allocation prefix denial within the executable. GPU libraries use their own allocators.",
+      "exact_prefixes": 4816,
+      "relative_prefixes": 4814,
+      "exact_log_sha256": "eb6bbb4063f787482d7b01804d799717e25ac80167460f6829500811b6f71884",
+      "relative_log_sha256": "bbbc6eee1c0069623393a4c6dea5c6dd2e5d10bffa8cf34e8fed1b78b555845d"
+    },
+    "matching_benchmark": {
+      "fixture": "Deterministically shuffled reflected triangle pairs with independent corners. Every run checks the complete map against a known corner order and verifies zero rest error.",
+      "scope": "Directory construction, device transfers, candidate tests and complete host verification. Timed with the same Release compiler. The GPU driver cache was already warm.",
+      "runs": [
+        {
+          "triangles": 512,
+          "host": {
+            "first_ms": 0.316483,
+            "warm_ms": [
+              0.287802,
+              0.284466,
+              0.280008,
+              0.274564,
+              0.271276
+            ],
+            "warm_median_ms": 0.280008,
+            "log_sha256": "22a70528d012f79d3479b75c505e027c04539b972851f7cbbc91ee584251b8ac"
+          },
+          "gpu": {
+            "first_ms": 62.2002,
+            "warm_ms": [
+              0.466094,
+              0.33073,
+              0.632625,
+              0.293893,
+              0.302196
+            ],
+            "warm_median_ms": 0.33073,
+            "log_sha256": "aa28444498483348955e168b6a979af48e31796011299a200fc99a8384ec6dbd"
+          }
+        },
+        {
+          "triangles": 32768,
+          "host": {
+            "first_ms": 28.941,
+            "warm_ms": [
+              26.9339,
+              26.6153,
+              28.4615,
+              26.9654,
+              27.0713
+            ],
+            "warm_median_ms": 26.9654,
+            "log_sha256": "123565c6e250af41a087df103bb9de8ed8905d71be658a2a76e856a0294f2ea2"
+          },
+          "gpu": {
+            "first_ms": 72.2261,
+            "warm_ms": [
+              7.14862,
+              7.10126,
+              8.15762,
+              7.68328,
+              7.11341
+            ],
+            "warm_median_ms": 7.14862,
+            "log_sha256": "83586cfb3f3ea24535b425c8623802eed2f8d7e924e654c10477978c109084b3"
+          }
+        },
+        {
+          "triangles": 180000,
+          "host": {
+            "first_ms": 327.614,
+            "warm_ms": [
+              334.212,
+              373.77,
+              353.51,
+              312.63,
+              330.343
+            ],
+            "warm_median_ms": 334.212,
+            "log_sha256": "aaf614e7db031195d2a40de3789c6918b43e004ac5a56a5b8ee7b7e8a6a2f658"
+          },
+          "gpu": {
+            "first_ms": 113.834,
+            "warm_ms": [
+              45.1835,
+              49.5103,
+              47.38,
+              47.4172,
+              48.1172
+            ],
+            "warm_median_ms": 47.4172,
+            "log_sha256": "c4a81a8e66d4b0aedca5385ee23449950688e96be7596b7f383150da298f77ce"
+          }
+        }
+      ]
+    }
+  },
+  "headless_reference": {
+    "tests": [
+      "cpu-reference-install-refused",
+      "key-mirror-vertex",
+      "key-mirror-correspondence",
+      "key-mirror-relative-kernel"
+    ],
+    "log_sha256": "4f0b5a49a8cb84b172dfdff3ca43be621d8a3e45de2303f01a2eeb8a61bb7db7"
+  },
+  "scoped_asan_ubsan": {
+    "leak_detection": false,
+    "instrumented": [
+      "key-mirror-correspondence.cpp",
+      "normal-key-derivation.cpp",
+      "tests/key-mirror-correspondence.cpp",
+      "tests/key-mirror-relative-owning.cpp"
+    ],
+    "correspondence_checks": 58,
+    "owning_checks": 22,
+    "correspondence_log_sha256": "f9bf79af3a2e1038625863311660314c5447d9a9a6e87dafb5a1360a3b923caa",
+    "owning_log_sha256": "07bda9bd53f58c9a4b99ca17fac26ec8b486447701bb365d39b186c53d2dc752"
+  },
+  "vendor_probes": {
+    "cuda": {
+      "shared_kernel_compiled": true,
+      "native_mirror_worker_linked": true,
+      "unavailable_device_refused": true,
+      "positive_hardware_tested": false,
+      "kernel_object_sha256": "d01cb8c897f971c525e23477fd3fb033aa295a1945ce9ce3c6b8e2efe02781c1",
+      "probe_log_sha256": "aafe490ed536831f4c6f2980f375798304c9c4929fc7b83f9270fa792447c88c"
+    },
+    "rocm": {
+      "shared_kernel_compiled": true,
+      "native_mirror_worker_linked": true,
+      "unavailable_device_refused": true,
+      "positive_hardware_tested": false,
+      "kernel_object_sha256": "971808cb64b00243b840ac21701319928c9b70a2410cbb23a8c389861642f87b",
+      "probe_log_sha256": "01779997c00b20f7f9bb1ad99b2e00319de4edeb74a557c9c1fe2d48ba5d8d7b"
+    }
+  }
+}

@@ -162,6 +162,19 @@ devices in direct probes. Actual positive vendor runs and physical XR remain
 open.
 [Vertex-position Mirror evidence](validation/key-mirror-gpu-20261128.json)
 
+Exact authored and relative artist-frame Mirror now search triangle centroids
+and test reversed corner order on the selected GPU. The device returns the
+first source corner and squared rest error. The worker verifies unique vertex
+partitions and complete corner and vertex involutions. One replay reuses the
+map across preflight and artist roles that share the same rest basis, plane and
+tolerance. Native DomeD Wayland passes Apply, Save, Cancel, Undo and Redo for an
+independent seam. Six synthetic OpenXR projects and the native relative-frame
+archive match the preceding scalar captures byte for byte. On Arc, the median
+warm matching time for 180,000 triangles is 47 ms, down from 334 ms. CUDA and
+ROCm compile and refuse absent devices in direct probes. Physical headset and
+positive AMD and NVIDIA execution remain open.
+[Authored corner Mirror evidence](validation/key-mirror-authored-gpu-20261128.json)
+
 Ambient occlusion in Bake now traces the biased hemisphere on the selected
 GPU against the existing immutable source BVH. The device returns one
 blocked-ray count per projected texel. Long traversals resume on the device

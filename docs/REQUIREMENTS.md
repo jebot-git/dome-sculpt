@@ -23,6 +23,16 @@ the headless numerical reference and scoped host sanitizers. Positive AMD and
 NVIDIA execution and physical XR still require qualification.
 [Vertex-position Mirror evidence](validation/key-mirror-gpu-20261128.json)
 
+Exact authored and relative artist-frame Mirror use the selected GPU for
+resident centroid queries and reversed-corner tests. The search retains
+binary64 radius and rest error, ambiguity/refinement diagnostics, bounded
+continuations and exact work accounting for successful operations. Ordered
+host proof checks protect the vertex partition, involution and archive replay.
+Topology that requires triangle refinement still receives a refinement
+diagnostic. Native Wayland, synthetic OpenXR and the headless reference cover
+the current authored workflows.
+[Authored corner Mirror evidence](validation/key-mirror-authored-gpu-20261128.json)
+
 Bake traces ambient occlusion on the selected GPU through the native
 source BVH. It preserves the original biased cosine hemisphere, inclusive
 ray distance and ordered native output. Continuation batches poll for
