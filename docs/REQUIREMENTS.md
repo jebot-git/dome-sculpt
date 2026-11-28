@@ -170,8 +170,16 @@ normal and POSITION targets remain intact.
 Prepared Core PBR HDR Bake preserves varying MASK alpha where the compiler
 can bound native and emitted visibility over each entire triangle. The
 export can keep distinct visible and hidden triangles in a single material.
-Cutout edges within a triangle and prepared typed MToon remain open.
+Cutout edges within a triangle remain open.
 [Baked MASK evidence](validation/baked-mask-20261128.json)
+
+Static imported MToon 1.0 with a prepared atlas now exports physical and
+relative emission paint to Standard GLB. The selected GPU resolves the
+original UV0 or UV1 emission role with the existing source sampler. The GLB
+retains the typed shading and normal roles and displays the compiled atlas
+after a portable re-import. Full typed Bake, painted color, and animated
+emission transport remain open.
+[Prepared MToon emission evidence](validation/prepared-mtoon-hdr-20261128.json)
 
 ## Current validation — 2026-11-27
 

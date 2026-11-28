@@ -540,8 +540,16 @@ The compiler bounds the actual atlas taps and texture alpha, including tighter
 source bounds for clamped non-mipmapped roles. Arc fixtures cover whole
 meshes that pass or fail and mixed geometry with both visible and hidden
 triangles. A real interior cutout edge still requires a portable adapter.
-Prepared typed MToon remains open.
 [Baked MASK evidence](validation/baked-mask-20261128.json)
+
+Static imported MToon1 with a prepared writable atlas now exports physical
+and material-relative emission paint in Standard GLB. The GPU resolves
+the original transformed UV0 or UV1 image with ordered FLOAT paint and the
+original strength. The emitted material keeps its shade, rim, normal and
+morph data. The OpenGL viewport displays the portable file using the
+emission atlas on UV2. Prepared MToon color and normal Bake, animated
+emission and the legacy VRM0 shared-UV adapter remain open.
+[Prepared MToon emission evidence](validation/prepared-mtoon-hdr-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with

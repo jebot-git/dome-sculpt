@@ -42,7 +42,17 @@ affine UV footprint. The compiler checks the padded PNG taps and original
 vertex alpha against the cutoff. It can move the cutoff within a proven gap
 to account for quantization. Cutout edges within a triangle still require a
 portable representation with a continuous visibility proof. Prepared typed
-MToon still needs its own material and normal adapter.
+MToon Bake still needs its own color and normal adapters.
+
+Static imported MToon 1.0 can carry physical and material-relative emission
+paint into Standard GLB. The exporter maps writable texels through the
+actual original UV0 or UV1 and the typed emission transform. The selected
+GPU samples the original image and resolves the premultiplied paint with
+the authored emission strength. The GLB keeps the original MToon roles and
+uses the writable atlas for the resulting emissive texture. The native
+package retains the original sampling, all FLOAT coefficients, and the
+editable layers. Dome Sculpt can display a portable re-import that uses
+an additional retained UV set for the compiled emissive texture.
 
 ## First GLB implementation
 

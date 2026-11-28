@@ -1,0 +1,145 @@
+{
+  "date": "2026-11-28",
+  "product": "a88f65738703bf7d1c5296ffd4d952172a5eec48",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Standard GLB emission for static imported MToon1 with a prepared writable atlas.",
+  "baseline": "The preceding release refused the same actual prepared scene and preserved a pre-existing GLB.",
+  "typed_roles": [
+    "base",
+    "shade",
+    "normal",
+    "rim",
+    "emission"
+  ],
+  "source_transform": "Original rotated and scaled texture with an explicit KHR_texture_transform UV override.",
+  "emission": "Original sampled radiance and ordered material-relative and absolute paint. The original MToon strength scales material-relative coefficients only.",
+  "native_project_round_trip_exact": true,
+  "fixtures": {
+    "prepared-mtoon-hdr-uv0": {
+      "original_emissive_uv": 0,
+      "writable_emissive_uv": 2,
+      "maximum_pixel_difference_bytes": 1,
+      "native_project_sha256": "1a0765360d2a4d20f006eb3c44904f79b5a12535576f59ab29ec6891b4e0c961",
+      "exact_original_sampler_and_rgba": {
+        "base": "201c5d9fdb48a973a5da4cf8b40666c37c6e3ddcb8eb2e5eacfdfc09fc256a28",
+        "normal": "1b6601b104b8a7ee81e7d6e24819af9439b7727b1016c1795527b1d2a151ec49",
+        "shade": "201c5d9fdb48a973a5da4cf8b40666c37c6e3ddcb8eb2e5eacfdfc09fc256a28",
+        "rim": "201c5d9fdb48a973a5da4cf8b40666c37c6e3ddcb8eb2e5eacfdfc09fc256a28"
+      }
+    },
+    "prepared-mtoon-hdr": {
+      "original_emissive_uv": 1,
+      "writable_emissive_uv": 2,
+      "maximum_pixel_difference_bytes": 1,
+      "native_project_sha256": "665fc6f863ef77ec230971eae6a0ea97512aa92a9edaa8a912326896e1484ee8",
+      "exact_original_sampler_and_rgba": {
+        "base": "201c5d9fdb48a973a5da4cf8b40666c37c6e3ddcb8eb2e5eacfdfc09fc256a28",
+        "normal": "1b6601b104b8a7ee81e7d6e24819af9439b7727b1016c1795527b1d2a151ec49",
+        "shade": "201c5d9fdb48a973a5da4cf8b40666c37c6e3ddcb8eb2e5eacfdfc09fc256a28",
+        "rim": "201c5d9fdb48a973a5da4cf8b40666c37c6e3ddcb8eb2e5eacfdfc09fc256a28"
+      }
+    }
+  },
+  "arc": {
+    "device": "Intel Arc A770 with oneAPI Level Zero and hardware EGL",
+    "checks": 648,
+    "mapped_emission_kernel": true,
+    "portable_reimport_tested_in_authored_mode": true
+  },
+  "release_ctest": [
+    "baked-emission-native",
+    "emission-raster-finite-compute",
+    "source-material-raster-compute",
+    "emission-raster-mapped-compute",
+    "emission-raster-mapped-missing-gpu",
+    "emission-raster-texture-set-compute",
+    "baked-emission-workflow",
+    "baked-emission-source",
+    "baked-emission-uv1-worker",
+    "emission-export",
+    "emission-export-worker",
+    "source-paint-export",
+    "source-paint-bake",
+    "source-paint-authoring",
+    "source-paint-physical-authoring",
+    "surface-program-switch",
+    "mtoon-render",
+    "mtoon-texture-sets",
+    "mtoon-painted-texture-sets",
+    "mtoon-resized-texture-set",
+    "mtoon-baked-texture-sets",
+    "vrm1-source-export",
+    "raw-hdr-authoring",
+    "xr-editable-export",
+    "source-role-missing-uv1"
+  ],
+  "other_gpu_profiles": {
+    "cuda": "adapter and device kernel compiled",
+    "rocm": "adapter and device kernel compiled"
+  },
+  "asan_ubsan": {
+    "mode": "opt-in headless CPU reference",
+    "checks": 648,
+    "new_glbs_match_arc": true
+  },
+  "missing_gpu": "Release CLI rejected the prepared MToon export and preserved the existing GLB.",
+  "native_wayland": {
+    "checks": 7,
+    "artifact_sha256": "55b80b4d2158b808a0db172236e4bbe6b938aea88cbf8790402abedf892e6062"
+  },
+  "openxr": {
+    "checks": 10,
+    "synthetic_tracking": true,
+    "artifact_sha256": "55b80b4d2158b808a0db172236e4bbe6b938aea88cbf8790402abedf892e6062",
+    "native_sha256": "665fc6f863ef77ec230971eae6a0ea97512aa92a9edaa8a912326896e1484ee8",
+    "focus_loss_cancelled_export": true
+  },
+  "khronos": {
+    "prepared-mtoon-hdr.glb": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 427804,
+      "sha256": "55b80b4d2158b808a0db172236e4bbe6b938aea88cbf8790402abedf892e6062",
+      "errors": 0,
+      "warnings": 0
+    },
+    "prepared-mtoon-hdr-uv0.glb": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 428228,
+      "sha256": "5821ff66098c95168efba401eada214444e2fdfa25ffe234113f6319a75abc88",
+      "errors": 0,
+      "warnings": 0
+    },
+    "prepared-mtoon-hdr-portable.glb": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 426944,
+      "sha256": "478a78f9cbfa60c161e8cfd4ec6eb3f3344e25003a1f03d51efb64d9fdfb88b7",
+      "errors": 0,
+      "warnings": 0
+    },
+    "prepared-mtoon-hdr-uv0-portable.glb": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 427368,
+      "sha256": "985eb0d9254715a1801ed28fcfba85299d44eb99b8d80f11151318fd99f463c6",
+      "errors": 0,
+      "warnings": 0
+    }
+  },
+  "official_mtoon_schema_validated": 4,
+  "prior_glbs_byte_identical": {
+    "baked-source-hdr.glb": "7a8d9dd3f41218ef527fe2fed9346a0607ca554d28ea1b10b2e328f939c95729",
+    "baked-generated-tangents-hdr.glb": "40b51a7c7cfe9259bd9f0c6ad8c66cfa95b9090b7661495dca255255d2ae4f70",
+    "baked-native-tangents-hdr.glb": "5c8f728a32c527c18eec64ad30f8aab5664e1dae3ae7158ea75c89696e826273",
+    "baked-mask-visible.glb": "7829e58d94294a184e1d04ef606a6511b10c12dd8c50bb343648c114401e61cf",
+    "baked-mask-hidden.glb": "b83e6cd6a27af1a137093069194dcf0a009b09e6618fd57efa66f5b9d442c218",
+    "baked-mask-mixed.glb": "679d0e26b8bcd883e9d3b3b34038fba217614469e96874d9130bdcea5b88d882",
+    "varying-source-hdr.glb": "497b70223ba5aeb39e6556950e824b471cc39714ff83de0966c42081cfaf9cc6",
+    "single-surface-hdr.glb": "54fe8dccaaf6fc0ba69ace992aade6199eaea18b60dc5aa19d6bd6a444527971",
+    "mixed-source.glb": "ff769fff8afebfb62309e67abf0bc5efc1843dc13151d909bb2d981ebe9c84fa",
+    "mixed-source-hidden.glb": "484678692c4aad88173eb79876d79241c09895fa3faf1a52c04020612a689f5d",
+    "uniform-mask-cross.glb": "98e526883365742fef5b60880641cb918d3f4b761424f88089ab9c3a948b1b9a"
+  },
+  "open": [
+    "Prepared typed color and normal Bake, UV animation and legacy VRM0 shared UV.",
+    "Physical headset and positive CUDA and ROCm hardware qualification."
+  ]
+}
