@@ -10,7 +10,8 @@ struct MappedSourceImage {
   const uint8_t *rgba;
   uint32_t width, height;
   int wrap_s, wrap_t;
-  bool nearest, srgb, encode;
+  bool nearest, srgb;
+  SourceUvSampler::Output format;
 };
 
 #if defined(__CUDACC__) || defined(__HIPCC__)
@@ -28,15 +29,18 @@ inline void sample_mapped_source(MappedSourceImage image,
   };
   float color[4];
   sample_source_taps(image.rgba, image.width, image.nearest, taps, image.srgb, table, color);
-  if (image.encode) {
+  using Output = SourceUvSampler::Output;
+  if (image.format == Output::EncodedRgba) {
     uint32_t rgba = 0;
     for (unsigned c = 0; c < 4; ++c) {
       const uint32_t byte = image.srgb && c < 3 ? srgb_byte(color[c], table) : linear_byte(color[c]);
       rgba |= byte << (8 * c);
     }
     output[at] = rgba;
-  } else {
+  } else if (image.format == Output::LinearRgba) {
     for (unsigned c = 0; c < 4; ++c) output[4 * at + c] = bits(color[c]);
+  } else {
+    output[at] = bits(color[unsigned(image.format)]);
   }
 }
 }

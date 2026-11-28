@@ -30,8 +30,8 @@ void check_mapped_sampler() {
   source.wrap_t=wrap;
   for(const bool nearest:{false,true}){
    source.mag_filter=nearest?9728:9729;
-   auto sampler=detail::upload_source_uv_sampler(source,!nearest,false,count);
-   auto byte_sampler=detail::upload_source_uv_sampler(source,!nearest,true,count);
+   auto sampler=detail::upload_source_uv_sampler(source,!nearest,Sampler::Output::LinearRgba,count);
+   auto byte_sampler=detail::upload_source_uv_sampler(source,!nearest,Sampler::Output::EncodedRgba,count);
    sampler->read(coordinates,colors);
    byte_sampler->read(coordinates,encoded);
    bool exact=true,exact_bytes=true;
@@ -48,6 +48,13 @@ void check_mapped_sampler() {
    check(exact_bytes,"Mapped source byte encoding matches the reference channel by channel");
    byte_sampler->read(std::span(coordinates).subspan(193,3),std::span(encoded).first(3));
    check(encoded[2]==encoded[195],"Partial dispatch replaces preceding sample results");
+   for(unsigned channel=0;channel<4;++channel){
+    auto scalar=detail::upload_source_uv_sampler(source,!nearest,Sampler::Output(channel),count);
+    scalar->read(coordinates,encoded);
+    bool same=true;
+    for(size_t at=0;at<count;++at)same&=encoded[at]==colors[4*at+channel];
+    check(same,"Single-channel sampling reproduces the corresponding full-precision channel");
+   }
   }
  }
 }
@@ -57,11 +64,69 @@ std::array<int,4> pixel(const PaintSourceTexture&t,int x=16,int y=48){auto &i=*t
 std::shared_ptr<CreatorAppearance> appearance(bool legacy,const PaintSourceMaps&m){auto a=std::make_shared<CreatorAppearance>();auto asset=std::make_shared<ImportedAsset>();std::vector<std::shared_ptr<const Image>> images{m.color.image,m.metal_rough.image,m.emission.image,m.normal.image,m.occlusion.image,flat({32,64,96,255})};asset->images.resize(images.size());for(size_t n=0;n<images.size();++n){ImportedTexture t;t.image=int(n);t.wrap_s=t.wrap_t=33071;t.min_filter=t.mag_filter=9728;asset->textures.push_back(t);}asset->materials.emplace_back();ImportedPrimitive p;p.mesh=quad();p.source_mesh=p.source_primitive=0;p.uv1.assign(4,{.25f,.75f});asset->primitives.push_back(p);a->asset=asset;a->decoded_images=std::make_shared<const std::vector<std::shared_ptr<const Image>>>(images);a->source_mesh=a->source_primitive=a->material=0;a->source_vertices={0,1,2,3};auto mt=legacy?MToonMaterial::from_vrm0({{"shader","VRM/MToon"}}):MToonMaterial::from_vrm1({{"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"}}}}}});for(size_t role=0;role<11;++role){if((legacy&&role==6)||(!legacy&&role>=9))continue;mt.textures[role].index=role==2?3:role==3?2:role==5?5:role>=6?4:0;}mt.parameters.normal_enabled=true;mt.parameters.base_color={.2f,.3f,.4f,1};mt.parameters.emission={.1f,.2f,.3f};if(legacy)a->mtoon_json=mt.source_json().dump();else a->material_json=mt.source_json().dump();return a;}
 MToonMaterial read(const CreatorAppearance&a){return !a.mtoon_json.empty()?MToonMaterial::from_vrm0(nlohmann::json::parse(a.mtoon_json),a.asset->textures.size()):MToonMaterial::from_vrm1(nlohmann::json::parse(a.material_json),a.asset->textures.size());}
 void set(std::shared_ptr<CreatorAppearance>a,const MToonMaterial&m){if(m.version()==MToonVersion::V0)a->mtoon_json=m.source_json().dump();else a->material_json=m.source_json().dump();}
+void check_animated_mask(const PaintSourceMaps &source, const SourceUvBakeOptions &options,bool legacy){
+ auto a=appearance(legacy,source);
+ auto asset=std::make_shared<ImportedAsset>(*a->asset);
+ asset->primitives[0].uv1={{{.125f,.5f}},{{.625f,.25f}},{{.875f,.5f}},{{.375f,.75f}}};
+ auto images=std::make_shared<std::vector<std::shared_ptr<const Image>>>(*a->decoded_images);
+ auto mask=std::make_shared<Image>(*gradient());
+ for(size_t at=0;at<mask->rgba.size();at+=4)mask->rgba[at+2]=uint8_t((at/4%64)*4);
+ (*images)[4]=mask;
+ auto &mask_source=asset->textures[4];
+ mask_source.wrap_s=33648;
+ mask_source.wrap_t=10497;
+ mask_source.min_filter=mask_source.mag_filter=9729;
+ a->asset=asset;
+ a->decoded_images=images;
+ auto toon=read(*a);
+ auto &mask_slot=toon.textures[size_t(MToonSlot::UvMask)];
+ if(!legacy){
+  mask_slot.transform_texcoord=1;
+  mask_slot.offset={.125f,-.25f};
+  mask_slot.scale={1.25f,.75f};
+ }
+ toon.parameters.scroll={.125f,.25f};
+ toon.parameters.rotation_speed=.375f;
+ set(a,toon);
+ auto in=input(PaintedMesh::from_maps(quad(),std::make_shared<PaintSourceMaps>(source),64));
+ in.appearance=a;
+ auto freeze=options;
+ freeze.animation=SourceUvAnimationPolicy::FreezeAtTime;
+ freeze.freeze_seconds=2.25;
+ auto result=bake_source_uv(in,freeze);
+ PaintSourceTexture mask_view;
+ mask_view.image=mask;
+ mask_view.wrap_s=mask_source.wrap_s;
+ mask_view.wrap_t=mask_source.wrap_t;
+ mask_view.mag_filter=mask_source.mag_filter;
+ bool matches=true;
+ for(int y=0;y<64;++y)for(int x=0;x<64;++x){
+  const std::array<float,2> original{(y+.5f)/64,1-(x+.5f)/64};
+  const std::array<float,2> uv1{.125f+.5f*original[0]+.25f*original[1],
+                               .5f-.25f*original[0]+.25f*original[1]};
+  auto mask_uv=mtoon_uv(toon,MToonSlot::UvMask,legacy?original:uv1,0);
+  const auto value=sample_source_texture(mask_view,mask_uv[0],mask_uv[1],legacy)[mask_slot.channel];
+  const auto q=mtoon_uv(toon,MToonSlot::Base,original,freeze.freeze_seconds,value);
+  const auto rgba=sample_source_texture(source.color,q[0],q[1],true);
+  const auto actual=pixel(result.mtoon_roles[0],x,y);
+  for(unsigned c=0;c<4;++c){
+   const float sample=c<3?linear_to_srgb(rgba[c]):rgba[c];
+   matches&=actual[c]==std::lround(std::clamp(sample,0.f,1.f)*255);
+  }
+ }
+ check(matches,legacy?"MToon 0 sRGB red mask controls the full frozen base image"
+                     :"MToon 1 transformed UV1 blue mask controls the full frozen base image");
+ check(result.animation_frozen&&result.mtoon_roles[2].image&&
+       result.mtoon_roles[2].image->rgba!=result.maps->normal.image->rgba,
+       "Animated tangent transfer uses spatially varying mask derivatives");
+}
 SourceUvBakeInput triangles(std::shared_ptr<const PaintedMesh>paint,std::shared_ptr<const CreatorAppearance>a){SourceUvBakeInput i;i.paint=paint;i.appearance=a;auto &source=paint->mesh();uint32_t faces=uint32_t(source.indices.size()/3),side=uint32_t(std::ceil(std::sqrt(double(faces))));for(uint32_t f=0;f<faces;++f)for(int k=0;k<3;++k){auto original=source.indices[size_t(f)*3+k];i.target.positions.push_back(source.positions[original]);i.target.normals.push_back(source.normals[original]);i.source_vertices.push_back(original);i.target.indices.push_back(uint32_t(i.target.positions.size()-1));float x=float(f%side),y=float(f/side);std::array<float,2> q=k==0?std::array<float,2>{.1f,.1f}:k==1?std::array<float,2>{.9f,.1f}:std::array<float,2>{.1f,.9f};i.target.uv.push_back({(x+q[0])/side,(y+q[1])/side});}return i;}
 }
 int main(int argc,char**argv)try{
  check_mapped_sampler();
  auto source=maps();auto paint=PaintedMesh::from_maps(quad(),source,64);auto before=paint->encode();SourceUvBakeOptions options;options.resolution=64;auto i=input(paint);auto baked=bake_source_uv(i,options);
+ check_animated_mask(*source,options,false);
+ check_animated_mask(*source,options,true);
  check(pixel(baked.maps->color)==std::array<int,4>{192,188,128,0},"Exact same-face barycentrics rotate original RGBA including transparent RGB without material flattening");
  check(pixel(baked.maps->metal_rough)==std::array<int,4>{64,96,128,255}&&pixel(baked.maps->emission)==std::array<int,4>{32,64,128,255}&&pixel(baked.maps->occlusion)==std::array<int,4>{96,0,0,255},"All raw PBR data/emission slots retain original channel values independently");
  auto normal=pixel(baked.maps->normal);check(std::abs(normal[0]-128)<=1&&normal[1]>=254&&std::abs(normal[2]-128)<=1,"Normal vectors rotate from old UV frame through world into the new tangent basis");

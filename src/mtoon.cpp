@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // MToon lighting adaptation: UniVRM/MToon, MIT. See docs/MTOON-LICENSE.txt.
 #include "dome/mtoon.hpp"
+#include "mtoon-uv.hpp"
 #include "dome/mtoon-shader.hpp"
 #include <set>
 namespace dome {
@@ -1017,6 +1018,11 @@ std::array<float, 2> mtoon_uv(const MToonMaterial &m, MToonSlot role,
                               std::array<float, 2> uv, double seconds,
                               float mask) {
   m.validate();
+  return detail::mtoon_uv_validated(m, role, uv, seconds, mask);
+}
+std::array<float, 2> detail::mtoon_uv_validated(const MToonMaterial &m, MToonSlot role,
+                                               std::array<float, 2> uv, double seconds,
+                                               float mask) {
   if (!std::isfinite(seconds) || !std::isfinite(mask))
     throw std::invalid_argument("Invalid MToon UV animation");
   if (size_t(role) >= S)

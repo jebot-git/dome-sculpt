@@ -15,6 +15,7 @@
 #include "dome/source-paint-bake.hpp"
 #include "source-paint-physical.hpp"
 #include "source-uv-sampler.hpp"
+#include "mtoon-uv.hpp"
 #include "emission-paint-access.hpp"
 #include "normal-projection-identity.hpp"
 #include "normal-sampling-access.hpp"
@@ -369,10 +370,22 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
   if(coordinate==1){const auto *values=logical?typed_uv1:uv1;if(!values)throw std::invalid_argument("Source UV1 bake requires its exact coordinate domain");return values;}
   const auto &maps=i.paint->source_maps();if(coordinate<2||coordinate>7||!maps)throw std::invalid_argument("Extra source UV bake requires its exact coordinate owner");auto found=maps->extra_uv_sets.find(uint32_t(coordinate));if(found==maps->extra_uv_sets.end()||!found->second||found->second->size()!=old.positions.size())throw std::invalid_argument("Extra source UV bake coordinate correspondence differs");return found->second.get();
  };
- auto mapped=[&](const Plan &p,const Hit &h){
-  auto q=uv(old,p.domain,h);if(!p.animated)return affine(q,p.transform);
-  float mask=1;auto maskview=original_role(8);if(maskview.image){const auto &mt=result.mtoon->textures[8];auto mu=uv(old,coordinate_domain(coordinate(mt),true),h);mu=mtoon_uv(*result.mtoon,MToonSlot::UvMask,mu,0,1);mask=sample_source_texture(maskview,mu[0],mu[1],mt.encoding==MToonEncoding::Srgb)[mt.channel];budget.work();}
-  return mtoon_uv(*result.mtoon,MToonSlot(p.role),q,o.freeze_seconds,mask);
+ if(result.mtoon)result.mtoon->validate();
+ constexpr auto mask_slot=MToonSlot::UvMask;
+ const auto mask_view=sampling_animation?original_role(int(mask_slot)):PaintSourceTexture{};
+ const auto *mask_texture=mask_view.image?&result.mtoon->textures[size_t(mask_slot)]:nullptr;
+ const auto *mask_domain=mask_texture?coordinate_domain(coordinate(*mask_texture),true):nullptr;
+ auto mapped=[&](const Plan &p,const Hit &h,float mask){
+  const auto q=uv(old,p.domain,h);
+  return p.animated
+    ?detail::mtoon_uv_validated(*result.mtoon,MToonSlot(p.role),q,o.freeze_seconds,mask)
+    :affine(q,p.transform);
+ };
+ constexpr float normal_step=.001f;
+ const auto shift=[](Hit h,size_t axis){
+  h.bary[0]-=normal_step;
+  h.bary[axis]+=normal_step;
+  return h;
  };
  std::vector<std::pair<Plan,std::shared_ptr<const Image>>> completed;std::optional<Raster> current;
  auto bake=[&](Plan p){
@@ -381,56 +394,97 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
   uint32_t size=o.resolution?o.resolution:std::max({p.view.image->width,p.view.image->height,i.paint->resolution()});if(size_t(size)*size>o.max_image_pixels)throw std::length_error("Source UV output image pixel budget exceeded");size_t bytes=size_t(size)*size*4;if(bytes>o.max_output_bytes-result.image_bytes)throw std::length_error("Source UV output image budget exceeded");
   if(!current||current->size!=size){current.reset();current=raster(i.target,size,false,true,budget);}
   auto image=std::make_shared<Image>();image->width=image->height=size;image->rgba.assign(bytes,0);
-  auto write_normal=[&](size_t at,std::array<float,4> value){
+  auto write_normal=[&](size_t at,std::array<float,4> value,std::array<float,2> q0,
+                        float mask_x,float mask_y){
    const auto &h=current->hits[at];
-   std::array<std::array<float,2>,3> oq,nq;for(int k=0;k<3;++k){Hit corner{h.face,{}};corner.bary[k]=1;oq[k]=mapped(p,corner);nq[k]=i.target.uv[i.target.indices[size_t(h.face)*3+k]];}
-    if(p.animated){constexpr float step=.001f;auto q0=mapped(p,h);Hit bx=h,by=h;bx.bary[0]-=step;bx.bary[1]+=step;by.bary[0]-=step;by.bary[2]+=step;auto qx=mapped(p,bx),qy=mapped(p,by);oq[0]=q0;oq[1]={q0[0]+(qx[0]-q0[0])/step,q0[1]+(qx[1]-q0[1])/step};oq[2]={q0[0]+(qy[0]-q0[0])/step,q0[1]+(qy[1]-q0[1])/step};}
+   std::array<std::array<float,2>,3> oq,nq;
+   for(size_t k=0;k<3;++k)nq[k]=i.target.uv[i.target.indices[size_t(h.face)*3+k]];
+   if(p.animated){
+    const auto qx=mapped(p,shift(h,1),mask_x),qy=mapped(p,shift(h,2),mask_y);
+    oq[0]=q0;
+    oq[1]={q0[0]+(qx[0]-q0[0])/normal_step,q0[1]+(qx[1]-q0[1])/normal_step};
+    oq[2]={q0[0]+(qy[0]-q0[0])/normal_step,q0[1]+(qy[1]-q0[1])/normal_step};
+   }else{
+    for(size_t k=0;k<3;++k){
+     Hit corner{h.face,{}};
+     corner.bary[k]=1;
+     oq[k]=mapped(p,corner,1);
+    }
+   }
     auto nf=frame(i.target,h,nq);if(!nf)throw std::runtime_error("Destination UV normal frame is degenerate");Vec3 world=nf->n;auto of=frame(old,h,oq);if(of){if(p.check_backface&&(std::abs(dot(of->t,nf->b))>1e-5f||std::abs(dot(of->b,nf->t))>1e-5f))throw std::invalid_argument("MToon1 backface normal frame rotates across UVs; preserve authored tangent transport before baking this material");Vec3 v{value[0]*2-1,value[1]*2-1,value[2]*2-1};if(length(v)>1e-8f)world=normalized(of->t*v.x+of->b*v.y+of->n*v.z);}Vec3 v{dot(world,nf->t),dot(world,nf->b),dot(world,nf->n)};value[0]=v.x*.5f+.5f;value[1]=v.y*.5f+.5f;value[2]=v.z*.5f+.5f;
    for(int k=0;k<4;++k)image->rgba[at*4+k]=byte(p.srgb&&k<3?linear_to_srgb(value[k]):value[k]);
   };
   using Sampler=detail::SourceUvSampler;
-  const size_t words_per_sample=p.normal?4:1;
-  const size_t scratch_per_sample=2*(sizeof(Sampler::Coordinate)+words_per_sample*sizeof(uint32_t))+sizeof(size_t);
+  const auto format=p.normal?Sampler::Output::LinearRgba:Sampler::Output::EncodedRgba;
+  const size_t words_per_sample=Sampler::words(format);
+  const size_t mask_probes=p.animated&&mask_texture?(p.normal?3:1):0;
+  const size_t scratch_per_sample=2*(sizeof(Sampler::Coordinate)+words_per_sample*sizeof(uint32_t)+
+    mask_probes*(sizeof(Sampler::Coordinate)+sizeof(uint32_t)))+sizeof(size_t);
   const size_t fixed_bytes=current->hits.size()*(sizeof(Hit)+sizeof(int32_t))+
-    p.view.image->rgba.size()+Sampler::table_bytes;
+    p.view.image->rgba.size()+Sampler::table_bytes+
+    (mask_probes?mask_view.image->rgba.size()+Sampler::table_bytes:0);
   if(fixed_bytes>=o.max_working_bytes||(o.max_working_bytes-fixed_bytes)<scratch_per_sample)
    throw std::length_error("Source UV sampling working memory budget exceeded");
-  const size_t capacity=std::min({Sampler::max_batch,current->hits.size(),
+  const size_t capacity=std::min({Sampler::max_batch/std::max(size_t(1),mask_probes),current->hits.size(),
     (o.max_working_bytes-fixed_bytes)/scratch_per_sample});
   budget.cancel();
-  auto sampler=detail::upload_source_uv_sampler(p.view,p.srgb,!p.normal,capacity);
-  std::vector<Sampler::Coordinate> coordinates;
+  auto sampler=detail::upload_source_uv_sampler(p.view,p.srgb,format,capacity);
+  std::unique_ptr<Sampler> mask_sampler;
+  if(mask_probes)
+   mask_sampler=detail::upload_source_uv_sampler(mask_view,mask_texture->encoding==MToonEncoding::Srgb,
+     Sampler::Output(mask_texture->channel),capacity*mask_probes);
+  std::vector<Sampler::Coordinate> coordinates(capacity),mask_coordinates;
   std::vector<size_t> texels;
-  std::vector<uint32_t> colors(capacity*words_per_sample);
-  coordinates.reserve(capacity);
+  std::vector<uint32_t> colors(capacity*words_per_sample),masks(capacity*mask_probes);
+  mask_coordinates.reserve(capacity*mask_probes);
   texels.reserve(capacity);
+  auto mask_at=[&](size_t index,size_t probe){
+   return mask_probes?std::bit_cast<float>(masks[index*mask_probes+probe]):1.f;
+  };
   auto flush=[&]{
-   if(coordinates.empty())return;
+   if(texels.empty())return;
    budget.cancel();
-   sampler->read(coordinates,std::span(colors).first(coordinates.size()*words_per_sample));
+   if(mask_sampler){
+    auto add_probe=[&](const Hit &hit){
+     const auto q=detail::mtoon_uv_validated(*result.mtoon,mask_slot,uv(old,mask_domain,hit),0,1);
+     mask_coordinates.push_back({q[0],q[1]});
+     budget.work();
+    };
+    for(const auto at:texels){
+     const auto &h=current->hits[at];
+     add_probe(h);
+     if(p.normal){add_probe(shift(h,1));add_probe(shift(h,2));}
+    }
+    mask_sampler->read(mask_coordinates,std::span(masks).first(mask_coordinates.size()));
+    budget.cancel();
+   }
+   for(size_t index=0;index<texels.size();++index){
+    const auto q=mapped(p,current->hits[texels[index]],mask_at(index,0));
+    coordinates[index]={q[0],q[1]};
+   }
+   sampler->read(std::span(coordinates).first(texels.size()),std::span(colors).first(texels.size()*words_per_sample));
    budget.cancel();
    if(p.normal){
     for(size_t index=0;index<texels.size();++index){
      std::array<float,4> color;
      for(size_t c=0;c<4;++c)color[c]=std::bit_cast<float>(colors[4*index+c]);
-     write_normal(texels[index],color);
+     const auto q0=coordinates[index];
+     write_normal(texels[index],color,{q0.u,q0.v},mask_at(index,1),mask_at(index,2));
     }
    }else{
     for(size_t index=0;index<texels.size();++index)
      for(size_t c=0;c<4;++c)image->rgba[texels[index]*4+c]=uint8_t(colors[index]>>(8*c));
    }
-   coordinates.clear();
+   mask_coordinates.clear();
    texels.clear();
   };
   for(size_t at=0;at<current->hits.size();++at){
    if(at%size==0)budget.cancel();
    const auto &h=current->hits[at];
    if(h.face==UINT32_MAX)continue;
-   const auto q=mapped(p,h);
-   coordinates.push_back({q[0],q[1]});
    texels.push_back(at);
    budget.work();
-   if(coordinates.size()==capacity)flush();
+   if(texels.size()==capacity)flush();
   }
   flush();
   for(size_t at=0;at<current->hits.size();++at)if(current->hits[at].face==UINT32_MAX&&current->padding[at]>=0){auto from=size_t(current->padding[at]);std::copy_n(image->rgba.begin()+from*4,4,image->rgba.begin()+at*4);++result.padded_texels;}

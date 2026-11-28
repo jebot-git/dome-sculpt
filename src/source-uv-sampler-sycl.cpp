@@ -30,12 +30,12 @@ class SyclSampler final : public SourceUvSampler {
   MappedSourceImage source_;
 
 public:
-  SyclSampler(const PaintSourceTexture &source, bool srgb, bool encode, size_t capacity)
-      : SourceUvSampler(capacity, encode), image_(allocate<uint8_t>(source.image->rgba.size())),
+  SyclSampler(const PaintSourceTexture &source, bool srgb, Output format, size_t capacity)
+      : SourceUvSampler(capacity, format), image_(allocate<uint8_t>(source.image->rgba.size())),
         table_(allocate<paint_compute::Quantization>(1)),
-        coordinates_(allocate<Coordinate>(capacity)), colors_(allocate<uint32_t>(capacity * (encode ? 1 : 4))),
+        coordinates_(allocate<Coordinate>(capacity)), colors_(allocate<uint32_t>(capacity * words(format))),
         source_{image_.get(), source.image->width, source.image->height,
-                source.wrap_s, source.wrap_t, source.mag_filter == 9728, srgb, encode} {
+                source.wrap_s, source.wrap_t, source.mag_filter == 9728, srgb, format} {
     const auto &table = paint_compute::quantization();
     queue_.memcpy(image_.get(), source.image->rgba.data(), source.image->rgba.size()).wait_and_throw();
     queue_.memcpy(table_.get(), &table, sizeof(table)).wait_and_throw();
@@ -62,7 +62,7 @@ private:
 }
 
 std::unique_ptr<SourceUvSampler> upload_source_uv_sampler(
-    const PaintSourceTexture &source, bool srgb, bool encode, size_t capacity) {
-  return std::make_unique<SyclSampler>(source, srgb, encode, capacity);
+    const PaintSourceTexture &source, bool srgb, SourceUvSampler::Output format, size_t capacity) {
+  return std::make_unique<SyclSampler>(source, srgb, format, capacity);
 }
 }

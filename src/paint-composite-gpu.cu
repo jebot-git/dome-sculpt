@@ -81,11 +81,11 @@ class GpuSourceUvSampler final : public SourceUvSampler {
   MappedSourceImage source_;
 
 public:
-  GpuSourceUvSampler(const PaintSourceTexture &source, bool srgb, bool encode, size_t capacity)
-      : SourceUvSampler(capacity, encode), image_(source.image->rgba.size()), coordinates_(capacity),
-        colors_(capacity * (encode ? 1 : 4)),
+  GpuSourceUvSampler(const PaintSourceTexture &source, bool srgb, Output format, size_t capacity)
+      : SourceUvSampler(capacity, format), image_(source.image->rgba.size()), coordinates_(capacity),
+        colors_(capacity * words(format)),
         source_{image_.data, source.image->width, source.image->height,
-                source.wrap_s, source.wrap_t, source.mag_filter == 9728, srgb, encode} {
+                source.wrap_s, source.wrap_t, source.mag_filter == 9728, srgb, format} {
     const auto &table = paint_compute::quantization();
     checked(DS_COPY(image_.data, source.image->rgba.data(), source.image->rgba.size(), DS_TO_DEVICE));
     checked(DS_COPY(table_.data, &table, sizeof(table), DS_TO_DEVICE));
@@ -103,8 +103,8 @@ private:
 }
 
 std::unique_ptr<SourceUvSampler> upload_source_uv_sampler(
-    const PaintSourceTexture &source, bool srgb, bool encode, size_t capacity) {
-  return std::make_unique<GpuSourceUvSampler>(source, srgb, encode, capacity);
+    const PaintSourceTexture &source, bool srgb, SourceUvSampler::Output format, size_t capacity) {
+  return std::make_unique<GpuSourceUvSampler>(source, srgb, format, capacity);
 }
 }
 namespace detail::portable_normal {

@@ -11,10 +11,11 @@ namespace dome::detail {
 namespace {
 class ReferenceSourceUvSampler final : public SourceUvSampler {
   PaintSourceTexture source_;
-  bool srgb_, encode_;
+  bool srgb_;
+  Output format_;
 public:
-  ReferenceSourceUvSampler(const PaintSourceTexture &source, bool srgb, bool encode, size_t capacity)
-      : SourceUvSampler(capacity, encode), source_(source), srgb_(srgb), encode_(encode) {
+  ReferenceSourceUvSampler(const PaintSourceTexture &source, bool srgb, Output format, size_t capacity)
+      : SourceUvSampler(capacity, format), source_(source), srgb_(srgb), format_(format) {
     source_.texcoord = 0;
     source_.uv_transform = {1, 0, 0, 1, 0, 0};
   }
@@ -22,7 +23,7 @@ private:
   void dispatch(std::span<const Coordinate> pending, std::span<uint32_t> result) override {
     for (size_t i = 0; i < pending.size(); ++i) {
       const auto color = sample_source_texture(source_, pending[i].u, pending[i].v, srgb_);
-      if (encode_) {
+      if (format_ == Output::EncodedRgba) {
         uint32_t rgba = 0;
         for (unsigned c = 0; c < 4; ++c) {
           const float value = srgb_ && c < 3 ? linear_to_srgb(color[c]) : color[c];
@@ -30,16 +31,18 @@ private:
           rgba |= byte << (8 * c);
         }
         result[i] = rgba;
-      } else {
+      } else if (format_ == Output::LinearRgba) {
         for (unsigned c = 0; c < 4; ++c) result[4 * i + c] = std::bit_cast<uint32_t>(color[c]);
+      } else {
+        result[i] = std::bit_cast<uint32_t>(color[unsigned(format_)]);
       }
     }
   }
 };
 }
 std::unique_ptr<SourceUvSampler> upload_source_uv_sampler(
-    const PaintSourceTexture &source, bool srgb, bool encode, size_t capacity) {
-  return std::make_unique<ReferenceSourceUvSampler>(source, srgb, encode, capacity);
+    const PaintSourceTexture &source, bool srgb, SourceUvSampler::Output format, size_t capacity) {
+  return std::make_unique<ReferenceSourceUvSampler>(source, srgb, format, capacity);
 }
 }
 namespace dome::detail::portable_normal {
