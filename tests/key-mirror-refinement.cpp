@@ -2,10 +2,15 @@
 #include "mirror-host-allocation-fault.hpp"
 namespace allocation=mirror_failure;
 #include "key-mirror-refinement.hpp"
+#include "cgltf.h"
 #include "dome/document.hpp"
+#include "dome/rig-edit.hpp"
+#include "dome/rig-rest.hpp"
+#include "dome/skin-authoring.hpp"
 #include <nlohmann/json.hpp>
 #include <cmath>
 #include <iostream>
+#include <set>
 using namespace dome;
 using namespace dome::detail;
 namespace {
@@ -78,11 +83,22 @@ double sampled(const MirrorSurfacePoint &p) {
   return sum;
 }
 
-Scene native_fixture(){
+Scene native_fixture(bool split_edge=false){
   Scene scene;
   const auto id=scene.active().id;
   auto mesh=*square();
-  mesh.uv_pins={1,0,0,0};
+  if(split_edge){
+    const auto original=mesh;
+    mesh={};
+    for(auto v:original.indices){
+      mesh.indices.push_back(uint32_t(mesh.positions.size()));
+      mesh.positions.push_back(original.positions[v]);
+      mesh.normals.push_back(original.normals[v]);
+      mesh.uv.push_back(original.uv[v]);
+    }
+  }
+  mesh.uv_pins.resize(mesh.positions.size());
+  mesh.uv_pins[0]=1;
   mesh.uv_seams={1,0,0,0,0,0};
   auto &object=scene.active();
   object.mesh_active=true;
@@ -104,6 +120,194 @@ Scene native_fixture(){
   return scene;
 }
 
+Scene rigged_fixture(bool split_edge=false){
+  auto scene=native_fixture(split_edge);
+  const auto id=scene.active().id;
+  auto rig=*scene.active().deformation;
+  rig.skeleton=Skeleton{{{"hips",-1,{},.5f},{"spine",0,{},.4f},{"detail",1,{},.2f}}};
+  rig.skeleton->bones[1].rest.translation={.16f,.28f,0};
+  rig.skeleton->bones[2].rest.translation={.12f,.21f,0};
+  rig.humanoid=HumanoidMapping{{{"hips",0},{"spine",1}}};
+  const auto &roles=human_roles();
+  for(const auto &role:roles){
+    if(rig.humanoid->joints.contains(role.name))continue;
+    const auto parent=rig.humanoid->joints.at(role.parent);
+    rig.humanoid->joints.emplace(role.name,uint32_t(rig.skeleton->bones.size()));
+    rig.skeleton->bones.push_back({role.name,int(parent),{},.08f,false});
+    rig.skeleton->bones.back().rest.translation={0,.08f,0};
+  }
+  rig.skeleton->inverse_bind_override=rig.skeleton->inverse_bind();
+  rig.landmarks=HumanLandmarks{{{"hips",{0,0,0}},{"spine",{.16f,.28f,0}}}};
+  rig.expressions=AvatarExpressions{{{"aa",{{"Asymmetric fold",.8f}}}}};
+  scene.set_deformation(id,std::move(rig));
+  SkinAuthoringOptions bind;bind.reference=id;bind.seed_distance=2;
+  if(!author_skin(scene,id,bind)||!scene.active().rig_source)
+    throw std::runtime_error("Fixture needs a native binding transaction and its first source");
+  rig=*scene.active().deformation;
+  // One tiny authored influence and one unsorted row detect normalization or
+  // reordering of exact old corners. The thirds vary across both diagonals.
+  rig.skin->vertices={{{1,.125f},{0,.875f}},{{0,.25f},{1,.75f}},
+                      {{0,.625f},{1,.375f}},{{0,.5f},{1,.49999976f},{2,0x1p-22f}}};
+  if(split_edge)rig.skin->vertices={{{0,1}},{{0,1}},{{0,1}},{{1,1}},{{1,1}},{{1,1}}};
+  for(const auto &bone:rig.skeleton->bones)rig.pose.push_back(bone.rest);
+  rig.pose[0].translation={.02f,.018f,.038f};
+  rig.pose[1].full_local_matrix=RigMatrix{1,.02f,.02f,0,.1f,.98f,0,0,.015f,0,1,0,.16f,.27f,.025f,1};
+  scene.set_deformation(id,std::move(rig));
+  return scene;
+}
+
+std::array<double,3> expected_weights(Vec3 p){
+  const double u=p.x+.5, v=p.y+.5;
+  if(v<=u)return {.875*(1-u)+.25*(u-v)+.625*v,.125*(1-u)+.75*(u-v)+.375*v,0.};
+  return {.875*(1-v)+.625*u+.5*(v-u),.125*(1-v)+.375*u+.49999976*(v-u),0x1p-22*(v-u)};
+}
+
+void check_skin(const Scene &before,const Scene &after){
+  const auto &a=before.active(),&b=after.active();
+  const auto &original=a.painted->mesh(),&mesh=b.painted->mesh();
+  auto prior=a.deformation->encode(original),now=b.deformation->encode(mesh);
+  for(auto key:{"source","skin","morphs","morph_weights"}){prior.erase(key);now.erase(key);}
+  check(prior==now&&bool(a.rig_source)&&bool(b.rig_source),
+        "Rig hierarchy inverse binds affine pose humanoid landmarks and expressions are preserved");
+  size_t at_original=0,new_tiny=0;
+  for(size_t v=0;v<mesh.positions.size();++v){
+    const auto p=mesh.positions[v];
+    const auto &row=b.deformation->skin->vertices[v];
+    const auto weights=expected_weights(p);
+    std::array<float,3> actual{};
+    for(const auto &entry:row)actual.at(entry.joint)=entry.weight;
+    if(std::abs(actual[0]-weights[0])>8e-8||std::abs(actual[1]-weights[1])>8e-8||
+       std::abs(actual[2]-weights[2])>1e-13)
+      throw std::runtime_error("New skin row disagrees with the original triangle weight field");
+    for(size_t old=0;old<original.positions.size();++old)if(length(p-original.positions[old])<1e-8f){
+      if(a.deformation->skin->vertices[old]!=row)
+        throw std::runtime_error("An original corner skin row changed during refinement");
+      ++at_original;
+    }
+    if(std::abs(p.x)<.49f&&std::abs(p.y)<.49f&&actual[2]>0)++new_tiny;
+  }
+  check(at_original>=4&&new_tiny>0,"Original corner rows stay exact and new rows retain the unpruned joint field");
+  auto restore_after=after,restore_before=before;
+  restore_rig_source(restore_after,b.id,false);restore_rig_source(restore_before,a.id,false);
+  check(restore_after.encode()==restore_before.encode(),"Original native rig Restore survives the topology transaction");
+}
+
+Vec3 gltf_point(const float *m,Vec3 p){
+  return {m[0]*p.x+m[4]*p.y+m[8]*p.z+m[12],m[1]*p.x+m[5]*p.y+m[9]*p.z+m[13],
+          m[2]*p.x+m[6]*p.y+m[10]*p.z+m[14]};
+}
+
+void check_skin_glb(const std::filesystem::path &file,const Scene &scene){
+  cgltf_options options{};
+  cgltf_data *raw=nullptr;
+  check(cgltf_parse_file(&options,file.c_str(),&raw)==cgltf_result_success,"Independent cgltf reader opens the refined skinned GLB");
+  const std::unique_ptr<cgltf_data,decltype(&cgltf_free)> model(raw,cgltf_free);
+  check(cgltf_load_buffers(&options,raw,file.c_str())==cgltf_result_success&&cgltf_validate(raw)==cgltf_result_success,
+        "Independent cgltf validation accepts the refined mesh skin and morph accessors");
+  const auto &object=scene.active();
+  const auto &rest=object.painted->mesh();
+  const auto posed=object.deformation->preview(rest);
+  size_t vertices=0;
+  float maximum=0;
+  const cgltf_skin *skin=nullptr;
+  nlohmann::json humanoid;
+  for(size_t n=0;n<raw->nodes_count;++n){
+    const auto &node=raw->nodes[n];
+    if(node.extras.data){
+      const auto extras=nlohmann::json::parse(node.extras.data);
+      if(extras.contains("domeSculptHumanoid"))humanoid=extras["domeSculptHumanoid"]["humanBones"];
+    }
+    if(!node.mesh)continue;
+    if(!node.skin||node.skin->joints_count!=object.deformation->skeleton->bones.size()||
+       !node.skin->inverse_bind_matrices||node.mesh->primitives_count!=1)
+      throw std::runtime_error("Exported refined mesh lost its native rig");
+    skin=node.skin;
+    const auto &extras=node.mesh->extras;
+    const auto text=std::string_view(raw->json,raw->json_size).substr(extras.start_offset,extras.end_offset-extras.start_offset);
+    if(nlohmann::json::parse(text).at("domeSculptExpressions")!=object.deformation->expressions->encode())
+      throw std::runtime_error("Exported refined mesh changed its expression binding");
+    const auto &primitive=node.mesh->primitives[0];
+    const auto *positions=cgltf_find_accessor(&primitive,cgltf_attribute_type_position,0);
+    const auto *joints=cgltf_find_accessor(&primitive,cgltf_attribute_type_joints,0);
+    const auto *weights=cgltf_find_accessor(&primitive,cgltf_attribute_type_weights,0);
+    if(!positions||!joints||!weights||primitive.targets_count!=2||!primitive.indices||
+       primitive.indices->count!=rest.indices.size())
+      throw std::runtime_error("Exported refined mesh lost its topology skin or morph attributes");
+    for(size_t v=0;v<positions->count;++v){
+      float p[3],w[4];unsigned j[4];
+      if(!cgltf_accessor_read_float(positions,v,p,3)||!cgltf_accessor_read_uint(joints,v,j,4)||
+         !cgltf_accessor_read_float(weights,v,w,4))throw std::runtime_error("Cannot read refined vertex accessors");
+      const Vec3 rest_point{p[0],p[1],p[2]};
+      Vec3 local=rest_point,actual{};
+      const auto expected_skin=expected_weights(rest_point);
+      std::array<float,3> sampled_skin{};
+      for(size_t t=0;t<primitive.targets_count;++t){
+        const auto &target=primitive.targets[t];
+        const auto end=target.attributes+target.attributes_count;
+        const auto attribute=std::find_if(target.attributes,end,[](const cgltf_attribute &a){
+          return a.type==cgltf_attribute_type_position;
+        });
+        if(attribute==end||!cgltf_accessor_read_float(attribute->data,v,p,3))
+          throw std::runtime_error("Cannot read refined morph accessor");
+        const auto expected_delta=field(t==0?rest_point.x:-rest_point.x,rest_point.y);
+        if(std::abs(p[2]-expected_delta)>1e-7||p[0]!=0||p[1]!=0)
+          throw std::runtime_error("Exported refined morph differs from its analytic field");
+        const float value=node.weights_count>t?node.weights[t]:node.mesh->weights_count>t?node.mesh->weights[t]:0;
+        local+=Vec3{p[0],p[1],p[2]}*value;
+      }
+      for(size_t i=0;i<4;++i)if(w[i]>0){
+        float inverse[16],world[16];
+        if(j[i]>=node.skin->joints_count||!cgltf_accessor_read_float(node.skin->inverse_bind_matrices,j[i],inverse,16))
+          throw std::runtime_error("Cannot read refined inverse bind");
+        sampled_skin.at(j[i])=w[i];
+        cgltf_node_transform_world(node.skin->joints[j[i]],world);
+        actual+=gltf_point(world,gltf_point(inverse,local))*w[i];
+      }
+      if(std::abs(sampled_skin[0]-expected_skin[0])>8e-8||std::abs(sampled_skin[1]-expected_skin[1])>8e-8||
+         std::abs(sampled_skin[2]-expected_skin[2])>1e-13)
+        throw std::runtime_error("Exported refined skin differs from the analytic weight field");
+      auto matching=std::ranges::find_if(rest.positions,[&](Vec3 q){return length(q-rest_point)<1e-6f;});
+      if(matching==rest.positions.end())throw std::runtime_error("Exported vertex has no matching refined rest point");
+      const auto &posed_point=posed.positions[matching-rest.positions.begin()];
+      const auto expected=scene.world_matrix(object.id).point({posed_point.x,posed_point.y,posed_point.z});
+      maximum=std::max(maximum,length(actual-Vec3{float(expected[0]),float(expected[1]),float(expected[2])}));
+      ++vertices;
+    }
+  }
+  bool same_roles=skin&&humanoid.size()==object.deformation->humanoid->joints.size();
+  for(const auto &[role,joint]:object.deformation->humanoid->joints)
+    same_roles=same_roles&&humanoid.at(role).at("node")==skin->joints[joint]-raw->nodes;
+  check(same_roles,"Independent GLB verifies humanoid joint identities and expression bindings");
+  std::cout<<"GLB_SKINNED_REFINEMENT vertices="<<vertices<<" max_pose_error="<<maximum<<std::endl;
+  check(vertices>4&&maximum<2e-6f,"Independent GLB skin and morph evaluation matches the refined native joint pose");
+}
+
+void check_smoothing(const Scene &scene){
+  const auto &object=scene.active();
+  const auto &rig=*object.deformation;
+  const auto &mesh=object.painted->mesh();
+  const auto posed=rig.preview(mesh);
+  const auto at=std::ranges::find_if(mesh.positions,[](Vec3 p){return length(p)<1e-8f;});
+  if(at==mesh.positions.end())throw std::runtime_error("Missing shared refined center");
+  const auto center=uint32_t(at-mesh.positions.begin());
+  std::set<uint32_t> ring;
+  for(size_t c=0;c<mesh.indices.size();c+=3){
+    const auto triangle=std::span(mesh.indices).subspan(c,3);
+    if(std::ranges::find(triangle,center)!=triangle.end())ring.insert(triangle.begin(),triangle.end());
+  }
+  ring.erase(center);
+  double average=0;
+  for(const auto v:ring)average+=expected_weights(mesh.positions[v])[1];
+  const WeightPaintSurface surface{object.id,&mesh,&*rig.skin,posed.positions};
+  WeightBrush brush;brush.from=brush.to=posed.positions[center];brush.radius=.001f;
+  brush.mode=WeightBrushMode::Smooth;brush.strength=1;brush.joint=1;
+  const auto result=edit_weights(std::span(&surface,1),rig.skeleton->bones.size(),brush);
+  const auto &row=result.surfaces.at(0).weights.vertices[center];
+  const auto weight=std::ranges::find(row,1u,&Influence::joint);
+  check(ring.size()>=4&&result.changed==1&&weight!=row.end()&&std::abs(weight->weight-average/ring.size())<1e-7,
+        "A posed Smooth weight stroke uses neighbors across the refined triangle boundaries");
+}
+
 void check_authored(const Scene &before,const Scene &after){
   const auto &a=before.active(),&b=after.active();
   const auto &m=b.painted->mesh();
@@ -119,6 +323,11 @@ void check_authored(const Scene &before,const Scene &after){
     interpolated|=std::abs(p.x)<.49f&&std::abs(p.y)<.49f;
   }
   check(interpolated,"Prior and mirrored keys preserve their physical fields at new interior vertices");
+  const auto middle=[](Vec3 p){return std::abs(p.x)<1e-8f&&std::abs(p.y)<1e-8f;};
+  const auto vertex=std::ranges::find_if(m.positions,middle);
+  check(vertex!=m.positions.end()&&std::ranges::count_if(m.positions,middle)==1&&
+        std::ranges::count(m.indices,uint32_t(vertex-m.positions.begin()))>=4,
+        "A continuous original and reflected field shares the crossing vertex between triangles");
   check(a.painted->encode()["layers"]==b.painted->encode()["layers"]&&
         a.painted->preview(a.material)->color.rgba==b.painted->preview(b.material)->color.rgba,
         "Every hidden and visible paint layer and the composited UV pixels survive refinement");
@@ -129,23 +338,44 @@ void check_authored(const Scene &before,const Scene &after){
   ShapeKeyEdit restore;restore.action=ShapeKeyAction::Restore;
   author_shapekey(restored,b.id,restore);
   check(restored.encode()==before.encode(),"Restore recovers the exact pre-refinement mesh, frame data and layers");
+  if(a.deformation->skin)check_skin(before,after);
 }
 
-void workflow(const std::filesystem::path &out){
+void workflow(const std::filesystem::path &out,bool rigged){
   std::filesystem::create_directories(out);
-  const auto source=native_fixture();
+  const auto source=rigged?rigged_fixture():native_fixture();
   auto direct=source;
   ShapeKeyEdit edit;edit.action=ShapeKeyAction::Mirror;edit.mirror_frames=ShapeKeyMirrorFrames::RefinedSurface;
   edit.name="Reflected fold";
   const auto id=source.active().id;
-  auto skinned=source;
-  auto rig=*skinned.active().deformation;
-  rig.skeleton=Skeleton{{{"root",-1,{},1}}};
-  rig.skin=SkinWeights{};rig.skin->vertices.assign(4,{{0,1}});
-  skinned.set_deformation(id,std::move(rig));
-  const auto before_skin=skinned.encode();
-  check(refuses([&]{author_shapekey(skinned,id,edit);},"unskinned")&&skinned.encode()==before_skin,
-        "A skinned source is refused with its exact mesh, paint and binding intact");
+  if(rigged){
+    auto overfull=source;
+    auto rig=*overfull.active().deformation;
+    rig.skeleton=Skeleton{};rig.skeleton->bones.push_back({"root",-1,{},1});
+    for(size_t joint=1;joint<64;++joint)rig.skeleton->bones.push_back({"detail "+std::to_string(joint),0,{},1});
+    rig.pose.clear();rig.humanoid.reset();
+    for(size_t v=0;v<4;++v){
+      auto &row=rig.skin->vertices[v];row.clear();
+      for(uint32_t j=0;j<32;++j)row.push_back({j+uint32_t(v%2)*32,1.f/32});
+    }
+    overfull.set_deformation(id,std::move(rig));
+    const auto old=overfull.encode();
+    check(refuses([&]{author_shapekey(overfull,id,edit);},"more than 32 influences")&&overfull.encode()==old,
+          "Influence overflow refuses without dropping weights or publishing partial topology");
+    auto split=rigged_fixture(true);
+    author_shapekey(split,id,edit);
+    const auto &mesh=split.active().painted->mesh();
+    const auto &weights=split.active().deformation->skin->vertices;
+    std::array<bool,2> seam{};
+    for(size_t v=0;v<mesh.positions.size();++v){
+      const auto p=mesh.positions[v];
+      if(std::abs(p.x)>1e-8f||std::abs(p.y)>1e-8f)continue;
+      if(weights[v].size()!=1||weights[v][0].weight!=1)
+        throw std::runtime_error("An independently weighted seam blended its opposite side");
+      seam.at(weights[v][0].joint)=true;
+    }
+    check(seam[0]&&seam[1],"Coincident but independently weighted original seam sides remain distinct");
+  }
   size_t polls=0;
   check(refuses([&]{author_shapekey(direct,id,edit,[&]{return ++polls>15;});},"cancelled")&&
         direct.encode()==source.encode(),"Cancelled refinement publishes no part of the detached topology");
@@ -168,16 +398,30 @@ void workflow(const std::filesystem::path &out){
   replace.positions[0].z+=.005f;
   check(author_shapekey(reopened,id,replace).changed&&Scene::decode(reopened.encode()).encode()==reopened.encode(),
         "The saved refined key remains editable and its later endpoint reopens exactly");
+  if(rigged){
+    const auto glb=out/"refined-skin.glb";
+    auto export_scene=Scene::load(file);
+    check_smoothing(export_scene);
+    RigEdit activate;activate.morph=MorphWeightEdit{1,.45f};
+    edit_rig(export_scene,id,activate);
+    document.replace(export_scene);
+    document.export_asset(glb).get();
+    check_skin_glb(glb,export_scene);
+  }
   source.save(out/"source.dsculpt");
 }
 } // namespace
 int main(int argc,char **argv) try {
   const auto source = square();
   if(argc==3&&std::string_view(argv[1])=="--ui-fixture"){native_fixture().save(argv[2]);return 0;}
-  if(argc==3&&std::string_view(argv[1])=="--xr-fixture"){
-    auto scene=native_fixture();scene.active().transform.position={0,1.3f,-1.1f};scene.save(argv[2]);return 0;
+  if(argc==3&&std::string_view(argv[1])=="--ui-rig-fixture"){rigged_fixture().save(argv[2]);return 0;}
+  if(argc==3&&(std::string_view(argv[1])=="--xr-fixture"||std::string_view(argv[1])=="--xr-rig-fixture")){
+    auto scene=std::string_view(argv[1])=="--xr-rig-fixture"?rigged_fixture():native_fixture();
+    scene.active().transform.position={0,1.3f,-1.1f};scene.save(argv[2]);return 0;
   }
-  if(argc==3&&std::string_view(argv[1])=="--authoring"){workflow(argv[2]);return 0;}
+  if(argc==3&&(std::string_view(argv[1])=="--authoring"||std::string_view(argv[1])=="--rigged-authoring")){
+    workflow(argv[2],std::string_view(argv[1])=="--rigged-authoring");return 0;
+  }
   if(argc==4&&std::string_view(argv[1])=="--verify-ui"){
     check_authored(Scene::load(argv[2]),Scene::load(argv[3]));return 0;
   }

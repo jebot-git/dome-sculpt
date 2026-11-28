@@ -4018,7 +4018,7 @@ endif()
 
 if(BUILD_TESTING)
   add_executable(dome-sculpt-key-mirror-refinement-test tests/key-mirror-refinement.cpp)
-  target_include_directories(dome-sculpt-key-mirror-refinement-test PRIVATE src)
+  target_include_directories(dome-sculpt-key-mirror-refinement-test PRIVATE src third_party/cgltf)
   target_link_libraries(dome-sculpt-key-mirror-refinement-test PRIVATE dome-sculpt-core)
   target_link_options(dome-sculpt-key-mirror-refinement-test PRIVATE -Wl,--wrap=_Znwm -Wl,--wrap=_Znam)
   add_test(NAME key-mirror-refinement COMMAND dome-sculpt-key-mirror-refinement-test)
@@ -4026,6 +4026,9 @@ if(BUILD_TESTING)
   add_test(NAME key-mirror-refinement-authoring COMMAND dome-sculpt-key-mirror-refinement-test
     --authoring "${CMAKE_CURRENT_BINARY_DIR}/key-mirror-refinement-authoring")
   set_tests_properties(key-mirror-refinement-authoring PROPERTIES TIMEOUT 120)
+  add_test(NAME key-mirror-refinement-rigged COMMAND dome-sculpt-key-mirror-refinement-test
+    --rigged-authoring "${CMAKE_CURRENT_BINARY_DIR}/key-mirror-refinement-rigged")
+  set_tests_properties(key-mirror-refinement-rigged PROPERTIES TIMEOUT 120)
   if(NOT DOME_COMPUTE_BACKEND STREQUAL "CPU")
     add_test(NAME key-mirror-refinement-missing-gpu COMMAND dome-sculpt-key-mirror-refinement-test --require-device)
     set_tests_properties(key-mirror-refinement-missing-gpu PROPERTIES TIMEOUT 30

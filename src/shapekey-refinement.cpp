@@ -7,6 +7,8 @@
 #include "polygon-conversion.hpp"
 #include "polygon-paint.hpp"
 #include "shapekey-attributes.hpp"
+#include <bit>
+#include <map>
 
 namespace dome::detail {
 namespace {
@@ -35,15 +37,38 @@ Vec3 vector_at(const MirrorSurfacePoint &at,Read read){
   return {v[0],v[1],v[2]};
 }
 
+struct VertexSupport {
+  uint32_t vertex=UINT32_MAX;
+  double weight=0;
+  auto operator<=>(const VertexSupport &)const=default;
+};
+using SurfaceSupport=std::array<VertexSupport,3>;
+
+SurfaceSupport support(const Mesh &source,const MirrorSurfacePoint &point){
+  SurfaceSupport result;
+  for(size_t k=0;k<3;++k)if(point.barycentric[k]!=0)
+    result[k]={source.indices[point.triangle*3+k],point.barycentric[k]};
+  std::ranges::sort(result,{},&VertexSupport::vertex);
+  return result;
+}
+
+struct RefinedVertex {
+  std::array<uint32_t,3> position;
+  // Two sides may share a geometric edge but carry independent POSITION
+  // fields. The original vertex IDs preserve both sides of such a seam.
+  SurfaceSupport current,reflected;
+  auto operator<=>(const RefinedVertex &)const=default;
+};
+
 void refine_uv_flags(const Mesh &source,const KeyMirrorRefinement &refined,Mesh &mesh,
     const std::function<bool()> &cancelled){
   if(!source.uv_pins.empty()){
-    mesh.uv_pins.resize(refined.corners.size());
+    mesh.uv_pins.resize(mesh.positions.size());
     for(size_t c=0;c<refined.corners.size();++c){
       if((c&1023)==0)stop(cancelled);
       const auto &sample=refined.corners[c].current;
       for(size_t k=0;k<3;++k)if(sample.barycentric[k]==1)
-        mesh.uv_pins[c]=source.uv_pins[source.indices[sample.triangle*3+k]];
+        mesh.uv_pins[mesh.indices[c]]=source.uv_pins[source.indices[sample.triangle*3+k]];
     }
   }
   if(!source.uv_seams.empty()){
@@ -61,19 +86,58 @@ void refine_uv_flags(const Mesh &source,const KeyMirrorRefinement &refined,Mesh 
   }
 }
 
+SkinWeights refine_skin(const DeformationState &before,const KeyMirrorRefinement &refined,
+    std::span<const uint32_t> representatives,const std::function<bool()> &cancelled){
+  SkinWeights result;
+  result.vertices.reserve(representatives.size());
+  const auto &rows=before.skin->vertices;
+  const auto &indices=refined.source->indices;
+  const size_t bones=before.skeleton->bones.size();
+  for(const auto corner:representatives){
+    if((result.vertices.size()&255)==0)stop(cancelled);
+    const auto &point=refined.corners[corner].current;
+    const auto face=point.triangle*3;
+    const auto exact=std::ranges::find(point.barycentric,1.);
+    if(exact!=point.barycentric.end()){
+      result.vertices.push_back(rows[indices[face+size_t(exact-point.barycentric.begin())]]);
+      continue;
+    }
+    // Interpolate this side's original face. Closest-point transfer can pick
+    // the other face of a seam, and pruning changes the authored weight field.
+    std::array<double,256> weights{};
+    for(size_t k=0;k<3;++k){
+      const auto fraction=point.barycentric[k];
+      if(fraction==0)continue;
+      for(const auto &entry:rows[indices[face+k]])
+        weights[entry.joint]+=fraction*entry.weight;
+    }
+    std::array<Influence,32> row;
+    size_t count=0;
+    for(size_t joint=0;joint<bones;++joint){
+      const auto weight=float(weights[joint]);
+      if(weight<=0)continue;
+      if(count==row.size())
+        throw std::invalid_argument("Refined surface Mirror would require more than 32 influences at a new vertex");
+      row[count++]={uint32_t(joint),weight};
+    }
+    result.vertices.emplace_back(row.begin(),row.begin()+count);
+  }
+  return result;
+}
+
 void admit(const SculptObject &source){
   const auto &paint=*source.painted;
   const auto binding=source.material_bindings;
-  if(source.appearance||source.polygon||source.texture_sets||source.retopology||source.bake_recipe||source.rig_source||
+  if(source.appearance||source.polygon||source.texture_sets||source.retopology||source.bake_recipe||
      paint.in_stroke()||paint.source_maps()||paint.baked()||paint.paint_sampling_domain()||
      paint.normal_projection()||paint.color_projection()||paint.surface_diagnostics().policy!=PaintUvPolicy::Strict||
-     source.deformation->skin||source.deformation->source_skin_instance||
+     source.deformation->source_skin_instance||
      (binding&&(binding->has_mtoon||binding->sampling_reparameterized||binding->key_derivation||binding->canonical_attributes||binding->canonical_uv||
        binding->normal_preparation||binding->color_preparation||binding->native_paint_sampling||
        binding->native_paint_frames||binding->canonical_paint_sampling||binding->polygon_surface_transfer||
        (binding->uv_origin&&(!binding->uv_origin->paint||binding->uv_origin->appearance||!binding->uv_origin->creator_kind.empty()||
                             binding->uv_origin->paint->source_maps())))))
-    throw std::invalid_argument("Refined surface Mirror currently needs a native unskinned mesh with writable UVs and plain paint layers");
+    throw std::invalid_argument("Refined surface Mirror requires a native mesh with writable UVs and plain paint layers");
 }
 
 std::shared_ptr<NormalFrames> refine_frame(const NormalFrames &before,const KeyMirrorRefinement &refined,
@@ -125,21 +189,35 @@ ShapeKeyResult author_refined_shapekey(Scene &scene,uint64_t object,const ShapeK
   const auto refined=refine_reflected_key(source.painted->mesh_owner(),{edit.mirror_plane},
       edit.mirror_tolerance,{128*1024*1024,64*1024*1024,cancelled});
   const auto corners=refined.corners.size();
-  if(corners>(128*1024*1024)/(sizeof(MirrorRefinementCorner)+64+(slot+1)*sizeof(Vec3)*10))
+  const auto &original_deformation=*source.deformation;
+  const auto skin_bytes=original_deformation.skin?sizeof(VertexWeights)+
+      sizeof(Influence)*std::min(size_t(32),original_deformation.skeleton->bones.size()):0;
+  const size_t indexing_bytes=sizeof(RefinedVertex)+sizeof(uint32_t)+4*sizeof(void *);
+  if(corners>(128*1024*1024)/(sizeof(MirrorRefinementCorner)+indexing_bytes+64+
+                            (slot+1)*sizeof(Vec3)*10+skin_bytes*2))
     throw std::length_error("Refined Mirror mesh and key data exceed the authoring quota");
 
   Mesh mesh;
-  std::vector<uint32_t> parents;
+  std::vector<uint32_t> parents,representatives;
   mesh.positions.reserve(corners);mesh.normals.reserve(corners);mesh.uv.reserve(corners);
-  mesh.indices.reserve(corners);parents.reserve(corners/3);
-  for(const auto &corner:refined.corners){
-    const auto at=mesh.positions.size();
-    if((at&1023)==0)stop(cancelled);
-    if(at%3==0)parents.push_back(corner.current.triangle);
-    mesh.positions.push_back(corner.position);
-    mesh.indices.push_back(uint32_t(at));
-    mesh.normals.push_back(vector_at(corner.current,[&](size_t c){return rest.normals[rest.indices[c]];}));
-    mesh.uv.push_back(interpolate<std::array<float,2>>(corner.current,[&](size_t c){return rest.uv[rest.indices[c]];}));
+  mesh.indices.reserve(corners);parents.reserve(corners/3);representatives.reserve(corners);
+  {
+    std::map<RefinedVertex,uint32_t> vertices;
+    for(size_t at=0;at<corners;++at){
+      if((at&1023)==0)stop(cancelled);
+      const auto &corner=refined.corners[at];
+      const auto p=corner.position;
+      if(at%3==0)parents.push_back(corner.current.triangle);
+      const RefinedVertex identity{{std::bit_cast<uint32_t>(p.x),std::bit_cast<uint32_t>(p.y),
+        std::bit_cast<uint32_t>(p.z)},support(rest,corner.current),support(rest,corner.reflected)};
+      const auto [vertex,inserted]=vertices.try_emplace(identity,uint32_t(mesh.positions.size()));
+      mesh.indices.push_back(vertex->second);
+      if(!inserted)continue;
+      representatives.push_back(uint32_t(at));
+      mesh.positions.push_back(p);
+      mesh.normals.push_back(vector_at(corner.current,[&](size_t c){return rest.normals[rest.indices[c]];}));
+      mesh.uv.push_back(interpolate<std::array<float,2>>(corner.current,[&](size_t c){return rest.uv[rest.indices[c]];}));
+    }
   }
   refine_uv_flags(rest,refined,mesh,cancelled);
   PaintSurfaceOptions paint_options;paint_options.cancelled=cancelled;
@@ -149,11 +227,13 @@ ShapeKeyResult author_refined_shapekey(Scene &scene,uint64_t object,const ShapeK
   auto deformation=std::make_shared<DeformationState>(*source.deformation);
   deformation->morphs=MorphSet(basis);
   deformation->source=deformation->morphs->topology;
+  if(original_deformation.skin)deformation->skin=refine_skin(original_deformation,refined,representatives,cancelled);
   auto transfer=[&](const MorphTarget &target,bool mirror,std::string title){
     MorphTarget result{std::move(title),{}};
-    result.delta.reserve(corners);
-    for(const auto &corner:refined.corners){
+    result.delta.reserve(representatives.size());
+    for(const auto c:representatives){
       if((result.delta.size()&1023)==0)stop(cancelled);
+      const auto &corner=refined.corners[c];
       auto d=vector_at(mirror?corner.reflected:corner.current,[&](size_t c){return target.delta[rest.indices[c]];});
       if(mirror)d.x=-d.x;
       result.delta.push_back(d);
@@ -183,7 +263,7 @@ ShapeKeyResult author_refined_shapekey(Scene &scene,uint64_t object,const ShapeK
   const auto id=frames->next_target++;
   auto mirrored=transfer(before.targets.at(edit.target),true,std::move(name));
   std::vector<Vec3> endpoint=basis.positions;
-  for(size_t i=0;i<corners;++i){if((i&1023)==0)stop(cancelled);endpoint[i]+=mirrored.delta[i];}
+  for(size_t i=0;i<endpoint.size();++i){if((i&1023)==0)stop(cancelled);endpoint[i]+=mirrored.delta[i];}
   const auto source_pbr=frames->pbr,source_mtoon=frames->mtoon,source_canonical=frames->canonical;
   auto role=[&](const std::shared_ptr<const NormalFrames> &source_frame)->std::shared_ptr<const NormalFrames>{
     if(!source_frame)return {};
