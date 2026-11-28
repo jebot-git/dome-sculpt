@@ -6,6 +6,8 @@
 #include "baked-normal-field.hpp"
 #include "emission-authority.hpp"
 #include "texture-set-native-grid.hpp"
+#include "portable-normal-raster.hpp"
+#include "dome/brush.hpp"
 #include "dome/source-maps.hpp"
 #include <algorithm>
 #include <cmath>
@@ -19,6 +21,10 @@ using Bary = std::array<double,3>;
 constexpr double normal_error_limit=.02;
 constexpr double gutter=2;
 constexpr std::array<double,2> probe_offsets{.5,1.};
+struct PendingNormalTexel {
+ size_t index,work;
+ Bary weights;
+};
 
 void stop(const TextureSetLimits &limits){
  if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Retained field export cancelled");
@@ -174,9 +180,10 @@ bool normal_map_matches(const PolygonSurfacePreview &preview,std::span<const uin
 std::optional<Image> reproject_normal(const PolygonSurfacePreview &preview,
     std::span<const uint32_t> domain,std::span<PortableTextureSetCorner> corners,
     const AffineTransform &world,uint32_t source_size,uint32_t size,bool independent,size_t &work,
-    const TextureSetLimits &limits){
+    const TextureSetLimits &limits,std::unique_ptr<portable_normal::Raster> &device){
  const size_t pixels=size_t(size)*size;
- if(pixels>limits.maximum_bytes/8)throw std::length_error("Portable normal raster exceeds its byte budget");
+ if(portable_normal_raster_scratch_bytes(size)>limits.maximum_bytes)
+  throw std::length_error("Portable normal raster exceeds its byte budget");
  const auto charge=[&]{
   if(work>=limits.maximum_work)throw std::length_error("Portable normal raster exceeds its sample budget");
   if((work++&1023)==0)stop(limits);
@@ -185,6 +192,61 @@ std::optional<Image> reproject_normal(const PolygonSurfacePreview &preview,
  auto &image=*raster;
  for(size_t i=0;i<pixels;++i){if((i&1023)==0)stop(limits);image.rgba[i*4]=image.rgba[i*4+1]=128;image.rgba[i*4+2]=image.rgba[i*4+3]=255;}
  std::vector<float> distance(pixels,std::numeric_limits<float>::infinity());
+ const bool gpu=compute_backend()!="CPU";
+ const auto capacity=gpu?std::min(pixels,portable_normal::batch_pixels):0;
+ const auto chart_capacity=std::min(capacity,portable_normal::batch_charts);
+ std::vector<PendingNormalTexel> pending;
+ std::vector<portable_normal::Sample> samples;
+ std::vector<uint32_t> encoded(capacity);
+ std::vector<portable_normal::Chart> charts;
+ std::vector<uint32_t> chart_triangles;
+ pending.reserve(capacity);
+ samples.reserve(capacity);
+ charts.reserve(chart_capacity);
+ chart_triangles.reserve(chart_capacity);
+ const auto reference=[&](uint32_t triangle,const std::array<NormalBakeVertex,3> &frame,
+                          const Bary &b,Uv uv)->std::optional<std::array<uint8_t,4>>{
+  const auto wanted=preview.sample_baked_normal(triangle,b,world,uv);
+  const auto basis=normal_bake_basis(frame,b,NormalFragmentBasis::UnitColumns);
+  const auto result=encode_normal_bake(basis,wanted);
+  if(!result||result->rgba[2]<128||result->quantized_angle_radians>normal_error_limit)return {};
+  return result->rgba;
+ };
+ const auto write=[&](size_t i,const std::array<uint8_t,4> &rgba){
+  std::copy(rgba.begin(),rgba.end(),image.rgba.begin()+i*4);
+ };
+ const auto flush=[&]{
+  if(pending.empty())return true;
+  if(!device){
+   const auto &original_image=preview.native_bake()?preview.native_bake():preview.baked()->normal_field->pbr();
+   device=portable_normal::upload(*original_image,limits.cancelled);
+  }
+  device->encode(charts,samples,std::span(encoded).first(samples.size()),limits.cancelled);
+  bool valid=true;
+  for(size_t i=0;i<pending.size();++i){
+   const auto &job=pending[i];
+   const auto word=encoded[i];
+   if(word==portable_normal::needs_reference){
+    const auto &sample=samples[i];
+    const auto &f=charts[sample.chart].destination;
+    const auto result=reference(chart_triangles[sample.chart],{f[0],f[1],f[2]},
+        job.weights,{sample.uv[0],sample.uv[1]});
+    if(!result){
+     // A failed sample historically ends this atlas attempt at this
+     // position. Deferred dispatch must preserve its cumulative budget.
+     work=job.work;
+     valid=false;
+     break;
+    }
+    write(job.index,*result);
+   }else write(job.index,{uint8_t(word),uint8_t(word>>8),uint8_t(word>>16),255});
+  }
+  pending.clear();
+  samples.clear();
+  charts.clear();
+  chart_triangles.clear();
+  return valid;
+ };
  const size_t columns=size_t(std::ceil(std::sqrt(double(domain.size())))),cell=columns?size/columns:0;
  if(independent&&cell<8)return {};
  const auto &original=preview.native_bake()?preview.paint_coordinates():preview.normal_coordinates();
@@ -218,8 +280,11 @@ std::optional<Image> reproject_normal(const PolygonSurfacePreview &preview,
  for(size_t face=0;face<domain.size();++face){
   stop(limits);
   const bool accepted=visit_normal_chart(preview,domain[face],corners.subspan(face*3,3),world,size,[&](uint32_t triangle,const auto &source,const auto &chart,const auto &frame){
+   std::optional<portable_normal::Chart> prepared;
+   uint32_t slot=UINT32_MAX;
    const auto [x0,x1,y0,y1]=chart.bounds();
    for(int y=y0;y<=y1;++y)for(int x=x0;x<=x1;++x){
+    if(work==limits.maximum_work&&!flush())return false;
     charge();
     const double u=(x+.5)/size,v=(y+.5)/size;
     const auto [b,d]=chart.closest(u,v);
@@ -229,17 +294,34 @@ std::optional<Image> reproject_normal(const PolygonSurfacePreview &preview,
     // Use the source image beyond the chart while holding the frame at
     // the nearest valid barycentrics.
     const auto uv=independent?interpolate(source,chart.barycentric(u,v)):Uv{float(u),float(v)};
-    const auto wanted=preview.sample_baked_normal(triangle,b,world,uv);
-    const auto basis=normal_bake_basis(frame,b,NormalFragmentBasis::UnitColumns);
-    const auto encoded=encode_normal_bake(basis,wanted);
-    if(!encoded||encoded->rgba[2]<128||encoded->quantized_angle_radians>normal_error_limit)return false;
+    if(gpu){
+     if(pending.size()==capacity||(slot==UINT32_MAX&&charts.size()==chart_capacity)){
+      if(!flush())return false;
+      slot=UINT32_MAX;
+     }
+     if(slot==UINT32_MAX){
+      if(!prepared)prepared=portable_normal::Chart{portable_normal::source_frame(preview,triangle,world),
+          {frame[0],frame[1],frame[2]}};
+      slot=uint32_t(charts.size());
+      charts.push_back(*prepared);
+      chart_triangles.push_back(triangle);
+     }
+     pending.push_back({i,work,b});
+     samples.push_back({{float(b[0]),float(b[1]),float(b[2])},{uv[0],uv[1]},slot});
+    }else{
+     const auto result=reference(triangle,frame,b,uv);
+     if(!result)return false;
+     write(i,*result);
+    }
+    // Reserve the accepted distance in triangle order. If its deferred
+    // encoding fails, the whole atlas attempt is discarded.
     distance[i]=float(d);
-    std::copy(encoded->rgba.begin(),encoded->rgba.end(),image.rgba.begin()+i*4);
    }
    return true;
   });
-  if(!accepted)return {};
+  if(!accepted){(void)flush();return {};}
  }
+ if(!flush())return {};
  if(!normal_map_matches(preview,domain,corners,world,raster,source_size,independent,work,limits))
   return {};
  return std::move(image);
@@ -294,6 +376,13 @@ std::vector<PortableTextureSetCorner> portable_corners(const PolygonSurfacePrevi
 }
 } // namespace
 
+size_t portable_normal_raster_scratch_bytes(uint32_t size) noexcept{
+ const auto pixels=size_t(size)*size;
+ const auto batch=compute_backend()=="CPU"?0:std::min(pixels,portable_normal::batch_pixels);
+ return pixels*(sizeof(float)+4)+batch*(sizeof(PendingNormalTexel)+sizeof(portable_normal::Sample)+sizeof(uint32_t))+
+     std::min(batch,portable_normal::batch_charts)*(sizeof(portable_normal::Chart)+sizeof(uint32_t));
+}
+
 PortableTextureSetField portable_texture_set_field(const TextureSetView &field,
     const AffineTransform &world,size_t &work,const TextureSetLimits &limits){
  limits.validate();stop(limits);
@@ -331,11 +420,12 @@ PortableTextureSetField portable_texture_set_field(const TextureSetView &field,
  if(out.reprojected){
   const uint32_t original=portable->normal.width;
   const auto maximum=portable_normal_export_max_resolution(original);
-  auto image=reproject_normal(*preview,domain,out.corners,world,original,original,false,work,limits);
+  std::unique_ptr<portable_normal::Raster> device;
+  auto image=reproject_normal(*preview,domain,out.corners,world,original,original,false,work,limits,device);
   if(!image&&maximum>original)
-   image=reproject_normal(*preview,domain,out.corners,world,original,maximum,false,work,limits);
+   image=reproject_normal(*preview,domain,out.corners,world,original,maximum,false,work,limits,device);
   if(!image)
-   image=reproject_normal(*preview,domain,out.corners,world,original,maximum,true,work,limits);
+   image=reproject_normal(*preview,domain,out.corners,world,original,maximum,true,work,limits,device);
   if(!image)throw std::invalid_argument("Portable retained normals exceed the sampled angular limit after reprojection");
   portable->normal=std::move(*image);
  }

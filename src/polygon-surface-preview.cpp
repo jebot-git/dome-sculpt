@@ -4,6 +4,7 @@
 #include "normal-frame-runtime.hpp"
 #include "baked-normal-field.hpp"
 #include "paint-overlay-packet.hpp"
+#include "portable-normal-raster.hpp"
 #include "dome/source-maps.hpp"
 #include <limits>
 namespace dome::detail {namespace {
@@ -222,6 +223,26 @@ NormalBakeBasis PolygonSurfacePreview::before_role_basis(
   vertices[k]=normal_bake_vertex(n,transform_tangent(world,t),t[3]*hand,NormalVertexBitangent::UnitCross);
  }
  return normal_bake_basis(vertices,weights,NormalFragmentBasis::UnitColumns);
+}
+portable_normal::SourceFrame portable_normal::source_frame(const PolygonSurfacePreview &preview,
+    size_t triangle,const AffineTransform &world){
+ const auto [before,current]=preview.triangle_frames(triangle,world);
+ SourceFrame out;
+ out.before=before.basis;
+ out.current=current.basis;
+ out.handedness=before.handedness;
+ out.native=preview.model()==PolygonSurfaceNormalModel::NativeNOnly;
+ const float hand=world.orientation()==AffineOrientation::Reversing?-1.f:1.f;
+ for(size_t k=0;k<3;++k){
+  const auto corner=triangle*3+k;
+  const auto n=transform_normal(world,preview.normals().at(corner));
+  if(out.native)out.vertices[k].n=n;
+  else {
+   const auto &t=preview.tangents().at(corner);
+   out.vertices[k]=normal_bake_vertex(n,transform_tangent(world,t),t[3]*hand,NormalVertexBitangent::UnitCross);
+  }
+ }
+ return out;
 }
 void PolygonSurfacePreview::validate_world(size_t triangle,const AffineTransform &world,double minimum,
     const std::function<bool()> &cancel)const{

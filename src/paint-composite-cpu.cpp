@@ -3,7 +3,13 @@
 #include "emission-raster-device.hpp"
 #include "paint-source-coordinate-kernel.hpp"
 #include "paint-grid-filter.hpp"
+#include "portable-normal-raster.hpp"
 #include <cstring>
+namespace dome::detail::portable_normal {
+std::unique_ptr<Raster> upload(const Image &,const std::function<bool()> &){
+ throw std::logic_error("Select a GPU backend for portable normal reprojection");
+}
+}
 namespace dome::detail::emission_raster {
 std::unique_ptr<EmissionRasterDevice> upload(const Input &,const std::function<bool()> &){
  throw std::logic_error("Select a GPU backend for device emission compositing");

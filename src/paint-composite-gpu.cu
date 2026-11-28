@@ -28,6 +28,8 @@
 #include "paint-composite-backend.hpp"
 #include "paint-grid-filter.hpp"
 #include "paint-source-coordinate-kernel.hpp"
+#include "portable-normal-raster-kernel.hpp"
+#include "dome/paint.hpp"
 namespace dome {namespace {
 template<class E>void checked(E value){if(value!=DS_SUCCESS)throw std::runtime_error(DS_ERROR_TEXT(value));}
 __global__ void map_source_coordinates(paint_compute::SourceCoordinateBatch batch,uint32_t width,
@@ -59,6 +61,51 @@ template<class T> struct Buffer {
   ~Buffer(){if(data)(void)DS_FREE(data);}
   Buffer(const Buffer &)=delete;
 };
+}
+namespace detail::portable_normal {
+namespace {
+__global__ void normal_texels(const Chart *charts,ImageView source,const paint_compute::Quantization *q,
+                             const Sample *samples,uint32_t *result,size_t count){
+ const size_t at=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+ if(at<count){
+  const auto sample=samples[at];
+  result[at]=encode_texel(charts[sample.chart],sample,source,*q);
+ }
+}
+class GpuRaster final:public Raster {
+ Buffer<uint8_t> image_;
+ Buffer<paint_compute::Quantization> quantization_{1};
+ Buffer<Chart> charts_{batch_charts};
+ Buffer<Sample> samples_{batch_pixels};
+ Buffer<uint32_t> result_{batch_pixels};
+ uint32_t width_,height_;
+public:
+ explicit GpuRaster(const Image &image):image_(image.rgba.size()),width_(image.width),height_(image.height){
+  const auto &table=paint_compute::quantization();
+  checked(DS_COPY(quantization_.data,&table,sizeof(table),DS_TO_DEVICE));
+  checked(DS_COPY(image_.data,image.rgba.data(),image.rgba.size(),DS_TO_DEVICE));
+ }
+ void encode(std::span<const Chart> charts,std::span<const Sample> pending,std::span<uint32_t> output,
+     const std::function<bool()> &cancelled) override{
+  validate_batch(charts,pending,output);
+  paint_compute::checkpoint(cancelled);
+  checked(DS_COPY(charts_.data,charts.data(),charts.size_bytes(),DS_TO_DEVICE));
+  checked(DS_COPY(samples_.data,pending.data(),pending.size_bytes(),DS_TO_DEVICE));
+  normal_texels<<<(pending.size()+127)/128,128>>>(charts_.data,{image_.data,width_,height_},
+      quantization_.data,samples_.data,result_.data,pending.size());
+  checked(DS_LAST_ERROR());
+  checked(DS_COPY(output.data(),result_.data,output.size_bytes(),DS_TO_HOST));
+  paint_compute::checkpoint(cancelled);
+ }
+};
+}
+std::unique_ptr<Raster> upload(const Image &image,const std::function<bool()> &cancelled){
+ paint_compute::checkpoint(cancelled);
+ image.validate();
+ auto raster=std::make_unique<GpuRaster>(image);
+ paint_compute::checkpoint(cancelled);
+ return raster;
+}
 }
 namespace paint_compute {
 Result composite(const Input &in,const std::function<bool()> &cancelled){

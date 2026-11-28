@@ -1,5 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "normal-bake-encoding.hpp"
+#include "portable-normal-raster.hpp"
+#include "polygon-surface-transfer.hpp"
+#include "dome/brush.hpp"
+#include "dome/paint.hpp"
+#include "dome/source-maps.hpp"
 #include <iostream>
 #include <numbers>
 using namespace dome;
@@ -16,8 +21,91 @@ Vec3 solve(NormalBakeBasis f,Vec3 d) {
 }
 Vec3 forward(NormalBakeBasis b,Vec3 q){return normalized(b.t*q.x+b.b*q.y+b.n*q.z);}
 double angle(Vec3 a,Vec3 b){a=normalized(a);b=normalized(b);return std::atan2(length(cross(a,b)),std::clamp(double(dot(a,b)),-1.,1.));}
+
+void device_normals(){
+ using namespace portable_normal;
+ auto image=std::make_shared<Image>(Image{73,37,std::vector<uint8_t>(73*37*4)});
+ for(size_t i=0;i<image->rgba.size();i+=4){
+  image->rgba[i]=uint8_t(92+(i*23)%77);
+  image->rgba[i+1]=uint8_t(87+(i*53)%83);
+  image->rgba[i+2]=uint8_t(224+i%23);
+  image->rgba[i+3]=(i/4)%11?255:0;
+ }
+ PaintSourceTexture source;
+ source.image=image;
+ source.wrap_s=source.wrap_t=33071;
+ source.min_filter=source.mag_filter=9729;
+ auto device=upload(*image,{});
+ std::vector<portable_normal::Sample> samples(batch_pixels);
+ for(size_t i=0;i<samples.size();++i){
+  const float a=float(i%691)/690,b=float(i%353)/352*(1-a);
+  samples[i]={{1-a-b,a,b},{float(i%293)/267-.049f,float(i%593)/557-.031f}};
+ }
+ std::vector<uint32_t> actual(samples.size());
+ std::array<Chart,2> charts{};
+ std::array<std::vector<uint32_t>,2> individual;
+ for(bool native:{true,false}){
+  const float hand=native?1.f:-1.f;
+  const NormalBakeBasis before{{1,0,0},{0,hand,0},{0,0,1}};
+  const NormalBakeBasis after{{1,0,0},{0,.8f*hand,.6f*hand},{0,-.6f,.8f}};
+  auto &chart=charts[native?0:1];
+  chart.source.before=before;
+  chart.source.current=after;
+  chart.source.native=native;
+  chart.source.handedness=hand;
+  const std::array<Vec3,3> tips{Vec3{.27f,.05f,1},Vec3{-.19f,-.18f,1},Vec3{.01f,.21f,1}};
+  std::array<NormalBakeVertex,3> placed,emitted;
+  for(size_t k=0;k<3;++k){
+   placed[k]=normal_bake_vertex(tips[k],{1,.08f*float(k),0},hand,NormalVertexBitangent::UnitCross);
+   emitted[k]=normal_bake_vertex(forward(after,tips[k]),{1,0,0},hand,NormalVertexBitangent::UnitCross);
+   chart.source.vertices[k]=placed[k];
+   chart.destination[k]=emitted[k];
+  }
+  device->encode(std::span(&chart,1),samples,actual,{});
+  individual[native?0:1]=actual;
+  size_t device_texels=0;
+  for(size_t i=0;i<samples.size();++i)if(actual[i]!=needs_reference){
+   const auto &p=samples[i];
+   const std::array<double,3> b{p.barycentric[0],p.barycentric[1],p.barycentric[2]};
+   auto basis=normal_bake_basis(placed,b,NormalFragmentBasis::UnitColumns);
+   if(native){
+    const auto n=normal_bake_math::unit(placed[0].n*float(b[0])+placed[1].n*float(b[1])+placed[2].n*float(b[2]));
+    const auto t=normal_bake_math::unit(before.t-n*dot(before.t,n));
+    basis={t,cross(n,t)*hand,n};
+   }
+   const auto e=sample_source_texture(source,p.uv[0],p.uv[1],false);
+   const Vec3 detail{2*e[0]-1,2*e[1]-1,2*e[2]-1};
+   const auto input=!native||e[3]>0?basis.t*detail.x+basis.b*detail.y+basis.n*detail.z:basis.n;
+   const auto desired=transport_polygon_direction(input,{before,hand},{after,hand});
+   const auto reference=encode_normal_bake(normal_bake_basis(emitted,b,NormalFragmentBasis::UnitColumns),desired);
+   if(!reference||reference->quantized_angle_radians>.02||reference->rgba[2]<128)
+    throw std::runtime_error("Device admitted an unqualified portable normal");
+   const auto word=actual[i];
+   if(reference->rgba!=std::array<uint8_t,4>{uint8_t(word),uint8_t(word>>8),uint8_t(word>>16),255})
+    throw std::runtime_error("Device changed the rounded normal byte outside its precision guard");
+   ++device_texels;
+  }
+  check(device_texels>samples.size()*9/10,"Device reproduces the exact native or reflected prepared encoding outside its guard");
+  std::cout<<"DEVICE_TEXELS native="<<native<<" encoded="<<device_texels<<" total="<<samples.size()<<'\n';
+  unsigned polls=0;
+  check(refuses([&]{device->encode(std::span(&chart,1),std::span(samples).first(32),std::span(actual).first(32),
+       [&]{return ++polls==2;});}),"Cancellation after device dispatch refuses the detached batch");
+ }
+ for(size_t i=0;i<samples.size();++i)samples[i].chart=uint32_t(i%charts.size());
+ device->encode(charts,samples,actual,{});
+ for(size_t i=0;i<samples.size();++i)if(actual[i]!=individual[samples[i].chart][i])
+  throw std::runtime_error("A batched chart produced another chart's normal result");
+ check(true,"Combined native and reflected prepared charts match their separate dispatches");
+ samples[0].chart=uint32_t(charts.size());
+ check(refuses([&]{device->encode(charts,samples,actual,{});}),"A normal sample cannot address a foreign chart");
 }
-int main()try {
+}
+int main(int argc,char **argv)try {
+  if(argc>1&&std::string_view(argv[1])=="--missing"){
+   try{(void)portable_normal::upload(Image{1,1,{128,128,255,255}},{});}
+   catch(const std::exception &e){std::cout<<"REFUSED "<<e.what()<<'\n';return 0;}
+   throw std::runtime_error("Missing device returned a portable normal raster");
+  }
   NormalBakeBasis identity{{1,0,0},{0,1,0},{0,0,1}};
   for(auto desired:{Vec3{0,0,1},Vec3{.3f,-.2f,1},Vec3{-.7f,.5f,-.4f}}){auto encoded=encode_normal_bake(identity,desired);check(encoded&&angle(encoded->tangent,solve(identity,desired))<1e-6&&encoded->quantized_angle_radians<.01,"Independent inverse and bounded RGB8 reconstruction agree for a full-rank frame");}
   std::array<NormalBakeVertex,3> raw,unit;
@@ -52,5 +140,6 @@ int main()try {
   check(refuses([&]{normal_bake_basis(raw,{.2,.2,.2},NormalFragmentBasis::RawColumns);}),"Malformed barycentric authority is rejected");
   auto mixed=raw;mixed[1].w=-1;check(refuses([&]{normal_bake_basis(mixed,bary,NormalFragmentBasis::RawColumns);}),"A triangle cannot silently mix tangent handedness");
   check(refuses([&]{encode_normal_bake(identity,{NAN,0,1});}),"Nonfinite input does not publish encoded normals");
+  if(compute_backend()!="CPU")device_normals();
   std::cout<<"PASS "<<checks<<" normal-bake encoding foundation checks\n";return 0;
 } catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

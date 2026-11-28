@@ -1546,8 +1546,9 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
     const auto maximum=portable_normal_export_max_resolution(width);
     const auto pixels=size_t(maximum)*maximum;
     charge(bytes,pixels,4,limits.maximum_bytes);
-    if(pixels>limits.maximum_bytes/8)throw std::length_error("Portable normal raster exceeds its byte budget");
-    scratch=std::max(scratch,pixels*8);
+    const auto raster=portable_normal_raster_scratch_bytes(maximum);
+    if(raster>limits.maximum_bytes)throw std::length_error("Portable normal raster exceeds its byte budget");
+    scratch=std::max(scratch,raster);
    }
   }
   if(hdr)charge(bytes,size_t(resolution)*resolution,4,limits.maximum_bytes);

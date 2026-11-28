@@ -19,6 +19,7 @@ struct PortableTextureSetField {
 constexpr uint32_t portable_normal_export_max_resolution(uint32_t source)noexcept{
  return source<1024?2*source:source;
 }
+size_t portable_normal_raster_scratch_bytes(uint32_t size) noexcept;
 PortableTextureSetField portable_texture_set_field(const TextureSetView&,
  const AffineTransform&,size_t &work,const TextureSetLimits&);
 std::vector<PortableTextureSetCorner> portable_texture_set_shape(
