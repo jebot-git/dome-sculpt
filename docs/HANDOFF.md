@@ -86,6 +86,11 @@ budget still counts every vertex and logical capsule test. The numerical
 corpus matches the previous scalar evaluator exactly across 49,173 queries.
 Native Wayland and synthetic OpenXR saves match the preceding affine
 weight-painting captures byte for byte.
+All 19 selected Arc Release regressions and scoped sanitizer checks pass.
+CUDA and ROCm compile the new capsule kernel. Direct brush probes reject
+unavailable devices across all three backends. Sustained production-size
+live stroke latency and physical headset testing remain open.
+[GPU weight-brush evidence](validation/weight-brush-gpu-20261128.json)
 
 Ambient occlusion in Bake now traces the biased hemisphere on the selected
 GPU against the existing immutable source BVH. The device returns one

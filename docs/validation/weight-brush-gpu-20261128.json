@@ -1,0 +1,103 @@
+{
+  "date": "2026-11-28",
+  "product": "d3f78e205d1eb35538ecb2610bd6a5cee8ff1688",
+  "preceding": "d533bb8fcb786a1176c89de9595b2f84a0e4136c",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "GPU evaluation of posed weight-brush capsules, compact direct/reflected winning vertex hits and host application of native constraints in stable vertex order.",
+  "arc_a770_release": {
+    "application_sha256": "82f4358ecb88b744e4d9ae6f8c5785f9ebcb965071923c7014f2d89415ac4dfd",
+    "ctest": {
+      "cases": [
+        "retopology-affine-ui-fixture",
+        "retopo",
+        "affine-weight-openxr",
+        "retopology-affine",
+        "weight-authoring",
+        "retopology-affine-openxr",
+        "weight-edit",
+        "retopology-surface-heat-plain",
+        "retopology-surface-heat-affine",
+        "retopology-prepared-color-normal-uv-plain",
+        "retopology-prepared-color-normal-uv-affine",
+        "retopology-prepared-color-normal-first",
+        "skin-authoring",
+        "retopology-prepared-color-normal-plain",
+        "weight-transfer-batch",
+        "retopology-prepared-color-normal-affine",
+        "application-missing-gpu",
+        "surface-query-oblique",
+        "retopology-imported-pbr"
+      ],
+      "log_sha256": "05e6d6e6f8de1fe732b5b75df5adb747221281d5d2b18def69dd0c50b21b4fcd"
+    },
+    "capsule_oracle": {
+      "vertex_queries": 49173,
+      "compacted_hits": 32432,
+      "logical_capsule_tests": 16849948,
+      "exact_against_preceding_scalar_math": true
+    },
+    "unchanged_affine_capture_sha256": {
+      "synthetic-openxr/fixtures/before.dsculpt": "eb0410bd52048d3fbe2554880b22c82263fa79b539aeb6714b69da2faeee9ba4",
+      "synthetic-openxr/fixtures/after.dsculpt": "69f46a87902a695d2f5ef30674226f07fed11ef8696d85cb5716b057e89fadb2",
+      "synthetic-openxr/accept.dsculpt": "69f46a87902a695d2f5ef30674226f07fed11ef8696d85cb5716b057e89fadb2",
+      "synthetic-openxr/focus.dsculpt": "eb0410bd52048d3fbe2554880b22c82263fa79b539aeb6714b69da2faeee9ba4",
+      "wayland/pointer-weights.dsculpt": "8d28f8170d3c71cb70b6e166381d106b37b27ed9334fbe5c5dc8f0b0636e0bfd"
+    },
+    "synthetic_openxr": {
+      "checks": 7,
+      "report_sha256": "31a14c81930ea20a3dbda9875090ba5ca95ac5bd9de64848c64028f713adaada"
+    },
+    "nested_domed_wayland": {
+      "checks": 10,
+      "dmabuf_render_node": "/dev/dri/renderD129",
+      "report_sha256": "94a5147e0daae1152fe275794fa5a809f4e504de96b01e6bc74d3fcd197e6a60",
+      "device_brush_launches": 4,
+      "trace_sha256": "1b348cab20f701674185cd37476b2846debc8d6112492c7208ed812ecc8569bf"
+    },
+    "missing_device": "FAIL No device of requested type 'info::device_type::gpu' available.",
+    "focused_suite_trace": {
+      "device_brush_launches": 119,
+      "trace_sha256": "8e4320b7b74480b3b9c0ffe93506bf6e733b20a6ae16c0ac4ee5333b451ac641"
+    }
+  },
+  "headless_numerical_test_reference": {
+    "cases": [
+      "cpu-reference-install-refused",
+      "weight-edit",
+      "weight-authoring",
+      "weight-transfer-batch"
+    ],
+    "log_sha256": "590b78fd5da8854c219f49c630f46aae4eef79a867684cd3b36b0e9b9999d07e"
+  },
+  "scoped_arc_asan_ubsan": {
+    "instrumented_units": [
+      "weight-edit.cpp",
+      "weight-authoring.cpp",
+      "tests/weight-edit.cpp",
+      "tests/weight-authoring.cpp"
+    ],
+    "edit": {
+      "checks": 46,
+      "log_sha256": "b4355083e2166c07412422d197fce4b93ebc38de48ac5b83f40ec314e73c9baf"
+    },
+    "authoring": {
+      "checks": 80,
+      "log_sha256": "7822e07d479ecc692271756aa0679233cbc73eadded321d97f47b525405af03e"
+    }
+  },
+  "vendor_compile_and_missing_device": {
+    "cuda": {
+      "object_sha256": "358dd2a4f38455463afeb43456e84876a352ff3662b8790b3a43b022837ce0e1",
+      "missing_device": "CUDA driver version is insufficient for CUDA runtime version"
+    },
+    "rocm": {
+      "object_sha256": "4d74d84b8b1a59dccd249e9767c0f59b735a08cea58c4b8bee98572f335aa760",
+      "missing_device": "no ROCm-capable device is detected"
+    }
+  },
+  "remaining_scope": [
+    "Sustained production-size live stroke latency",
+    "Positive CUDA and ROCm execution",
+    "Physical headset and full GPU-only Release qualification"
+  ]
+}
