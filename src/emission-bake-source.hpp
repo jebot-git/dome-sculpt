@@ -17,10 +17,10 @@ std::shared_ptr<const TextureMaps> raw_bake_source(const SculptObject &,
 std::shared_ptr<const TextureMaps> source_baked_preview(const SculptObject &,
     const std::function<bool()> &cancelled={});
 // Actual immutable source radiance evaluated at the source projection hit.
-// Empty means the unchanged legacy Bake path is sufficient. No RGB8 composite
-// is accepted as physical radiance authority.
+// Empty means the unchanged legacy Bake path is sufficient. An absolute Bake
+// requests the exact source field even when all source values fit in LDR.
 std::function<std::array<float,3>(uint32_t,std::array<float,3>)>
 emission_bake_source(const SculptObject &,const std::function<bool()> &cancelled={},
     const SourceBakeNormalResolver *captured_normals=nullptr,
-    std::shared_ptr<const EmissionBakeBatch> *batch=nullptr);
+    std::shared_ptr<const EmissionBakeBatch> *batch=nullptr,bool require_absolute=false);
 }

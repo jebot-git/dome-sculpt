@@ -126,8 +126,8 @@ struct Source {
 bool framed_source_bake(const SculptObject &object) noexcept {
   const auto &paint=object.painted;
   const auto &binding=object.material_bindings;
-  if(!object.mesh_active||!paint||!binding||!binding->normal_frames||binding->has_mtoon||
-     object.material.toon||binding->canonical_attributes||paint->paint_sampling_domain()||
+  if(!object.mesh_active||!paint||!binding||!binding->normal_frames||
+     (!binding->has_mtoon&&object.material.toon)||binding->canonical_attributes||paint->paint_sampling_domain()||
      !paint->source_sampling_prepared()||!paint->source_maps()||!paint->valid_source_sampling_attachment()||
      paint->color_projection()||paint->normal_projection())return false;
   const auto &baked=paint->baked();
@@ -141,11 +141,15 @@ struct ImportedBakedNormal {
   AffineTransform placement;
   std::vector<NormalBakeVertex> columns;
 
-  Vec3 at(const Source &source, const std::vector<NormalBakeVertex> &artist,
-          uint32_t triangle, std::array<float,3> bary) const {
+  Vec3 core_normal(const Source &source, const std::vector<NormalBakeVertex> &artist,
+                   uint32_t triangle, std::array<float,3> bary) const {
     Vec3 original{};
     for(size_t k=0;k<3;++k)original+=artist.at(size_t(triangle)*3+k).n*bary[k];
-    original=source_texture_normal_placed(*geometry,*source.maps,triangle,bary,original,placement);
+    return source_texture_normal_placed(*geometry,*source.maps,triangle,bary,original,placement);
+  }
+
+  Vec3 with_detail(const Source &source,Vec3 original,uint32_t triangle,
+                   std::array<float,3> bary,bool back=false) const {
     if(columns.empty())return original;
     const auto &event=*source.packet->baked();
     const auto uv=source.coordinates(triangle,bary,0,false);
@@ -167,7 +171,8 @@ struct ImportedBakedNormal {
       return m>1e-20f?normalized(v/m):Vec3{0,0,1};
     };
     const auto detail=premultiplied/amount;
-    const auto n=unit_or_z(frame.t*detail.x+frame.b*detail.y+frame.n*detail.z);
+    const auto n=unit_or_z(frame.t*detail.x+frame.b*(back?-detail.y:detail.y)+
+                          frame.n*(back?-detail.z:detail.z));
     return unit_or_z(original*(1-amount)+n*amount);
   }
 };
@@ -532,6 +537,7 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
   Source coordinates;coordinates.mesh=object.painted->mesh_owner();coordinates.maps=object.painted->source_maps();
   coordinates.packet=paired_maps?paired_maps->overlay:PaintOverlayFactory::capture(*object.painted,options.cancelled);
   coordinates.authored_mtoon_uv1=options.authored_mtoon_uv1;
+  coordinates.independent_source=object.painted->source_sampling_prepared();
   coordinates.cancelled=options.cancelled;
   if(!coordinates.maps)coordinates.maps=std::make_shared<const PaintSourceMaps>();
   coordinates.maps->validate_surface(mesh);
@@ -590,7 +596,11 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
       current_normals,retained,field,canonical_uv,native_normal=std::move(native_normal),domain,
       source8=std::move(source8)](uint32_t triangle,std::array<float,3> bary,bool mtoon_back){
     coordinates.stop();const std::array<double,3> weights{bary[0],bary[1],bary[2]};std::array<Vec3,2> result;
-    if(source8){const auto n=source8->at(coordinates,immutable->at(0),triangle,bary);return std::array{n,n};}
+    if(source8){
+      const auto original=source8->core_normal(coordinates,immutable->at(0),triangle,bary);
+      result[0]=source8->with_detail(coordinates,original,triangle,bary);
+      if(!typed)return std::array{result[0],result[0]};
+    }
     if(field){
       // Both canonical planes are encoded against the same prepared PBR columns.
       std::array<NormalBakeVertex,3> corners;
@@ -618,7 +628,7 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
       const auto normal=normalized(basis.t*n.x+basis.b*n.y+basis.n*n.z);
       return std::array{normal,normal};
     }
-    for(size_t role=0;role<(typed?2u:1u);++role){
+    for(size_t role=source8?1:0;role<(typed?2u:1u);++role){
       std::array<NormalBakeVertex,3> corners;for(size_t k=0;k<3;++k)corners[k]=immutable->at(role).at(size_t(triangle)*3+k);
       const bool back=mtoon_back&&role==1&&typed->version()==MToonVersion::V1;
       if(!has_tangent[role]){Vec3 N;for(size_t k=0;k<3;++k)N+=corners[k].n*bary[k];result[role]=normalized(N)*(back?-1.f:1.f);continue;}
@@ -650,7 +660,9 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
         result[role]=normalized(basis.t*ts.x+basis.b*ts.y+basis.n*ts.z);
       }
     }
-    if(!typed)result[1]=result[0];
+    if(source8)result[1]=source8->with_detail(coordinates,result[1],triangle,bary,
+        mtoon_back&&typed->version()==MToonVersion::V1);
+    else if(!typed)result[1]=result[0];
     return result;
   };
   return SourceBakeNormalResolver(std::move(sample),prepared?object.painted->normal_projection():nullptr,
@@ -730,8 +742,8 @@ std::shared_ptr<const TextureMaps> raw_bake_source(const SculptObject &object,
 std::shared_ptr<const TextureMaps> source_baked_preview(const SculptObject &object,
     const std::function<bool()> &cancelled){
   if(!object.mesh_active||!object.painted||!object.painted->source_sampling_prepared()||!object.painted->baked())return {};
-  // Same authenticated original/current role and rest-frame contract as Bake.
-  // This deliberately retains typed/prepared/changed-pose refusals.
+  // Keep the original material frames and the independently baked atlas
+  // frame paired with their current geometry and deformation.
   if(framed_source_bake(object))
     normal_frame_current_authority(*object.material_bindings,object.painted->mesh(),object.deformation.get(),cancelled);
   else (void)raw_bake_source(object,cancelled);
@@ -739,7 +751,8 @@ std::shared_ptr<const TextureMaps> source_baked_preview(const SculptObject &obje
 }
 std::function<std::array<float,3>(uint32_t,std::array<float,3>)>
 emission_bake_source(const SculptObject &object,const std::function<bool()> &cancelled,
-    const SourceBakeNormalResolver *captured_normals,std::shared_ptr<const EmissionBakeBatch> *batch){
+    const SourceBakeNormalResolver *captured_normals,std::shared_ptr<const EmissionBakeBatch> *batch,
+    bool require_absolute){
   if(batch)batch->reset();
   if(cancelled&&cancelled())throw std::runtime_error("Emission Bake cancelled");
   const auto &binding=object.material_bindings;
@@ -750,7 +763,8 @@ emission_bake_source(const SculptObject &object,const std::function<bool()> &can
   const bool typed_hdr=typed&&(typed->parameters.emission_strength>1||
       typed->parameters.emission.x>1||typed->parameters.emission.y>1||typed->parameters.emission.z>1);
   const bool hdr=std::any_of(object.material.emissive.begin(),object.material.emissive.end(),[](float x){return x>1;});
-  if(!hdr&&!typed_hdr&&!(object.painted&&object.painted->has_physical_emission())&&!(binding&&binding->physical_emission))return {};
+  if(!require_absolute&&!hdr&&!typed_hdr&&!(object.painted&&object.painted->has_physical_emission())&&
+     !(binding&&binding->physical_emission))return {};
   object.material.validate();if(binding)binding->validate();
   auto source=std::make_shared<Source>();source->background=object.material.emissive;source->cancelled=cancelled;
   if(object.mesh_active&&object.painted){

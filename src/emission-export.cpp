@@ -478,9 +478,10 @@ EmissionExportPrepared prepare_emission_export(std::span<const ObjectSurface> ob
  const auto &binding=owner.material_bindings;
  const bool prepared_mtoon=entry.prepared_source_mesh&&binding&&binding->has_mtoon&&
      binding->material.version()==MToonVersion::V1;
- if(prepared_mtoon&&(!owner.appearance||owner.painted->baked()))
-  throw std::invalid_argument("Prepared MToon1 HDR Bake requires separate typed color and normal adapters");
+ if(prepared_mtoon&&!owner.appearance)
+  throw std::invalid_argument("Prepared MToon1 HDR requires its original imported material");
  entry.authored_mtoon=authored_mtoon||prepared_mtoon;
+ if(prepared_mtoon)entry.prepared_mtoon_bake=owner.painted->baked();
  auto &image=entry.image;
  if(result.streaming){
   auto source=export_emission_raster(owner,cancelled,entry.authored_mtoon,bool(entry.prepared_source_mesh));

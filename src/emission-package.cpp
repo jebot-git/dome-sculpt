@@ -378,8 +378,15 @@ void prepared_source_domain(const Json &j,std::span<const uint8_t> binary,const 
  if(typed!=(extensions!=material.end()&&extensions->contains("VRMC_materials_mtoon"))||
     (typed&&(!object.appearance||!object.material_bindings||!object.material_bindings->has_mtoon||
      object.material_bindings->material.version()!=MToonVersion::V1||
-     extensions->at("VRMC_materials_mtoon").at("specVersion")!="1.0"||object.painted->baked())))
+     extensions->at("VRMC_materials_mtoon").at("specVersion")!="1.0")))
   throw std::invalid_argument("Prepared HDR lost its actual emitted MToon1 view");
+ if(typed&&object.painted->baked()){
+  const auto same_atlas=[&](const Json &info){return info.value("texCoord",size_t(0))==coordinate&&!info.contains("extensions");};
+  if(!same_atlas(material.at("pbrMetallicRoughness").at("baseColorTexture"))||
+     (!object.painted->baked()->maps.normal.rgba.empty()&&
+       (!same_atlas(material.at("normalTexture"))||!primitives[0].at("attributes").contains("TANGENT"))))
+   throw std::invalid_argument("Prepared MToon1 Bake lost its compiled color or normal atlas");
+ }
  const auto &info=material.at("emissiveTexture");
  if(info.value("texCoord",size_t(0))!=coordinate||info.contains("extensions"))
   throw std::invalid_argument("Prepared HDR emissive texture uses different coordinates");
@@ -566,8 +573,10 @@ void detail::attach_native_emission(GltfDocument &document,const NativeEmissionE
  exr_bytes+=bytes.size();auto record=append(bytes);record["object"]=entry.object;record["node"]=entry.node;record["material"]=entry.material;if(streaming)record["view"]=entry.authored_mtoon?"authored-mtoon":"pbr";record["fallback"]={{"strength",entry.fallback_strength},{"emissiveFactor",entry.fallback_factor},{"maximumAbsoluteError",entry.maximum_absolute_error},{"maximumRelativeError",entry.maximum_relative_error},{"erasedNonzeroSamples",entry.erased_nonzero_samples},{"evaluation","current-static-view"}};if(entry.image.version==2){record["fallback"]["version"]=2;record["fallback"]["units"]=detail::resolved_fallback_units;record["fallback"]["view"]=entry.authored_mtoon?"authored-mtoon":"pbr";}fallback(record.at("fallback"),entry.image.version);if(entry.native_paint_domain||entry.canonical_paint_domain){record["domain"]={{"version",1},{"kind",entry.canonical_paint_domain?"canonical-paint37":"native-paint32"},{"texCoord",entry.texcoord}};native_domain(j,document.binary,record,owner.object(entry.object),cancelled,canonical_domains);}
  if(entry.prepared_source_mesh){
   const auto mesh=current_object.painted?current_object.painted->mesh_owner():nullptr;
+  const auto baked=entry.authored_mtoon&&current_object.painted?current_object.painted->baked():nullptr;
   if(entry.native_paint_domain||entry.canonical_paint_domain||entry.texture_set||
-     entry.prepared_source_mesh!=mesh||entry.prepared_source_mesh.owner_before(mesh)||mesh.owner_before(entry.prepared_source_mesh))
+     entry.prepared_source_mesh!=mesh||entry.prepared_source_mesh.owner_before(mesh)||mesh.owner_before(entry.prepared_source_mesh)||
+     entry.prepared_mtoon_bake!=baked||entry.prepared_mtoon_bake.owner_before(baked)||baked.owner_before(entry.prepared_mtoon_bake))
    throw std::invalid_argument("Prepared HDR record lost its immutable mesh owner");
   record["domain"]={{"version",1},{"kind","prepared-source"},{"texCoord",entry.texcoord}};
   prepared_source_domain(j,document.binary,record,current_object,cancelled);

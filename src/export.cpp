@@ -987,10 +987,12 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     return true;
   };
   std::array<bool,8> uv_available{};
-  const auto prepared_mtoon=[&](uint64_t id){
-    return physical&&!physical->authored_mtoon&&std::ranges::any_of(physical->images,[&](const auto &entry){
+  const auto prepared_mtoon=[&](uint64_t id)->const EmissionExportImage*{
+    if(!physical||physical->authored_mtoon)return nullptr;
+    const auto field=std::ranges::find_if(physical->images,[&](const auto &entry){
       return entry.object==id&&entry.prepared_source_mesh&&entry.authored_mtoon;
     });
+    return field==physical->images.end()?nullptr:&*field;
   };
   auto source_info = [&](const PaintSourceTexture &slot) {
     slot.validate(8);
@@ -1114,13 +1116,17 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     }
   };
   const auto write_prepared_mtoon=[&](const ObjectSurface &object,size_t i,int material_id){
-    if(!prepared_mtoon(object.id))return;
+    const auto *field=prepared_mtoon(object.id);
+    if(!field)return;
+    const bool baked=bool(field->prepared_mtoon_bake);
+    const bool baked_normal=baked&&!field->prepared_mtoon_bake->maps.normal.rgba.empty();
     const auto &binding=*object.material_bindings;
     const auto &frames=binding.normal_frames;
     const auto &params=binding.material.parameters;
+    const bool tangent=params.normal_enabled||baked_normal;
     if(!frames||!frames->pbr||!frames->mtoon||
-       !normal_frame_attribute_equal(*frames->pbr,*frames->mtoon,params.normal_enabled,cancelled)||
-       (params.normal_enabled&&frames->pbr->tangents.empty()))
+       !normal_frame_attribute_equal(*frames->pbr,*frames->mtoon,tangent,cancelled)||
+       (tangent&&frames->pbr->tangents.empty()))
       throw std::invalid_argument("Prepared MToon1 HDR needs its shared glTF normal and tangent frame");
     (void)binding.material.copy_working_bytes(12*1024*1024,cancelled);
     auto typed=binding.material;
@@ -1145,6 +1151,11 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     const auto &attributes=j["meshes"][identity.mesh]["primitives"][0]["attributes"];
     constexpr auto emission_slot=size_t(MToonSlot::Emission);
     typed.textures[emission_slot].index=-1;
+    if(baked)typed.textures[size_t(MToonSlot::Base)].index=-1;
+    if(baked_normal){
+      typed.textures[size_t(MToonSlot::Normal)].index=-1;
+      effective.normal_enabled=false;
+    }
     for(size_t role=0;role<binding.roles.size();++role){
       stop();
       auto &slot=typed.textures[role];
@@ -1162,12 +1173,16 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     if(!collect_mtoon_extensions(source,extensions))
       throw std::invalid_argument("Prepared MToon1 HDR requires known material and texture extensions");
     auto &output=j["materials"][material_id];
-    output["pbrMetallicRoughness"]["baseColorFactor"]=effective.base_color;
-    if(typed.textures[size_t(MToonSlot::Base)].index>=0)
-      output["pbrMetallicRoughness"]["baseColorTexture"]=source.at("pbrMetallicRoughness").at("baseColorTexture");
-    else output["pbrMetallicRoughness"].erase("baseColorTexture");
-    if(effective.normal_enabled)output["normalTexture"]=source.at("normalTexture");
-    else output.erase("normalTexture");
+    if(!baked){
+      output["pbrMetallicRoughness"]["baseColorFactor"]=effective.base_color;
+      if(typed.textures[size_t(MToonSlot::Base)].index>=0)
+        output["pbrMetallicRoughness"]["baseColorTexture"]=source.at("pbrMetallicRoughness").at("baseColorTexture");
+      else output["pbrMetallicRoughness"].erase("baseColorTexture");
+    }
+    if(!baked_normal){
+      if(effective.normal_enabled)output["normalTexture"]=source.at("normalTexture");
+      else output.erase("normalTexture");
+    }
     output["doubleSided"]=effective.cull==MToonCull::Off;
     output["alphaMode"]=effective.alpha==MToonAlpha::Mask?"MASK":effective.alpha==MToonAlpha::Blend?"BLEND":"OPAQUE";
     if(effective.alpha==MToonAlpha::Mask)output["alphaCutoff"]=effective.alpha_cutoff;

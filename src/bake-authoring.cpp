@@ -384,11 +384,16 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   RetainedBakePose retained_pose{cancelled};
   const auto retained_recipient=retained_target
     ?retained_pose.field(*recipient,posed_target?&*posed_target:nullptr):nullptr;
+  // A typed recipient's relative layer gain must not dim or amplify the donor.
+  const auto &recipient_binding=recipient?recipient->material_bindings:target.material_bindings;
+  const bool absolute_emission=(!recipient||!recipient->source)&&recipient_binding&&
+      recipient_binding->has_mtoon&&recipient_binding->material.parameters.emission_strength!=1;
   if(source.texture_sets)source_fields=capture_texture_set_bake_source(high,source,relative,placement,retained_pose);
   else{
     high.materials[0].material=source.material;
     auto &material=high.materials[0];
-    material.resolved_emission=detail::emission_bake_source(source,cancelled,&source_normals,&material.emission_batch);
+    material.resolved_emission=detail::emission_bake_source(source,cancelled,&source_normals,
+        &material.emission_batch,absolute_emission&&!recipient);
   }
   std::vector<Tangent> placed_corners;
   if(placement&&!source_normals&&std::any_of(high.materials.begin(),high.materials.end(),[](const auto &field){
@@ -631,9 +636,6 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   };
   if(retained_recipient&&!split_recipient)encode_retained(options);
   if(separate_normal_pass&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
-  // A typed recipient's relative layer gain must not dim or amplify the donor.
-  const bool absolute_emission=recipient&&!recipient->source&&recipient->material_bindings&&
-      recipient->material_bindings->has_mtoon&&recipient->material_bindings->material.parameters.emission_strength!=1;
   auto result = native_attributes?detail::bake_mesh_native_attributes(low_mesh,high,options,
       source_normals,source_fields,source_placement,target_metric_corners,settings.corresponding_topology):
       detail::bake_mesh_source_normals(low_mesh,high,options,source_normals,

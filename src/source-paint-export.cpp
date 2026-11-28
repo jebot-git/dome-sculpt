@@ -6,6 +6,8 @@
 #include "emission-bake-source.hpp"
 #include "emission-paint-access.hpp"
 #include "emission-raster-device.hpp"
+#include "import-texture-transform.hpp"
+#include "mtoon-role-sampling.hpp"
 #include "normal-bake-encoding.hpp"
 #include "normal-bake-frames.hpp"
 #include "paint-overlay-sample.hpp"
@@ -434,7 +436,7 @@ void prepare_baked_export_frame(const SculptObject &owner,ObjectSurface &out,
   options.cancelled=cancelled;
   auto candidate=normal_bake_frame_candidate(owner.painted->mesh(),owner.deformation.get(),binding.get(),options);
   auto staged=binding?std::make_shared<SourceMaterialBindings>(*binding):std::make_shared<SourceMaterialBindings>();
-  staged->has_mtoon=false;
+  staged->has_mtoon=binding&&binding->has_mtoon;
   staged->normal_frame=SourceMaterialNormalFrame::OriginalAttributes;
   staged->normal_frames=std::move(candidate.frames);
   if(!frames){
@@ -468,6 +470,8 @@ std::shared_ptr<Image> baked_normal_atlas(const SculptObject &owner,const Object
   const auto sample=source_bake_normals(rest,{},SourceBakeNormalOptions{128u*1024u*1024u,work.cancelled});
   if(!sample)throw std::invalid_argument("Prepared HDR Bake lost its actual native normal resolver");
   const auto &frame=*frames->pbr;
+  const bool typed=out.material_bindings->has_mtoon;
+  const auto basis_mode=typed?NormalFragmentBasis::UnitCross:NormalFragmentBasis::UnitColumns;
   const auto r=paint.resolution();
   auto normal=std::make_shared<Image>(Image{r,r,std::vector<uint8_t>(padding.size()*4)});
   uint32_t prior=UINT32_MAX;
@@ -485,13 +489,37 @@ std::shared_ptr<Image> baked_normal_atlas(const SculptObject &owner,const Object
       }
       prior=face;
     }
-    const auto basis=normal_bake_basis(columns,{bary[0],bary[1],bary[2]},NormalFragmentBasis::UnitColumns);
-    const auto encoded=encode_normal_bake(basis,sample(face,bary)[0]);
+    const auto basis=normal_bake_basis(columns,{bary[0],bary[1],bary[2]},basis_mode);
+    const auto encoded=encode_normal_bake(basis,sample(face,bary)[typed?1:0]);
     if(!encoded||encoded->quantized_angle_radians>.02)
       throw std::invalid_argument("Prepared HDR Bake cannot encode its normal in the emitted tangent frame");
     std::copy(encoded->rgba.begin(),encoded->rgba.end(),normal->rgba.begin()+at*4);
   }
   return normal;
+}
+
+void validate_baked_mtoon_color(const SculptObject &owner) {
+  const auto &binding=*owner.material_bindings;
+  const auto &typed=binding.material;
+  const auto &params=typed.parameters;
+  if(typed.version()!=MToonVersion::V1||params.base_color!=binding.native_reference.color||
+     int(params.alpha)+1!=binding.native_reference.alpha||params.alpha_cutoff!=binding.native_reference.alpha_cutoff||
+     mtoon_shared_shade(binding))
+    throw std::invalid_argument("Prepared MToon1 color Bake requires its shared base role and separate shade sampling");
+  const auto &before=*owner.painted->source_sampling_original();
+  const PaintSourceTexture empty;
+  const auto &source=before.source_maps()?before.source_maps()->color:empty;
+  const auto &base=binding.roles[size_t(MToonSlot::Base)];
+  const auto &slot=typed.textures[size_t(MToonSlot::Base)];
+  if(base.image!=source.image||base.image.owner_before(source.image)||source.image.owner_before(base.image))
+    throw std::invalid_argument("Prepared MToon1 color Bake requires the original glTF base image");
+  if(base.image&&(base.wrap_s!=source.wrap_s||base.wrap_t!=source.wrap_t||
+      base.min_filter!=source.min_filter||base.mag_filter!=source.mag_filter||
+      base.uv_transform!=std::array<float,6>{1,0,0,1,0,0}||
+      source.texcoord!=mtoon_coordinate(slot)||
+      source.uv_transform!=imported_texture_matrix(ImportedTextureTransform{
+          true,slot.offset,slot.scale,slot.rotation,slot.transform_texcoord})))
+    throw std::invalid_argument("Prepared MToon1 color Bake requires the original glTF base sampler");
 }
 
 PaintAtlas compile_baked_hdr_atlas(const SculptObject &owner,const ObjectSurface &out,
@@ -502,6 +530,8 @@ PaintAtlas compile_baked_hdr_atlas(const SculptObject &owner,const ObjectSurface
   const auto r=paint.resolution();
   ProofWork work{cancelled};
   work.charge(padding.size()*6);
+  if(owner.material_bindings&&owner.material_bindings->has_mtoon&&material.alpha==Material::AlphaMode::Automatic)
+    material.alpha=Material::AlphaMode(owner.material_bindings->native_reference.alpha);
   AtlasAlpha alpha;
   bool prove_mask=false;
   if(material.alpha==Material::AlphaMode::Mask){
@@ -911,6 +941,7 @@ void source_baked_hdr_export(const SculptObject &owner,ObjectSurface &out,
      out.material.emissive!=std::array<float,3>{})
     throw std::invalid_argument("Prepared HDR Bake requires its actual non-emission material view");
   out.textures=std::move(marker);
+  if(owner.material_bindings&&owner.material_bindings->has_mtoon)validate_baked_mtoon_color(owner);
   prepare_baked_export_frame(owner,out,cancelled);
   compile_source_surface(*paint,out,cancelled,SourcePaintExport::StandardHdr,&owner);
 }
