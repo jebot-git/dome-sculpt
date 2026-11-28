@@ -4760,16 +4760,31 @@ std::shared_ptr<PaintedMesh> SourcePaintAccess::transfer_bake_uv(const PaintedMe
         write_normals(at,directions);
       }
     }else{
-      const size_t row_bytes=sizeof(Device::BakeUvSample)+sizeof(Device::BakeUvMapsPixel)+
+      const size_t row_bytes=sizeof(Device::BakeUvPoint)+sizeof(Device::BakeUvMapsPixel)+
           (bake.emission_field?sizeof(BakedEmissionSample):0);
-      const auto input_bytes=bake.storage_bytes()+sizeof(paint_compute::Quantization)+std::span(frames).size_bytes();
-      if(input_bytes>=remaining)throw std::length_error("UV transfer cannot stage its Bake on the GPU");
+      const auto triangle_count=old.indices.size()/3;
+      const auto triangle_bytes=triangle_count*sizeof(Device::BakeUvTriangle);
+      const auto &padding=source.surface_->padding;
+      const auto input_bytes=bake.storage_bytes()+sizeof(paint_compute::Quantization)+std::span(frames).size_bytes()+
+          triangle_bytes+std::span(padding).size_bytes();
+      if(input_bytes>=remaining||triangle_bytes>=remaining-input_bytes)
+        throw std::length_error("UV transfer cannot stage its Bake and source atlas on the GPU");
       // Bound both host and device batches, leaving room for native FLOAT output.
-      const auto capacity=std::min({Device::mapped_batch,pixels,size_t((remaining-input_bytes)/(4*row_bytes))});
+      const auto capacity=std::min({Device::mapped_batch,pixels,size_t((remaining-input_bytes-triangle_bytes)/(4*row_bytes))});
       if(!capacity)throw std::length_error("UV transfer cannot stage a GPU Bake filter batch");
       const auto available=remaining-input_bytes-2*capacity*row_bytes;
-      const auto device=detail::create_bake_uv_maps_device(bake,r,frames,capacity,options.cancelled);
-      std::vector<Device::BakeUvSample> requests(capacity);
+      const auto device=[&]{
+        std::vector<Device::BakeUvTriangle> triangles(triangle_count);
+        for(size_t face=0;face<triangle_count;++face){
+          if((face&1023)==0)stop();
+          for(size_t corner=0;corner<3;++corner){
+            const auto &uv=old.uv[old.indices[face*3+corner]];
+            std::copy(uv.begin(),uv.end(),triangles[face].uv[corner]);
+          }
+        }
+        return detail::create_bake_uv_maps_device(bake,r,frames,capacity,options.cancelled,{triangles,padding});
+      }();
+      std::vector<Device::BakeUvPoint> requests(capacity);
       std::vector<Device::BakeUvMapsPixel> maps(capacity);
       size_t maps_written=0;
       const auto filter=[&](size_t first,size_t count,std::span<BakedEmissionSample> emission){
@@ -4782,25 +4797,14 @@ std::shared_ptr<PaintedMesh> SourcePaintAccess::transfer_bake_uv(const PaintedMe
           const auto &texel=surface.texels[first+n];
           if(!texel.covered())continue;
           if(write_maps)visit(16);
-          if(write_maps&&!frames.empty()){
-            batch[n].face=texel.face;
-            batch[n].bary[0]=texel.bary[0];
-            batch[n].bary[1]=texel.bary[1];
-          }
-          const auto taps=taps_at(texel);
-          for(size_t tap=0;tap<taps.size();++tap){
-            batch[n].texels[tap]=uint32_t(taps[tap].texel);
-            batch[n].weights[tap]=float(taps[tap].weight);
-          }
+          batch[n]={texel.face,{texel.bary[0],texel.bary[1]}};
         }
-        if(!write_maps){
-          device->read_bake_uv(batch,emission,options.cancelled);
-          return;
-        }
-        device->read_bake_uv_maps(batch,std::span(maps).first(count),emission,options.cancelled);
+        const auto batch_maps=std::span(maps).first(write_maps?count:0);
+        device->read_bake_uv_points(batch,batch_maps,emission,options.cancelled);
+        if(!write_maps)return;
         for(size_t n=0;n<count;++n){
           if((n&1023)==0)stop();
-          const auto &sample=maps[n];
+          const auto &sample=batch_maps[n];
           if(!sample.coverage)continue;
           if(sample.invalid_normal)
             throw std::invalid_argument("UV transfer exceeds the baked normal frame error limit");

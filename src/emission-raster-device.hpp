@@ -40,6 +40,12 @@ public:
     uint32_t face=0;
     float bary[2]{};
   };
+  struct BakeUvPoint { uint32_t face=UINT32_MAX; float bary[2]{}; };
+  struct BakeUvTriangle { float uv[3][2]{}; };
+  struct BakeUvSource {
+    std::span<const BakeUvTriangle> triangles;
+    std::span<const int32_t> padding;
+  };
   struct BakeUvFrame { NormalBakeVertex before[3],after[3]; };
   struct BakeUvMapsPixel {
     uint8_t color[4]{},orm[4]{},legacy[4]{},normals[2][4]{};
@@ -54,6 +60,8 @@ public:
   virtual void read_bake_uv(std::span<const BakeUvSample>,std::span<BakedEmissionSample>,const std::function<bool()> &) = 0;
   virtual void read_bake_uv_maps(std::span<const BakeUvSample>,std::span<BakeUvMapsPixel>,
                                  std::span<BakedEmissionSample>,const std::function<bool()> &) = 0;
+  virtual void read_bake_uv_points(std::span<const BakeUvPoint>,std::span<BakeUvMapsPixel>,
+                                   std::span<BakedEmissionSample>,const std::function<bool()> &) = 0;
   virtual void read_texture_set_preview(size_t first,std::span<TextureSetPreview>,const std::function<bool()> &) = 0;
 };
 
@@ -72,7 +80,8 @@ std::unique_ptr<EmissionRasterDevice> create_mapped_emission_field_device(
 std::unique_ptr<EmissionRasterDevice> create_bake_uv_emission_device(const BakedEmissionField &,size_t capacity,
     const std::function<bool()> &);
 std::unique_ptr<EmissionRasterDevice> create_bake_uv_maps_device(const BakedTextures &,uint32_t resolution,
-    std::span<const EmissionRasterDevice::BakeUvFrame>,size_t capacity,const std::function<bool()> &);
+    std::span<const EmissionRasterDevice::BakeUvFrame>,size_t capacity,const std::function<bool()> &,
+    EmissionRasterDevice::BakeUvSource source={});
 std::unique_ptr<EmissionRasterDevice> create_texture_set_emission_device(
     const PaintedMesh &,const PaintSourceTexture *,const Image *aligned_mtoon,
     std::array<float,3> background,float strength,const std::function<bool()> &);
@@ -115,6 +124,16 @@ struct BakeUvMaps {
   const paint_compute::Quantization *quantization=nullptr;
   const EmissionRasterDevice::BakeUvFrame *frames=nullptr;
 };
+struct BakeUvGeometry {
+  const EmissionRasterDevice::BakeUvTriangle *triangles=nullptr;
+  const int32_t *padding=nullptr;
+  uint32_t resolution=0;
+};
+struct BakeUvRequests {
+  BakeUvGeometry geometry;
+  const EmissionRasterDevice::BakeUvSample *taps=nullptr;
+  const EmissionRasterDevice::BakeUvPoint *points=nullptr;
+};
 struct Source {
   paint_compute::SourceCoordinateJob coordinates;
   const uint8_t *rgba=nullptr;
@@ -132,6 +151,7 @@ struct Input {
   std::span<const uint8_t> legacy_bake,bake_coverage;
   const BakedTextures *bake_uv_maps=nullptr;
   std::span<const EmissionRasterDevice::BakeUvFrame> bake_uv_frames;
+  EmissionRasterDevice::BakeUvSource bake_uv_source;
   std::span<const uint8_t> source;
   std::span<const float> aligned_mtoon_linear;
   std::vector<paint_compute::SourceTerms> columns,rows;

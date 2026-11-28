@@ -6,7 +6,7 @@
 namespace dome::detail::emission_raster {
 void launch_bake(sycl::queue &,DeviceInput,size_t,size_t,uint32_t *);
 void launch_bake_uv_filter(sycl::queue &,Bake,const EmissionRasterDevice::BakeUvSample *,size_t,uint32_t *);
-void launch_bake_uv_maps(sycl::queue &,BakeUvMaps,Bake,const EmissionRasterDevice::BakeUvSample *,size_t,
+void launch_bake_uv_maps(sycl::queue &,BakeUvMaps,Bake,BakeUvRequests,size_t,
                          EmissionRasterDevice::BakeUvMapsPixel *,uint32_t *);
 void launch_typed(sycl::queue &,DeviceInput,size_t,size_t,uint32_t *);
 void launch_finite(sycl::queue &,DeviceInput,FiniteGrid,size_t,size_t,uint32_t *);
@@ -67,9 +67,9 @@ public:
   void filter_bake_uv(Bake bake,const EmissionRasterDevice::BakeUvSample *samples,size_t count,uint32_t *out){
     launch_bake_uv_filter(queue_,bake,samples,count,out);
   }
-  void filter_bake_uv_maps(BakeUvMaps maps,Bake bake,const EmissionRasterDevice::BakeUvSample *samples,
+  void filter_bake_uv_maps(BakeUvMaps maps,Bake bake,BakeUvRequests requests,
       size_t count,EmissionRasterDevice::BakeUvMapsPixel *out,uint32_t *emission){
-    launch_bake_uv_maps(queue_,maps,bake,samples,count,out,emission);
+    launch_bake_uv_maps(queue_,maps,bake,requests,count,out,emission);
   }
   void sample_material(MappedSourceImage image,const paint_compute::Quantization *q,
       const SourceUvSampler::Coordinate *uv,size_t count,uint32_t *out){

@@ -395,6 +395,81 @@ void compare_uv_layers(){
   std::cout<<"PASS mapped UV paint exact common bytes, coverage, masks, FLOAT and prepared color "<<3*probes<<" texels\n";
 }
 
+void compare_uv_correspondence(){
+  constexpr uint32_t extent=64;
+  constexpr size_t count=extent*extent;
+  using Device=detail::EmissionRasterDevice;
+  const std::array triangles{
+    Device::BakeUvTriangle{{{0,0},{1,0},{0,1}}},
+    Device::BakeUvTriangle{{{1,1},{0,1},{1,0}}},
+    Device::BakeUvTriangle{{{.13f,.06f},{.78f,.91f},{.33f,.13f}}},
+    Device::BakeUvTriangle{{{.5f,.5f},{.49999997f,.50000006f},{.02f,.96875f}}}};
+  BakedTextures bake;
+  std::vector<int32_t> padding(count);
+  std::vector<Device::BakeUvPoint> points(count);
+  std::vector<Device::BakeUvSample> taps(count);
+  bake.coverage.resize(count);
+  for(auto *image:{&bake.maps.color,&bake.maps.metal_rough,&bake.maps.emission})
+    *image={extent,extent,std::vector<uint8_t>(count*4)};
+  for(size_t at=0;at<count;++at){
+    padding[at]=at%7==0?-1:at%19==0?int32_t((at+11)%count):int32_t(at);
+    bake.coverage[at]=(at%13)?uint8_t(at*93):0;
+    for(unsigned c=0;c<4;++c){
+      bake.maps.color.rgba[at*4+c]=uint8_t((at*(61+c))^(at/31));
+      bake.maps.metal_rough.rgba[at*4+c]=uint8_t((at*(79+c))^(at/17));
+      bake.maps.emission.rgba[at*4+c]=uint8_t((at*(51+c))^(at/23));
+    }
+  }
+  for(size_t i=0;i<count;++i){
+    if(i%17==0)continue;
+    const float a=i%23?float(i%101)/101.f:1;
+    const float b=i%23?(1-a)*(float(i%73)/73.f):0;
+    auto &point=points[i];
+    point={uint32_t(i%triangles.size()),{a,b}};
+    const auto &corners=triangles[point.face].uv;
+    const float weights[]{a,b,1-a-b};
+    std::array<float,2> uv{};
+    for(unsigned corner=0;corner<3;++corner)for(unsigned axis=0;axis<2;++axis)
+      uv[axis]+=weights[corner]*corners[corner][axis];
+    const auto footprint=detail::paint_bilinear_taps(extent,uv,padding,true);
+    for(unsigned j=0;j<4;++j){
+      taps[i].texels[j]=uint32_t(footprint[j].texel);
+      taps[i].weights[j]=float(footprint[j].weight);
+    }
+  }
+  for(bool physical:{false,true}){
+    if(physical){
+      bake.maps.emission={};
+      bake.emission_field=BakedEmissionField::generate_compact(extent,[](size_t at){
+        return at%2?BakedEmissionSample{{.125f,.25f,0},{42000.f,1e-37f,.5f},1}:BakedEmissionSample{};
+      });
+    }
+    auto reference=detail::create_bake_uv_maps_device(bake,extent,{},count,{});
+    auto device=detail::create_bake_uv_maps_device(bake,extent,{},count,{},{triangles,padding});
+    std::vector<Device::BakeUvMapsPixel> a(count),b(count);
+    std::vector<BakedEmissionSample> expected(physical?count:0),actual(expected.size());
+    reference->read_bake_uv_maps(taps,a,expected,{});
+    device->read_bake_uv_points(points,b,actual,{});
+    for(size_t at=0;at<count;++at)
+      if(std::memcmp(&a[at],&b[at],sizeof(a[at]))||
+         (physical&&std::memcmp(&expected[at],&actual[at],sizeof(actual[at]))))
+        throw std::runtime_error("GPU Bake UV correspondence differs from host taps at "+std::to_string(at));
+    if(physical){
+      std::fill(actual.begin(),actual.end(),BakedEmissionSample{});
+      device->read_bake_uv_points(points,{},actual,{});
+      check(std::memcmp(expected.data(),actual.data(),actual.size()*sizeof(actual[0]))==0,
+            "GPU correspondence-only FLOAT pass differs from fused Bake output");
+    }
+    auto invalid=points.front();
+    invalid.face=uint32_t(triangles.size());
+    bool refused=false;
+    try{device->read_bake_uv_points(std::span(&invalid,1),std::span(b).first(1),{},{});}
+    catch(const std::invalid_argument &){refused=true;}
+    check(refused,"Invalid GPU correspondence triangle was not rejected");
+  }
+  std::cout<<"PASS GPU UV correspondence matches host taps over "<<2*count<<" map texels and "<<count<<" FLOAT-only texels\n";
+}
+
 void compare_finite(Fixture fixture,uint32_t extent,bool original){
   const auto scene=model(fixture);
   const auto &object=scene.active();
@@ -725,6 +800,7 @@ int main(int argc,char **argv)try{
     compare_bake_uv();
     compare_bake_uv_maps();
     compare_uv_layers();
+    compare_uv_correspondence();
     compare_finite(Fixture::BakeOnly,512,false);
     compare_finite(Fixture::LegacyBake,256,false);
     compare_finite(Fixture::Paint,512,true);

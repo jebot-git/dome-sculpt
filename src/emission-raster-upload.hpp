@@ -18,7 +18,11 @@ public:
     if(bake_uv_capacity_){
       stop();
       upload_bake(input);
-      bake_uv_samples_=allocate<BakeUvSample>(bake_uv_capacity_);
+      bake_uv_triangles_=input.bake_uv_source.triangles.size();
+      if(bake_uv_triangles_){
+        bake_uv_geometry_={upload(input.bake_uv_source.triangles),upload(input.bake_uv_source.padding),input.resolution};
+        bake_uv_points_=allocate<BakeUvPoint>(bake_uv_capacity_);
+      }else bake_uv_samples_=allocate<BakeUvSample>(bake_uv_capacity_);
       if(input.physical_bake)output_=allocate<uint32_t>(7*bake_uv_capacity_);
       if(input.bake_uv_maps){
         const auto &bake=*input.bake_uv_maps;
@@ -139,19 +143,41 @@ public:
        (!emission.empty()&&(!view_.bake.physical||emission.size()!=samples.size())))
       throw std::invalid_argument("Invalid GPU Bake UV maps batch");
     if(bake_uv_faces_)for(const auto &sample:samples){
-      const auto first=double(sample.bary[0]),second=double(sample.bary[1]),third=1.-first-second;
-      const auto valid=[](double value){return value>=-.00001&&value<=1.00001;};
-      if(sample.face>=bake_uv_faces_||!valid(first)||!valid(second)||!valid(third))
+      if(sample.face>=bake_uv_faces_||!valid_bake_uv_bary(sample.bary))
         throw std::invalid_argument("Invalid GPU Bake UV tangent sample");
     }
     upload_bake_uv_taps(samples,cancelled);
-    device_.filter_bake_uv_maps(bake_uv_maps_,view_.bake,bake_uv_samples_,samples.size(),
+    device_.filter_bake_uv_maps(bake_uv_maps_,view_.bake,{{},bake_uv_samples_,nullptr},samples.size(),
                                 bake_uv_maps_output_,emission.empty()?nullptr:output_);
     device_.download(maps.data(),bake_uv_maps_output_,maps.size_bytes());
     download_bake_uv(emission,cancelled);
   }
+  void read_bake_uv_points(std::span<const BakeUvPoint> points,std::span<BakeUvMapsPixel> maps,
+                          std::span<BakedEmissionSample> emission,const std::function<bool()> &cancelled) override {
+    if(!bake_uv_points_||points.empty()||points.size()>bake_uv_capacity_||
+       (maps.empty()&&emission.empty())||(!maps.empty()&&maps.size()!=points.size())||
+       (!emission.empty()&&(!view_.bake.physical||emission.size()!=points.size())))
+      throw std::invalid_argument("Invalid GPU Bake UV correspondence batch");
+    paint_compute::checkpoint(cancelled);
+    for(size_t i=0;i<points.size();++i){
+      if((i&1023)==0)paint_compute::checkpoint(cancelled);
+      const auto &point=points[i];
+      if(point.face!=UINT32_MAX&&(point.face>=bake_uv_triangles_||!valid_bake_uv_bary(point.bary)))
+        throw std::invalid_argument("Invalid GPU Bake UV correspondence point");
+    }
+    device_.upload(bake_uv_points_,points.data(),points.size_bytes());
+    device_.filter_bake_uv_maps(bake_uv_maps_,view_.bake,{bake_uv_geometry_,nullptr,bake_uv_points_},points.size(),
+                                maps.empty()?nullptr:bake_uv_maps_output_,emission.empty()?nullptr:output_);
+    if(!maps.empty())device_.download(maps.data(),bake_uv_maps_output_,maps.size_bytes());
+    download_bake_uv(emission,cancelled);
+  }
+  static bool valid_bake_uv_bary(const float (&bary)[2]){
+    const auto first=double(bary[0]),second=double(bary[1]),third=1.-first-second;
+    const auto valid=[](double value){return value>=-.00001&&value<=1.00001;};
+    return valid(first)&&valid(second)&&valid(third);
+  }
   void upload_bake_uv_taps(std::span<const BakeUvSample> samples,const std::function<bool()> &cancelled) {
-    if(samples.empty()||samples.size()>bake_uv_capacity_)
+    if(!bake_uv_samples_||samples.empty()||samples.size()>bake_uv_capacity_)
       throw std::invalid_argument("Invalid GPU Bake UV filter taps");
     paint_compute::checkpoint(cancelled);
     const auto pixels=size_t(view_.resolution)*view_.resolution;
@@ -372,9 +398,11 @@ private:
   MappedSourceImage mapped_source_{};
   MappedSample *coordinates_=nullptr;
   BakeUvSample *bake_uv_samples_=nullptr;
+  BakeUvPoint *bake_uv_points_=nullptr;
+  BakeUvGeometry bake_uv_geometry_{};
   BakeUvMaps bake_uv_maps_{};
   BakeUvMapsPixel *bake_uv_maps_output_=nullptr;
-  size_t bake_uv_faces_=0;
+  size_t bake_uv_faces_=0,bake_uv_triangles_=0;
   size_t mapped_capacity_=0;
   size_t bake_uv_capacity_=0;
   bool mapped_field_=false;

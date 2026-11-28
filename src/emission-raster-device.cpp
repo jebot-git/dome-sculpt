@@ -294,18 +294,34 @@ std::unique_ptr<EmissionRasterDevice> create_bake_uv_emission_device(const Baked
 
 std::unique_ptr<EmissionRasterDevice> create_bake_uv_maps_device(const BakedTextures &bake,
     uint32_t resolution,std::span<const EmissionRasterDevice::BakeUvFrame> frames,
-    size_t capacity,const std::function<bool()> &cancelled){
+    size_t capacity,const std::function<bool()> &cancelled,EmissionRasterDevice::BakeUvSource source){
   paint_compute::checkpoint(cancelled);
   bake.validate(resolution);
   if(!capacity||capacity>EmissionRasterDevice::mapped_batch||capacity>bake.coverage.size())
     throw std::invalid_argument("Invalid GPU Bake UV filter batch capacity");
   if(frames.empty()!=bake.maps.normal.rgba.empty())
     throw std::invalid_argument("GPU Bake UV normal planes require ordered tangent frames");
+  if(source.triangles.empty()!=source.padding.empty()||
+     (!source.triangles.empty()&&(source.padding.size()!=bake.coverage.size()||
+         (!frames.empty()&&source.triangles.size()!=frames.size()))))
+    throw std::invalid_argument("GPU Bake UV correspondence requires its matching source atlas");
+  for(size_t at=0;at<source.triangles.size();++at){
+    if((at&1023)==0)paint_compute::checkpoint(cancelled);
+    for(const auto &uv:source.triangles[at].uv)for(const auto coordinate:uv)
+      if(!std::isfinite(coordinate)||coordinate<0||coordinate>1)
+        throw std::invalid_argument("GPU Bake UV correspondence has an invalid source corner");
+  }
+  for(size_t at=0;at<source.padding.size();++at){
+    if((at&4095)==0)paint_compute::checkpoint(cancelled);
+    if(source.padding[at]>=0&&size_t(source.padding[at])>=source.padding.size())
+      throw std::invalid_argument("GPU Bake UV correspondence has an invalid padding owner");
+  }
   emission_raster::Input input;
   input.resolution=resolution;
   input.bake_uv_capacity=capacity;
   input.bake_uv_maps=&bake;
   input.bake_uv_frames=frames;
+  input.bake_uv_source=source;
   if(bake.emission_field){
     input.physical_bake=true;
     input.bake=bake.emission_field->storage();

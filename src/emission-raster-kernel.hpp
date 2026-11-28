@@ -56,6 +56,47 @@ DOME_EMISSION_MATH uint32_t finite_over(uint32_t below,uint32_t above,uint32_t c
 DOME_EMISSION_FN bool bounded(uint32_t value,uint32_t limit){
   return magnitude(value)==0||value<=limit;
 }
+DOME_EMISSION_FN EmissionRasterDevice::BakeUvSample bake_uv_sample(const BakeUvRequests &requests,size_t at){
+  if(!requests.points)return requests.taps[at];
+  const auto &point=requests.points[at];
+  EmissionRasterDevice::BakeUvSample result;
+  if(point.face==UINT32_MAX)return result;
+  result.face=point.face;
+  result.bary[0]=point.bary[0];
+  result.bary[1]=point.bary[1];
+  const float weights[]{point.bary[0],point.bary[1],
+      paint_compute::sub(paint_compute::sub(1,point.bary[0]),point.bary[1])};
+  const auto &geometry=requests.geometry;
+  const auto &triangle=geometry.triangles[point.face];
+  const auto extent=paint_grid::integer(int32_t(geometry.resolution));
+  const int last=int(geometry.resolution)-1;
+  int addresses[2][2];
+  uint64_t fractions[2];
+  for(unsigned axis=0;axis<2;++axis){
+    float uv=0;
+    for(unsigned corner=0;corner<3;++corner)
+      uv=paint_compute::add(uv,paint_compute::mul(weights[corner],triangle.uv[corner][axis]));
+    // Match the host's binary64 texel-center offset and bilinear product.
+    // After clamping, floor is in [-1, resolution-1].
+    const auto pixel=sum64(product64(widen(paint_compute::bits(uv<0?0:uv>1?1:uv)),extent),0xbfe0000000000000ull);
+    const int exponent=int((pixel>>52)&0x7ff)-1023;
+    const int first=(pixel&sign64)&&pixel!=sign64?-1:exponent<0?0:
+        int(((pixel&0xfffffffffffffull)|(1ull<<52))>>(52-exponent));
+    fractions[axis]=sum64(pixel,paint_grid::integer(-first));
+    addresses[axis][0]=first<0?0:first;
+    addresses[axis][1]=first<last?first+1:last;
+  }
+  for(unsigned tap=0;tap<4;++tap){
+    const auto texel=size_t(addresses[1][tap>>1])*geometry.resolution+addresses[0][tap&1];
+    const auto owner=geometry.padding[texel];
+    if(owner<0)continue;
+    const auto x=tap&1?fractions[0]:sum64(one64,fractions[0]^sign64);
+    const auto y=tap&2?fractions[1]:sum64(one64,fractions[1]^sign64);
+    result.texels[tap]=uint32_t(owner);
+    result.weights[tap]=bake_uv_normal::narrow(product64(x,y));
+  }
+  return result;
+}
 DOME_EMISSION_FN void unpack(PackedField field,const uint32_t *data,size_t index,uint32_t (&result)[7]){
   size_t next=field.offset+index*field.stride;
   for(unsigned k=0;k<7;++k)result[k]=field.mask&(1u<<k)?data[next++]:field.constants[k];
