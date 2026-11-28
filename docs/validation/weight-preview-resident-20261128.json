@@ -1,0 +1,200 @@
+{
+  "date": "2026-11-28",
+  "product": "38a6ad25d509987a74b6618604bf2b281e5cd5f5",
+  "preceding": "505bdc5a11d39877bb0e33704ab44c77814b05cf",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Live weight preview retains posed positions and per-vertex peak falloff on the GPU. Compact readback carries changed winners only. Allocation pressure preserves an exact staged GPU route.",
+  "arc_a770_release": {
+    "application_sha256": "73836d4e362a1607ccd1f8e4b13e4e09a93a31e6ad329dcaf9e06db9477c4a28",
+    "ctest": {
+      "cases": [
+        "retopology-affine-ui-fixture",
+        "retopo",
+        "retopology-affine-openxr",
+        "retopology-surface-heat-plain",
+        "retopology-surface-heat-affine",
+        "retopology-prepared-color-normal-uv-plain",
+        "retopology-prepared-color-normal-uv-affine",
+        "retopology-affine",
+        "weight-authoring",
+        "weight-edit",
+        "skin-authoring",
+        "retopology-prepared-color-normal-first",
+        "retopology-prepared-color-normal-plain",
+        "retopology-prepared-color-normal-affine",
+        "affine-weight-openxr",
+        "application-missing-gpu",
+        "retopology-imported-pbr",
+        "surface-query-oblique",
+        "weight-transfer-batch"
+      ],
+      "log_sha256": "ef9ad15035c4743f1e46f380a721cefd978db008a4225a67f88a7488a0d6c7d1"
+    },
+    "capsule_oracle": {
+      "vertex_queries": 49173,
+      "compacted_hits": 32432,
+      "logical_capsule_tests": 16849948,
+      "exact_against_preceding_scalar_math": true
+    },
+    "focused_suite_trace": {
+      "device_brush_launches": 184,
+      "trace_sha256": "6e2746c9ccff28825a556266296d78be69740228ab3cf69e363a55797b030c1d"
+    },
+    "unchanged_affine_capture_sha256": {
+      "synthetic-openxr/fixtures/before.dsculpt": "eb0410bd52048d3fbe2554880b22c82263fa79b539aeb6714b69da2faeee9ba4",
+      "synthetic-openxr/fixtures/after.dsculpt": "69f46a87902a695d2f5ef30674226f07fed11ef8696d85cb5716b057e89fadb2",
+      "synthetic-openxr/accept.dsculpt": "69f46a87902a695d2f5ef30674226f07fed11ef8696d85cb5716b057e89fadb2",
+      "synthetic-openxr/focus.dsculpt": "eb0410bd52048d3fbe2554880b22c82263fa79b539aeb6714b69da2faeee9ba4",
+      "wayland/pointer-weights.dsculpt": "8d28f8170d3c71cb70b6e166381d106b37b27ed9334fbe5c5dc8f0b0636e0bfd"
+    },
+    "synthetic_openxr": {
+      "checks": 7,
+      "report_sha256": "31a14c81930ea20a3dbda9875090ba5ca95ac5bd9de64848c64028f713adaada"
+    },
+    "nested_domed_wayland": {
+      "checks": 10,
+      "dmabuf_render_node": "/dev/dri/renderD129",
+      "report_sha256": "94a5147e0daae1152fe275794fa5a809f4e504de96b01e6bc74d3fcd197e6a60",
+      "device_brush_launches": 4,
+      "trace_sha256": "2949f69d376311c6b4280c38fff899b916f2312cedcf1ac24700864b4dc3abc7"
+    },
+    "transfer_trace": {
+      "fixture": "96 successive previews across all 19 linked parts and 9,851 vertices",
+      "forced_control": "The isolated oneAPI control throws std::bad_alloc for the 39,404-byte resident maxima allocation.",
+      "final_project_exact_against_complete_replay": true,
+      "resident": {
+        "upload_calls": 211,
+        "upload_bytes": 130500,
+        "posed_vertex_upload_calls": 19,
+        "posed_vertex_upload_bytes": 118212,
+        "brush_dispatches": 1824,
+        "readback_calls": 1967,
+        "readback_bytes": 177480,
+        "hit_count_readbacks": 1824,
+        "hit_payload_readback_calls": 143,
+        "hit_payload_bytes": 170184,
+        "trace_sha256": "499cc86106de346f6892b8567c9d2dce5867eb9f0ae9b3a7c4fd5e9ed3fd8685"
+      },
+      "forced_staging_after_maxima_allocation_failure": {
+        "upload_calls": 2016,
+        "upload_bytes": 11360640,
+        "posed_vertex_upload_calls": 1824,
+        "posed_vertex_upload_bytes": 11348352,
+        "brush_dispatches": 1824,
+        "readback_calls": 2005,
+        "readback_bytes": 388528,
+        "hit_count_readbacks": 1824,
+        "hit_payload_readback_calls": 181,
+        "hit_payload_bytes": 381232,
+        "trace_sha256": "96ab42f7a29c5cb083f3db2c9960804b8f4b17a2ca7c1d3b0c1e8873d78e08ad"
+      },
+      "traffic_source_sha256": "9480026dd694f2e22df2f04ad1561cbdd4584f416acf9ae59e0c1584298a6fad"
+    },
+    "worker_benchmarks": {
+      "fixture": "Linked mirrored CC0 VRoid beta female",
+      "scope": "Warm stroke evaluation and scene assembly through the current one-shot and preview APIs. Excludes render, device input and save.",
+      "preceding": {
+        "parts": 19,
+        "vertices": 9851,
+        "stroke_prefixes": 96,
+        "trials": [
+          {
+            "incremental_total_ms": 663.156,
+            "complete_replay_total_ms": 3200.96,
+            "max_incremental_ms": 13.7154,
+            "last_complete_replay_ms": 38.9984
+          },
+          {
+            "incremental_total_ms": 660.445,
+            "complete_replay_total_ms": 3185.35,
+            "max_incremental_ms": 11.8251,
+            "last_complete_replay_ms": 39.5594
+          },
+          {
+            "incremental_total_ms": 655.644,
+            "complete_replay_total_ms": 3188.08,
+            "max_incremental_ms": 12.4386,
+            "last_complete_replay_ms": 39.713
+          }
+        ],
+        "every_prefix_skin_weights_exact": true,
+        "incremental_median_ms": 660.445,
+        "complete_replay_median_ms": 3188.08,
+        "max_incremental_ms": 13.7154,
+        "log_sha256": "0c7be3fd7c370257b2be5d620a0bd44fc8167fc254b1e7eb9afc7fa9fd12954f"
+      },
+      "current": {
+        "parts": 19,
+        "vertices": 9851,
+        "stroke_prefixes": 96,
+        "trials": [
+          {
+            "incremental_total_ms": 646.416,
+            "complete_replay_total_ms": 3162.99,
+            "max_incremental_ms": 11.3836,
+            "last_complete_replay_ms": 40.3785
+          },
+          {
+            "incremental_total_ms": 659.95,
+            "complete_replay_total_ms": 3188.26,
+            "max_incremental_ms": 11.7455,
+            "last_complete_replay_ms": 40.4419
+          },
+          {
+            "incremental_total_ms": 638.536,
+            "complete_replay_total_ms": 3173.43,
+            "max_incremental_ms": 12.5144,
+            "last_complete_replay_ms": 40.1874
+          }
+        ],
+        "every_prefix_skin_weights_exact": true,
+        "incremental_median_ms": 646.416,
+        "complete_replay_median_ms": 3173.43,
+        "max_incremental_ms": 12.5144,
+        "log_sha256": "5d601945560f3a24e012f3dc71f22d83949c0cce6a89bcc59d3b5bf3765f42cc"
+      },
+      "benchmark_96_source_sha256": "70478c0f54fc202a02b9d6c1ddae3104e224a2320d2cc884908425ecb95f3d14"
+    }
+  },
+  "headless_numerical_test_reference": {
+    "cases": [
+      "weight-edit",
+      "weight-transfer-batch",
+      "cpu-reference-install-refused",
+      "weight-authoring"
+    ],
+    "log_sha256": "4dcca6542450b40065b91cffa006f45cd6e4d59450c431a27c79c7b507935244"
+  },
+  "scoped_arc_asan_ubsan": {
+    "instrumented_units": [
+      "document.cpp (weight-authoring test)",
+      "weight-edit.cpp",
+      "weight-authoring.cpp",
+      "tests/weight-edit.cpp",
+      "tests/weight-authoring.cpp"
+    ],
+    "edit": {
+      "checks": 66,
+      "log_sha256": "f0d9cdf0a834ba70feac690cc4cc8c6b66044e274f0c960cb17f1c1d69995b16"
+    },
+    "authoring": {
+      "checks": 80,
+      "log_sha256": "7822e07d479ecc692271756aa0679233cbc73eadded321d97f47b525405af03e"
+    }
+  },
+  "vendor_compile_and_missing_device": {
+    "cuda": {
+      "object_sha256": "8daf39d576f3017fa1b2ec2fa81293883876ef511e2d48eef3bf598893449d7c",
+      "missing_device": "CUDA driver version is insufficient for CUDA runtime version"
+    },
+    "rocm": {
+      "object_sha256": "e916572bc6fc43123c6e650b576b7edbd9d1057f41cd797a86bb378719e9a154",
+      "missing_device": "no ROCm-capable device is detected"
+    }
+  },
+  "remaining_scope": [
+    "End-to-end production-size headset latency",
+    "Positive CUDA and ROCm execution",
+    "Physical headset and full GPU-only Release qualification"
+  ]
+}

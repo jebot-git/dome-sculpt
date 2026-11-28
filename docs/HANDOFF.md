@@ -125,6 +125,10 @@ takes the staged route and restores the same final project as full replay.
 Every intermediate skin matches full replay in the timing runs. Median
 worker time across 96 prefixes changes from 660 to 646 ms, with overlapping
 trial timings. Physical headset latency still requires qualification.
+All 19 selected Arc Release regressions and scoped sanitizer checks
+pass. Nested DomeD Wayland and synthetic OpenXR reproduce their saved
+projects byte for byte. CUDA and ROCm compile and reject missing devices.
+[Resident weight-preview evidence](validation/weight-preview-resident-20261128.json)
 
 Ambient occlusion in Bake now traces the biased hemisphere on the selected
 GPU against the existing immutable source BVH. The device returns one
