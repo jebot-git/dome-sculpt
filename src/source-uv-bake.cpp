@@ -717,7 +717,7 @@ SourcePaintBakeResult bake_source_paint(const SourceUvBakeInput &input,const Mat
  if(retained>=bounded.max_working_bytes)throw std::length_error("Portable source output exceeds raster working budget");
  bounded.max_working_bytes-=retained;
  Budget budget{bounded,result.sampling};
- auto layout=raster(input.target,r,false,true,budget);auto packet=detail::PaintOverlayFactory::capture(*input.paint,options.cancelled);
+ auto layout=raster(input.target,r,false,true,budget);
  auto maps=std::make_shared<TextureMaps>();auto roles=std::make_shared<PaintSourceMaps>(*result.sampling.maps);
  // A finite portable paint image has its own linear, clamped sampling. Original
  // sampler metadata remains in the source and per-role preparation result.
@@ -726,9 +726,55 @@ SourcePaintBakeResult bake_source_paint(const SourceUvBakeInput &input,const Mat
  for(auto *image:{&maps->color,&maps->metal_rough,&maps->emission,&maps->color_coverage,&maps->emission_coverage}){image->width=image->height=r;image->rgba.assign(pixels*4,0);}
  const PaintSourceMaps empty;const auto &source=input.paint->source_maps()?*input.paint->source_maps():empty;const auto &mesh=input.paint->mesh();
  const bool source_emission=material.emissive!=std::array<float,3>{};
- const std::array roles_to_sample{RasterImageRole{&source.color,true},RasterImageRole{&source.metal_rough,false},
+ if(compute_backend()!="CPU"){
+  const detail::SourceMaterialRaster::Roles roles{
+      source.color.image?&source.color:nullptr,source.metal_rough.image?&source.metal_rough:nullptr,
+      source_emission&&source.emission.image?&source.emission:nullptr,source.occlusion.image?&source.occlusion:nullptr};
+  for(const auto *role:roles)if(role)role->validate(source.coordinate_count());
+  const auto raster_bytes=layout.hits.capacity()*sizeof(Hit)+layout.padding.capacity()*sizeof(int32_t);
+  if(raster_bytes>=bounded.max_working_bytes)
+   throw std::length_error("Portable source material exceeds raster working budget");
+  auto device=detail::create_source_material_raster(*input.paint,material,roles,source.occlusion_strength,r,
+      bounded.max_working_bytes-raster_bytes,options.cancelled);
+  std::vector<uint32_t> texels;
+  texels.reserve(device->capacity());
+  std::vector<paint_compute::Output> output(device->capacity());
+  const auto flush=[&]{
+   if(texels.empty())return;
+   device->read_material(texels,[&](unsigned role,std::span<RoleSampler::Coordinate> coordinates){
+    const int set=roles[role]->texcoord;
+    for(size_t i=0;i<texels.size();++i){
+     if((i&1023)==0)budget.cancel();
+     const auto &hit=layout.hits[texels[i]];
+     const auto uv=source_texture_uv(mesh,source,set,hit.face,hit.bary);
+     coordinates[i]={uv[0],uv[1]};
+    }
+   },std::span(output).first(texels.size()),options.cancelled);
+   for(size_t i=0;i<texels.size();++i){
+    const auto offset=size_t(texels[i])*4;
+    const auto &pixel=output[i];
+    std::copy_n(pixel.color,4,maps->color.rgba.data()+offset);
+    std::copy_n(pixel.orm,4,maps->metal_rough.rgba.data()+offset);
+    std::copy_n(pixel.emission,4,maps->emission.rgba.data()+offset);
+    maps->color_coverage.rgba[offset]=pixel.color_coverage;
+    maps->emission_coverage.rgba[offset]=pixel.emission_coverage;
+    maps->color_coverage.rgba[offset+3]=maps->emission_coverage.rgba[offset+3]=255;
+    maps->transparent|=pixel.transparent!=0;
+   }
+   texels.clear();
+  };
+  for(size_t at=0;at<layout.padding.size();++at){
+   if((at&1023)==0)budget.cancel();
+   if(layout.padding[at]!=int32_t(at))continue;
+   texels.push_back(uint32_t(at));
+   if(texels.size()==device->capacity())flush();
+  }
+  flush();
+ }else{
+  const auto packet=detail::PaintOverlayFactory::capture(*input.paint,options.cancelled);
+  const std::array roles_to_sample{RasterImageRole{&source.color,true},RasterImageRole{&source.metal_rough,false},
      RasterImageRole{source_emission?&source.emission:nullptr,true},RasterImageRole{&source.occlusion,false}};
- sample_material_raster(mesh,source,layout,roles_to_sample,budget,
+  sample_material_raster(mesh,source,layout,roles_to_sample,budget,
     [&](size_t at,const auto &samples){
   const auto overlay=material_overlay(*packet,r,at);
   const auto &[base,orm,emission,occlusion]=samples;
@@ -739,7 +785,8 @@ SourcePaintBakeResult bake_source_paint(const SourceUvBakeInput &input,const Mat
   for(size_t k=0;k<3;++k){const float glow=material.emissive[k]*emission[k]*(1-overlay[3][3])+overlay[2][k]+overlay[4][k];if(glow>1)throw std::invalid_argument("Portable source paint radiance exceeds byte material representation");maps->emission.rgba[at*4+k]=byte(linear_to_srgb(glow));}
   maps->emission.rgba[at*4+3]=maps->color_coverage.rgba[at*4+3]=maps->emission_coverage.rgba[at*4+3]=255;
   maps->color_coverage.rgba[at*4]=byte(overlay[3][0]);maps->emission_coverage.rgba[at*4]=byte(overlay[3][3]);maps->transparent|=colour[3]<.999f;
- });
+  });
+ }
  visit_material_padding(layout,budget,[&](size_t at,size_t owner){
   for(auto *image:{&maps->color,&maps->metal_rough,&maps->emission,&maps->color_coverage,&maps->emission_coverage})
    std::copy_n(image->rgba.data()+4*owner,4,image->rgba.data()+4*at);

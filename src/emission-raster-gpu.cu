@@ -31,6 +31,16 @@ __global__ void render_mapped_pixels(DeviceInput input,FiniteGrid grid,MappedSou
   const size_t index=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
   if(index<count)emission_raster::render_mapped(input,grid,image,samples[index],out+3*index);
 }
+__global__ void sample_material_sources(MappedSourceImage image,const paint_compute::Quantization *q,
+    const SourceUvSampler::Coordinate *uv,size_t count,uint32_t *out){
+  const size_t index=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+  if(index<count)sample_mapped_source(image,uv[index],*q,out,index);
+}
+__global__ void render_material_pixels(DeviceInput input,MaterialView material,FiniteGrid grid,
+    MaterialSources source,const uint32_t *texels,size_t count,paint_compute::Output *out){
+  const size_t index=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+  if(index<count)out[index]=emission_raster::render_material(input,material,grid,source,texels[index],index);
+}
 template<bool mapped>
 __global__ void render_texture_set_pixels(DeviceInput input,size_t first,size_t count,uint32_t *out,bool coefficients){
   const size_t index=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
@@ -79,6 +89,18 @@ public:
     render_mapped_pixels<<<(count+block-1)/block,block,0,stream_>>>(input,grid,image,samples,count,out);
     checked(DOME_DEVICE(GetLastError)());
   }
+  void sample_material(MappedSourceImage image,const paint_compute::Quantization *q,
+      const SourceUvSampler::Coordinate *uv,size_t count,uint32_t *out){
+    constexpr size_t block=128;
+    sample_material_sources<<<(count+block-1)/block,block,0,stream_>>>(image,q,uv,count,out);
+    checked(DOME_DEVICE(GetLastError)());
+  }
+  void render_material(DeviceInput input,MaterialView material,FiniteGrid grid,MaterialSources source,
+      const uint32_t *texels,size_t count,paint_compute::Output *out){
+    constexpr size_t block=128;
+    render_material_pixels<<<(count+block-1)/block,block,0,stream_>>>(input,material,grid,source,texels,count,out);
+    checked(DOME_DEVICE(GetLastError)());
+  }
   void render_texture_set(DeviceInput input,size_t first,size_t count,uint32_t *out,bool coefficients){
     constexpr size_t block=128;
     if(input.source.coordinates.columns)
@@ -93,5 +115,9 @@ private:
 }
 std::unique_ptr<EmissionRasterDevice> upload(const Input &input,const std::function<bool()> &cancelled){
   return std::make_unique<Raster<Device>>(input,cancelled);
+}
+std::unique_ptr<SourceMaterialRaster> upload_material(const Input &input,const MaterialInput &material,
+    const std::function<bool()> &cancelled){
+  return std::make_unique<Raster<Device>>(input,cancelled,&material);
 }
 }

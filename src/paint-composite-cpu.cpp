@@ -56,6 +56,10 @@ namespace dome::detail::emission_raster {
 std::unique_ptr<EmissionRasterDevice> upload(const Input &,const std::function<bool()> &){
  throw std::logic_error("Select a GPU backend for device emission compositing");
 }
+std::unique_ptr<SourceMaterialRaster> upload_material(const Input &,const MaterialInput &,
+    const std::function<bool()> &){
+ throw std::logic_error("Select a GPU backend for mapped material compositing");
+}
 }
 namespace dome::paint_compute {
 Result composite(const Input &in,const std::function<bool()> &cancelled){

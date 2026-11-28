@@ -6,6 +6,7 @@
 #include "emission-export.hpp"
 #include "emission-raster-device.hpp"
 #include "paint-emission-sample.hpp"
+#include "paint-overlay-sample.hpp"
 #include <chrono>
 #include <cstring>
 #include <iostream>
@@ -228,6 +229,131 @@ void compare_mapped(Fixture fixture,uint32_t extent,bool original){
 }
 
 enum class SetBackdrop { Constant, Core, MToon };
+
+void compare_material(bool baked,uint32_t extent){
+  using namespace paint_compute;
+  const auto texture=[](unsigned seed){
+    auto image=std::make_shared<Image>(Image{131,127,std::vector<uint8_t>(131*127*4)});
+    for(size_t i=0;i<image->rgba.size();++i)image->rgba[i]=uint8_t((i*(seed+3))^(i/31));
+    return image;
+  };
+  auto maps=std::make_shared<PaintSourceMaps>();
+  maps->uv1=std::make_shared<const std::vector<std::array<float,2>>>(mesh().uv);
+  maps->color.image=texture(43);
+  maps->metal_rough.image=texture(74);
+  maps->emission.image=maps->color.image;
+  maps->occlusion.image=texture(109);
+  maps->metal_rough.texcoord=maps->occlusion.texcoord=1;
+  maps->metal_rough.mag_filter=9728;
+  maps->occlusion.wrap_t=33071;
+  maps->emission.uv_transform={.8f,-.3f,1.2f,1.4f,-.23f,.84f};
+  maps->emission.wrap_s=33648;
+  maps->occlusion_strength=.61f;
+  constexpr size_t native=64;
+  auto paint=std::make_shared<PaintedMesh>(mesh(),native);
+  if(baked){
+    BakedTextures bake;
+    for(auto *image:{&bake.maps.color,&bake.maps.metal_rough,&bake.maps.emission}){
+      *image={native,native,std::vector<uint8_t>(native*native*4)};
+      for(size_t i=0;i<image->rgba.size();++i)image->rgba[i]=uint8_t((i*131u)^(i/17u));
+    }
+    bake.coverage.resize(native*native);
+    for(size_t i=0;i<bake.coverage.size();++i)bake.coverage[i]=uint8_t(i^(i/native));
+    paint->install_bake(std::move(bake));
+  }
+  const auto stroke=[&](PaintChannel channel,float y){
+    PaintSettings settings;
+    settings.channel=channel;
+    settings.color={.89f,.013f,.43f,.42f};
+    settings.metallic=.83f;
+    settings.roughness=.47f;
+    settings.emission={.16f,.007f,.29f};
+    settings.mask=.3f;
+    settings.front_only=false;
+    Brush brush;
+    brush.from={-.35f,y,0};brush.to={.38f,y+.04f,0};
+    brush.radius=.26f;brush.pressure=.6f;brush.strength=.7f;brush.normal={0,0,1};
+    paint->begin_stroke();
+    paint->stamp(brush,settings);
+    check(paint->end_stroke(),"Material fixture must author paint");
+  };
+  stroke(PaintChannel::Color,0);
+  stroke(PaintChannel::Metallic,-.16f);
+  paint->add_layer("Second material glaze");
+  stroke(PaintChannel::Color,.19f);
+  stroke(PaintChannel::Emission,-.12f);
+  stroke(PaintChannel::Roughness,.2f);
+  stroke(PaintChannel::Mask,-.05f);
+  paint->layer_properties("Second material glaze",true,.61f);
+  paint->add_layer("Hidden material glaze");
+  stroke(PaintChannel::Color,-.19f);
+  paint->layer_properties("Hidden material glaze",false,1);
+  Material material;
+  material.color={.83f,.7f,.45f,.88f};
+  material.metallic=.78f;
+  material.roughness=.43f;
+  material.emissive={.25f,.16f,.3f};
+  using Raster=detail::SourceMaterialRaster;
+  const Raster::Roles roles{&maps->color,&maps->metal_rough,&maps->emission,&maps->occlusion};
+  std::vector<uint32_t> texels(4096);
+  for(size_t i=0;i<texels.size();++i)texels[i]=uint32_t((i*541u+11)%(extent*extent));
+  const auto coordinate=[](unsigned set,size_t i){
+    return detail::SourceUvSampler::Coordinate{float(int((i+set*19)%149)-75)/64,float(int((i+set*23)%173)-61)/64};
+  };
+  const auto byte=[](float value){return uint8_t(std::lround(std::clamp(value,0.f,1.f)*255));};
+  const auto packet=detail::PaintOverlayFactory::capture(*paint);
+  std::vector<Output> expected(texels.size());
+  for(size_t i=0;i<texels.size();++i){
+    const auto at=texels[i];
+    const auto overlay=detail::sample_overlay_values(*packet,(float(at%extent)+.5f)/extent,(float(at/extent)+.5f)/extent,true);
+    std::array<std::array<float,4>,SourceRoleCount> source;
+    for(unsigned role=0;role<roles.size();++role){
+      const auto uv=coordinate(roles[role]->texcoord,i);
+      auto view=*roles[role];
+      view.texcoord=0;
+      source[role]=sample_source_texture(view,uv.u,uv.v,role==SourceColor||role==SourceEmission);
+    }
+    auto &out=expected[i];
+    for(unsigned k=0;k<4;++k){
+      const float color=material.color[k]*source[SourceColor][k]*(1-overlay[3][0])+overlay[0][k];
+      out.color[k]=byte(k<3?linear_to_srgb(color):color);
+      if(k==3)out.transparent=color<.999f;
+    }
+    const auto ao=1-maps->occlusion_strength*(1-source[SourceOcclusion][0]);
+    out.orm[0]=byte(ao*(1-overlay[1][3])+overlay[1][0]);
+    out.orm[1]=byte(material.roughness*source[SourceOrm][1]*(1-overlay[3][2])+overlay[1][1]);
+    out.orm[2]=byte(material.metallic*source[SourceOrm][2]*(1-overlay[3][1])+overlay[1][2]);
+    out.orm[3]=out.emission[3]=255;
+    for(unsigned k=0;k<3;++k)
+      out.emission[k]=byte(linear_to_srgb(material.emissive[k]*source[SourceEmission][k]*(1-overlay[3][3])+overlay[2][k]+overlay[4][k]));
+    out.color_coverage=byte(overlay[3][0]);
+    out.emission_coverage=byte(overlay[3][3]);
+  }
+  for(size_t bytes:{size_t(6*1024*1024),size_t(640*1024)}){
+    auto device=detail::create_source_material_raster(*paint,material,roles,maps->occlusion_strength,extent,bytes,{});
+    std::vector<Output> got(texels.size());
+    for(size_t first=0;first<texels.size();){
+      const auto count=std::min(device->capacity(),texels.size()-first);
+      unsigned coordinate_batches=0;
+      device->read_material(std::span(texels).subspan(first,count),[&](unsigned role,auto uv){
+        ++coordinate_batches;
+        for(size_t i=0;i<uv.size();++i)uv[i]=coordinate(roles[role]->texcoord,first+i);
+      },std::span(got).subspan(first,count),{});
+      check(coordinate_batches==2,"Only the two actual coordinate sets should be uploaded");
+      first+=count;
+    }
+    for(size_t i=0;i<got.size();++i)
+      check(std::memcmp(&expected[i],&got[i],sizeof(Output))==0,"Mapped GPU material changed portable material bytes");
+    bool refused=false;
+    try{
+      device->read_material(std::span(texels).first(1),{},std::span(got).first(1),[]{return true;});
+    }catch(const std::runtime_error &){refused=true;}
+    check(refused,"Cancellation must stop mapped material composition");
+    std::cout<<"PASS material extent="<<extent<<" bake="<<baked<<" budget="<<bytes
+             <<" capacity="<<device->capacity()<<' '<<got.size()<<" exact RGBA/ORM/emission/coverage samples\n";
+  }
+}
+
 void compare_texture_set(Fixture fixture,SetBackdrop backdrop){
   const auto scene=model(fixture);
   const auto &paint=*scene.active().painted;
@@ -282,6 +408,11 @@ std::string_view wrapped_backend() asm("__wrap__ZN4dome15compute_backendEv");
 std::string_view wrapped_backend(){return host_reference?"CPU":actual_backend();}
 
 int main(int argc,char **argv)try{
+  if(argc>1&&std::string_view(argv[1])=="--material"){
+    compare_material(false,64);
+    compare_material(true,128);
+    return 0;
+  }
   if(argc>1&&std::string_view(argv[1])=="--missing-mapped"){
     const auto scene=model(Fixture::BakeOnly);
     try{

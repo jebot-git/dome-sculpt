@@ -46,7 +46,8 @@ elseif(DOME_COMPUTE_BACKEND STREQUAL "ONEAPI")
   set(paint_compute_source src/paint-composite-sycl.cpp src/paint-grid-sycl.cpp
     src/paint-source-coordinate-sycl.cpp src/emission-raster-sycl.cpp
     src/emission-raster-bake-sycl.cpp src/emission-raster-typed-sycl.cpp
-    src/emission-raster-finite-sycl.cpp src/emission-raster-mapped-sycl.cpp src/emission-raster-texture-set-sycl.cpp
+    src/emission-raster-finite-sycl.cpp src/emission-raster-mapped-sycl.cpp src/source-material-raster-sycl.cpp
+    src/emission-raster-texture-set-sycl.cpp
     src/emission-raster-texture-set-source-sycl.cpp src/portable-normal-raster-sycl.cpp
     src/portable-normal-certificate-sycl.cpp src/source-uv-sampler-sycl.cpp)
 else()
@@ -182,6 +183,8 @@ if(BUILD_TESTING)
   add_test(NAME emission-raster-compute COMMAND dome-sculpt-emission-raster-compute-test)
   add_test(NAME emission-raster-finite-compute COMMAND dome-sculpt-emission-raster-compute-test --finite)
   if(NOT DOME_COMPUTE_BACKEND STREQUAL "CPU")
+    add_test(NAME source-material-raster-compute COMMAND dome-sculpt-emission-raster-compute-test --material)
+    set_tests_properties(source-material-raster-compute PROPERTIES TIMEOUT 300)
     add_test(NAME emission-raster-mapped-compute COMMAND dome-sculpt-emission-raster-compute-test --mapped)
     set_tests_properties(emission-raster-mapped-compute PROPERTIES TIMEOUT 300)
     add_test(NAME emission-raster-mapped-missing-gpu COMMAND dome-sculpt-emission-raster-compute-test --missing-mapped)

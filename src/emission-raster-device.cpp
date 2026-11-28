@@ -3,6 +3,7 @@
 #include "emission-raster-device.hpp"
 #include "emission-paint-access.hpp"
 #include "dome/mtoon.hpp"
+#include "dome/scene.hpp"
 #include "paint-composite-backend.hpp"
 #include "dome/source-maps.hpp"
 #include "source-texture-grid.hpp"
@@ -77,7 +78,8 @@ size_t emission_raster_staging_bytes(const PaintedMesh &paint) noexcept {
 
 namespace {
 emission_raster::Input describe_raster(const PaintedMesh &paint,std::span<const int32_t> padding,
-    std::array<float,3> background,float strength,bool authoring_blend,const std::function<bool()> &cancelled){
+    std::array<float,3> background,float strength,bool authoring_blend,const std::function<bool()> &cancelled,
+    emission_raster::MaterialInput *material=nullptr){
   using namespace emission_raster;
   const auto stop=[&]{paint_compute::checkpoint(cancelled);};
   stop();
@@ -100,6 +102,8 @@ emission_raster::Input describe_raster(const PaintedMesh &paint,std::span<const 
   }
   std::unordered_map<const PaintTile *,uint32_t> common_ids;
   std::unordered_map<const PaintEmissionTile *,uint32_t> physical_ids;
+  std::unordered_map<const PaintTile *,uint32_t> material_ids;
+  std::unordered_map<const PaintColorTile *,uint32_t> pbr_ids;
   uint32_t coefficient_offset=0;
   for(const auto &layer:paint.layers()){
     if(!layer.visible||layer.opacity<=0)continue;
@@ -116,6 +120,20 @@ emission_raster::Input describe_raster(const PaintedMesh &paint,std::span<const 
       auto &entry=input.entries.emplace_back();
       const auto *tile=layer.tiles[i].get();
       const auto *physical=layer.emission_tiles.empty()?nullptr:layer.emission_tiles[i].get();
+      if(material){
+        auto &material_entry=material->entries.emplace_back();
+        if(tile&&!PaintTile::is_shared_default(tile)){
+          contributes=true;
+          const auto [id,added]=material_ids.try_emplace(tile,material->common.size());
+          material_entry.common=id->second;
+          if(added)material->common.push_back(tile);
+          if(const auto *pbr=layer.pbr_tiles.empty()?nullptr:layer.pbr_tiles[i].get()){
+            const auto [color,inserted]=pbr_ids.try_emplace(pbr,material->pbr.size());
+            material_entry.pbr=color->second;
+            if(inserted)material->pbr.push_back(pbr);
+          }
+        }
+      }
       const bool use_mask=physical||(tile&&std::any_of(tile->pixels.begin(),tile->pixels.end(),
           [](const auto &pixel){return pixel.data[12]!=0;}));
       if(use_mask&&tile&&!PaintTile::is_shared_default(tile)){
@@ -140,6 +158,7 @@ emission_raster::Input describe_raster(const PaintedMesh &paint,std::span<const 
     if(!contributes){
       input.layers.pop_back();
       input.entries.resize(first_entry);
+      if(material)material->entries.resize(first_entry);
     }
   }
   stop();
@@ -170,6 +189,78 @@ void describe_finite_grid(emission_raster::Input &input,uint32_t resolution,floa
     input.finite_axis.push_back({std::clamp(first,0,last),std::clamp(first+1,0,last),at-first});
   }
 }
+
+void plan_material_upload(const emission_raster::Input &input,emission_raster::MaterialInput &material,
+    uint32_t resolution,size_t limit){
+  using namespace emission_raster;
+  // Account for the active raster owners on the device and their transient
+  // planning/upload storage. Texture sources share one allocation per image.
+  size_t resident_bytes=input.padding.size_bytes()+sizeof(paint_compute::Quantization)+
+      resolution*sizeof(SourceTextureAxis)+input.layers.size()*sizeof(Layer)+input.entries.size()*sizeof(Entry)+
+      material.entries.size()*sizeof(MaterialEntry)+input.common.size()*tile_pixels*sizeof(CommonPixel)+
+      material.common.size()*tile_pixels*sizeof(PaintPixel)+material.pbr.size()*sizeof(PaintColorTile)+
+      input.legacy_bake.size()+input.bake_coverage.size()+input.bake.dense.size_bytes()+
+      input.bake.varying.size_bytes()+input.bake.binary_coverage.size_bytes()+
+      material.bake_color.size()+material.bake_orm.size()+material.bake_coverage.size();
+  size_t physical_words=0;
+  for(const auto &tile:input.physical)physical_words+=tile.samples.size();
+  resident_bytes+=physical_words*sizeof(float)+input.physical.size()*sizeof(PackedField);
+  const size_t planning_bytes=input.layers.capacity()*sizeof(Layer)+input.entries.capacity()*sizeof(Entry)+
+      material.entries.capacity()*sizeof(MaterialEntry)+resolution*sizeof(SourceTextureAxis)+
+      (input.common.capacity()+material.common.capacity()+material.pbr.capacity())*sizeof(void *)+
+      input.physical.capacity()*sizeof(PhysicalTile);
+  const size_t upload_bytes=std::max(std::min(input.common.size(),size_t(32))*tile_pixels*sizeof(CommonPixel),
+      std::min(physical_words,size_t(65536))*sizeof(float)+input.physical.size()*sizeof(PackedField));
+  const auto fixed=resident_bytes+planning_bytes+upload_bytes;
+  size_t image_bytes=0,active=0;
+  std::array<const Image *,paint_compute::SourceRoleCount> images{};
+  for(size_t role=0;role<images.size();++role)if(material.roles[role]){
+    ++active;
+    images[role]=material.roles[role]->image.get();
+    if(std::find(images.begin(),images.begin()+role,images[role])==images.begin()+role){
+      const auto bytes=images[role]->rgba.size();
+      image_bytes+=bytes;
+      material.largest_image=std::max(material.largest_image,bytes);
+    }
+  }
+  constexpr auto coordinate_bytes=sizeof(SourceUvSampler::Coordinate);
+  const auto sample_bytes=2*(sizeof(uint32_t)+sizeof(paint_compute::Output)+coordinate_bytes)+
+      active*4*sizeof(uint32_t);
+  const auto preferred=std::min(size_t(resolution)*resolution,SourceUvSampler::max_batch);
+  if(fixed>=limit||material.largest_image>=limit-fixed)
+    throw std::length_error("Portable source material exceeds raster sampling working budget");
+  const auto remaining=limit-fixed;
+  material.resident=image_bytes==material.largest_image||
+      (image_bytes<=remaining&&preferred<=(remaining-image_bytes)/sample_bytes);
+  const auto source_bytes=material.resident?image_bytes:material.largest_image;
+  material.capacity=std::min(preferred,(remaining-source_bytes)/sample_bytes);
+  if(!material.capacity)throw std::length_error("Portable source material lacks sampler batch storage");
+}
+}
+
+std::unique_ptr<SourceMaterialRaster> create_source_material_raster(const PaintedMesh &paint,
+    const Material &material,const SourceMaterialRaster::Roles &roles,float occlusion_strength,
+    uint32_t resolution,size_t working_bytes,const std::function<bool()> &cancelled){
+  if(!resolution||resolution>8192)throw std::invalid_argument("Invalid portable source material grid");
+  emission_raster::MaterialInput raster;
+  raster.roles=roles;
+  for(const auto *role:roles)if(role&&!role->image)
+    throw std::invalid_argument("Portable source material needs actual role images");
+  std::copy(material.color.begin(),material.color.end(),raster.factors.color);
+  std::copy(material.emissive.begin(),material.emissive.end(),raster.factors.emission);
+  raster.factors.roughness=material.roughness;
+  raster.factors.metallic=material.metallic;
+  raster.occlusion_strength=occlusion_strength;
+  if(const auto &bake=paint.baked()){
+    raster.bake_coverage=bake->coverage;
+    raster.bake_color=(bake->color_interpretation==BakedColorInterpretation::ResolvedPbr?
+        bake->maps.pbr_color:bake->maps.color).rgba;
+    raster.bake_orm=bake->maps.metal_rough.rgba;
+  }
+  auto input=describe_raster(paint,EmissionExportAccess::writable_padding(paint),{},1,true,cancelled,&raster);
+  describe_finite_grid(input,resolution,0);
+  plan_material_upload(input,raster,resolution,working_bytes);
+  return emission_raster::upload_material(input,raster,cancelled);
 }
 
 std::unique_ptr<EmissionRasterDevice> create_emission_raster_device(

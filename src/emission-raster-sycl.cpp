@@ -9,6 +9,10 @@ void launch_typed(sycl::queue &,DeviceInput,size_t,size_t,uint32_t *);
 void launch_finite(sycl::queue &,DeviceInput,FiniteGrid,size_t,size_t,uint32_t *);
 void launch_mapped(sycl::queue &,DeviceInput,FiniteGrid,MappedSourceImage,
     const EmissionRasterDevice::MappedSample *,size_t,uint32_t *);
+void launch_material_sources(sycl::queue &,MappedSourceImage,const paint_compute::Quantization *,
+    const SourceUvSampler::Coordinate *,size_t,uint32_t *);
+void launch_material(sycl::queue &,DeviceInput,MaterialView,FiniteGrid,MaterialSources,
+    const uint32_t *,size_t,paint_compute::Output *);
 void launch_texture_set(sycl::queue &,DeviceInput,size_t,size_t,uint32_t *,bool coefficients);
 void launch_texture_set_source(sycl::queue &,DeviceInput,size_t,size_t,uint32_t *,bool coefficients);
 
@@ -51,6 +55,14 @@ public:
       const EmissionRasterDevice::MappedSample *samples,size_t count,uint32_t *out){
     launch_mapped(queue_,input,grid,image,samples,count,out);
   }
+  void sample_material(MappedSourceImage image,const paint_compute::Quantization *q,
+      const SourceUvSampler::Coordinate *uv,size_t count,uint32_t *out){
+    launch_material_sources(queue_,image,q,uv,count,out);
+  }
+  void render_material(DeviceInput input,MaterialView material,FiniteGrid grid,MaterialSources source,
+      const uint32_t *texels,size_t count,paint_compute::Output *out){
+    launch_material(queue_,input,material,grid,source,texels,count,out);
+  }
   void render_texture_set(DeviceInput input,size_t first,size_t count,uint32_t *out,bool coefficients){
     // Keep affine wrapping out of the first compilation for constant and
     // already aligned backdrops.
@@ -65,5 +77,9 @@ private:
 }
 std::unique_ptr<EmissionRasterDevice> upload(const Input &input,const std::function<bool()> &cancelled){
   return std::make_unique<Raster<Device>>(input,cancelled);
+}
+std::unique_ptr<SourceMaterialRaster> upload_material(const Input &input,const MaterialInput &material,
+    const std::function<bool()> &cancelled){
+  return std::make_unique<Raster<Device>>(input,cancelled,&material);
 }
 }

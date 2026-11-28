@@ -2,13 +2,29 @@
 #pragma once
 
 #include "dome/paint.hpp"
+#include "paint-composite-kernel.hpp"
 #include "paint-source-coordinate.hpp"
+#include "source-uv-sampler.hpp"
 #include <array>
 #include <cstddef>
 #include <span>
 
 namespace dome {struct MToonTexture;struct PaintSourceTexture;}
 namespace dome::detail {
+class SourceMaterialRaster {
+public:
+  using Roles=std::array<const PaintSourceTexture *,paint_compute::SourceRoleCount>;
+  using Coordinates=std::function<void(unsigned,std::span<SourceUvSampler::Coordinate>)>;
+  virtual ~SourceMaterialRaster()=default;
+  virtual size_t capacity() const noexcept=0;
+  virtual void read_material(std::span<const uint32_t>,const Coordinates &,
+                             std::span<paint_compute::Output>,const std::function<bool()> &)=0;
+};
+
+std::unique_ptr<SourceMaterialRaster> create_source_material_raster(
+    const PaintedMesh &,const Material &,const SourceMaterialRaster::Roles &,
+    float occlusion_strength,uint32_t resolution,size_t working_bytes,const std::function<bool()> &);
+
 class EmissionRasterDevice {
 public:
   virtual ~EmissionRasterDevice() = default;
@@ -42,6 +58,18 @@ inline constexpr uint32_t absent=UINT32_MAX;
 inline constexpr size_t chunk_pixels=65536, tile_pixels=PaintTile::size*PaintTile::size;
 struct CommonPixel {uint8_t legacy[3],coverage,mask;};
 struct Entry {uint32_t common=absent,physical=absent;};
+struct MaterialEntry {uint32_t common=absent,pbr=absent;};
+struct MaterialInput {
+  SourceMaterialRaster::Roles roles;
+  std::vector<MaterialEntry> entries;
+  std::vector<const PaintTile *> common;
+  std::vector<const PaintColorTile *> pbr;
+  std::span<const uint8_t> bake_color,bake_orm,bake_coverage;
+  paint_compute::Parameters factors;
+  float occlusion_strength=1;
+  size_t capacity=0,largest_image=0;
+  bool resident=false;
+};
 struct PackedField {
   uint32_t constants[7]{},mask=0,stride=0,offset=0;
 };
@@ -83,5 +111,7 @@ struct Input {
   bool physical_bake=false,texture_set=false;
 };
 std::unique_ptr<EmissionRasterDevice> upload(const Input &,const std::function<bool()> &);
+std::unique_ptr<SourceMaterialRaster> upload_material(const Input &,const MaterialInput &,
+                                                        const std::function<bool()> &);
 }
 }
