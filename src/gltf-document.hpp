@@ -11,6 +11,7 @@ struct GltfObjectIdentity {
   int node = -1, mesh = -1, material = -1;
   std::vector<uint32_t> joints;
   PaintSourceTexture canonical_normal,prepared_normal;
+  std::optional<unsigned> prepared_emission_texcoord;
 };
 struct GltfDocument {
   nlohmann::json json;

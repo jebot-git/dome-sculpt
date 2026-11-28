@@ -526,6 +526,100 @@ void mixed_emission(const std::filesystem::path &out,Fbo &fbo,
   check(file_bytes(retry)==bytes,"Native mixed scene extraction and re-export reproduce the exact GLB");
  }
 }
+void single_surface_emission(const std::filesystem::path &out,const Scene &initial,
+    const ImportAuthoringOptions &options,SurfaceRenderer &native,Fbo &fbo,
+    prepared_normal_consumer::Renderer &consumer) {
+ auto fixture=source(1,false,"BLEND",.65f);
+ auto &material=fixture.j["materials"][0];
+ auto &pbr=material["pbrMetallicRoughness"];
+ pbr["baseColorTexture"]["index"]=1;
+ pbr["metallicRoughnessTexture"]={{"index",0},{"texCoord",1}};
+ material["emissiveTexture"]={{"index",1},{"texCoord",1}};
+ material["emissiveFactor"]={.08f,.16f,.25f};
+ const auto input=out/"single-surface-hdr-input.glb";
+ fixture.save(input);
+ auto scene=prepare_authoring_import(initial,input,options).scene;
+ auto &object=scene.active();
+ for(const auto &other:scene.objects())if(other.id!=object.id)scene.object(other.id).visible=false;
+ object.painted=object.painted->snapshot();
+ PaintSettings ink;
+ ink.front_only=false;
+ ink.color={.19f,.74f,.24f,.52f};
+ paint_uniform(*object.painted,ink,.28f);
+ object.painted->add_layer("Physical light");
+ ink.channel=PaintChannel::Emission;
+ ink.emission_units=PaintEmissionUnits::Physical;
+ ink.emission={3.5f,.02f,.43f};
+ paint_uniform(*object.painted,ink,.22f);
+ const auto before=scene.encode();
+ Document doc;
+ doc.replace(scene.snapshot());
+ doc.shading(false);
+ settled(doc);
+ const auto reference=draw(native,doc.frame().surface);
+ const auto path=out/"single-surface-hdr.glb",saved=out/"single-surface-hdr.dsculpt";
+ auto written=doc.export_asset(path);
+ auto save=doc.save_async(saved);
+ written.get();
+ save.get();
+
+ color_consumer::Model exported(path);
+ const auto &primitive=exported.data->meshes[0].primitives[0];
+ const auto &compiled=*primitive.material;
+ check(compiled.has_emissive_strength&&compiled.emissive_texture.texcoord==2&&
+       compiled.pbr_metallic_roughness.base_color_texture.texcoord==2&&
+       compiled.normal_texture.texcoord==1&&compiled.pbr_metallic_roughness.metallic_roughness_texture.texcoord==1&&
+       primitive.targets_count==1,"Same-surface HDR shares the writable UV with color and retains original UV1 maps and morph");
+ fbo.bind();
+ consumer.render(exported.data);
+ const auto error=delta(reference,read());
+ std::cout<<"SINGLE_SURFACE_STANDARD max="<<error<<'\n';
+ check(error<=3,"Independent GLB renderer reproduces painted color and HDR on their independent normal and ORM surface");
+ const auto bytes=file_bytes(path);
+ const auto glb=std::span(bytes);
+ const size_t json_size=glb[12]|(size_t(glb[13])<<8)|(size_t(glb[14])<<16)|(size_t(glb[15])<<24);
+ const auto json=nlohmann::json::parse(bytes.begin()+20,bytes.begin()+20+json_size);
+ const auto &package=json.at("extras").at("domeSculptEmission");
+ const auto &entry=package.at("images").at(0);
+ check(package.at("version")==7&&entry.at("object")==object.id&&
+       entry.at("domain").at("kind")=="prepared-source"&&entry.at("domain").at("texCoord")==2,
+       "The native FLOAT field identifies its actual writable coordinates");
+ const auto &view=json.at("bufferViews").at(entry.at("bufferView").get<size_t>());
+ const auto exr=decode_emission_exr(glb.subspan(28+json_size+view.at("byteOffset").get<size_t>(),
+                                               view.at("byteLength").get<size_t>()));
+ check(std::any_of(exr.pixels.begin(),exr.pixels.end(),[](const auto &p){
+        return p[9]>.5f&&p[6]==3.5f*p[9]&&p[7]==.02f*p[9]&&p[8]==.43f*p[9];
+       })&&
+       std::any_of(exr.pixels.begin(),exr.pixels.end(),[](const auto &p){
+        const auto remaining=1-p[9];
+        return remaining>.1f&&std::abs(p[0]-(.08f*srgb_to_linear(230.f/255)*remaining+p[6]))<5e-7f&&
+               std::abs(p[1]-(.16f*srgb_to_linear(153.f/255)*remaining+p[7]))<5e-7f;
+       }),"EXR carries exact physical ink coefficients and the constant original textured backdrop");
+ auto restored=extract_native_emission(bytes);
+ check(restored&&restored->encode()==before&&Scene::load(saved).encode()==before&&
+       doc.copy_scene().encode()==before,"HDR GLB recovery and ordered Save preserve source geometry, layers, and physical paint exactly");
+ doc.replace(std::move(*restored));
+ const auto retry=out/"single-surface-hdr-retry.glb";
+ doc.export_asset(retry).get();
+ check(file_bytes(retry)==bytes,"Restored single-surface HDR project exports the same exact GLB");
+
+ material["emissiveTexture"]["index"]=0;
+ const auto varying=out/"varying-source-hdr-input.glb";
+ fixture.save(varying);
+ auto unsupported=prepare_authoring_import(initial,varying,options).scene;
+ auto &varying_object=unsupported.active();
+ for(const auto &other:unsupported.objects())if(other.id!=varying_object.id)unsupported.object(other.id).visible=false;
+ varying_object.painted=varying_object.painted->snapshot();
+ paint_uniform(*varying_object.painted,ink,.22f);
+ const auto original=unsupported.encode();
+ doc.replace(unsupported.snapshot());
+ auto refused=doc.export_asset(path);
+ auto queued_save=doc.save_async(out/"varying-source-hdr-preserved.dsculpt");
+ check(rejects([&]{refused.get();}),"Varying original emission still requires the explicit portable compiler");
+ queued_save.get();
+ check(file_bytes(path)==bytes&&Scene::load(out/"varying-source-hdr-preserved.dsculpt").encode()==original,
+       "Unsupported emission preserves the earlier GLB and saves all native authoring data");
+}
 }
 int main(int argc,char **argv)try{
  if(argc<2||argc>3)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
@@ -568,5 +662,6 @@ int main(int argc,char **argv)try{
  uniform_coat(out,initial,options,native,fbo,separate_roles);
  spatial_paint(out,initial,options,native,fbo,separate_roles);
  mixed_emission(out,fbo,separate_roles);
+ single_surface_emission(out,initial,options,native,fbo,separate_roles);
  std::cout<<"PASS "<<checks<<" source-aware original standard export checks maxerror="<<maximum<<'\n';return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

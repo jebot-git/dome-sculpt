@@ -3,9 +3,10 @@
 #include "dome/scene.hpp"
 
 namespace dome::detail {
-// The avatar and legacy surface compilers admit constant factor rewrites.
-// The Standard GLB file worker can also emit a proved writable atlas.
-void source_paint_export(const PaintedMesh &,ObjectSurface &,const std::function<bool()> &cancelled={},
-                         bool allow_paint_atlas=false);
+enum class SourcePaintExport { Factors, Standard, StandardHdr };
+// StandardHdr compiles the non-emission channels. The HDR field supplies its
+// own portable emissive image and binding after core material compilation.
+void source_paint_export(const PaintedMesh &,ObjectSurface &,
+    const std::function<bool()> &cancelled={},SourcePaintExport mode=SourcePaintExport::Factors);
 std::vector<ObjectSurface> prepare_standard_glb_surfaces(const Scene &,const std::function<bool()> &);
 }

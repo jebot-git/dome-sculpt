@@ -1479,7 +1479,8 @@ std::vector<ObjectSurface> export_surface_views(const Scene &scene,const std::fu
     const auto &o=scene.object(surface.id);
     surface.retopo_mtoon_export=detail::RetopoMToonExport::capture(o,cancelled);
     if(o.mesh_active&&o.painted->source_sampling_prepared())
-      detail::source_paint_export(*o.painted,surface,cancelled,allow_paint_atlas);
+      detail::source_paint_export(*o.painted,surface,cancelled,
+          allow_paint_atlas?detail::SourcePaintExport::Standard:detail::SourcePaintExport::Factors);
   }
   return result;
 }

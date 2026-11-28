@@ -502,12 +502,12 @@ unsigned adopt_atlas_coordinates(PaintSourceMaps &source,const ObjectSurface &ou
 }
 
 void install_atlas(PaintSourceMaps &source,PaintAtlas atlas,const ObjectSurface &out,
-    const std::vector<std::array<float,2>> &uv0,size_t maximum_bytes) {
+    const std::vector<std::array<float,2>> &uv0,size_t maximum_bytes,bool hdr) {
   // Unbound authored accessors still belong to CreatorAppearance. Keep only
   // coordinate owners actually used by the detached material bindings here.
   if(atlas.color)source.color={};
   if(atlas.orm)source.metal_rough={};
-  if(atlas.emission)source.emission={};
+  if(atlas.emission||hdr)source.emission={};
   if(!source.uses_uv1())source.uv1.reset();
   std::erase_if(source.extra_uv_sets,[&](const auto &entry){return !uses_coordinate(source,entry.first);});
   if(!atlas.color&&!atlas.orm&&!atlas.emission)return;
@@ -526,7 +526,7 @@ void install_atlas(PaintSourceMaps &source,PaintAtlas atlas,const ObjectSurface 
 } // namespace
 
 void source_paint_export(const PaintedMesh &paint,ObjectSurface &out,
-    const std::function<bool()> &cancelled,bool allow_paint_atlas) {
+    const std::function<bool()> &cancelled,SourcePaintExport mode) {
   auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Source paint export cancelled");};
   stop();
   if(!paint.source_sampling_prepared()||!paint.valid_source_sampling_attachment())
@@ -558,13 +558,14 @@ void source_paint_export(const PaintedMesh &paint,ObjectSurface &out,
   auto material=out.material;
   PaintAtlas atlas;
   if(!marker->overlay->empty())
-    atlas=compile_source_paint(paint,out,*marker->overlay,*source,material,cancelled,allow_paint_atlas);
+    atlas=compile_source_paint(paint,out,*marker->overlay,*source,material,cancelled,
+                               mode!=SourcePaintExport::Factors);
   if(original.uv1)source->uv1=std::make_shared<const std::vector<std::array<float,2>>>(remap(*original.uv1));
   for(auto &[set,values]:source->extra_uv_sets)
     values=std::make_shared<const std::vector<std::array<float,2>>>(remap(*values));
   auto uv0=remap(before->mesh().uv);
   const bool transparent=atlas.transparent;
-  install_atlas(*source,std::move(atlas),out,uv0,bytes_limit);
+  install_atlas(*source,std::move(atlas),out,uv0,bytes_limit,mode==SourcePaintExport::StandardHdr);
   out.mesh.uv=std::move(uv0);
   // The pins and seams describe the native atlas editor.
   out.mesh.uv_pins.clear();

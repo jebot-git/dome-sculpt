@@ -249,6 +249,14 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     const auto &o=prepared?prepared->surface:input;auto *frame=prepared?&*prepared:nullptr;
     GltfObjectIdentity emission;
     if(frame){emission.canonical_normal=frame->canonical_normal;emission.prepared_normal=frame->prepared_normal;}
+    const Mesh *hdr_mesh=nullptr;
+    if(physical){
+      const auto field=std::find_if(physical->images.begin(),physical->images.end(),[&](const auto &entry){
+        return entry.object==input.id&&entry.prepared_source_mesh;
+      });
+      if(field!=physical->images.end())hdr_mesh=field->prepared_source_mesh.get();
+    }
+    const bool gather_uvs=hdr_mesh||(frame&&(!frame->normal_coordinates.empty()||!frame->paint_coordinates.empty()));
     auto &mesh = o.mesh;
     const auto source_uv1=input.textures&&input.textures->source_maps?input.textures->source_maps->uv1:nullptr;
     const auto source_maps=input.textures?input.textures->source_maps:nullptr;
@@ -303,7 +311,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       };
       if(!source_uv1){
         attribute(source->uv1,"TEXCOORD_1","VEC2");
-        if(frame&&(!frame->normal_coordinates.empty()||!frame->paint_coordinates.empty())&&!source->uv1.empty())
+        if(gather_uvs&&!source->uv1.empty())
           for(auto v:a.source_vertices)emitted_uv1.push_back(source->uv1.at(v));
       }
       else if(!source->uv1.empty()){
@@ -335,7 +343,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     }
     if(source_uv1){
       begin=data.size();
-      for(size_t vertex=0;vertex<mesh.positions.size();++vertex){checkpoint();auto uv=source_uv1->at(frame?frame->rest_vertices.at(vertex):vertex);floats(uv);if(frame&&(!frame->normal_coordinates.empty()||!frame->paint_coordinates.empty()))emitted_uv1.push_back(uv);}
+      for(size_t vertex=0;vertex<mesh.positions.size();++vertex){checkpoint();auto uv=source_uv1->at(frame?frame->rest_vertices.at(vertex):vertex);floats(uv);if(gather_uvs)emitted_uv1.push_back(uv);}
       attributes["TEXCOORD_1"]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,"VEC2");
     }
     if(source_maps)for(const auto &[set,coordinates]:source_maps->extra_uv_sets){
@@ -375,16 +383,29 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       }
       retained_paint_sets.back()=coordinate;
     }
-    if(bundles[object_index]){
+    if(bundles[object_index]||hdr_mesh){
       const auto coordinate=[&](const std::vector<std::array<float,2>>&values)->unsigned{
-        if(values.size()!=mesh.positions.size())throw std::invalid_argument("Compiled texture-set coordinate domain differs from its one emitted geometry");
+        if(values.size()!=mesh.positions.size())throw std::invalid_argument("Compiled paint coordinate domain differs from emitted geometry");
         if(values==mesh.uv)return 0;
         if(attributes.contains("TEXCOORD_1")&&values==emitted_uv1)return 1;
         for(const auto&[set,existing]:emitted_extra_uv)if(values==existing)return set;
-        unsigned set=1;while(set<8&&attributes.contains("TEXCOORD_"+std::to_string(set)))++set;if(set==8)throw std::length_error("Texture-set export has no free genuine glTF coordinate domain");
+        unsigned set=1;while(set<8&&attributes.contains("TEXCOORD_"+std::to_string(set)))++set;if(set==8)throw std::length_error("Paint export has no free glTF coordinate domain");
         begin=data.size();for(auto uv:values){checkpoint();floats(uv);}attributes["TEXCOORD_"+std::to_string(set)]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,"VEC2");emitted_extra_uv[set]=values;return set;
       };
-      const auto&bundle=*bundles[object_index];if(!bundle.paint_coordinates.empty())retained_paint_sets.back()=coordinate(bundle.paint_coordinates);if(!bundle.normal_coordinates.empty())retained_normal_sets.back()=coordinate(bundle.normal_coordinates);
+      if(hdr_mesh){
+        if(bundles[object_index]||hdr_mesh->indices!=input.mesh.indices)
+          throw std::invalid_argument("Prepared source HDR requires its exact emitted vertex correspondence");
+        if(frame){
+          std::vector<std::array<float,2>> writable;
+          writable.reserve(frame->rest_vertices.size());
+          for(auto vertex:frame->rest_vertices){checkpoint();writable.push_back(hdr_mesh->uv.at(vertex));}
+          emission.prepared_emission_texcoord=coordinate(writable);
+        }else emission.prepared_emission_texcoord=coordinate(hdr_mesh->uv);
+      }else{
+        const auto &bundle=*bundles[object_index];
+        if(!bundle.paint_coordinates.empty())retained_paint_sets.back()=coordinate(bundle.paint_coordinates);
+        if(!bundle.normal_coordinates.empty())retained_normal_sets.back()=coordinate(bundle.normal_coordinates);
+      }
     }
     bool uv_gap=false;
     for(unsigned coordinate=0;coordinate<8;++coordinate) {

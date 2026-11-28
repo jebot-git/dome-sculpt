@@ -10,7 +10,7 @@ struct EmissionExportRaster {
  EmissionExrSource read;
 };
 EmissionExportRaster export_emission_raster(const SculptObject &,
-    const std::function<bool()> &, bool authored_mtoon);
+    const std::function<bool()> &, bool authored_mtoon,bool prepared_source=false);
 EmissionInterchangeImage canonical_paint_emission_field(const SculptObject &,const std::function<bool()> &);
 EmissionInterchangeImage native_paint_emission_field(const SculptObject &,const std::function<bool()> &);
 EmissionInterchangeImage baked_emission_field(const SculptObject &,const std::function<bool()> &,bool authored_mtoon);
