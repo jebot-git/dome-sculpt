@@ -78,13 +78,14 @@ Bakes remain readable. Standard GLB emits the authored MToon plane in its
 workspace applies new charts over the same ordered geometry. It transports
 projected normals through the old and new tangent frames, filters FLOAT
 emission and layer samples, and retains the original UV mapping for each
-material sampler. The selected compute GPU filters the native Bake emission
-coefficients in bounded batches from the original dense or packed field.
-This preserves subnormal values and supports the full finite baked radiance
-range. Apply rejects a result if its nonzero energy cannot be represented
-with the rounded coverage. Atlas correspondence, byte-channel and layer
-transfer, tangent-frame conversion and native field storage run on the host.
-Independently selectable portable material variants,
+material sampler. The selected compute GPU filters the Bake color, alpha,
+ORM, coverage, legacy emission and both tangent normal planes. The same
+dispatch can filter independent FLOAT emission from its original dense or
+packed field. It preserves subnormal values and the full finite baked
+radiance range. Apply rejects a result if its nonzero energy cannot be
+represented with the rounded coverage. Atlas correspondence, editable layer
+transfer, final tangent-frame conversion and native field storage run on
+the host. Independently selectable portable material variants,
 topology-changing transfer and animated UVs remain open.
 
 ## First GLB implementation

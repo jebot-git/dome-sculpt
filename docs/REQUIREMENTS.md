@@ -191,8 +191,10 @@ planes. A partial rebake keeps both directions on misses. Standard GLB
 displays the authored MToon normal and stores both planes for native recovery.
 UV Apply on existing geometry now transports both normal planes and FLOAT
 Bake and paint while preserving the original image samplers. The selected
-compute GPU filters baked FLOAT emission from native dense and compact storage.
-It preserves subnormal coefficients and the full finite Bake radiance range.
+compute GPU filters Bake color, alpha, ORM, coverage, legacy emission and
+both tangent normal planes. It also filters baked FLOAT emission from
+native dense and compact storage, preserving subnormal coefficients and
+the full finite Bake radiance range.
 Topology-changing transfer, broader deformation and physical headset
 workflows remain open.
 [Prepared MToon1 Bake evidence](validation/prepared-mtoon-bake-20261128.json)
@@ -200,6 +202,7 @@ workflows remain open.
 [Paired Bake evidence](validation/prepared-mtoon-paired-bake-20261128.json)
 [Paired Bake UV evidence](validation/prepared-mtoon-uv-bake-20261128.json)
 [GPU Bake UV evidence](validation/prepared-mtoon-uv-gpu-20261128.json)
+[Fused GPU Bake UV evidence](validation/prepared-mtoon-uv-map-gpu-20261128.json)
 
 ## Current validation — 2026-11-27
 

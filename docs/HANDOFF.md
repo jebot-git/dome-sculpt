@@ -602,11 +602,20 @@ dense and compact native storage, including subnormal values and radiance above
 the brush limit. The original fixture produces byte-identical projects and GLBs.
 All 31 focused Arc Release tests pass, along with native DomeD Wayland export
 and synthetic OpenXR export and UV Apply. The CUDA and ROCm kernels compile.
-Atlas correspondence, editable layer transfer, byte-channel filtering, tangent
-conversion and native field packing run on the host. Topology-changing transfer
-remains open.
+UV Apply now shares one device dispatch per batch for Bake color, alpha, ORM,
+legacy emission, coverage, both tangent normal planes and optional FLOAT emission.
+The scoped Arc oracle compares 4,096 varied taps bit for bit for both the
+paired legacy-emission and single-normal FLOAT cases. The paired import
+fixture produces the existing native project and both GLBs byte for byte.
+All 31 focused Arc tests, native DomeD Wayland export, synthetic OpenXR
+export and controller UV Apply, and the headless sanitizer reference pass.
+The updated CUDA and ROCm kernels compile.
+Atlas correspondence, editable layer transfer, final tangent-frame conversion
+and native field packing run on the host. Topology-changing transfer remains
+open.
 [Paired Bake UV evidence](validation/prepared-mtoon-uv-bake-20261128.json)
 [GPU Bake UV evidence](validation/prepared-mtoon-uv-gpu-20261128.json)
+[Fused GPU Bake UV evidence](validation/prepared-mtoon-uv-map-gpu-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
