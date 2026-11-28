@@ -1994,7 +1994,8 @@ void retopo_toon_materials(bool affine,bool legacy,const std::filesystem::path &
           (reopened.roles[base].image==reopened.roles[shade].image)==shared,
           "Apply and cold Open preserve Base/Shade sharing only when the source samplers agree");
     const auto r=target.roles[0].image->width;
-    check(r==(slot==trim?128u:512u) && target.roles[0].image!=source.roles[0].image &&
+    check(old.painted->resolution()==64 && r==(slot==trim?128u:64u) &&
+          target.roles[0].image!=source.roles[0].image &&
           target.roles[size_t(MToonSlot::Matcap)].image==source.roles[size_t(MToonSlot::Matcap)].image &&
           target.material.parameters.alpha==source.material.parameters.alpha &&
           target.material.version()==source.material.version() &&
@@ -2014,7 +2015,8 @@ void retopo_toon_materials(bool affine,bool legacy,const std::filesystem::path &
       const auto uv=mesh.uv[ia];
       const auto u=mesh.uv[ib][0]-uv[0], v=mesh.uv[ib][1]-uv[1];
       const auto s=mesh.uv[ic][0]-uv[0], t=mesh.uv[ic][1]-uv[1];
-      for (uint32_t y=0;y<r;y+=11) for (uint32_t x=0;x<r;x+=11) {
+      const auto stride=std::max(r/32,1u);
+      for (uint32_t y=0;y<r;y+=stride) for (uint32_t x=0;x<r;x+=stride) {
         const auto dx=(x+.5f)/r-uv[0], dy=(y+.5f)/r-uv[1];
         const auto p=(dx*t-dy*s)/(u*t-v*s), q=(dy*u-dx*v)/(u*t-v*s);
         const std::array w{1-p-q,p,q};
@@ -2064,10 +2066,17 @@ void retopo_toon_materials(bool affine,bool legacy,const std::filesystem::path &
     const auto reopened=extract_native_authoring(payload);
     check(reopened && reopened->encode()==after.encode(),"Editable GLB reopens both native typed material fields exactly");
     auto portable=after.snapshot();
-    check(edit_texture_set(portable,active.id,trim,[](PaintedMesh &paint,Material &) {
-      paint.delete_layer();
-      return !paint.has_paint_data();
-    }),"An independent export control keeps the projected typed roles without its additional ink overlay");
+    for (const auto slot:{TextureSetId(0),trim}) {
+      if (!texture_set_view(portable.active(),slot).painted->has_paint_data()) continue;
+      check(edit_texture_set(portable,active.id,slot,[](PaintedMesh &paint,Material &) {
+        paint.add_layer("Unpainted export control");
+        while (paint.layers().size()>1) {
+          paint.select_layer(paint.layers().front().id);
+          paint.delete_layer();
+        }
+        return !paint.has_paint_data();
+      }),"The independent export control removes inherited and additional paint from this material slot");
+    }
     Document portable_document;
     portable_document.replace(portable);
     settled(portable_document);
