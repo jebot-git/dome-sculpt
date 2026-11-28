@@ -293,15 +293,19 @@ std::unique_ptr<EmissionRasterDevice> create_bake_uv_emission_device(const Baked
 }
 
 std::unique_ptr<EmissionRasterDevice> create_bake_uv_maps_device(const BakedTextures &bake,
-    uint32_t resolution,size_t capacity,const std::function<bool()> &cancelled){
+    uint32_t resolution,std::span<const EmissionRasterDevice::BakeUvFrame> frames,
+    size_t capacity,const std::function<bool()> &cancelled){
   paint_compute::checkpoint(cancelled);
   bake.validate(resolution);
   if(!capacity||capacity>EmissionRasterDevice::mapped_batch||capacity>bake.coverage.size())
     throw std::invalid_argument("Invalid GPU Bake UV filter batch capacity");
+  if(frames.empty()!=bake.maps.normal.rgba.empty())
+    throw std::invalid_argument("GPU Bake UV normal planes require ordered tangent frames");
   emission_raster::Input input;
   input.resolution=resolution;
   input.bake_uv_capacity=capacity;
   input.bake_uv_maps=&bake;
+  input.bake_uv_frames=frames;
   if(bake.emission_field){
     input.physical_bake=true;
     input.bake=bake.emission_field->storage();

@@ -2,6 +2,7 @@
 #pragma once
 
 #include "dome/paint.hpp"
+#include "normal-bake-encoding.hpp"
 #include "paint-composite-kernel.hpp"
 #include "paint-source-coordinate.hpp"
 #include "source-uv-sampler.hpp"
@@ -33,10 +34,16 @@ public:
   using Pixel=std::array<float,10>;
   using Radiance=std::array<float,3>;
   struct MappedSample { uint32_t texel; float u,v; };
-  struct BakeUvSample { uint32_t texels[4]{}; float weights[4]{}; };
+  struct BakeUvSample {
+    uint32_t texels[4]{};
+    float weights[4]{};
+    uint32_t face=0;
+    float bary[2]{};
+  };
+  struct BakeUvFrame { NormalBakeVertex before[3],after[3]; };
   struct BakeUvMapsPixel {
-    uint8_t color[4]{},orm[4]{},legacy[4]{},coverage=0,padding[3]{};
-    float normals[2][3]{};
+    uint8_t color[4]{},orm[4]{},legacy[4]{},normals[2][4]{};
+    uint8_t coverage=0,invalid_normal=0;
   };
   static constexpr size_t mapped_batch=16384;
   using TextureSetPreview=std::array<float,4>; // RGB radiance, coverage
@@ -65,7 +72,7 @@ std::unique_ptr<EmissionRasterDevice> create_mapped_emission_field_device(
 std::unique_ptr<EmissionRasterDevice> create_bake_uv_emission_device(const BakedEmissionField &,size_t capacity,
     const std::function<bool()> &);
 std::unique_ptr<EmissionRasterDevice> create_bake_uv_maps_device(const BakedTextures &,uint32_t resolution,
-    size_t capacity,const std::function<bool()> &);
+    std::span<const EmissionRasterDevice::BakeUvFrame>,size_t capacity,const std::function<bool()> &);
 std::unique_ptr<EmissionRasterDevice> create_texture_set_emission_device(
     const PaintedMesh &,const PaintSourceTexture *,const Image *aligned_mtoon,
     std::array<float,3> background,float strength,const std::function<bool()> &);
@@ -106,6 +113,7 @@ struct Bake {
 struct BakeUvMaps {
   const uint8_t *color=nullptr,*orm=nullptr,*legacy=nullptr,*coverage=nullptr,*normals[2]{};
   const paint_compute::Quantization *quantization=nullptr;
+  const EmissionRasterDevice::BakeUvFrame *frames=nullptr;
 };
 struct Source {
   paint_compute::SourceCoordinateJob coordinates;
@@ -123,6 +131,7 @@ struct Input {
   BakedEmissionField::StorageView bake;
   std::span<const uint8_t> legacy_bake,bake_coverage;
   const BakedTextures *bake_uv_maps=nullptr;
+  std::span<const EmissionRasterDevice::BakeUvFrame> bake_uv_frames;
   std::span<const uint8_t> source;
   std::span<const float> aligned_mtoon_linear;
   std::vector<paint_compute::SourceTerms> columns,rows;

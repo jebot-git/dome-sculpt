@@ -29,6 +29,8 @@ public:
         bake_uv_maps_.normals[0]=upload(std::span(bake.maps.normal.rgba));
         bake_uv_maps_.normals[1]=upload(std::span(bake.maps.mtoon_normal.rgba));
         bake_uv_maps_.quantization=upload(std::span(&paint_compute::quantization(),1));
+        bake_uv_maps_.frames=upload(input.bake_uv_frames);
+        bake_uv_faces_=input.bake_uv_frames.size();
         bake_uv_maps_output_=allocate<BakeUvMapsPixel>(bake_uv_capacity_);
       }
       stop();
@@ -136,6 +138,12 @@ public:
     if(samples.size()!=maps.size()||!bake_uv_maps_output_||
        (!emission.empty()&&(!view_.bake.physical||emission.size()!=samples.size())))
       throw std::invalid_argument("Invalid GPU Bake UV maps batch");
+    if(bake_uv_faces_)for(const auto &sample:samples){
+      const auto first=double(sample.bary[0]),second=double(sample.bary[1]),third=1.-first-second;
+      const auto valid=[](double value){return value>=-.00001&&value<=1.00001;};
+      if(sample.face>=bake_uv_faces_||!valid(first)||!valid(second)||!valid(third))
+        throw std::invalid_argument("Invalid GPU Bake UV tangent sample");
+    }
     upload_bake_uv_taps(samples,cancelled);
     device_.filter_bake_uv_maps(bake_uv_maps_,view_.bake,bake_uv_samples_,samples.size(),
                                 bake_uv_maps_output_,emission.empty()?nullptr:output_);
@@ -366,6 +374,7 @@ private:
   BakeUvSample *bake_uv_samples_=nullptr;
   BakeUvMaps bake_uv_maps_{};
   BakeUvMapsPixel *bake_uv_maps_output_=nullptr;
+  size_t bake_uv_faces_=0;
   size_t mapped_capacity_=0;
   size_t bake_uv_capacity_=0;
   bool mapped_field_=false;

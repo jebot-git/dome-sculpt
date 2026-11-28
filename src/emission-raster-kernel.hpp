@@ -2,6 +2,7 @@
 #pragma once
 
 #include "emission-raster-device.hpp"
+#include "bake-uv-normal-kernel.hpp"
 #include "paint-composite-kernel.hpp"
 #include "paint-source-coordinate-kernel.hpp"
 #include "source-uv-sampler-kernel.hpp"
@@ -136,11 +137,14 @@ DOME_EMISSION_FN EmissionRasterDevice::BakeUvMapsPixel filter_bake_uv_maps(const
     out.orm[c]=linear_byte(bake_uv_divide(orm[c],coverage));
     if(maps.legacy)out.legacy[c]=srgb_byte(bake_uv_divide(legacy[c],coverage),q);
     for(unsigned role=0;role<2;++role)if(maps.normals[role])
-      out.normals[role][c]=mul(normals[role][c],reciprocal);
+      normals[role][c]=mul(normals[role][c],reciprocal);
   }
   out.color[3]=linear_byte(bake_uv_divide(color[3],coverage));
   out.orm[3]=255;
   if(maps.legacy)out.legacy[3]=255;
+  if(maps.frames)
+    out.invalid_normal=!bake_uv_normal::transport(maps.frames[sample.face],sample,normals,
+                                                 maps.normals[1]!=nullptr,out.normals);
   return out;
 }
 DOME_EMISSION_FN bool valid_coefficients(const uint32_t (&value)[7],bool physical){

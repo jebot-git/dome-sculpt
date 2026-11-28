@@ -201,6 +201,16 @@ void compare_bake_uv_maps(){
   for(auto *image:{&bake.maps.color,&bake.maps.metal_rough,&bake.maps.emission,
                    &bake.maps.normal,&bake.maps.mtoon_normal})
     *image={extent,extent,std::vector<uint8_t>(count*4)};
+  std::array<Device::BakeUvFrame,4> frames{};
+  for(unsigned face=0;face<frames.size();++face)for(unsigned corner=0;corner<3;++corner){
+    const Vec3 n{(float(corner)-1)*.12f,(float(face)-1)*.08f,1};
+    const float w=face%2?-1.f:1.f;
+    auto &frame=frames[face];
+    using detail::NormalVertexBitangent;
+    frame.before[corner]=detail::normal_bake_vertex(n,{1,.1f*corner,0},w,NormalVertexBitangent::RawCross);
+    const Vec3 tangent=face%2?Vec3{0,-1,.1f*corner}:Vec3{.2f,1,.04f*corner};
+    frame.after[corner]=detail::normal_bake_vertex(n,tangent,face<2?w:-w,NormalVertexBitangent::RawCross);
+  }
   std::vector<Device::BakeUvSample> taps(count);
   for(size_t at=0;at<count;++at){
     bake.coverage[at]=at%7?uint8_t(at^at/17):0;
@@ -212,7 +222,8 @@ void compare_bake_uv_maps(){
     }
     const float u=float(at%127)/128,v=float(at%31)/32;
     if(at%9)taps[at]={{uint32_t(at),uint32_t((at+13)%count),uint32_t((at+37)%count),uint32_t((at+31)%count)},
-                     {(1-u)*(1-v),u*(1-v),(1-u)*v,u*v}};
+                     {(1-u)*(1-v),u*(1-v),(1-u)*v,u*v},uint32_t(at%frames.size()),
+                     {float(at%61)/128,float(at%57)/128}};
   }
   const auto product=[](float a,float b){volatile float value=a*b;return value;};
   const auto add=[](float a,float b){volatile float value=a+b;return value;};
@@ -244,12 +255,25 @@ void compare_bake_uv_maps(){
       out.color[c]=color(quotient(rgba[c],coverage));
       out.orm[c]=byte(quotient(orm[c],coverage));
       out.legacy[c]=color(quotient(emission[c],coverage));
-      for(unsigned role=0;role<2;++role)out.normals[role][c]=product(normals[role][c],quotient(1,coverage));
     }
     out.color[3]=byte(quotient(rgba[3],coverage));
     out.orm[3]=out.legacy[3]=255;
+    const auto &frame=frames[sample.face];
+    const std::array<double,3> bary{sample.bary[0],sample.bary[1],1.-sample.bary[0]-sample.bary[1]};
+    const auto basis=[&](const auto &columns){
+      return detail::normal_bake_basis({columns[0],columns[1],columns[2]},bary,detail::NormalFragmentBasis::RawColumns);
+    };
+    const auto before=basis(frame.before),after=basis(frame.after);
+    for(unsigned role=0;role<2;++role){
+      const auto reciprocal=quotient(1,coverage);
+      const auto q=Vec3{normals[role][0],normals[role][1],normals[role][2]}*reciprocal;
+      const auto desired=before.t*q.x+before.b*q.y+before.n*q.z;
+      const auto encoded=detail::encode_normal_bake(after,length(desired)>1e-8f?desired:before.n);
+      check(encoded&&encoded->quantized_angle_radians<=.02,"Bake UV quality fixture needs a valid frame");
+      std::copy(encoded->rgba.begin(),encoded->rgba.end(),out.normals[role]);
+    }
   }
-  auto device=detail::create_bake_uv_maps_device(bake,extent,count,{});
+  auto device=detail::create_bake_uv_maps_device(bake,extent,frames,count,{});
   device->read_bake_uv_maps(taps,actual,{},{});
   const auto compare=[&]{
     for(size_t i=0;i<count;++i){
@@ -271,9 +295,9 @@ void compare_bake_uv_maps(){
   });
   for(auto &sample:expected){
     std::fill_n(sample.legacy,4,0);
-    std::fill_n(sample.normals[1],3,0);
+    std::fill_n(sample.normals[1],4,0);
   }
-  device=detail::create_bake_uv_maps_device(bake,extent,count,{});
+  device=detail::create_bake_uv_maps_device(bake,extent,frames,count,{});
   auto emission_device=detail::create_bake_uv_emission_device(*bake.emission_field,count,{});
   std::vector<BakedEmissionSample> reference(count),fused(count);
   emission_device->read_bake_uv(taps,reference,{});
@@ -281,7 +305,32 @@ void compare_bake_uv_maps(){
   compare();
   check(std::memcmp(reference.data(),fused.data(),count*sizeof(fused[0]))==0,
         "Fusing RGB8 Bake UV maps changed the FLOAT coefficients");
-  std::cout<<"PASS Bake UV maps exact RGBA/ORM/legacy/coverage and dual normals, fused FLOAT "<<count<<" texels\n";
+  // Include a non-singular frame that exceeds the angular error limit.
+  auto invalid=frames;
+  for(auto &corner:invalid[0].after)corner.b={};
+  invalid[1].after[1].w=-invalid[1].after[0].w;
+  for(unsigned corner=0;corner<3;++corner){
+    using detail::NormalVertexBitangent;
+    invalid[3].before[corner]=detail::normal_bake_vertex({0,0,1},{1,0,0},1,NormalVertexBitangent::RawCross);
+    invalid[3].after[corner]=detail::normal_bake_vertex({0,0,1},{.02f,0,1},1,NormalVertexBitangent::RawCross);
+  }
+  bake.coverage[0]=255;
+  const std::array<uint8_t,3> high_error{102,178,135};
+  std::copy(high_error.begin(),high_error.end(),bake.maps.normal.rgba.begin());
+  const auto &bad=invalid[3].after[0];
+  const auto bad_encoding=detail::encode_normal_bake({bad.t,bad.b,bad.n},
+      {unit(high_error[0])*2-1,unit(high_error[1])*2-1,unit(high_error[2])*2-1});
+  check(bad_encoding&&bad_encoding->quantized_angle_radians>.02,
+        "Frame refusal fixture must fail quantization and pass the determinant gate");
+  device=detail::create_bake_uv_maps_device(bake,extent,invalid,4,{});
+  const Device::BakeUvSample angular{{0,0,0,0},{1,0,0,0},3,{.5f,.125f}};
+  const std::array failures{taps[8],taps[5],angular,taps[10]};
+  device->read_bake_uv_maps(failures,std::span(actual).first(failures.size()),{},{});
+  for(unsigned i=0;i<failures.size();++i){
+    check(actual[i].coverage>0,"Frame refusal fixture must sample covered data");
+    check(bool(actual[i].invalid_normal)==(i<3),"Device accepted an invalid Bake UV tangent frame");
+  }
+  std::cout<<"PASS Bake UV maps exact RGBA/ORM/legacy/coverage, frame-transformed normals and fused FLOAT "<<count<<" texels\n";
 }
 
 void compare_finite(Fixture fixture,uint32_t extent,bool original){

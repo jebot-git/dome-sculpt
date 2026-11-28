@@ -4664,34 +4664,35 @@ std::shared_ptr<PaintedMesh> SourcePaintAccess::transfer_bake_uv(const PaintedMe
     converted.maps.color=blank_image(r);
     converted.maps.metal_rough=blank_image(r);
     if(!bake.emission_field)converted.maps.emission=blank_image(r);
-    std::vector<detail::NormalBakeVertex> old_columns,new_columns;
+    using Device=detail::EmissionRasterDevice;
+    std::vector<Device::BakeUvFrame> frames;
     if(!old_normals[0]->rgba.empty()){
       reserve(mesh.indices.size()*(2*sizeof(detail::NormalBakeVertex)+4*sizeof(Tangent)));
-      const auto columns=[&](const Mesh &m,const NormalFrames *frame){
+      frames.resize(mesh.indices.size()/3);
+      const auto columns=[&](const Mesh &m,const NormalFrames *frame,
+                             detail::NormalBakeVertex (Device::BakeUvFrame::*member)[3]){
         const auto generated=frame?std::vector<Tangent>{}:tangent_corners(m,options.cancelled);
-        std::vector<detail::NormalBakeVertex> result;
-        result.reserve(m.indices.size());
         for(size_t c=0;c<m.indices.size();++c){
           if((c&1023)==0)stop();
           const auto &t=frame?frame->tangents.at(c):generated.at(c);
           const auto n=frame?frame->normals.at(c):m.normals[m.indices[c]];
-          result.push_back(detail::normal_bake_vertex(n,{t[0],t[1],t[2]},t[3],detail::NormalVertexBitangent::RawCross));
+          (frames[c/3].*member)[c%3]=detail::normal_bake_vertex(
+              n,{t[0],t[1],t[2]},t[3],detail::NormalVertexBitangent::RawCross);
         }
-        return result;
       };
-      old_columns=columns(old,old_canonical);
-      new_columns=columns(mesh,nullptr);
+      columns(old,old_canonical,&Device::BakeUvFrame::before);
+      columns(mesh,nullptr,&Device::BakeUvFrame::after);
       for(size_t role=0;role<old_normals.size();++role)
         if(!old_normals[role]->rgba.empty())*new_normals[role]=blank_image(r,true);
     }
     const auto write_normals=[&](size_t at,const std::array<Vec3,2> &directions){
-      if(old_columns.empty())return;
+      if(frames.empty())return;
       const auto &texel=surface.texels[at];
-      const size_t c=size_t(texel.face)*3;
+      const auto &frame=frames[texel.face];
       const std::array<double,3> bary{texel.bary[0],texel.bary[1],1.-texel.bary[0]-texel.bary[1]};
-      const auto basis=[&](const auto &columns){return detail::normal_bake_basis({columns[c],columns[c+1],columns[c+2]},
+      const auto basis=[&](const auto &columns){return detail::normal_bake_basis({columns[0],columns[1],columns[2]},
           bary,detail::NormalFragmentBasis::RawColumns);};
-      const auto before=basis(old_columns),after=basis(new_columns);
+      const auto before=basis(frame.before),after=basis(frame.after);
       for(size_t role=0;role<directions.size();++role)if(!new_normals[role]->rgba.empty()){
         visit(8);
         const auto q=directions[role];
@@ -4759,16 +4760,15 @@ std::shared_ptr<PaintedMesh> SourcePaintAccess::transfer_bake_uv(const PaintedMe
         write_normals(at,directions);
       }
     }else{
-      using Device=detail::EmissionRasterDevice;
       const size_t row_bytes=sizeof(Device::BakeUvSample)+sizeof(Device::BakeUvMapsPixel)+
           (bake.emission_field?sizeof(BakedEmissionSample):0);
-      const auto input_bytes=bake.storage_bytes()+sizeof(paint_compute::Quantization);
+      const auto input_bytes=bake.storage_bytes()+sizeof(paint_compute::Quantization)+std::span(frames).size_bytes();
       if(input_bytes>=remaining)throw std::length_error("UV transfer cannot stage its Bake on the GPU");
       // Bound both host and device batches, leaving room for native FLOAT output.
       const auto capacity=std::min({Device::mapped_batch,pixels,size_t((remaining-input_bytes)/(4*row_bytes))});
       if(!capacity)throw std::length_error("UV transfer cannot stage a GPU Bake filter batch");
       const auto available=remaining-input_bytes-2*capacity*row_bytes;
-      const auto device=detail::create_bake_uv_maps_device(bake,r,capacity,options.cancelled);
+      const auto device=detail::create_bake_uv_maps_device(bake,r,frames,capacity,options.cancelled);
       std::vector<Device::BakeUvSample> requests(capacity);
       std::vector<Device::BakeUvMapsPixel> maps(capacity);
       size_t maps_written=0;
@@ -4782,6 +4782,11 @@ std::shared_ptr<PaintedMesh> SourcePaintAccess::transfer_bake_uv(const PaintedMe
           const auto &texel=surface.texels[first+n];
           if(!texel.covered())continue;
           if(write_maps)visit(16);
+          if(write_maps&&!frames.empty()){
+            batch[n].face=texel.face;
+            batch[n].bary[0]=texel.bary[0];
+            batch[n].bary[1]=texel.bary[1];
+          }
           const auto taps=taps_at(texel);
           for(size_t tap=0;tap<taps.size();++tap){
             batch[n].texels[tap]=uint32_t(taps[tap].texel);
@@ -4797,13 +4802,17 @@ std::shared_ptr<PaintedMesh> SourcePaintAccess::transfer_bake_uv(const PaintedMe
           if((n&1023)==0)stop();
           const auto &sample=maps[n];
           if(!sample.coverage)continue;
+          if(sample.invalid_normal)
+            throw std::invalid_argument("UV transfer exceeds the baked normal frame error limit");
           const auto at=first+n;
           converted.coverage[at]=sample.coverage;
           std::copy_n(sample.color,4,converted.maps.color.rgba.begin()+at*4);
           std::copy_n(sample.orm,4,converted.maps.metal_rough.rgba.begin()+at*4);
           if(!bake.emission_field)std::copy_n(sample.legacy,4,converted.maps.emission.rgba.begin()+at*4);
-          write_normals(at,{{{sample.normals[0][0],sample.normals[0][1],sample.normals[0][2]},
-                             {sample.normals[1][0],sample.normals[1][1],sample.normals[1][2]}}});
+          for(size_t role=0;role<new_normals.size();++role)if(!new_normals[role]->rgba.empty()){
+            visit(8);
+            std::copy_n(sample.normals[role],4,new_normals[role]->rgba.begin()+at*4);
+          }
         }
         maps_written+=count;
       };
