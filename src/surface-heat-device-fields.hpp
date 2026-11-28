@@ -40,12 +40,39 @@ class DeviceFields final:public Fields {
   static constexpr size_t vectors=static_cast<size_t>(Vector::Count);
   SparseBuffer matrix_,lower_,upper_;
   Buffer<Scalar> vectors_,partial_a_,partial_b_;
+  Buffer<IterationState> state_;
   static size_t chunks(size_t count){return (count+reduction_chunk-1)/reduction_chunk;}
   Scalar *address(Vector v) const {return vectors_.data+static_cast<size_t>(v)*count_;}
+
+  Scalar *reduce(Vector a,Vector b,ReductionResult result,IterationState *state) {
+    auto *partial=partial_a_.data,*next=partial_b_.data;
+    size_t count=chunks(count_);
+    api_.launch(count,DotChunks{address(a),address(b),partial,count_,state,
+                                count==1?result:ReductionResult::Store});
+    while(count>1){
+      const size_t groups=chunks(count);
+      api_.launch(groups,DotChunks{partial,nullptr,next,count,state,
+                                   groups==1?result:ReductionResult::Store});
+      std::swap(next,partial);
+      count=groups;
+    }
+    return partial;
+  }
+
+  void precondition(std::span<const uint32_t> ranges) {
+    const auto below=lower_.view();
+    const auto above=upper_.view(lower_.diagonal.data);
+    auto *forward=address(Vector::Forward),*out=address(Vector::Preconditioned);
+    for(size_t i=1;i<ranges.size();++i)
+      api_.launch(ranges[i]-ranges[i-1],Triangular{below,address(Vector::Residual),forward,ranges[i-1],state_.data});
+    for(size_t i=ranges.size()-1;i>0;--i)
+      api_.launch(ranges[i]-ranges[i-1],Triangular{above,forward,out,ranges[i-1],state_.data});
+  }
+
 public:
   explicit DeviceFields(const System &input):count_(input.matrix.diagonal.size()),
     matrix_(api_,input.matrix,false),lower_(api_,input.lower,false),upper_(api_,input.upper,true),
-    vectors_(api_,vectors*count_),partial_a_(api_,chunks(count_)),partial_b_(api_,chunks(count_)) {
+    vectors_(api_,vectors*count_),partial_a_(api_,chunks(count_)),partial_b_(api_,chunks(count_)),state_(api_,1) {
     try {
       matrix_.upload(api_,input.matrix);
       lower_.upload(api_,input.lower);
@@ -72,26 +99,40 @@ public:
   void multiply(Vector result,Vector input) override {
     api_.launch(count_,Multiply{matrix_.view(),address(input),address(result)});
   }
-  void forward(uint32_t first,uint32_t last) override {
-    api_.launch(last-first,Triangular{lower_.view(),address(Vector::Residual),address(Vector::Forward),first});
-  }
-  void backward(uint32_t first,uint32_t last) override {
-    api_.launch(last-first,Triangular{upper_.view(lower_.diagonal.data),address(Vector::Forward),address(Vector::Preconditioned),first});
-  }
   double dot(Vector a,Vector b) override {
-    auto *partial=partial_a_.data,*next=partial_b_.data;
-    size_t count=chunks(count_);
-    api_.launch(count,DotChunks{address(a),address(b),partial,count_});
-    while(count>1){
-      const size_t groups=chunks(count);
-      api_.launch(groups,DotChunks{partial,nullptr,next,count});
-      std::swap(next,partial);
-      count=groups;
-    }
+    const auto *partial=reduce(a,b,ReductionResult::Store,nullptr);
     double scalar;
     try{api_.read(&scalar,partial,sizeof(scalar));}
     catch(...){api_.drain();throw;}
     return scalar;
+  }
+
+  void start_iterations(double target,std::span<const uint32_t> ranges) override {
+    using enum Vector;
+    api_.launch(1,StartIterations{state_.data,std::bit_cast<Scalar>(target)});
+    precondition(ranges);
+    copy(Direction,Preconditioned);
+    reduce(Residual,Preconditioned,ReductionResult::InitialRho,state_.data);
+  }
+
+  IterationProgress iterate(size_t steps,std::span<const uint32_t> ranges) override {
+    using enum Vector;
+    auto *state=state_.data;
+    auto *direction=address(Direction),*product=address(Product);
+    for(size_t i=0;i<steps;++i){
+      api_.launch(count_,Multiply{matrix_.view(),direction,product,state});
+      reduce(Direction,Product,ReductionResult::Alpha,state);
+      api_.launch(count_,UpdateSolution{address(Solution),address(Residual),direction,product,state});
+      reduce(Residual,Residual,ReductionResult::Estimate,state);
+      precondition(ranges);
+      reduce(Residual,Preconditioned,ReductionResult::Beta,state);
+      api_.launch(count_,UpdateDirection{direction,address(Preconditioned),state});
+    }
+    IterationProgress progress;
+    // The prefix of the device state is all the host needs between batches.
+    try{api_.read(&progress,state,sizeof(progress));}
+    catch(...){api_.drain();throw;}
+    return progress;
   }
 };
 } // namespace dome::detail::surface_heat_device

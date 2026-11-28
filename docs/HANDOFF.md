@@ -39,6 +39,15 @@ seconds on Arc in the focused run. The preceding host-solver run took
 need work. CUDA and ROCm kernels compile and refuse unavailable devices.
 [GPU Surface Heat evidence](validation/gpu-surface-heat-20261128.json)
 
+The GPU now calculates the Surface Heat step and direction coefficients and
+checks the recursive residual itself. The worker checks one status record
+per bounded batch and still replays the true residual before accepting a
+field. The traced open-grid fixture issued 58 memory-copy calls, down from
+629. Across three alternating runs on Arc, the median native male VRoid fixture
+took 9.83 seconds with batching and 10.28 seconds with the preceding GPU solver.
+The run-to-run times overlap. The saved project matched in all six runs.
+[Batched Surface Heat evidence](validation/gpu-surface-heat-batches-20261128.json)
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.

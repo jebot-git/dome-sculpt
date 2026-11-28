@@ -304,6 +304,12 @@ field and reads back the certified solution. The original residual,
 maximum-principle and partition checks still apply.
 [GPU Surface Heat evidence](validation/gpu-surface-heat-20261128.json)
 
+Surface Heat now keeps its iteration coefficients and convergence check on
+the GPU through bounded batches. The worker polls batch status and still
+requires original-residual replay before field adoption. Tests cover a field
+that stops after one iteration and cancellation followed by exact retry.
+[Batched Surface Heat evidence](validation/gpu-surface-heat-batches-20261128.json)
+
 Volume Geodesic binds consistently oriented closed meshes to internal
 deforming bones. It checks topology and seeds on the worker and propagates
 through the certified material on the selected GPU. The Arc A770 results

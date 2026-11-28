@@ -117,18 +117,6 @@ struct FieldSolver::Impl {
     work.stop();
   }
 
-  void precondition(weight_surface::Budget &work) {
-    work.step(4*order.size()+4*factor_edges);
-    for(size_t c=1;c<ranges.size();++c){
-      work.step();
-      device->forward(ranges[c-1],ranges[c]);
-    }
-    for(size_t c=ranges.size()-1;c>0;--c){
-      work.step();
-      device->backward(ranges[c-1],ranges[c]);
-    }
-  }
-
   double true_residual(surface_heat_device::Vector rhs,surface_heat_device::Vector x,
                        weight_surface::Budget &work) {
     work.step(3*order.size()+matrix_edges);
@@ -143,41 +131,46 @@ struct FieldSolver::Impl {
       throw std::runtime_error("Surface Heat received an invalid control norm");
     const size_t n=order.size();
     const auto target=1e-18*norm_squared;
+    const size_t sweeps=2*(ranges.size()-1);
+    const size_t precondition_work=4*n+4*factor_edges+sweeps;
+    const size_t iteration_work=7*n+matrix_edges+precondition_work;
+    const size_t batch_limit=std::max(size_t(1),std::min({size_t(8),size_t(1'000'000)/n,size_t(256)/(sweeps+12)}));
+    constexpr size_t max_iterations=4096;
+    using Phase=surface_heat_device::IterationPhase;
+
+    work.step(5*n+precondition_work);
     device->zero(Solution);
     device->copy(Residual,rhs);
-    precondition(work);
-    device->copy(Direction,Preconditioned);
-    work.step(5*n);
-    double rho=device->dot(Residual,Preconditioned);
-    for(size_t i=0;i<4096;++i){
+    device->start_iterations(target,ranges);
+    size_t used=0,previous=0;
+    while(used<max_iterations){
       work.stop();
-      work.step(5*n+matrix_edges);
-      device->multiply(Product,Direction);
-      const double curvature=device->dot(Direction,Product);
-      if(!(curvature>0)||!(rho>0)||!std::isfinite(curvature)||!std::isfinite(rho))
+      const size_t steps=std::min({batch_limit,max_iterations-used,(work.maximum-work.used)/iteration_work});
+      if(!steps)throw std::length_error("Bone heat work budget exceeded");
+      const auto status=device->iterate(steps,ranges);
+      if(status.completed<previous||status.completed-previous>steps||
+         (status.phase==Phase::Running&&status.completed-previous!=steps))
+        throw std::logic_error("Surface Heat GPU iteration count changed unexpectedly");
+      const size_t completed=status.completed-previous;
+      used+=completed;
+      previous=status.completed;
+      proof.iterations+=completed;
+      work.step(completed*iteration_work);
+      work.stop();
+      if(status.phase==Phase::InvalidCurvature)
         throw std::runtime_error("Surface Heat GPU solve lost positive curvature");
-      const double alpha=rho/curvature;
-      device->combine(Solution,Solution,alpha,Direction);
-      device->combine(Residual,Residual,-alpha,Product);
-      ++proof.iterations;
-      const double estimate=device->dot(Residual,Residual);
-      if(!(estimate>=0)||!std::isfinite(estimate))
+      if(status.phase==Phase::InvalidResidual)
         throw std::runtime_error("Surface Heat GPU residual is nonfinite");
-      const bool replay=estimate<=target||i==4095;
-      if(replay){
-        const double actual=true_residual(rhs,Solution,work);
-        if(actual>=0&&actual<=target){
-          proof.residual=std::max(proof.residual,std::sqrt(actual/norm_squared));
-          return;
-        }
-        if(i==4095)break;
+      if(status.phase==Phase::Running&&used<max_iterations)continue;
+      const double actual=true_residual(rhs,Solution,work);
+      if(actual>=0&&actual<=target){
+        proof.residual=std::max(proof.residual,std::sqrt(actual/norm_squared));
+        return;
       }
-      precondition(work);
-      work.step(2*n);
-      const double next=device->dot(Residual,Preconditioned);
-      if(replay)device->copy(Direction,Preconditioned);
-      else device->combine(Direction,Preconditioned,next/rho,Direction);
-      rho=next;
+      if(used==max_iterations)break;
+      work.step(precondition_work+2*n);
+      device->start_iterations(target,ranges);
+      previous=0;
     }
     throw std::runtime_error("Surface Heat GPU solve failed the original residual bound");
   }

@@ -14,6 +14,11 @@ struct System {
 };
 
 enum class Vector { Right, Refined, Solution, Residual, Direction, Product, Forward, Preconditioned, Defect, Count };
+enum class IterationPhase : uint32_t { Running, ReplayResidual, InvalidCurvature, InvalidResidual };
+struct IterationProgress {
+  uint32_t completed;
+  IterationPhase phase;
+};
 
 class Fields {
 public:
@@ -25,9 +30,9 @@ public:
   // result = first + scale * second. Result may alias either input.
   virtual void combine(Vector result, Vector first, double scale, Vector second) = 0;
   virtual void multiply(Vector result, Vector input) = 0;
-  virtual void forward(uint32_t first_row,uint32_t last_row) = 0;
-  virtual void backward(uint32_t first_row,uint32_t last_row) = 0;
   virtual double dot(Vector,Vector) = 0;
+  virtual void start_iterations(double target,std::span<const uint32_t> color_ranges) = 0;
+  virtual IterationProgress iterate(size_t steps,std::span<const uint32_t> color_ranges) = 0;
 };
 std::unique_ptr<Fields> create(const System &);
 } // namespace dome::detail::surface_heat_device

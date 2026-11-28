@@ -35,6 +35,16 @@ int main() try {
   for(size_t i=0;i<expected.size();++i)expected[i]=.1+.8*double(i%width)/(width-1);
   const std::function<bool()> never;
   weight_surface::Budget work{0,100'000'000,never};
+  auto scalar=grid(1,1);
+  scalar.diagonal[0]=4.;
+  visibility_heat::FieldSolver exact_solver(scalar,work);
+  const std::array scalar_rhs{3.};
+  std::array scalar_field{-1.};
+  ContinuationReport exact_step;
+  exact_solver.solve(scalar_rhs,scalar_field,work,exact_step);
+  require(exact_step.iterations==1&&scalar_field[0]==.75,
+          "A solved field must stop updating within its first batch");
+
   system.multiply(expected,rhs,work);
   visibility_heat::FieldSolver solver(system,work);
   ContinuationReport cancelled;
@@ -62,6 +72,7 @@ int main() try {
   require(worst<1e-11&&residual<=1e-9&&proof.residual<=1e-9,"Surface Heat exceeded the independent field or residual bound");
   std::cout<<"PASS manufactured open-grid field after Cancel and retry, rows="<<expected.size()
            <<" error="<<worst<<" replay="<<residual<<" iterations="<<proof.iterations<<'\n';
+  std::cout<<"PASS exact single-step field stops at its first converged iteration\n";
   return 0;
 } catch(const std::exception &error) {
   std::cerr<<"FAIL "<<error.what()<<'\n';
