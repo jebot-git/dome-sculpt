@@ -1,0 +1,157 @@
+{
+  "date": "2026-11-28",
+  "product": "1a618dd95c71cfa05df17bd67ee831742a87069d",
+  "preceding": "8345bd30d13c2d623704a609b654f7f00a3c26cd",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Reuse device material and FLOAT radiance samplers across successive Bake batches with bounded allocation accounting and pressure recovery.",
+  "oneapi_arc_release": {
+    "application_sha256": "739761fbab20b1ab9ad80b24a49ce3897b5a5668d4e4064b03541525c4c8218a",
+    "fltk_core_sha256": "35aa46ebf11f5f3a9772d926b05a24938572471d9dbcf3e2718e98376fadbdb3",
+    "bake_regression": {
+      "passed": 27,
+      "synthetic_openxr": 4,
+      "log_sha256": "04d01ded72de1b991d6f80d9877237fe3d209f2494638e207ad6bf2047fea61c",
+      "junit_sha256": "8ff369eaa263162b25242cfe5ef849b91cebccf34f7b1ef3768fa2a70655e2a4"
+    },
+    "retained_regression": {
+      "passed": 6,
+      "synthetic_openxr": 1,
+      "log_sha256": "6f491e0c2743f9a78d6bd7bf702eb3694814c7bec705c0379476d9ccb9c07f60",
+      "junit_sha256": "dca9c40bbfed8002ffa42637a43ead2a65c0444d32bf409e60af52553cb97afd"
+    },
+    "paint_export_regression": {
+      "passed": 10,
+      "synthetic_openxr": 0,
+      "log_sha256": "704a311cce355e909f1c0c393efd3193ab59dfadacc7ae171f21b6f40664578f",
+      "junit_sha256": "73d7f63e5853bccac7ace2101327310d40ccf6fcd9f92f7aeb0e6fbc0b6040e9"
+    },
+    "overlap_between_regressions": [
+      "texture-set-retained-bake-source"
+    ],
+    "identical_regression_project_sha256": {
+      "affine-target.dsculpt": "7b72d9389b8365f9f330f53a70278789bb4f90183312584d0336d1c601c68b6b",
+      "mixed-before.dsculpt": "172a4a4084468e1f3d4b16c7dbe569633c329002ea78d8a595250f13705c658e",
+      "mixed-baked.dsculpt": "17338f40b4521cce6880102778bce603e72d13a2b877724e2c19c2b62ddfa37c",
+      "retained-bake-source.dsculpt": "27578419255b987de8c64a534a070bb3125b3d09269443cb769e26dd91cf25ad"
+    },
+    "prepared_hdr_bake": {
+      "donor_fields": 2,
+      "donor_resolution": 512,
+      "target_resolution": 1024,
+      "projected_texels": 430336,
+      "projection_rays": 0,
+      "identical_project_sha256": "9783c773289c0914f41364ea99ba692a71cc6790e0e0ad074ec57e864d079554",
+      "seconds_first_then_repeats": {
+        "preceding": [
+          8.20584,
+          0.545256,
+          0.579466
+        ],
+        "candidate": [
+          8.26663,
+          0.534816,
+          0.530809
+        ]
+      },
+      "median_repeat_seconds": {
+        "preceding": 0.562361,
+        "candidate": 0.5328124999999999
+      },
+      "log_sha256": "0859f9d6e46a2de0725dd88bb073ed4b05e10f0980260f626b0bc2b933331a9d",
+      "unified_runtime_trace": {
+        "scope": "First Bake on the same persisted donor after input setup. End markers exclude setup and publication I/O.",
+        "copy_count_and_bytes_order": [
+          "count",
+          "bytes"
+        ],
+        "measurements": {
+          "preceding": {
+            "trace_sha256": "e377fab9cea8a2535f7e7c9f89c0fcf2dfb1603577cfd18178db6a368d056b4f",
+            "copy_counts_and_bytes": {
+              "device_to_host": [
+                124,
+                53576944
+              ],
+              "host_to_device": [
+                289,
+                78790344
+              ]
+            },
+            "device_memory_allocations": 81,
+            "device_queue_creations": 7,
+            "resident_2m_allocations": 2,
+            "material_result_buffer_allocations": 4,
+            "radiance_result_buffer_allocations": 4
+          },
+          "candidate": {
+            "trace_sha256": "d8d52b3aa9fd397d3e910425f135117a378e90a267f863f578f77dafd12573bb",
+            "copy_counts_and_bytes": {
+              "device_to_host": [
+                124,
+                53576944
+              ],
+              "host_to_device": [
+                227,
+                66047272
+              ]
+            },
+            "device_memory_allocations": 51,
+            "device_queue_creations": 5,
+            "resident_2m_allocations": 2,
+            "material_result_buffer_allocations": 2,
+            "radiance_result_buffer_allocations": 2
+          }
+        },
+        "bytes_avoided": {
+          "host_to_device": 12743072,
+          "device_to_host": 0
+        }
+      }
+    },
+    "wayland": {
+      "passed": 15,
+      "report_sha256": "3206993dcd5a5c556e4a8584dc324197fcbb72c60819d1efa07f2d98534a9aa7",
+      "runtime_maps_sha256": "90b67db84bd936bcf4aa740b8d80365779a4039d08cbbbfcd7cf65487d5a750b",
+      "log_sha256": "73ceb02c01635b06559179321da5b01a986e00d0db7561fe65b8d347340bd3de"
+    }
+  },
+  "missing_device": {
+    "target": "OneAPI retained HDR Bake with the Arc device masked",
+    "result": "No device of requested type 'info::device_type::gpu' available.",
+    "log_sha256": "d4577ebb23da302893a8aacfc19231c1d481a473c21468fe783fffd72618f566"
+  },
+  "headless_reference": {
+    "passed": 5,
+    "log_sha256": "608b973f18ba6f8a0086e14fa1f42bcf782b661a661afae37805c844c4409f32",
+    "asan_ubsan_retained_checks": 1191,
+    "sanitizer_log_sha256": "664fb3fd6cef60e02f27b23fa4ebbbbe288c429515cbcb44996b8dd711d3ac51",
+    "asan_ubsan_cache_checks": [
+      "PASS Bake reuses the recent sampler and evicts the least recent under its byte limit",
+      "PASS An oversized Bake source gets the original single-sampler workspace",
+      "PASS Device allocation pressure discards cached samplers and retries the same source once",
+      "PASS Cancellation leaves the admitted sampler alone and never retries"
+    ],
+    "cache_sanitizer_log_sha256": "32f98f9f10832dde2f308af2da4325964e19542fb84d638587efe60c483d63a9"
+  },
+  "vendor_compile_only": {
+    "cuda": {
+      "bake-ray-gpu.cu": "886ae9cb1e5658fdf614625694c7fe8c4cd67602ac57124b3d651ce3bd81aeb3",
+      "emission-raster-gpu.cu": "4cfe2aaf8f87f263510cd4affe0fc810cfda3a383e58ea6305a265d3fc77e8f8",
+      "bake.cpp": "f83b9afb17ace372d9835176345eef220af940c89af51dacc3abc50ca3860325",
+      "emission-raster-device.cpp": "7ad47e980d3b8500bfca8c901e63f70a525ba1a5c29a244e42fa57f6e9ccbb35"
+    },
+    "rocm": {
+      "bake-ray-gpu.cu": "7d923a2c5d290bcf3e160d6354271686ad568ffcf2e19a65c3a709d54ccb802a",
+      "emission-raster-gpu.cu": "e309dd4910ba3d95ce1cd8eebe4c7186e82171edb6d260e40a1e5225a0b8256d",
+      "bake.cpp": "be06ea9d665a02eb5ffd839358ebe7a9343c26b74cfa499461e6be1be96d7d5c",
+      "emission-raster-device.cpp": "61d0615141a81fd88c5db9627be0681715555dd5eff9759bb8e49a7e2983f2ba"
+    }
+  },
+  "limits": [
+    "Each Bake sampler cache admits 32 MiB of requested device buffers. A single larger sampler can exceed that cache threshold.",
+    "Allocation and cancellation pressure controls use a simulated allocator. Hardware tests cover successful reuse and the missing-GPU error.",
+    "Batched material and FLOAT radiance results return to the worker.",
+    "Timing is one paired matching-topology fixture with two repeat runs per executable.",
+    "AMD and NVIDIA hardware execution and physical OpenXR acceptance remain open."
+  ]
+}

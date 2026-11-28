@@ -198,6 +198,16 @@ from either resident atlas. Median repeat Bake time was 0.67 seconds,
 compared with 0.64 seconds on the preceding build in that trial.
 [Resident donor atlas evidence](validation/retained-bake-atlas-residency-20261128.json)
 
+Bake now reuses material and FLOAT radiance samplers across donor switches.
+In the same two-field 512² HDR fixture, Arc uploaded 12.15 MiB less and
+created 51 device allocations, down from 81. Each sampler type allocated
+two output buffers across the Bake, down from four. The 1024² project still
+matches byte for byte. The median repeat was 0.53 seconds, down from 0.56
+in that trial. The first runs took 8.27 and 8.21 seconds respectively.
+Each cache evicts by recency before new allocations and retries on device
+allocation pressure after releasing idle buffers.
+[Bake sampler reuse evidence](validation/bake-sampler-reuse-20261128.json)
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.

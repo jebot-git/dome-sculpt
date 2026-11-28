@@ -85,6 +85,14 @@ through host staging. Bake samples independent normal and FLOAT emission
 inputs in their authored coordinate domains.
 [Resident donor atlas evidence](validation/retained-bake-atlas-residency-20261128.json)
 
+Batched Bake reuses the device material and FLOAT radiance samplers for
+recently sampled donors. Each cache accounts for actual buffer allocation
+sizes and evicts before exceeding its 32 MiB shared allowance. A larger
+sampler can use the original single-field workspace. Allocation failure
+releases cached buffers and retries on the selected GPU. The Bake keeps
+native result order and cancellation behavior across material switches.
+[Bake sampler reuse evidence](validation/bake-sampler-reuse-20261128.json)
+
 Eligible 512–2048 current-grid RGB8 Bake materials now composite color, ORM
 and legacy emission on the selected GPU. Their ordered paint, coverage,
 native normal-map output, and GLB export match the preceding implementation.
