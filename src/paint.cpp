@@ -4684,14 +4684,32 @@ std::shared_ptr<PaintedMesh> SourcePaintAccess::transfer_bake_uv(const PaintedMe
       for(size_t role=0;role<old_normals.size();++role)
         if(!old_normals[role]->rgba.empty())*new_normals[role]=blank_image(r,true);
     }
-    if(bake.emission_field){
-      constexpr size_t storage=128*1024*1024;
-      const auto used=result->storage_bytes()+converted.storage_bytes();
-      if(used>=storage)throw std::length_error("UV transfer leaves no room for FLOAT emission");
-      const auto &field=*bake.emission_field;
-      const auto output_limit=uint64_t(storage-used);
-      if(compute_backend()=="CPU"){
-        // CPU reference builds exercise the same FLOAT coefficients.
+    const auto write_normals=[&](size_t at,const std::array<Vec3,2> &directions){
+      if(old_columns.empty())return;
+      const auto &texel=surface.texels[at];
+      const size_t c=size_t(texel.face)*3;
+      const std::array<double,3> bary{texel.bary[0],texel.bary[1],1.-texel.bary[0]-texel.bary[1]};
+      const auto basis=[&](const auto &columns){return detail::normal_bake_basis({columns[c],columns[c+1],columns[c+2]},
+          bary,detail::NormalFragmentBasis::RawColumns);};
+      const auto before=basis(old_columns),after=basis(new_columns);
+      for(size_t role=0;role<directions.size();++role)if(!new_normals[role]->rgba.empty()){
+        visit(8);
+        const auto q=directions[role];
+        const auto desired=before.t*q.x+before.b*q.y+before.n*q.z;
+        const auto encoded=detail::encode_normal_bake(after,length(desired)>1e-8f?desired:before.n);
+        if(!encoded||encoded->quantized_angle_radians>.02)
+          throw std::invalid_argument("UV transfer exceeds the baked normal frame error limit");
+        std::copy(encoded->rgba.begin(),encoded->rgba.end(),new_normals[role]->rgba.begin()+at*4);
+      }
+    };
+    constexpr size_t storage=128*1024*1024;
+    const auto used=result->storage_bytes()+converted.storage_bytes();
+    if(used>=storage&&bake.emission_field)throw std::length_error("UV transfer leaves no room for FLOAT emission");
+    const auto output_limit=used<storage?uint64_t(storage-used):0;
+    if(compute_backend()=="CPU"){
+      // The opt-in headless reference preserves the original raster arithmetic.
+      if(bake.emission_field){
+        const auto &field=*bake.emission_field;
         converted.emission_field=BakedEmissionField::generate_compact(r,[&](size_t at){
           using paint_compute::add;
           using paint_compute::mul;
@@ -4715,93 +4733,107 @@ std::shared_ptr<PaintedMesh> SourcePaintAccess::transfer_bake_uv(const PaintedMe
           }
           return filtered;
         },{size_t(std::min(remaining,output_limit)),options.cancelled});
-      }else{
-        using Device=detail::EmissionRasterDevice;
-        constexpr size_t row_bytes=sizeof(Device::BakeUvSample)+sizeof(BakedEmissionSample);
-        const auto input_bytes=field.storage_bytes();
-        if(input_bytes>=remaining)throw std::length_error("UV transfer cannot stage its FLOAT Bake on the GPU");
-        // Bound both host and device batches, leaving room for the native output field.
-        const auto capacity=std::min({Device::mapped_batch,pixels,size_t((remaining-input_bytes)/(4*row_bytes))});
-        if(!capacity)throw std::length_error("UV transfer cannot stage a FLOAT Bake filter batch");
-        const auto available=remaining-input_bytes-2*capacity*row_bytes;
-        const auto device=detail::create_bake_uv_emission_device(field,capacity,options.cancelled);
-        std::vector<Device::BakeUvSample> requests(capacity);
-        const auto filter=[&](size_t first,std::span<BakedEmissionSample> output){
-          auto batch=std::span(requests).first(output.size());
-          for(size_t n=0;n<batch.size();++n){
-            if((n&1023)==0)stop();
-            visit(8);
-            batch[n]={};
-            const auto &texel=surface.texels[first+n];
-            if(!texel.covered())continue;
-            const auto taps=taps_at(texel);
-            for(size_t tap=0;tap<taps.size();++tap){
-              batch[n].texels[tap]=uint32_t(taps[tap].texel);
-              batch[n].weights[tap]=float(taps[tap].weight);
-            }
-          }
-          device->read_bake_uv(batch,output,options.cancelled);
-        };
-        const auto dense_bytes=pixels*sizeof(BakedEmissionSample);
-        if(dense_bytes<=available/2){
-          std::vector<BakedEmissionSample> filtered(pixels);
-          for(size_t first=0;first<pixels;first+=capacity)
-            filter(first,std::span(filtered).subspan(first,std::min(capacity,pixels-first)));
-          converted.emission_field=BakedEmissionField::generate_compact(r,[&](size_t at){return filtered[at];},
-            {size_t(std::min(available-dense_bytes,output_limit)),options.cancelled});
-        }else{
-          std::vector<BakedEmissionSample> filtered(capacity);
-          size_t first=pixels,count=0;
-          converted.emission_field=BakedEmissionField::generate_compact(r,[&](size_t at){
-            if(at<first||at-first>=count){
-              first=at;
-              count=std::min(capacity,pixels-at);
-              filter(first,std::span(filtered).first(count));
-            }
-            return filtered[at-first];
-          },{size_t(std::min(available,output_limit)),options.cancelled});
+      }
+      for(size_t at=0;at<pixels;++at){
+        if((at&1023)==0)stop();
+        const auto &texel=surface.texels[at];
+        if(!texel.covered())continue;
+        visit(16);
+        BakedPixel value{};
+        std::array<Vec3,2> directions{};
+        float coverage=0;
+        for(const auto tap:taps_at(texel)){
+          const auto alpha=float(tap.weight)*unit(bake.coverage[tap.texel]);
+          if(alpha==0)continue;
+          const auto sample=baked_pixel(bake,tap.texel);
+          for(size_t k=0;k<10;++k)value[k]+=sample[k]*alpha;
+          for(size_t role=0;role<directions.size();++role)
+            directions[role]+=unpack_baked_normal(*old_normals[role],tap.texel)*alpha;
+          coverage+=alpha;
         }
+        converted.coverage[at]=byte(coverage);
+        if(!converted.coverage[at])continue;
+        for(auto &component:value)component/=coverage;
+        baked_pixel(converted,at,value,false);
+        for(auto &direction:directions)direction=direction/coverage;
+        write_normals(at,directions);
       }
-      reserve(converted.emission_field->storage_bytes());
+    }else{
+      using Device=detail::EmissionRasterDevice;
+      const size_t row_bytes=sizeof(Device::BakeUvSample)+sizeof(Device::BakeUvMapsPixel)+
+          (bake.emission_field?sizeof(BakedEmissionSample):0);
+      const auto input_bytes=bake.storage_bytes()+sizeof(paint_compute::Quantization);
+      if(input_bytes>=remaining)throw std::length_error("UV transfer cannot stage its Bake on the GPU");
+      // Bound both host and device batches, leaving room for native FLOAT output.
+      const auto capacity=std::min({Device::mapped_batch,pixels,size_t((remaining-input_bytes)/(4*row_bytes))});
+      if(!capacity)throw std::length_error("UV transfer cannot stage a GPU Bake filter batch");
+      const auto available=remaining-input_bytes-2*capacity*row_bytes;
+      const auto device=detail::create_bake_uv_maps_device(bake,r,capacity,options.cancelled);
+      std::vector<Device::BakeUvSample> requests(capacity);
+      std::vector<Device::BakeUvMapsPixel> maps(capacity);
+      size_t maps_written=0;
+      const auto filter=[&](size_t first,size_t count,std::span<BakedEmissionSample> emission){
+        const bool write_maps=first==maps_written;
+        auto batch=std::span(requests).first(count);
+        for(size_t n=0;n<count;++n){
+          if((n&1023)==0)stop();
+          if(!emission.empty())visit(8);
+          batch[n]={};
+          const auto &texel=surface.texels[first+n];
+          if(!texel.covered())continue;
+          if(write_maps)visit(16);
+          const auto taps=taps_at(texel);
+          for(size_t tap=0;tap<taps.size();++tap){
+            batch[n].texels[tap]=uint32_t(taps[tap].texel);
+            batch[n].weights[tap]=float(taps[tap].weight);
+          }
+        }
+        if(!write_maps){
+          device->read_bake_uv(batch,emission,options.cancelled);
+          return;
+        }
+        device->read_bake_uv_maps(batch,std::span(maps).first(count),emission,options.cancelled);
+        for(size_t n=0;n<count;++n){
+          if((n&1023)==0)stop();
+          const auto &sample=maps[n];
+          if(!sample.coverage)continue;
+          const auto at=first+n;
+          converted.coverage[at]=sample.coverage;
+          std::copy_n(sample.color,4,converted.maps.color.rgba.begin()+at*4);
+          std::copy_n(sample.orm,4,converted.maps.metal_rough.rgba.begin()+at*4);
+          if(!bake.emission_field)std::copy_n(sample.legacy,4,converted.maps.emission.rgba.begin()+at*4);
+          write_normals(at,{{{sample.normals[0][0],sample.normals[0][1],sample.normals[0][2]},
+                             {sample.normals[1][0],sample.normals[1][1],sample.normals[1][2]}}});
+        }
+        maps_written+=count;
+      };
+      const auto dense_bytes=pixels*sizeof(BakedEmissionSample);
+      if(!bake.emission_field){
+        for(size_t first=0;first<pixels;first+=capacity)
+          filter(first,std::min(capacity,pixels-first),{});
+      }else if(dense_bytes<=available/2){
+        std::vector<BakedEmissionSample> filtered(pixels);
+        for(size_t first=0;first<pixels;first+=capacity){
+          const auto count=std::min(capacity,pixels-first);
+          filter(first,count,std::span(filtered).subspan(first,count));
+        }
+        converted.emission_field=BakedEmissionField::generate_compact(r,[&](size_t at){return filtered[at];},
+          {size_t(std::min(available-dense_bytes,output_limit)),options.cancelled});
+      }else{
+        // Compact storage may revisit coefficients. Only the first pass writes maps.
+        std::vector<BakedEmissionSample> filtered(capacity);
+        size_t first=pixels,count=0;
+        converted.emission_field=BakedEmissionField::generate_compact(r,[&](size_t at){
+          if(at<first||at-first>=count){
+            first=at;
+            count=std::min(capacity,pixels-at);
+            filter(first,count,std::span(filtered).first(count));
+          }
+          return filtered[at-first];
+        },{size_t(std::min(available,output_limit)),options.cancelled});
+      }
     }
-    for(size_t at=0;at<pixels;++at){
-      if((at&1023)==0)stop();
-      const auto &texel=surface.texels[at];
-      if(!texel.covered())continue;
-      visit(16);
-      const auto taps=taps_at(texel);
-      BakedPixel value{};
-      std::array<Vec3,2> directions{};
-      float coverage=0;
-      for(const auto tap:taps){
-        const auto alpha=float(tap.weight)*unit(bake.coverage[tap.texel]);
-        if(alpha==0)continue;
-        const auto sample=baked_pixel(bake,tap.texel);
-        for(size_t k=0;k<10;++k)value[k]+=sample[k]*alpha;
-        for(size_t role=0;role<directions.size();++role)
-          directions[role]+=unpack_baked_normal(*old_normals[role],tap.texel)*alpha;
-        coverage+=alpha;
-      }
-      converted.coverage[at]=byte(coverage);
-      if(!converted.coverage[at])continue;
-      for(auto &component:value)component/=coverage;
-      baked_pixel(converted,at,value,false);
-      if(old_columns.empty())continue;
-      const size_t c=size_t(texel.face)*3;
-      const std::array<double,3> bary{texel.bary[0],texel.bary[1],1.-texel.bary[0]-texel.bary[1]};
-      const auto basis=[&](const auto &columns){return detail::normal_bake_basis({columns[c],columns[c+1],columns[c+2]},
-          bary,detail::NormalFragmentBasis::RawColumns);};
-      const auto before=basis(old_columns),after=basis(new_columns);
-      for(size_t role=0;role<directions.size();++role)if(!new_normals[role]->rgba.empty()){
-        visit(8);
-        const auto q=directions[role]/coverage;
-        const auto desired=before.t*q.x+before.b*q.y+before.n*q.z;
-        const auto encoded=detail::encode_normal_bake(after,length(desired)>1e-8f?desired:before.n);
-        if(!encoded||encoded->quantized_angle_radians>.02)
-          throw std::invalid_argument("UV transfer exceeds the baked normal frame error limit");
-        std::copy(encoded->rgba.begin(),encoded->rgba.end(),new_normals[role]->rgba.begin()+at*4);
-      }
-    }
+    if(converted.emission_field)reserve(converted.emission_field->storage_bytes());
     result->layers_.clear();
     result->layers_.reserve(source.layers_.size());
     const auto tile_count=surface.tiles.size();

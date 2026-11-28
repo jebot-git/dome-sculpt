@@ -96,6 +96,53 @@ DOME_EMISSION_FN void filter_bake_uv(const Bake &bake,const EmissionRasterDevice
   }
   out[6]=coverage;
 }
+DOME_EMISSION_MATH float bake_uv_divide(float value,float coverage){
+  const auto a=widen(paint_compute::bits(value)),b=widen(paint_compute::bits(coverage));
+  const auto word=narrow(paint_grid::div(a,b));
+#if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
+  return __uint_as_float(word);
+#else
+  return std::bit_cast<float>(word);
+#endif
+}
+DOME_EMISSION_FN EmissionRasterDevice::BakeUvMapsPixel filter_bake_uv_maps(const BakeUvMaps &maps,
+    const EmissionRasterDevice::BakeUvSample &sample){
+  using namespace paint_compute;
+  const auto &q=*maps.quantization;
+  float coverage=0,color[4]{},orm[3]{},legacy[3]{},normals[2][3]{};
+  for(unsigned tap=0;tap<4;++tap){
+    const auto at=sample.texels[tap];
+    const float alpha=mul(sample.weights[tap],q.unit[maps.coverage[at]]);
+    if(!alpha)continue;
+    const auto rgba=size_t(at)*4;
+    coverage=add(coverage,alpha);
+    for(unsigned c=0;c<3;++c){
+      color[c]=add(color[c],mul(q.srgb[maps.color[rgba+c]],alpha));
+      orm[c]=add(orm[c],mul(q.unit[maps.orm[rgba+c]],alpha));
+      if(maps.legacy)legacy[c]=add(legacy[c],mul(q.srgb[maps.legacy[rgba+c]],alpha));
+      for(unsigned role=0;role<2;++role)if(maps.normals[role]){
+        const float direction=sub(mul(q.unit[maps.normals[role][rgba+c]],2),1);
+        normals[role][c]=add(normals[role][c],mul(direction,alpha));
+      }
+    }
+    color[3]=add(color[3],mul(q.unit[maps.color[rgba+3]],alpha));
+  }
+  EmissionRasterDevice::BakeUvMapsPixel out;
+  out.coverage=linear_byte(coverage);
+  if(!out.coverage)return out;
+  const float reciprocal=maps.normals[0]?bake_uv_divide(1,coverage):0;
+  for(unsigned c=0;c<3;++c){
+    out.color[c]=srgb_byte(bake_uv_divide(color[c],coverage),q);
+    out.orm[c]=linear_byte(bake_uv_divide(orm[c],coverage));
+    if(maps.legacy)out.legacy[c]=srgb_byte(bake_uv_divide(legacy[c],coverage),q);
+    for(unsigned role=0;role<2;++role)if(maps.normals[role])
+      out.normals[role][c]=mul(normals[role][c],reciprocal);
+  }
+  out.color[3]=linear_byte(bake_uv_divide(color[3],coverage));
+  out.orm[3]=255;
+  if(maps.legacy)out.legacy[3]=255;
+  return out;
+}
 DOME_EMISSION_FN bool valid_coefficients(const uint32_t (&value)[7],bool physical){
   if(!bounded(value[6],one32))return false;
   const auto limit=product(physical?max32:std::bit_cast<uint32_t>(maximum_native_emission),value[6]);

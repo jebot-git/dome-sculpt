@@ -292,6 +292,23 @@ std::unique_ptr<EmissionRasterDevice> create_bake_uv_emission_device(const Baked
   return emission_raster::upload(input,cancelled);
 }
 
+std::unique_ptr<EmissionRasterDevice> create_bake_uv_maps_device(const BakedTextures &bake,
+    uint32_t resolution,size_t capacity,const std::function<bool()> &cancelled){
+  paint_compute::checkpoint(cancelled);
+  bake.validate(resolution);
+  if(!capacity||capacity>EmissionRasterDevice::mapped_batch||capacity>bake.coverage.size())
+    throw std::invalid_argument("Invalid GPU Bake UV filter batch capacity");
+  emission_raster::Input input;
+  input.resolution=resolution;
+  input.bake_uv_capacity=capacity;
+  input.bake_uv_maps=&bake;
+  if(bake.emission_field){
+    input.physical_bake=true;
+    input.bake=bake.emission_field->storage();
+  }
+  return emission_raster::upload(input,cancelled);
+}
+
 std::unique_ptr<EmissionRasterDevice> create_finite_emission_raster_device(
     const PaintedMesh &paint,const PaintSourceTexture *source,std::array<float,3> background,
     uint32_t resolution,float offset,const std::function<bool()> &cancelled){

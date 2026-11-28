@@ -192,6 +192,98 @@ void compare_bake_uv(){
   std::cout<<"PASS Bake UV exact dense/packed FLOAT, peak, subnormal and cancellation\n";
 }
 
+void compare_bake_uv_maps(){
+  constexpr uint32_t extent=64;
+  constexpr size_t count=extent*extent;
+  using Device=detail::EmissionRasterDevice;
+  BakedTextures bake;
+  bake.coverage.resize(count);
+  for(auto *image:{&bake.maps.color,&bake.maps.metal_rough,&bake.maps.emission,
+                   &bake.maps.normal,&bake.maps.mtoon_normal})
+    *image={extent,extent,std::vector<uint8_t>(count*4)};
+  std::vector<Device::BakeUvSample> taps(count);
+  for(size_t at=0;at<count;++at){
+    bake.coverage[at]=at%7?uint8_t(at^at/17):0;
+    unsigned seed=29;
+    for(auto *image:{&bake.maps.color,&bake.maps.metal_rough,&bake.maps.emission,
+                     &bake.maps.normal,&bake.maps.mtoon_normal}){
+      for(unsigned c=0;c<4;++c)image->rgba[at*4+c]=uint8_t((at*(seed+c+2))^(at/(23+c)));
+      seed+=7;
+    }
+    const float u=float(at%127)/128,v=float(at%31)/32;
+    if(at%9)taps[at]={{uint32_t(at),uint32_t((at+13)%count),uint32_t((at+37)%count),uint32_t((at+31)%count)},
+                     {(1-u)*(1-v),u*(1-v),(1-u)*v,u*v}};
+  }
+  const auto product=[](float a,float b){volatile float value=a*b;return value;};
+  const auto add=[](float a,float b){volatile float value=a+b;return value;};
+  const auto quotient=[](float a,float b){volatile float divisor=b,value=a/divisor;return value;};
+  const auto unit=[&](uint8_t value){return quotient(float(value),255);};
+  const auto byte=[](float value){return uint8_t(std::lround(std::clamp(value,0.f,1.f)*255));};
+  const auto color=[&](float value){return byte(linear_to_srgb(value));};
+  std::vector<Device::BakeUvMapsPixel> expected(count),actual(count);
+  for(size_t at=0;at<count;++at){
+    float coverage=0,rgba[4]{},orm[3]{},emission[3]{},normals[2][3]{};
+    const auto &sample=taps[at];
+    for(unsigned tap=0;tap<4;++tap){
+      const size_t source=sample.texels[tap],i=source*4;
+      const float alpha=product(sample.weights[tap],unit(bake.coverage[source]));
+      coverage=add(coverage,alpha);
+      for(unsigned c=0;c<3;++c){
+        rgba[c]=add(rgba[c],product(srgb_to_linear(unit(bake.maps.color.rgba[i+c])),alpha));
+        orm[c]=add(orm[c],product(unit(bake.maps.metal_rough.rgba[i+c]),alpha));
+        emission[c]=add(emission[c],product(srgb_to_linear(unit(bake.maps.emission.rgba[i+c])),alpha));
+        normals[0][c]=add(normals[0][c],product(add(product(unit(bake.maps.normal.rgba[i+c]),2),-1),alpha));
+        normals[1][c]=add(normals[1][c],product(add(product(unit(bake.maps.mtoon_normal.rgba[i+c]),2),-1),alpha));
+      }
+      rgba[3]=add(rgba[3],product(unit(bake.maps.color.rgba[i+3]),alpha));
+    }
+    auto &out=expected[at];
+    out.coverage=byte(coverage);
+    if(!out.coverage)continue;
+    for(unsigned c=0;c<3;++c){
+      out.color[c]=color(quotient(rgba[c],coverage));
+      out.orm[c]=byte(quotient(orm[c],coverage));
+      out.legacy[c]=color(quotient(emission[c],coverage));
+      for(unsigned role=0;role<2;++role)out.normals[role][c]=product(normals[role][c],quotient(1,coverage));
+    }
+    out.color[3]=byte(quotient(rgba[3],coverage));
+    out.orm[3]=out.legacy[3]=255;
+  }
+  auto device=detail::create_bake_uv_maps_device(bake,extent,count,{});
+  device->read_bake_uv_maps(taps,actual,{},{});
+  const auto compare=[&]{
+    for(size_t i=0;i<count;++i){
+      if(std::memcmp(&expected[i],&actual[i],sizeof(actual[i]))==0)continue;
+      const auto expected_bytes=std::as_bytes(std::span(expected).subspan(i,1));
+      const auto actual_bytes=std::as_bytes(std::span(actual).subspan(i,1));
+      for(size_t byte=0;byte<expected_bytes.size();++byte)
+        if(expected_bytes[byte]!=actual_bytes[byte])
+          std::cerr<<"GPU UV Bake texel "<<i<<" byte "<<byte<<": expected "
+                   <<int(expected_bytes[byte])<<", got "<<int(actual_bytes[byte])<<'\n';
+      throw std::runtime_error("GPU UV Bake maps differ from the CPU reference");
+    }
+  };
+  compare();
+  bake.maps.emission={};
+  bake.maps.mtoon_normal={};
+  bake.emission_field=BakedEmissionField::generate_compact(extent,[](size_t at){
+    return at%2?BakedEmissionSample{{.25f,0,0},{12345.f,.125f,0},1}:BakedEmissionSample{};
+  });
+  for(auto &sample:expected){
+    std::fill_n(sample.legacy,4,0);
+    std::fill_n(sample.normals[1],3,0);
+  }
+  device=detail::create_bake_uv_maps_device(bake,extent,count,{});
+  auto emission_device=detail::create_bake_uv_emission_device(*bake.emission_field,count,{});
+  std::vector<BakedEmissionSample> reference(count),fused(count);
+  emission_device->read_bake_uv(taps,reference,{});
+  device->read_bake_uv_maps(taps,actual,fused,{});
+  compare();
+  check(std::memcmp(reference.data(),fused.data(),count*sizeof(fused[0]))==0,
+        "Fusing RGB8 Bake UV maps changed the FLOAT coefficients");
+  std::cout<<"PASS Bake UV maps exact RGBA/ORM/legacy/coverage and dual normals, fused FLOAT "<<count<<" texels\n";
+}
+
 void compare_finite(Fixture fixture,uint32_t extent,bool original){
   const auto scene=model(fixture);
   const auto &object=scene.active();
@@ -520,6 +612,7 @@ int main(int argc,char **argv)try{
   }
   if(argc>1&&std::string_view(argv[1])=="--finite"){
     compare_bake_uv();
+    compare_bake_uv_maps();
     compare_finite(Fixture::BakeOnly,512,false);
     compare_finite(Fixture::LegacyBake,256,false);
     compare_finite(Fixture::Paint,512,true);

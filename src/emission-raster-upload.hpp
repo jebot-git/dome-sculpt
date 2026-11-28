@@ -19,7 +19,18 @@ public:
       stop();
       upload_bake(input);
       bake_uv_samples_=allocate<BakeUvSample>(bake_uv_capacity_);
-      output_=allocate<uint32_t>(7*bake_uv_capacity_);
+      if(input.physical_bake)output_=allocate<uint32_t>(7*bake_uv_capacity_);
+      if(input.bake_uv_maps){
+        const auto &bake=*input.bake_uv_maps;
+        bake_uv_maps_.color=upload(std::span(bake.maps.color.rgba));
+        bake_uv_maps_.orm=upload(std::span(bake.maps.metal_rough.rgba));
+        bake_uv_maps_.legacy=upload(std::span(bake.maps.emission.rgba));
+        bake_uv_maps_.coverage=upload(std::span(bake.coverage));
+        bake_uv_maps_.normals[0]=upload(std::span(bake.maps.normal.rgba));
+        bake_uv_maps_.normals[1]=upload(std::span(bake.maps.mtoon_normal.rgba));
+        bake_uv_maps_.quantization=upload(std::span(&paint_compute::quantization(),1));
+        bake_uv_maps_output_=allocate<BakeUvMapsPixel>(bake_uv_capacity_);
+      }
       stop();
       return;
     }
@@ -114,17 +125,36 @@ public:
 
   void read_bake_uv(std::span<const BakeUvSample> samples,std::span<BakedEmissionSample> output,
                     const std::function<bool()> &cancelled) override {
-    static_assert(sizeof(BakedEmissionSample)==7*sizeof(uint32_t));
-    if(samples.empty()||samples.size()!=output.size()||samples.size()>bake_uv_capacity_)
+    if(samples.size()!=output.size()||!view_.bake.physical)
       throw std::invalid_argument("Invalid GPU Bake UV filter batch");
+    upload_bake_uv_taps(samples,cancelled);
+    device_.filter_bake_uv(view_.bake,bake_uv_samples_,samples.size(),output_);
+    download_bake_uv(output,cancelled);
+  }
+  void read_bake_uv_maps(std::span<const BakeUvSample> samples,std::span<BakeUvMapsPixel> maps,
+                        std::span<BakedEmissionSample> emission,const std::function<bool()> &cancelled) override {
+    if(samples.size()!=maps.size()||!bake_uv_maps_output_||
+       (!emission.empty()&&(!view_.bake.physical||emission.size()!=samples.size())))
+      throw std::invalid_argument("Invalid GPU Bake UV maps batch");
+    upload_bake_uv_taps(samples,cancelled);
+    device_.filter_bake_uv_maps(bake_uv_maps_,view_.bake,bake_uv_samples_,samples.size(),
+                                bake_uv_maps_output_,emission.empty()?nullptr:output_);
+    device_.download(maps.data(),bake_uv_maps_output_,maps.size_bytes());
+    download_bake_uv(emission,cancelled);
+  }
+  void upload_bake_uv_taps(std::span<const BakeUvSample> samples,const std::function<bool()> &cancelled) {
+    if(samples.empty()||samples.size()>bake_uv_capacity_)
+      throw std::invalid_argument("Invalid GPU Bake UV filter taps");
     paint_compute::checkpoint(cancelled);
     const auto pixels=size_t(view_.resolution)*view_.resolution;
     for(const auto &sample:samples)for(size_t i=0;i<4;++i)
       if(sample.texels[i]>=pixels||!std::isfinite(sample.weights[i])||sample.weights[i]<0||sample.weights[i]>1)
         throw std::invalid_argument("Invalid GPU Bake UV filter tap");
     device_.upload(bake_uv_samples_,samples.data(),samples.size_bytes());
-    device_.filter_bake_uv(view_.bake,bake_uv_samples_,samples.size(),output_);
-    device_.download(output.data(),output_,output.size_bytes());
+  }
+  void download_bake_uv(std::span<BakedEmissionSample> output,const std::function<bool()> &cancelled){
+    static_assert(sizeof(BakedEmissionSample)==7*sizeof(uint32_t));
+    if(!output.empty())device_.download(output.data(),output_,output.size_bytes());
     paint_compute::checkpoint(cancelled);
   }
 
@@ -334,6 +364,8 @@ private:
   MappedSourceImage mapped_source_{};
   MappedSample *coordinates_=nullptr;
   BakeUvSample *bake_uv_samples_=nullptr;
+  BakeUvMaps bake_uv_maps_{};
+  BakeUvMapsPixel *bake_uv_maps_output_=nullptr;
   size_t mapped_capacity_=0;
   size_t bake_uv_capacity_=0;
   bool mapped_field_=false;
