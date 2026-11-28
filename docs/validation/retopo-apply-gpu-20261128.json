@@ -1,0 +1,145 @@
+{
+  "date": "2026-11-28",
+  "product": "951b52d635f2c1e8bbea286fe7fbc4d5e9073e99",
+  "preceding": "0764d0b5f5ea2621260c6bf4b1113a805ed5a5e1",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Retopology Apply/reapply selects material slots and source correspondence for paint, Bake, skin weights and shapekeys on the selected GPU. The existing worker samples source layers and publishes the complete replacement through the ordered transaction.",
+  "oneapi_arc_release": {
+    "application_sha256": "b88591f2df993e79e4ec29990e11b07cd2fa3b0e54e7f69e78cfc10e0296fc58",
+    "fltk_prefix": "/opt/fltk-vr/toolkit",
+    "bitmap_runtime_prefix": "/opt/fltk-vr/bdf-runtime",
+    "ctest_passed": 48,
+    "ctest_cases": [
+      "application-missing-gpu",
+      "bake",
+      "bake-recipes",
+      "mesh-processing",
+      "retopo",
+      "retopo-cancellation-boundaries",
+      "retopo-edges",
+      "retopology-affine",
+      "retopology-affine-openxr",
+      "retopology-affine-ui-fixture",
+      "retopology-authoring",
+      "retopology-first-material-affine",
+      "retopology-first-material-plain",
+      "retopology-first-material-posed-affine",
+      "retopology-first-material-posed-plain",
+      "retopology-held-admission",
+      "retopology-history-openxr-apply",
+      "retopology-history-openxr-cancel",
+      "retopology-imported-bake-resize",
+      "retopology-imported-mtoon-mixed-hdr",
+      "retopology-imported-mtoon-mixed-ldr",
+      "retopology-imported-mtoon-painted",
+      "retopology-imported-mtoon-resize",
+      "retopology-imported-mtoon-tinted",
+      "retopology-imported-mtoon-unprepared",
+      "retopology-imported-pbr",
+      "retopology-imported-prior-bake",
+      "retopology-mixed-material",
+      "retopology-prepared-color-affine",
+      "retopology-prepared-color-normal-affine",
+      "retopology-prepared-color-normal-first",
+      "retopology-prepared-color-normal-plain",
+      "retopology-prepared-color-normal-uv-affine",
+      "retopology-prepared-color-normal-uv-plain",
+      "retopology-prepared-color-plain",
+      "retopology-prepared-detached-affine",
+      "retopology-reapply-affine",
+      "retopology-reapply-plain",
+      "retopology-save-handoff",
+      "retopology-surface-heat-affine",
+      "retopology-surface-heat-plain",
+      "retopology-worker-accepted-publication",
+      "retopology-worker-faults",
+      "retopology-worker-reporter-recovery",
+      "surface-query-oblique",
+      "texture-set-retained-retopology-affine",
+      "texture-set-retained-retopology-plain",
+      "weight-transfer-batch"
+    ],
+    "ctest_log_sha256": {
+      "test-split.log": "b1acb38e34f42a3e5bc9960fb8a623439c775b721fdfa0ba86a69f3ff0725fd0",
+      "test-skin.log": "23b36cbc377b33a8741e68d98224ee319cade242951d75e8a2bf893ae4c2902b",
+      "openxr-retry.trace": "eec284de2ea81e26aab589a6724ce5c5b37986c4eac5233179d24bf1d1e5e541"
+    },
+    "correspondence_checks": "Both affine and identity queries match triangle IDs, float barycentrics and BVH triangle visits against the host oracle with two material memberships. The 2048-triangle case resumes traversal, retains the lowest affine tie, observes cancellation and retries on the same device surface. Native extended dot products are checked against 100,000 independent host samples.",
+    "bit_identical_archives_to_preceding": {
+      "retopology-affine/0-posed.dsculpt": "988355c6c6dcbf4573a9b48779cd791766d62296002c210061c1d02e99b743d9",
+      "retopology-affine/0-rest.dsculpt": "426af1d247cb474bc11582f50366a6ab0f9d9210dfd35b7b44f1f500bdfa8563",
+      "retopology-affine/1-posed.dsculpt": "385c79543401aec6b68cd1c7ee4126f5cf79f5ac899d203bd9c4406e52308771",
+      "retopology-affine/1-rest.dsculpt": "83b00f0d2405f6c12997e2f2bbe151c7c71f08488f8e82c07759f2aae1a4d2b3",
+      "retopology-affine/2-posed.dsculpt": "bd3997afcfd34c9a3ce839416ee7d1b499d18cf0ffb9bf757c9c010950bfdbb6",
+      "retopology-affine/2-rest.dsculpt": "2c3cac1c7ebfd2b3015b3480ca6ddf58181eb65d54e43a96b6bd79cf5ca3ba1b",
+      "retopology-affine/3-posed.dsculpt": "c135a29975d4287f374009586823d236f809454351124698e156850ba4db7c86",
+      "retopology-affine/3-rest.dsculpt": "8d8755586829067b9445439fa9faada8a580ee51851db2e96d8cfc4006a7ea3d",
+      "retopology-affine/first-native-input.dsculpt": "98122714c96a8dc369d89f8e46deee9dedceb84c1421d6ee0f9115a80187e4b3",
+      "retopology-affine/first-native-material.dsculpt": "f6742867c7b203eca1f73c87513007d351e0f0f56de42b66656f0b657a2c7acf",
+      "retopology-affine/reflected-posed-baked.dsculpt": "0afd286277a7c987159082d5c8c0f606d4bb1ff6653896a01af833807291abfd",
+      "retopology-reapply-affine/before-bind.dsculpt": "2295e66832ff6077701b548bb8af5c2001da207b418329b0b5d07da99b160583",
+      "retopology-reapply-affine/before-reapply.dsculpt": "8ff60d00c6f8a1c00737741c79858f8a5af1f31af3e467fc10b30aeda3949639",
+      "retopology-reapply-affine/patch.dsculpt": "83d3e6d891b2307add0c04f604121140a2b095ce78c3cbb7756f77a49982ee84",
+      "retopology-reapply-affine/reapplied.dsculpt": "006202ab7a79672f9e31a6b7fe28d78486dd98b6ba52e418205713e3cbaa2e4d",
+      "retopology-reapply-affine/reapplied.glb": "95e7acb4305155a8efd2d07b88d2eea5863c879980a843b1598b4d25c3f1c900",
+      "stress/1024/first-native-input.dsculpt": "1b8c90a469c3a1f6ec6b64bbda6d1fb97ae8ff2616b3fad59d06f5e311d7baa6",
+      "stress/1024/first-native-material.dsculpt": "1fbafeb0c630be391128c7c74ecc9ce9afa816857e94489b9eb488c035e55424"
+    },
+    "1024_atlas_checks": 10,
+    "1024_atlas_log_sha256": "c2a04ad2b908686cfda674e31d1af9786ea2e06a2e91533cdae2b5ba0c8ab8ef",
+    "wayland": {
+      "checks_passed": 10,
+      "renderer": "Zink Vulkan on Intel Arc A770",
+      "report_sha256": "6811b7e50dc8c6e104385da6fdf566dfe56a57c88bcfc0cf7947a0cd86b85bec",
+      "project_sha256": "1d1d39ea9e02ad45aff01b9c4dae7ad7e8dbaa28712dc90cf023258334471738",
+      "standard_glb_sha256": "5143b31b057be81f85acc542dd94742d18ead901084d1371301f24e666dec9e2",
+      "validator_version": "2.0.0-dev.3.10",
+      "validator_errors": 0,
+      "validator_warnings": 0,
+      "validator_report_sha256": "e5a06683f5d4846602fda68c3f69c716cdfa61b54c7590fba339c7574b86aa1b"
+    },
+    "synthetic_openxr": {
+      "checks_passed": 33,
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "report_sha256": "71c3790a457ecc20e40c329175e3fa488f8970c6aeb712bfb11fd0324e40520c",
+      "scenes_sha256": {
+        "committed": "7c144d1709705c59fd8713876fd9600fa8ee0b7f2ddcf5009380bce1071263ec",
+        "accept": "5bac118a5f2ab0e77b790264f8f989d47908b58c59eab20ed5de9b47d90fdee1",
+        "focus": "5bac118a5f2ab0e77b790264f8f989d47908b58c59eab20ed5de9b47d90fdee1",
+        "unconfirmed": "7c144d1709705c59fd8713876fd9600fa8ee0b7f2ddcf5009380bce1071263ec"
+      },
+      "trace_sha256": {
+        "accept": "880f086416b82078a24127eb8036be78285ad7ece8f200776002027720abfb12",
+        "focus": "8480c1e9f81ca4a895c87c6c170ff75325caee5ea5899d0aa1fde3e420170f27"
+      },
+      "fixture": "Waits on rendered Face and Apply readiness and holds each joystick press across consecutive samples. Both accepted runs dispatch the affine transfer kernel. The unconfirmed run preserves the earlier committed scene."
+    }
+  },
+  "cpu_policy": {
+    "unsupported_production_configurations_refused": 5,
+    "policy_log_sha256": "83484a1b8861da4cf3bb3e7994714a6d28faa36f176449c403fb8d15d249d791",
+    "opt_in_headless_reference_tests_passed": 2,
+    "reference_log_sha256": "eac96f5e56da1b14126e036e03070e17d84d0126a933ffab8e03d3c1b5f85fa3",
+    "startup_refusal_covered_by": "application-missing-gpu"
+  },
+  "sanitizers": {
+    "scope": "ASan and UBSan on native paint, affine surface matching, retopology authoring and their affine fixture. The Release oneAPI device kernels ran on Arc. Leak detection was disabled.",
+    "assertions_passed": 426,
+    "log_sha256": "2d2532823abdae18a22f7a3db527c11dc1aa631729fc6b0d646ca4526dff8070"
+  },
+  "cuda_and_rocm": {
+    "cuda": {
+      "scope": "Device kernel and host query units compiled. Hardware execution unavailable.",
+      "log_sha256": "73f11e4d3311d934194ea9077e831e61ffc1efd2ef979e26d64f5fd12e91841f"
+    },
+    "rocm": {
+      "scope": "Device kernel and host query units compiled. Hardware execution unavailable.",
+      "log_sha256": "2fdb6d4c0b1e8d638610037afa04be9e15fbc944f3fd3ee8f7d0cdb408d2bcb1"
+    }
+  },
+  "open_work": [
+    "GPU sampling of paint layers and native normal fields",
+    "First transfer of posed prepared native normal fields",
+    "Physical headset and positive AMD/NVIDIA hardware acceptance"
+  ]
+}

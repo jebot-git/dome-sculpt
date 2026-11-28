@@ -299,9 +299,19 @@ FLOAT Bake data. DomeD Wayland covers native pointer placement, Apply, Save,
 Undo, Redo and standard GLB. Synthetic OpenXR verifies that the accepted
 patch has writable FLOAT paint and a hidden mask after the first Apply from
 a reflected, posed guide. Prepared native normal fields currently require
-the source rest pose for first transfer. Moving the filtered texel
-correspondence and layer sampling to the selected device remains open.
+the source rest pose for first transfer.
 [Native first-patch material evidence](validation/retopo-native-material-20261128.json)
+
+Retopology Apply and reapply now use the selected GPU to match source
+triangles for material slots, texels, weights and shapekeys. The worker
+uploads the immutable source BVH and facing normals once per transfer.
+The device checks material membership and orientation and preserves the
+existing affine radius, tie rules and clipped-triangle barycentrics.
+Intel Arc supports the same arithmetic on hardware without native FP64.
+Layer sampling and the first transfer of posed prepared normal fields still
+require work. Physical headset acceptance and AMD and NVIDIA execution
+remain open.
+[GPU Retopology Apply evidence](validation/retopo-apply-gpu-20261128.json)
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
