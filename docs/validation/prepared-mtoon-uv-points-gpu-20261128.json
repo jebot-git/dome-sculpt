@@ -1,0 +1,182 @@
+{
+  "date": "2026-11-28",
+  "product": "85dd652a7dced1cd510328f505142c753728bad1",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Selected GPU Bake UV correspondence from compact destination points and resident source triangle and padding tables.",
+  "reference_product": "4723e970",
+  "unchanged_native_and_both_glbs": true,
+  "gpu_filter_checks": {
+    "legacy_and_float_maps_matching_host_taps": 8192,
+    "float_only_matching_host_taps": 4096,
+    "invalid_triangle_refused": true,
+    "editable_layer_probes": 5850,
+    "covers_legacy_and_float": true,
+    "covered_no_taps_and_uncovered_distinct": true,
+    "exact_common_and_legacy_texels": 4096,
+    "exact_float_and_single_normal_texels": 4096,
+    "both_frame_encoded_normal_planes_byte_exact": true,
+    "quantization_error_singular_and_mixed_handedness_rejected": true,
+    "fused_emission_matches_separate_kernel": true,
+    "dense_and_compact_binary_coverage": true,
+    "full_float_peak": true,
+    "subnormal_radiance": true,
+    "coverage_underflow_refuses_unrepresentable_radiance": true,
+    "cancellation_and_short_batch_retry": true,
+    "missing_oneapi_device_refused": true
+  },
+  "bake_transfer_bytes": {
+    "texels": 4096,
+    "prior_input_bytes_per_texel": 44,
+    "current_input_bytes_per_texel": 12,
+    "prior_first_batch_bytes": 180224,
+    "current_first_batch_bytes": 49152,
+    "one_time_source_uv_triangles_bytes": 48,
+    "one_time_padding_bytes": 16384,
+    "total_input_bytes_saved": 114640
+  },
+  "fixture": {
+    "atlas_size": 64,
+    "relative_island_scale": 0.82,
+    "rotation_degrees": 90,
+    "checked_texels": 2704,
+    "directions_within_unit_vector_distance_0_025": 2704,
+    "distinct_core_and_authored_normals": 520,
+    "absolute_bake_energy_error": 0.0,
+    "native_sha256": "0d9ef65656cfc359ea6c54e1259c43f5bf5d8637ca5afed4517227b4fb8d6726",
+    "physical_paint_layer_preserved": true,
+    "exact_cancel_ordered_save_undo_and_redo": true,
+    "native_glb_recovery_exact": true,
+    "portable_reimport_max_channel_error": 1
+  },
+  "arc": {
+    "device": "Intel Arc A770 with oneAPI Level Zero and hardware EGL",
+    "checks": 725,
+    "bake_export_kernels": [
+      "run_mapped",
+      "launch_bake_uv_maps",
+      "launch_mapped_field",
+      "launch_material_sources",
+      "launch_material"
+    ]
+  },
+  "release_ctest": [
+    "baked-emission-native",
+    "emission-raster-finite-compute",
+    "source-material-raster-compute",
+    "emission-raster-mapped-compute",
+    "emission-raster-mapped-missing-gpu",
+    "emission-raster-texture-set-compute",
+    "source-prepared-normal-bake",
+    "source-advanced-normal-bake",
+    "source-canonical-normal-bake",
+    "baked-emission-workflow",
+    "baked-emission-source",
+    "baked-emission-uv1-worker",
+    "emission-export",
+    "emission-export-worker",
+    "source-paint-export",
+    "source-paint-bake",
+    "source-paint-authoring",
+    "source-paint-physical-authoring",
+    "uv-workflow",
+    "surface-program-switch",
+    "mtoon-render",
+    "mtoon-texture-sets",
+    "mtoon-painted-texture-sets",
+    "mtoon-resized-texture-set",
+    "mtoon-baked-texture-sets",
+    "source-uv-bake",
+    "uv-worker-cancellation",
+    "vrm1-source-export",
+    "raw-hdr-authoring",
+    "xr-editable-export",
+    "dome-sculpt-texture-set-resolution",
+    "dome-sculpt-texture-set-baked-resolution",
+    "dome-sculpt-texture-set-baked-mtoon-resolution",
+    "native-empty-paint-resolution",
+    "native-authored-paint-resolution",
+    "native-baked-paint-resolution",
+    "native-bake-resize-missing-device",
+    "native-retained-paint-resolution",
+    "native-fullsize-physical-paint",
+    "source-role-missing-uv1"
+  ],
+  "release_junit_sha256": "bdcf8a5a7801bb779c138cf0c04edef795dcf8c87da2dd70c422327af3a1c15b",
+  "other_gpu_profiles": {
+    "cuda": {
+      "release_application_linked": true,
+      "compute_test_linked": true,
+      "missing_device": "CUDA driver version is insufficient for CUDA runtime version"
+    },
+    "rocm": {
+      "release_application_linked": true,
+      "compute_test_linked": true,
+      "missing_device": "no ROCm-capable device is detected"
+    }
+  },
+  "asan_ubsan": {
+    "mode": "opt-in headless reference",
+    "checks": 725,
+    "export_matches_arc": true
+  },
+  "native_wayland": {
+    "checks": 7,
+    "artifact_sha256": "22f0c598a29ce8b9b7e6e384a3a98971de46a4a0afe393a1609c8a9b25fe493a"
+  },
+  "openxr": {
+    "checks": 10,
+    "synthetic_tracking": true,
+    "artifact_sha256": "22f0c598a29ce8b9b7e6e384a3a98971de46a4a0afe393a1609c8a9b25fe493a",
+    "native_sha256": "0d9ef65656cfc359ea6c54e1259c43f5bf5d8637ca5afed4517227b4fb8d6726",
+    "focus_loss_cancelled_export": true
+  },
+  "openxr_uv_apply": {
+    "checks": 5,
+    "synthetic_tracking": true,
+    "saved_project_sha256": "a147da2871cbc2b1170fbcdcd06e512af857753df9068ef755a14e76764c9423",
+    "app_log_sha256": "f53dd92497de540dbc6665ef88956261d3366dbad6dac3e4ccf1b7e94784cf1a",
+    "graphics_sha256": "879618503e38b709c993bf4102d6033f20608ab94e5b4e1fbd42547d2d84a333"
+  },
+  "release_cli_missing_gpu_preserves_existing_export": true,
+  "cpu_only_desktop_xr_and_production_configurations_refused": true,
+  "khronos": {
+    "prepared-mtoon-uv-bake.glb": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 555132,
+      "sha256": "22f0c598a29ce8b9b7e6e384a3a98971de46a4a0afe393a1609c8a9b25fe493a",
+      "errors": 0,
+      "warnings": 0
+    },
+    "prepared-mtoon-uv-bake-portable.glb": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 554136,
+      "sha256": "5b28973f0a7a62832c09ab9d2a293ac2224bec5c0b87c228bdeae5192820b89d",
+      "errors": 0,
+      "warnings": 0
+    }
+  },
+  "official_mtoon_schema_validated": 2,
+  "prior_glbs_byte_identical": {
+    "prepared-mtoon-paired-bake.glb": "396525a57e5a777ed8b56ebd579c8dffcd6252f648fbc2465174732dd5f359cc",
+    "prepared-mtoon-shared-shade-bake.glb": "fbb0ea9d68f5013fb682b8e60d3c8dc974fed4faae0b5dc2c3e2474acd45ae51",
+    "prepared-mtoon-baked.glb": "930e295138979556aadc7505cec4397f62c781c538812cc5c849c5c1bf64a5a7",
+    "prepared-mtoon-hdr.glb": "55b80b4d2158b808a0db172236e4bbe6b938aea88cbf8790402abedf892e6062",
+    "prepared-mtoon-hdr-uv0.glb": "5821ff66098c95168efba401eada214444e2fdfa25ffe234113f6319a75abc88",
+    "baked-source-hdr.glb": "7a8d9dd3f41218ef527fe2fed9346a0607ca554d28ea1b10b2e328f939c95729",
+    "baked-generated-tangents-hdr.glb": "40b51a7c7cfe9259bd9f0c6ad8c66cfa95b9090b7661495dca255255d2ae4f70",
+    "baked-native-tangents-hdr.glb": "5c8f728a32c527c18eec64ad30f8aab5664e1dae3ae7158ea75c89696e826273",
+    "baked-mask-visible.glb": "7829e58d94294a184e1d04ef606a6511b10c12dd8c50bb343648c114401e61cf",
+    "baked-mask-hidden.glb": "b83e6cd6a27af1a137093069194dcf0a009b09e6618fd57efa66f5b9d442c218",
+    "baked-mask-mixed.glb": "679d0e26b8bcd883e9d3b3b34038fba217614469e96874d9130bdcea5b88d882",
+    "varying-source-hdr.glb": "497b70223ba5aeb39e6556950e824b471cc39714ff83de0966c42081cfaf9cc6",
+    "single-surface-hdr.glb": "54fe8dccaaf6fc0ba69ace992aade6199eaea18b60dc5aa19d6bd6a444527971",
+    "mixed-source.glb": "ff769fff8afebfb62309e67abf0bc5efc1843dc13151d909bb2d981ebe9c84fa",
+    "mixed-source-hidden.glb": "484678692c4aad88173eb79876d79241c09895fa3faf1a52c04020612a689f5d",
+    "uniform-mask-cross.glb": "98e526883365742fef5b60880641cb918d3f4b761424f88089ab9c3a948b1b9a"
+  },
+  "open": [
+    "Editable-layer footprint construction and source staging, Mikk tangent generation and native packing use the host.",
+    "Topology-changing UV transfer and portable material variants for independent normal maps.",
+    "Physical-headset, CUDA and ROCm device qualification."
+  ]
+}

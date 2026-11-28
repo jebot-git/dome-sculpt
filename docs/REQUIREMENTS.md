@@ -200,6 +200,8 @@ limit. Arc matches the reference normal bytes and refuses singular frames,
 mixed handedness within a triangle, and excessive quantization error.
 The selected GPU also filters editable layers for this UV Apply path,
 including channel-specific coverage, masks, legacy and FLOAT emission.
+For Bake maps, the device resolves the source correspondence and padding
+ownership from the destination triangle and its barycentric coordinates.
 Topology-changing transfer, broader deformation and physical headset
 workflows remain open.
 [Prepared MToon1 Bake evidence](validation/prepared-mtoon-bake-20261128.json)
@@ -210,6 +212,7 @@ workflows remain open.
 [Fused GPU Bake UV evidence](validation/prepared-mtoon-uv-map-gpu-20261128.json)
 [GPU Bake tangent conversion evidence](validation/prepared-mtoon-uv-normal-gpu-20261128.json)
 [GPU editable paint UV evidence](validation/prepared-mtoon-uv-layer-gpu-20261128.json)
+[GPU Bake UV correspondence evidence](validation/prepared-mtoon-uv-points-gpu-20261128.json)
 
 ## Current validation — 2026-11-27
 

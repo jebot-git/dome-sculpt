@@ -87,7 +87,9 @@ values and the full finite baked radiance range. Apply rejects a result if
 its nonzero energy cannot be represented with the rounded coverage. The
 selected device also filters editable paint from the authored coverage and
 FLOAT data. The worker stages each distinct source texel once per batch and
-reconstructs native sparse tiles from the results. Atlas correspondence, Mikk
+reconstructs native sparse tiles from the results. Bake filtering resolves
+atlas correspondence on the device from the source triangles, padding owners
+and destination barycentric coordinates. Editable-layer source staging, Mikk
 tangent generation and native field storage run on the host.
 Independently selectable portable material variants,
 topology-changing transfer and animated UVs remain open.

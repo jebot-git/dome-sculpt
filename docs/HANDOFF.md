@@ -619,9 +619,8 @@ synthetic paired-normal conversion, three runs give medians of 39 ms on Arc
 including transfers and 92 ms on the previous scalar host path. All 31 focused
 Arc tests, native DomeD Wayland export, synthetic OpenXR controller Apply and
 the headless sanitizer reference pass. CUDA and ROCm Release applications
-link, and both compute fixtures refuse execution without a usable device. Atlas
-correspondence, Mikk tangent generation and native field packing still run
-on the host. Editable paint layers now use GPU filtering in bounded batches
+link, and both compute fixtures refuse execution without a usable device.
+Editable paint layers use GPU filtering in bounded batches
 with deduplicated source texels. Layer identity, visibility, opacity, masks,
 common paint and independent FLOAT emission remain editable. The worker packs
 the detached result into the native sparse tiles before publishing it.
@@ -629,12 +628,26 @@ All 40 focused Arc tests pass, including full-size paint-grid reduction.
 On a warm synthetic 512-square layer, three runs gave medians of 65 ms for
 the GPU path including staging and 64 ms for the host reference. The
 paired reference project and both GLBs are byte-identical.
+Bake UV Apply now uploads the source triangles and padding owners once.
+It sends 12 bytes per destination texel for its triangle ID and barycentric
+coordinates, down from 44 bytes for the expanded taps and frame address.
+The device resolves the source atlas correspondence inside the Bake filter,
+including holes in padding and the separate FLOAT-only pass. The traced
+64-square paired fixture uploads 114,640 fewer bytes after counting the
+new source triangles and padding. Its native project and both GLBs match
+byte for byte. All 40 focused Arc tests, native DomeD Wayland export,
+synthetic OpenXR export and controller Apply, and the headless sanitizer
+reference pass. CUDA and ROCm Release applications link, and both compute
+fixtures refuse execution without a usable device. Editable-layer footprint
+construction and source staging, Mikk tangent generation and native field
+packing still run on the host.
 Topology-changing transfer remains open.
 [Paired Bake UV evidence](validation/prepared-mtoon-uv-bake-20261128.json)
 [GPU Bake UV evidence](validation/prepared-mtoon-uv-gpu-20261128.json)
 [Fused GPU Bake UV evidence](validation/prepared-mtoon-uv-map-gpu-20261128.json)
 [GPU Bake tangent conversion evidence](validation/prepared-mtoon-uv-normal-gpu-20261128.json)
 [GPU editable paint UV evidence](validation/prepared-mtoon-uv-layer-gpu-20261128.json)
+[GPU Bake UV correspondence evidence](validation/prepared-mtoon-uv-points-gpu-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
