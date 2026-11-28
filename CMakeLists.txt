@@ -803,7 +803,7 @@ if(BUILD_TESTING)
                            prepared-color-plain prepared-color-affine
                            prepared-color-normal-plain prepared-color-normal-affine prepared-color-normal-first
                            prepared-color-normal-uv-plain prepared-color-normal-uv-affine
-                           mtoon-plain mtoon-affine mtoon-v0 mtoon-detached)
+                           mtoon-plain mtoon-affine mtoon-v0 mtoon-detached mtoon-bounded)
     add_test(NAME retopology-${workflow} COMMAND dome-sculpt-retopo-surface-heat-test
       ${CMAKE_CURRENT_BINARY_DIR}/retopology-${workflow} ${workflow})
     set_tests_properties(retopology-${workflow} PROPERTIES TIMEOUT 480)
@@ -903,6 +903,9 @@ if(BUILD_TESTING)
   add_test(NAME retopology-prepared-affine-ui-fixture COMMAND dome-sculpt-retopo-affine-ui-fixture
     ${CMAKE_CURRENT_BINARY_DIR}/retopology-prepared-affine-ui.dsculpt prepared)
   set_tests_properties(retopology-prepared-affine-ui-fixture PROPERTIES FIXTURES_SETUP retopology_prepared_affine_ui)
+  add_test(NAME retopology-mtoon-affine-ui-fixture COMMAND dome-sculpt-retopo-affine-ui-fixture
+    ${CMAKE_CURRENT_BINARY_DIR}/retopology-mtoon-affine-ui.dsculpt mtoon)
+  set_tests_properties(retopology-mtoon-affine-ui-fixture PROPERTIES FIXTURES_SETUP retopology_mtoon_affine_ui)
   add_executable(dome-sculpt-cut-color-publication-test tests/cut-color-publication.cpp)
   target_include_directories(dome-sculpt-cut-color-publication-test PRIVATE src)
   target_link_libraries(dome-sculpt-cut-color-publication-test PRIVATE dome-sculpt-core)
@@ -4932,6 +4935,10 @@ if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND 
     $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-native-authoring-inspect>
     ${CMAKE_CURRENT_BINARY_DIR}/retopology-prepared-affine-ui.dsculpt ${CMAKE_CURRENT_BINARY_DIR}/retopology-prepared-affine-openxr)
   set_tests_properties(retopology-prepared-affine-openxr PROPERTIES FIXTURES_REQUIRED retopology_prepared_affine_ui TIMEOUT 600)
+  add_test(NAME retopology-mtoon-affine-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/retopo-affine-xr.py
+    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-native-authoring-inspect>
+    ${CMAKE_CURRENT_BINARY_DIR}/retopology-mtoon-affine-ui.dsculpt ${CMAKE_CURRENT_BINARY_DIR}/retopology-mtoon-affine-openxr)
+  set_tests_properties(retopology-mtoon-affine-openxr PROPERTIES FIXTURES_REQUIRED retopology_mtoon_affine_ui TIMEOUT 600)
 endif()
 
 if(BUILD_TESTING)

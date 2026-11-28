@@ -364,6 +364,10 @@ Vec3 detail::source_sampled_normal(const Mesh &mesh,const PaintSourceMaps &maps,
 }
 Vec3 source_texture_normal_placed(const Mesh &mesh,const PaintSourceMaps &maps,size_t triangle,
     std::array<float,3> bary,Vec3 normal,const AffineTransform &placement,float strength) {
-  return derivative_texture_normal(mesh,maps,triangle,bary,normal,&placement,strength);
+  return detail::source_sampled_normal_placed(mesh,maps,triangle,bary,normal,placement,nullptr,strength);
+}
+Vec3 detail::source_sampled_normal_placed(const Mesh &mesh,const PaintSourceMaps &maps,size_t triangle,
+    std::array<float,3> bary,Vec3 normal,const AffineTransform &placement,const float *encoded,float strength) {
+  return derivative_texture_normal(mesh,maps,triangle,bary,normal,&placement,strength,encoded);
 }
 } // namespace dome

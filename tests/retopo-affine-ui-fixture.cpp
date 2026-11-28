@@ -5,43 +5,72 @@
 #include "dome/source-placement.hpp"
 #include "dome/normal-preparation.hpp"
 #include <iostream>
+#include <nlohmann/json.hpp>
 #include <string_view>
 using namespace dome;
 int main(int argc,char **argv)try {
   const bool prepared=argc==3 && std::string_view(argv[2])=="prepared";
-  if(argc!=2 && !prepared)return 2;
+  const bool mtoon=argc==3 && std::string_view(argv[2])=="mtoon";
+  if(argc!=2 && !prepared && !mtoon)return 2;
   Mesh m;m.positions={{-.6f,-.6f,0},{.6f,-.6f,0},{.6f,.6f,0},{-.6f,.6f,0}};
   m.normals.assign(4,{0,0,1});m.uv={{0,0},{1,0},{1,1},{0,1}};m.indices={0,1,2,0,2,3};
   Scene s;auto &o=s.active();o.name="Affine reference — původní 日本語";o.mesh_active=true;
   o.painted=std::make_shared<PaintedMesh>(m,64);
-  o.painted->begin_stroke();Brush b;b.from=b.to={0,0,0};b.radius=.22f;b.normal={0,0,1};
-  PaintSettings p;p.color={.18f,.65f,.32f,.9f};o.painted->stamp(b,p);
-  if(!o.painted->end_stroke())throw std::runtime_error("Real source paint did not change");
-  o.painted->begin_stroke();p.channel=PaintChannel::Emission;
-  p.emission_units=PaintEmissionUnits::Physical;p.emission={3,.4f,.2f};
-  o.painted->stamp(b,p);
-  if(!o.painted->end_stroke())throw std::runtime_error("Real source HDR paint did not change");
-  o.painted->add_layer("保護");
-  o.painted->begin_stroke();p.channel=PaintChannel::Mask;p.mask=0;o.painted->stamp(b,p);
-  if(!o.painted->end_stroke())throw std::runtime_error("Real source mask did not change");
-  o.painted->layer_properties("保護",false,0);
-  BakedTextures bake;
-  bake.coverage.assign(64*64,255);
-  bake.maps.color={64,64,std::vector<uint8_t>(64*64*4,96)};
-  bake.maps.metal_rough=bake.maps.color;
-  bake.maps.normal=bake.maps.color;
-  for(size_t i=0;i<bake.coverage.size();++i){
-    const auto pixel=4*i;
-    bake.maps.color.rgba[pixel+3]=255;
-    bake.maps.metal_rough.rgba[pixel+3]=255;
-    bake.maps.normal.rgba[pixel]=prepared?uint8_t(161+i%64/3):128;
-    bake.maps.normal.rgba[pixel+1]=128;
-    bake.maps.normal.rgba[pixel+2]=bake.maps.normal.rgba[pixel+3]=255;
+  if(mtoon){
+    const auto info=[](int index){
+      return nlohmann::json{{"index",index},{"extensions",{{"KHR_texture_transform",
+          {{"rotation",.2},{"offset",{-.15,.18}},{"scale",{1.14,.83}}}}}}};
+    };
+    auto binding=std::make_shared<SourceMaterialBindings>();
+    binding->material=MToonMaterial::from_vrm1({
+        {"pbrMetallicRoughness",{{"baseColorTexture",info(0)},{"baseColorFactor",o.material.color}}},
+        {"normalTexture",info(2)},{"emissiveTexture",info(3)},{"emissiveFactor",{.3,.12,.08}},
+        {"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"},
+            {"shadeColorFactor",{.55,.61,.64}},{"shadeMultiplyTexture",info(1)}}}}}},4);
+    binding->native_reference={o.material.color,o.material.emissive,int(o.material.alpha),
+                               o.material.alpha_cutoff,o.material.double_sided};
+    for(size_t role=0;role<4;++role){
+      Image image{16,16,std::vector<uint8_t>(16*16*4,255)};
+      for(size_t i=0;i<16*16;++i){
+        image.rgba[4*i]=uint8_t(120+3*(i%16));
+        image.rgba[4*i+1]=uint8_t(100+3*(i/16));
+        image.rgba[4*i+2]=role==size_t(MToonSlot::Normal)?237:145;
+      }
+      binding->roles[role].image=std::make_shared<const Image>(std::move(image));
+      binding->roles[role].wrap_s=33648;
+      binding->roles[role].mag_filter=role==size_t(MToonSlot::Shade)?9728:9729;
+    }
+    o.material_bindings=std::move(binding);
+  }else{
+    o.painted->begin_stroke();Brush b;b.from=b.to={0,0,0};b.radius=.22f;b.normal={0,0,1};
+    PaintSettings p;p.color={.18f,.65f,.32f,.9f};o.painted->stamp(b,p);
+    if(!o.painted->end_stroke())throw std::runtime_error("Real source paint did not change");
+    o.painted->begin_stroke();p.channel=PaintChannel::Emission;
+    p.emission_units=PaintEmissionUnits::Physical;p.emission={3,.4f,.2f};
+    o.painted->stamp(b,p);
+    if(!o.painted->end_stroke())throw std::runtime_error("Real source HDR paint did not change");
+    o.painted->add_layer("保護");
+    o.painted->begin_stroke();p.channel=PaintChannel::Mask;p.mask=0;o.painted->stamp(b,p);
+    if(!o.painted->end_stroke())throw std::runtime_error("Real source mask did not change");
+    o.painted->layer_properties("保護",false,0);
+    BakedTextures bake;
+    bake.coverage.assign(64*64,255);
+    bake.maps.color={64,64,std::vector<uint8_t>(64*64*4,96)};
+    bake.maps.metal_rough=bake.maps.color;
+    bake.maps.normal=bake.maps.color;
+    for(size_t i=0;i<bake.coverage.size();++i){
+      const auto pixel=4*i;
+      bake.maps.color.rgba[pixel+3]=255;
+      bake.maps.metal_rough.rgba[pixel+3]=255;
+      bake.maps.normal.rgba[pixel]=prepared?uint8_t(161+i%64/3):128;
+      bake.maps.normal.rgba[pixel+1]=128;
+      bake.maps.normal.rgba[pixel+2]=bake.maps.normal.rgba[pixel+3]=255;
+    }
+    bake.emission_field=BakedEmissionField::generate_compact(64,[](size_t){
+      return BakedEmissionSample{{},{2.5f,.25f,.5f},1.f};
+    });
+    o.painted->install_bake(std::move(bake));
   }
-  bake.emission_field=BakedEmissionField::generate_compact(64,[](size_t){
-    return BakedEmissionSample{{},{2.5f,.25f,.5f},1.f};
-  });
-  o.painted->install_bake(std::move(bake));
   DeformationState d(m);d.skeleton=Skeleton{{{"root",-1,{},.2f}}};
   d.skin=SkinWeights{};d.skin->vertices.assign(4,{{0,1}});
   d.morphs=MorphSet(m);auto target=m.positions;for(auto &v:target){v.x+=.04f*(v.y+.6f);v.y+=.025f*(v.x+.6f);}

@@ -3,7 +3,7 @@
 
 The runtime uses synthetic controller tracking and hardware stereo rendering.
 """
-import hashlib,json,signal,subprocess,sys
+import hashlib,json,signal,struct,subprocess,sys
 from pathlib import Path
 from xr_test_graphics import hardware_environment, hardware_renderer
 signal.pthread_sigmask(signal.SIG_SETMASK, [])
@@ -87,19 +87,43 @@ for mode in ('accept','focus','unconfirmed'):
     def metadata(layers):
         return [{key:layer[key] for key in ('id','name','visible','opacity')} for layer in layers]
     check(replacement['resolution']==guide_paint['resolution'] and replacement['active']==guide_paint['active'] and
-          metadata(replacement['layers'])==metadata(guide_paint['layers']) and
-          bool(replacement['layers'][0]['physical_emission_tiles']) and bool(replacement['layers'][1]['tiles']),
-          mode+' publishes a writable FLOAT layer and hidden mask on the new native patch')
-    baked = replacement.get('baked', {})
-    expected_prepared = guide_paint.get('baked', {}).get('normal_interpretation') == 'independent-baked-field-v1'
-    normal_preserved = (
-        baked.get('base_version') == 5 and
-        baked.get('normal_interpretation') == 'independent-baked-field-v1' and
-        'normal_field' in baked
-    ) if expected_prepared else bool(baked.get('normal', {}).get('bytes'))
-    check(baked.get('version') == 6 and bool(baked.get('float_emission', {}).get('bytes')) and
-          normal_preserved and 255 in baked.get('coverage', {}).get('bytes', []),
-          mode+' publishes the separate FLOAT Bake and covered normal map')
+          metadata(replacement['layers'])==metadata(guide_paint['layers']),
+          mode+' keeps the writable layers on the new native patch')
+    base = guide_paint.get('baked')
+    if base:
+        check(bool(replacement['layers'][0]['physical_emission_tiles']) and bool(replacement['layers'][1]['tiles']),
+              mode+' preserves FLOAT paint and its hidden mask')
+        baked = replacement.get('baked', {})
+        expected_prepared = base.get('normal_interpretation') == 'independent-baked-field-v1'
+        normal_preserved = (
+            baked.get('base_version') == 5 and
+            baked.get('normal_interpretation') == 'independent-baked-field-v1' and
+            'normal_field' in baked
+        ) if expected_prepared else bool(baked.get('normal', {}).get('bytes'))
+        check(baked.get('version') == 6 and bool(baked.get('float_emission', {}).get('bytes')) and
+              normal_preserved and 255 in baked.get('coverage', {}).get('bytes', []),
+              mode+' publishes the separate FLOAT Bake and covered normal map')
+    else:
+        bindings = scene_payload(after)['source_materials']['bindings']
+        old_binding, new_binding = [bindings[obj['material_bindings']] for obj in objects]
+        check(old_binding['material'] and new_binding['material'] and replacement.get('baked') is None and
+              all(old['image'] != new['image'] and new['image'] is not None and new['wrap'] == [33071,33071]
+                  for old,new in zip(old_binding['roles'][:4],new_binding['roles'][:4])),
+              mode+' captures the original MToon color, shade, normal and emission as independent patch maps')
+        if mode=='accept':
+            glb=out/'mtoon-portable.glb'
+            subprocess.run([str(binary),'--export-project',str(out/'accept.dsculpt'),str(glb)],
+                           env=env,check=True,timeout=60)
+            payload=glb.read_bytes()
+            length=struct.unpack_from('<I',payload,12)[0]
+            exported=json.loads(payload[20:20+length])
+            primitive=exported['meshes'][0]['primitives'][0]
+            variant=primitive['extensions']['KHR_materials_variants']['mappings'][0]['material']
+            material=exported['materials'][variant]
+            check('TANGENT' in primitive['attributes'] and 'normalTexture' in material and
+                  'emissiveTexture' in material and 'baseColorTexture' in material['pbrMetallicRoughness'] and
+                  'shadeMultiplyTexture' in material['extensions']['VRMC_materials_mtoon'],
+                  'Standard GLB includes the authored MToon variant and its four sampled roles')
     patch=objects[1]['retopology'];topology=json.loads(patch['topology'])
     positions=sorted(v[1] for v in topology['vertices'])
     want=sorted([[-.2,-.2,0],[.2,-.2,0],[0,.2,0]])

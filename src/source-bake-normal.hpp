@@ -17,27 +17,41 @@ struct SourceBakeNormalOptions {
 // Only the capture function can pair a resolver with prepared material data.
 class SourceBakeNormalResolver {
 public:
+ using FilteredTextures=std::array<std::array<float,4>,2>;
  SourceBakeNormalResolver()=default;
  explicit operator bool() const noexcept { return bool(sample_); }
  std::array<Vec3,2> operator()(uint32_t triangle,std::array<float,3> bary,bool mtoon_back=false) const {
-   return sample_(triangle,bary,mtoon_back);
+   return sample_(triangle,bary,mtoon_back,nullptr);
+ }
+ // Original PBR and typed normal images can be filtered in batches before
+ // evaluating these same authored tangent columns on the worker.
+ bool accepts_filtered_textures() const noexcept { return bool(texture_uv_); }
+ std::array<float,2> texture_uv(unsigned role,uint32_t triangle,std::array<float,3> bary) const {
+   return texture_uv_(role,triangle,bary);
+ }
+ std::array<Vec3,2> with_filtered_textures(uint32_t triangle,std::array<float,3> bary,
+     const FilteredTextures &textures,bool mtoon_back=false) const {
+   if(!texture_uv_)throw std::logic_error("Normal field has no original texture coordinate capture");
+   return sample_(triangle,bary,mtoon_back,&textures);
  }
  bool matches_prepared_source(const TextureMaps &) const noexcept;
  bool requires_source_pairing() const noexcept {return bool(projection_)||bool(paired_maps_);}
  const auto &paired_maps() const noexcept {return paired_maps_;}
  const auto &paint_domain() const noexcept {return paint_domain_;}
 private:
- using Sample=std::function<std::array<Vec3,2>(uint32_t,std::array<float,3>,bool)>;
+ using Sample=std::function<std::array<Vec3,2>(uint32_t,std::array<float,3>,bool,const FilteredTextures *)>;
+ using TextureUv=std::function<std::array<float,2>(unsigned,uint32_t,std::array<float,3>)>;
  SourceBakeNormalResolver(Sample sample,std::shared_ptr<const PaintNormalProjection> projection,
      std::shared_ptr<const PaintOverlayPacket> packet,std::shared_ptr<const TextureMaps> paired_maps={},
-     std::shared_ptr<const PaintSamplingDomain> paint_domain={})
+     std::shared_ptr<const PaintSamplingDomain> paint_domain={},TextureUv texture_uv={})
    :sample_(std::move(sample)),projection_(std::move(projection)),packet_(std::move(packet)),
-    paired_maps_(std::move(paired_maps)),paint_domain_(std::move(paint_domain)){}
+    paired_maps_(std::move(paired_maps)),paint_domain_(std::move(paint_domain)),texture_uv_(std::move(texture_uv)){}
  Sample sample_;
  std::shared_ptr<const PaintNormalProjection> projection_;
  std::shared_ptr<const PaintOverlayPacket> packet_;
  std::shared_ptr<const TextureMaps> paired_maps_;
  std::shared_ptr<const PaintSamplingDomain> paint_domain_;
+ TextureUv texture_uv_;
  friend SourceBakeNormalResolver source_bake_normals(
      const SculptObject &,CanvasTransform,const SourceBakeNormalOptions &);
 };

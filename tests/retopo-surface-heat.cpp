@@ -13,6 +13,7 @@
 #include "native-surface-heat.hpp"
 #include "texture-set-paint-access.hpp"
 #include "texture-set-resample.hpp"
+#include "retopo-transfer.hpp"
 #include "affine-interaction.hpp"
 #include "baked-normal-field.hpp"
 #include "source-bake-normal.hpp"
@@ -1414,6 +1415,49 @@ SourceMaterialBindings retopo_toon_binding(const TextureSetView &slot,bool trim,
   return binding;
 }
 
+void bounded_mtoon_sampling() {
+  auto scene=reference(false);
+  const auto &guide=scene.active();
+  const auto &mesh=guide.painted->mesh();
+  auto binding=std::make_shared<SourceMaterialBindings>(retopo_toon_binding(active_texture_set(guide),false,false));
+  const auto matcap=size_t(MToonSlot::Matcap), normal=size_t(MToonSlot::Normal);
+  constexpr uint32_t resolution=256;
+  for (size_t role=0;role<binding->roles.size();++role) {
+    auto &source=binding->roles[role];
+    if (!source.image || role==matcap) continue;
+    Image image{resolution,resolution,std::vector<uint8_t>(size_t(resolution)*resolution*4,255)};
+    for (uint32_t y=0;y<resolution;++y) for (uint32_t x=0;x<resolution;++x) {
+      const auto at=4*(size_t(y)*resolution+x);
+      image.rgba[at]=uint8_t(104+x/8+y/16);
+      image.rgba[at+1]=uint8_t(121+(x^y)/8);
+      image.rgba[at+2]=role==normal?249:uint8_t(82+y/4);
+    }
+    source.image=std::make_shared<const Image>(std::move(image));
+    source.mag_filter=role==size_t(MToonSlot::Shade)?9728:9729;
+  }
+  const auto original=scene.encode();
+  const auto base_image=binding->roles[0].image;
+  const std::function<bool()> cancelled;
+  const auto apply=[&](size_t working_limit) {
+    detail::RetopoTransferBudget budget(cancelled);
+    if (working_limit<budget.remaining_bytes())budget.reserve(1,budget.remaining_bytes()-working_limit);
+    detail::RetopoTransfer projection(mesh,AffineTransform{},AffineTransform{},budget,{},true);
+    auto result=scene.snapshot();
+    auto &patch=result.active();
+    patch.painted=std::make_shared<PaintedMesh>(mesh,resolution);
+    patch.material_bindings=detail::TextureSetPaintAccess::reproject_retopology_mtoon(
+        *guide.painted,*patch.painted,guide.material,binding,projection);
+    const auto &mapped=patch.material_bindings->roles[0].image;
+    check(mapped->width==resolution && mapped->rgba!=base_image->rgba &&
+          patch.material_bindings->roles[matcap].image==binding->roles[matcap].image,
+          "Original role transforms are captured into new texels and MatCap retains its image");
+    return result.encode();
+  };
+  const auto staged=apply(4*1024*1024);
+  check(staged==apply(SIZE_MAX) && scene.encode()==original && binding->roles[0].image==base_image,
+        "Bounded and resident MToon image filtering publish the same native bytes");
+}
+
 void first_prepared_patch(bool affine, const std::filesystem::path &out) {
   Mesh mesh;
   mesh.positions={{-.5f,-.5f,0},{.5f,-.5f,0},{.5f,.5f,0},{-.5f,.5f,0}};
@@ -2283,6 +2327,7 @@ int main(int argc,char **argv) try {
       mode!="first-material-posed-plain" && mode!="first-material-posed-affine" &&
       mode!="first-prepared-posed-plain" && mode!="first-prepared-posed-affine" &&
       mode!="mtoon-plain" && mode!="mtoon-affine" && mode!="mtoon-v0" && mode!="mtoon-detached" &&
+      mode!="mtoon-bounded" &&
       mode!="reapply-plain" && mode!="reapply-affine" && mode!="prepared-plain" && mode!="prepared-affine" &&
       mode!="prepared-detached" && mode!="prepared-detached-affine" &&
       mode!="prepared-color-plain" && mode!="prepared-color-affine" &&
@@ -2302,6 +2347,7 @@ int main(int argc,char **argv) try {
   else if (mode.starts_with("first-prepared-")) first_prepared_patch(mode.ends_with("affine"),out);
   else if (mode.starts_with("material-seam-")) split_material_seam(mode.ends_with("affine"),out);
   else if (mode.starts_with("subdivide-seam-")) split_material_seam(mode.ends_with("affine"),out,true);
+  else if (mode=="mtoon-bounded") bounded_mtoon_sampling();
   else if (mode.starts_with("mtoon-")) retopo_toon_materials(mode.ends_with("affine"),mode.ends_with("v0"),out,mode=="mtoon-detached");
   else if (mode=="prepared-color-normal-first") prepared_color_edit(false,out,PreparedColorOrder::NormalFirst);
   else if (mode.starts_with("prepared-color-normal-uv-"))

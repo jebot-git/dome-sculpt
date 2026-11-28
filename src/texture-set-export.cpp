@@ -2131,16 +2131,17 @@ std::shared_ptr<const RetopoMToonExport> RetopoMToonExport::capture(const Sculpt
  const auto &binding=object.material_bindings;
  if(!object.retopology||object.texture_sets||!object.mesh_active||object.deformation||
     !native_texture_set_mtoon(paint.get(),object.appearance.get(),binding.get())||
-    binding->material.version()!=MToonVersion::V1||!paint->source_maps()||paint->in_stroke()||
+    binding->material.version()!=MToonVersion::V1||paint->in_stroke()||
+    (paint->has_paint_data()&&!paint->source_maps())||
     paint->baked()||paint->has_physical_emission()||binding->physical_emission)
   return {};
  const auto &params=binding->material.parameters;
  if(params.rotation_speed!=0||params.scroll!=std::array<float,2>{})return {};
- const auto &core=paint->source_maps()->normal;
+ const auto &core=paint->source_maps();
  const auto &normal=binding->material.textures[size_t(MToonSlot::Normal)];
  // Both materials read the same explicit tangent attribute in a portable
  // primitive. The independently projected maps must use the same UV basis.
- if(core.texcoord||core.uv_transform!=std::array<float,6>{1,0,0,1,0,0}||
+ if((core&&(core->normal.texcoord||core->normal.uv_transform!=std::array<float,6>{1,0,0,1,0,0}))||
     normal.texcoord||normal.transform_texcoord!=-1||normal.offset!=std::array<float,2>{}||
     normal.scale!=std::array<float,2>{1,1}||normal.rotation!=0)
   return {};

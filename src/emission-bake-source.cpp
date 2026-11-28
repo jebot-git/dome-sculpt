@@ -10,6 +10,7 @@
 #include "emission-paint-access.hpp"
 #include "paint-overlay-sample.hpp"
 #include "source-bake-normal.hpp"
+#include "source-texture-grid.hpp"
 #include "normal-frame-runtime.hpp"
 #include "normal-bake-encoding.hpp"
 #include "normal-projection-identity.hpp"
@@ -145,10 +146,10 @@ struct ImportedBakedNormal {
   std::vector<NormalBakeVertex> columns;
 
   Vec3 core_normal(const Source &source, const std::vector<NormalBakeVertex> &artist,
-                   uint32_t triangle, std::array<float,3> bary) const {
+                   uint32_t triangle, std::array<float,3> bary,const float *filtered) const {
     Vec3 original{};
     for(size_t k=0;k<3;++k)original+=artist.at(size_t(triangle)*3+k).n*bary[k];
-    return source_texture_normal_placed(*geometry,*source.maps,triangle,bary,original,placement);
+    return source_sampled_normal_placed(*geometry,*source.maps,triangle,bary,original,placement,filtered);
   }
 
   Vec3 with_detail(const Source &source,Vec3 original,uint32_t triangle,
@@ -439,7 +440,8 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
     }
     auto sample=[normals=std::shared_ptr<const std::vector<Vec3>>(std::move(normals)),
         tangents=std::move(tangents),normal_image=std::move(normal_image),domain,
-        geometry=object.painted->mesh_owner(),cancelled=options.cancelled](uint32_t triangle,std::array<float,3> bary,bool){
+        geometry=object.painted->mesh_owner(),cancelled=options.cancelled](uint32_t triangle,std::array<float,3> bary,bool,
+            const SourceBakeNormalResolver::FilteredTextures *){
       if(cancelled&&cancelled())throw std::runtime_error("Native paint Bake sampling cancelled");
       TangentFrame frame;
       for(size_t k=0;k<3;++k){
@@ -596,12 +598,25 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
   for(size_t role=0;role<(typed?2u:1u);++role)for(size_t c=0;c<corners;c+=3){if((c&1023)==0)stop();if(vertices->at(role)[c].w!=vertices->at(role)[c+1].w||vertices->at(role)[c].w!=vertices->at(role)[c+2].w)throw std::invalid_argument("Artist source tangent handedness changes inside a triangle");}
   stop();std::shared_ptr<const std::array<std::vector<NormalBakeVertex>,2>> immutable=std::move(vertices);
   const auto packet=coordinates.packet;
+  SourceBakeNormalResolver::TextureUv texture_uv;
+  if(!prepared&&!field&&!native_normal.image&&(!source8||!typed)) {
+    texture_uv=[coordinates,typed,derivative=bool(source8)](unsigned role,uint32_t triangle,std::array<float,3> bary) {
+      if(derivative)
+        return source_texture_uv(*coordinates.mesh,*coordinates.maps,coordinates.maps->normal.texcoord,triangle,bary);
+      constexpr auto slot=MToonSlot::Normal;
+      const auto uv=coordinates.coordinates(triangle,bary,
+          role?mtoon_coordinate(typed->textures[size_t(slot)]):coordinates.maps->normal.texcoord,role!=0);
+      return role?mtoon_uv_validated(*typed,slot,uv,0,1):uv;
+    };
+  }
   auto sample=[immutable,coordinates=std::move(coordinates),typed,typed_role,has_tangent,prepared,
       current_normals,retained,field,canonical_uv,native_normal=std::move(native_normal),domain,
-      source8=std::move(source8)](uint32_t triangle,std::array<float,3> bary,bool mtoon_back){
+      source8=std::move(source8)](uint32_t triangle,std::array<float,3> bary,bool mtoon_back,
+          const SourceBakeNormalResolver::FilteredTextures *filtered){
     coordinates.stop();const std::array<double,3> weights{bary[0],bary[1],bary[2]};std::array<Vec3,2> result;
     if(source8){
-      const auto original=source8->core_normal(coordinates,immutable->at(0),triangle,bary);
+      const auto original=source8->core_normal(coordinates,immutable->at(0),triangle,bary,
+                                             filtered?(*filtered)[0].data():nullptr);
       result[0]=source8->with_detail(coordinates,original,triangle,bary);
       if(!typed)return std::array{result[0],result[0]};
     }
@@ -646,20 +661,24 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
         view.image=role==0?current_normals->pbr:current_normals->mtoon;
       }
       if(enabled&&view.image){
-        auto uv=retained?std::array<float,2>{}:coordinates.coordinates(triangle,bary,
-            prepared?0:role==0?view.texcoord:mtoon_coordinate(typed->textures[size_t(MToonSlot::Normal)]),!prepared&&role!=0);
-        if(retained){
-          const auto &values=role&&!retained->mtoon_coordinates.empty()?retained->mtoon_coordinates:retained->coordinates;
-          std::array<double,2> point{};
-          for(size_t k=0;k<3;++k){
-            const auto q=values[retained->indices[size_t(triangle)*3+k]];
-            for(size_t c=0;c<2;++c)point[c]+=double(q[c])*bary[k];
+        const auto value=[&] {
+          if(filtered)return (*filtered)[role];
+          auto uv=retained?std::array<float,2>{}:coordinates.coordinates(triangle,bary,
+              prepared?0:role==0?view.texcoord:mtoon_coordinate(typed->textures[size_t(MToonSlot::Normal)]),!prepared&&role!=0);
+          if(retained){
+            const auto &values=role&&!retained->mtoon_coordinates.empty()?retained->mtoon_coordinates:retained->coordinates;
+            std::array<double,2> point{};
+            for(size_t k=0;k<3;++k){
+              const auto q=values[retained->indices[size_t(triangle)*3+k]];
+              for(size_t c=0;c<2;++c)point[c]+=double(q[c])*bary[k];
+            }
+            uv={float(point[0]),float(point[1])};
           }
-          uv={float(point[0]),float(point[1])};
-        }
-        if(role&&!prepared)uv=mtoon_uv(*typed,MToonSlot::Normal,uv,0);
-        view.texcoord=0;
-        const auto value=sample_source_texture(view,uv[0],uv[1],false);const float scale=role==0?(prepared?1:coordinates.maps->normal_scale):typed->parameters.normal_scale;
+          if(role&&!prepared)uv=mtoon_uv(*typed,MToonSlot::Normal,uv,0);
+          view.texcoord=0;
+          return sample_source_texture(view,uv[0],uv[1],false);
+        }();
+        const float scale=role==0?(prepared?1:coordinates.maps->normal_scale):typed->parameters.normal_scale;
         const auto ts=mtoon_normal_map({value[0],value[1],value[2]},scale);
         result[role]=normalized(basis.t*ts.x+basis.b*ts.y+basis.n*ts.z);
       }
@@ -670,7 +689,7 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
     return result;
   };
   return SourceBakeNormalResolver(std::move(sample),prepared?object.painted->normal_projection():nullptr,
-      packet,std::move(paired_maps),domain);
+      packet,std::move(paired_maps),domain,std::move(texture_uv));
 }
 std::shared_ptr<const TextureMaps> raw_bake_source(const SculptObject &object,
     const std::function<bool()> &cancelled,const SourceBakeNormalResolver *captured_normals){

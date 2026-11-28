@@ -335,6 +335,20 @@ matching UV seam copies of the posed source. Physical headset and positive
 AMD and NVIDIA runs remain open.
 [Posed prepared normals and GPU sampling evidence](validation/retopo-posed-prepared-20261128.json)
 
+Retopology now filters original imported PBR textures and static MToon 0
+and 1 texture roles on the selected GPU. Each role keeps its source UVs,
+affine transform, encoding, wrap mode and filter. The worker resolves factors
+and transports the sampled normal vectors through the authored tangent
+frames. MatCap keeps its original view-space image. The source images stay
+resident when the budget permits. Bounded batches reuse space for one image
+at a time. The imported prior-Bake normal blend still uses the existing
+worker path for the historical atlas.
+
+Standard GLB now keeps the MToon material variant on a static unpainted
+native patch whose typed roles have no separate Core PBR source maps. The
+variant carries its own base color, shade, normal and emission maps and the
+certified tangent stream.
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.
