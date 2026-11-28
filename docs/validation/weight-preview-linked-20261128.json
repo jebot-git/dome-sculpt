@@ -1,0 +1,221 @@
+{
+  "date": "2026-11-28",
+  "product": "5462de70ed37a98619363be85e98a75955e6aab7",
+  "preceding": "b9bc29a0003db0bcdc2239d1b6e09aa288f6292b",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Resident live weight previews group linked parts by available direct and reflected joints. Bounded dispatches may span parts. Compact results map back to the original surface and vertex order.",
+  "arc_a770_release": {
+    "application_sha256": "0a38910d0d346231dab19286aa6a3de33367c5207590284a2bb718b92148a004",
+    "ctest": {
+      "cases": [
+        "retopology-affine-ui-fixture",
+        "retopo",
+        "retopology-affine",
+        "retopology-surface-heat-plain",
+        "retopology-surface-heat-affine",
+        "retopology-prepared-color-normal-uv-plain",
+        "retopology-prepared-color-normal-uv-affine",
+        "skin-authoring",
+        "retopology-affine-openxr",
+        "weight-transfer-batch",
+        "retopology-prepared-color-normal-first",
+        "retopology-prepared-color-normal-plain",
+        "affine-weight-openxr",
+        "application-missing-gpu",
+        "retopology-prepared-color-normal-affine",
+        "weight-edit",
+        "retopology-imported-pbr",
+        "surface-query-oblique",
+        "weight-authoring"
+      ],
+      "log_sha256": "f8c3fdcb259e00b256dbc8938076417b20808e9a9d70a514931787c992c9daac"
+    },
+    "capsule_oracle": {
+      "vertex_queries": 49173,
+      "compacted_hits": 32432,
+      "logical_capsule_tests": 16849948,
+      "exact_against_preceding_scalar_math": true
+    },
+    "focused_suite_trace": {
+      "device_brush_launches": 192,
+      "trace_sha256": "57a3ae1ea13ca72ed10e120dd0388b663b86e2ad8d10ed87ced3b44ebbd8d771"
+    },
+    "unchanged_affine_capture_sha256": {
+      "synthetic-openxr/fixtures/before.dsculpt": "eb0410bd52048d3fbe2554880b22c82263fa79b539aeb6714b69da2faeee9ba4",
+      "synthetic-openxr/fixtures/after.dsculpt": "69f46a87902a695d2f5ef30674226f07fed11ef8696d85cb5716b057e89fadb2",
+      "synthetic-openxr/accept.dsculpt": "69f46a87902a695d2f5ef30674226f07fed11ef8696d85cb5716b057e89fadb2",
+      "synthetic-openxr/focus.dsculpt": "eb0410bd52048d3fbe2554880b22c82263fa79b539aeb6714b69da2faeee9ba4",
+      "wayland/pointer-weights.dsculpt": "8d28f8170d3c71cb70b6e166381d106b37b27ed9334fbe5c5dc8f0b0636e0bfd"
+    },
+    "synthetic_openxr": {
+      "checks": 7,
+      "report_sha256": "31a14c81930ea20a3dbda9875090ba5ca95ac5bd9de64848c64028f713adaada"
+    },
+    "nested_domed_wayland": {
+      "checks": 10,
+      "dmabuf_render_node": "/dev/dri/renderD129",
+      "report_sha256": "94a5147e0daae1152fe275794fa5a809f4e504de96b01e6bc74d3fcd197e6a60",
+      "device_brush_launches": 3,
+      "trace_sha256": "3832a1b85600bf5090a72404fff05c40c30bf712530a9fe18b3a1cd7f834f426"
+    },
+    "transfer_trace": {
+      "fixture": "96 successive previews across all 19 linked parts and 9,851 vertices",
+      "forced_control": "The isolated oneAPI control throws std::bad_alloc for the 39,404-byte resident maxima allocation.",
+      "final_project_exact_against_complete_replay": true,
+      "preceding_resident_per_part": {
+        "upload_calls": 211,
+        "upload_bytes": 130500,
+        "posed_vertex_upload_calls": 19,
+        "posed_vertex_upload_bytes": 118212,
+        "brush_dispatches": 1824,
+        "readback_calls": 1967,
+        "readback_bytes": 177480,
+        "hit_count_readbacks": 1824,
+        "hit_payload_readback_calls": 143,
+        "hit_payload_bytes": 170184,
+        "trace_sha256": "499cc86106de346f6892b8567c9d2dce5867eb9f0ae9b3a7c4fd5e9ed3fd8685"
+      },
+      "current_resident_grouped": {
+        "upload_calls": 211,
+        "upload_bytes": 130500,
+        "posed_vertex_upload_calls": 19,
+        "posed_vertex_upload_bytes": 118212,
+        "brush_dispatches": 96,
+        "readback_calls": 190,
+        "readback_bytes": 170568,
+        "hit_count_readbacks": 96,
+        "hit_payload_readback_calls": 94,
+        "hit_payload_bytes": 170184,
+        "trace_sha256": "9f17a1dda53f80a41bc83defdd008a28ab83157a79948b6281127f7be705e618"
+      },
+      "forced_staging_after_maxima_allocation_failure": {
+        "upload_calls": 2016,
+        "upload_bytes": 11360640,
+        "posed_vertex_upload_calls": 1824,
+        "posed_vertex_upload_bytes": 11348352,
+        "brush_dispatches": 1824,
+        "readback_calls": 2005,
+        "readback_bytes": 388528,
+        "hit_count_readbacks": 1824,
+        "hit_payload_readback_calls": 181,
+        "hit_payload_bytes": 381232,
+        "trace_sha256": "9ed7a53bb2a0ffbb8e36e8f7cb71e5f2f94eb493f6baea46c561871826458c79"
+      },
+      "traffic_source_sha256": "9480026dd694f2e22df2f04ad1561cbdd4584f416acf9ae59e0c1584298a6fad"
+    },
+    "worker_benchmarks": {
+      "fixture": "Linked mirrored CC0 VRoid beta female",
+      "scope": "Warm stroke evaluation and scene assembly through the current one-shot and preview APIs. Excludes render, device input and save.",
+      "preceding": {
+        "parts": 19,
+        "vertices": 9851,
+        "stroke_prefixes": 96,
+        "trials": [
+          {
+            "incremental_total_ms": 681.369,
+            "complete_replay_total_ms": 3232.36,
+            "max_incremental_ms": 11.814,
+            "last_complete_replay_ms": 40.3159
+          },
+          {
+            "incremental_total_ms": 698.372,
+            "complete_replay_total_ms": 3250.26,
+            "max_incremental_ms": 12.8128,
+            "last_complete_replay_ms": 40.3009
+          },
+          {
+            "incremental_total_ms": 676.101,
+            "complete_replay_total_ms": 3201.59,
+            "max_incremental_ms": 12.8058,
+            "last_complete_replay_ms": 41.1698
+          }
+        ],
+        "every_prefix_skin_weights_exact": true,
+        "incremental_median_ms": 681.369,
+        "complete_replay_median_ms": 3232.36,
+        "max_incremental_ms": 12.8128,
+        "log_sha256": "83a0441ecbaceb337b319214044f47fdcecebd1043cc5b0e6c91384831807321"
+      },
+      "current": {
+        "parts": 19,
+        "vertices": 9851,
+        "stroke_prefixes": 96,
+        "trials": [
+          {
+            "incremental_total_ms": 476.834,
+            "complete_replay_total_ms": 3206.0,
+            "max_incremental_ms": 9.26209,
+            "last_complete_replay_ms": 40.5325
+          },
+          {
+            "incremental_total_ms": 473.25,
+            "complete_replay_total_ms": 3214.92,
+            "max_incremental_ms": 9.68238,
+            "last_complete_replay_ms": 39.931
+          },
+          {
+            "incremental_total_ms": 472.166,
+            "complete_replay_total_ms": 3182.26,
+            "max_incremental_ms": 9.58379,
+            "last_complete_replay_ms": 39.8578
+          }
+        ],
+        "every_prefix_skin_weights_exact": true,
+        "incremental_median_ms": 473.25,
+        "complete_replay_median_ms": 3206.0,
+        "max_incremental_ms": 9.68238,
+        "log_sha256": "0b2e9742b9976937ef6638922046499a8f995342e275d2a55ba5f439fbbd91c1"
+      },
+      "benchmark_96_source_sha256": "70478c0f54fc202a02b9d6c1ddae3104e224a2320d2cc884908425ecb95f3d14"
+    }
+  },
+  "headless_numerical_test_reference": {
+    "cases": [
+      "weight-edit",
+      "weight-transfer-batch",
+      "cpu-reference-install-refused",
+      "weight-authoring"
+    ],
+    "log_sha256": "06749693500812610ce43b5f3df455c86e32b029a8d91e3ad99e587f999b9aa7"
+  },
+  "scoped_arc_asan_ubsan": {
+    "instrumented_units": [
+      "document.cpp (weight-authoring test)",
+      "weight-edit.cpp",
+      "weight-authoring.cpp",
+      "tests/weight-edit.cpp",
+      "tests/weight-authoring.cpp"
+    ],
+    "edit": {
+      "checks": 68,
+      "log_sha256": "759c078b078a0ac1f79ea0516c84ca1daa87742ef10baedcc1995456f640c78e"
+    },
+    "authoring": {
+      "checks": 80,
+      "log_sha256": "7822e07d479ecc692271756aa0679233cbc73eadded321d97f47b525405af03e"
+    }
+  },
+  "vendor_host_compile": {
+    "cuda": {
+      "host_translation_units": [
+        "weight-edit.cpp",
+        "weight-authoring.cpp",
+        "document.cpp"
+      ],
+      "log_sha256": "f99dc0d3a4c35bad87bfae0c30a7c02b8e38f32e238a395e9715647dad907360"
+    },
+    "rocm": {
+      "host_translation_units": [
+        "weight-edit.cpp",
+        "weight-authoring.cpp",
+        "document.cpp"
+      ],
+      "log_sha256": "fefc6dfe3bcfc6b010e248e748d833ce37d337da783535248beb40d4d3a7f6ee"
+    }
+  },
+  "remaining_scope": [
+    "End-to-end production-size headset latency",
+    "Positive CUDA and ROCm execution",
+    "Physical headset and full GPU-only Release qualification"
+  ]
+}

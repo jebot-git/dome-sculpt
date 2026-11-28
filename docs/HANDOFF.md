@@ -138,6 +138,12 @@ brush dispatch per preview. Over 96 prefixes, Arc traces record 96
 dispatches and 190 readback calls. The per-part path recorded 1,824
 dispatches and 1,967 readback calls. The final project matches the full
 replay on both the grouped route and the staged GPU allocation fallback.
+Median worker time for 96 previews falls from 681 to 473 ms across three
+trials, with identical intermediate skin weights. All 19 selected Arc
+regressions and scoped ASan/UBSan runs pass. Nested DomeD Wayland and
+synthetic OpenXR reproduce the saved projects byte for byte. The affected
+host units compile under CUDA and ROCm configurations.
+[Grouped weight-preview evidence](validation/weight-preview-linked-20261128.json)
 
 Ambient occlusion in Bake now traces the biased hemisphere on the selected
 GPU against the existing immutable source BVH. The device returns one
