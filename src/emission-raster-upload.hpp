@@ -63,7 +63,11 @@ public:
     mapped_capacity_=input.mapped_capacity;
     mapped_field_=input.mapped_field;
     finite_={upload(std::span(input.finite_axis)),uint32_t(input.finite_axis.size())};
-    if(!material)output_=allocate<uint32_t>(mapped_capacity_?mapped_capacity_*(mapped_field_?10:3):chunk_pixels*(finite_.resolution?3:10));
+    if(input.bake_radiance_capacity){
+      bake_radiance_capacity_=input.bake_radiance_capacity;
+      output_=allocate<uint32_t>(3*bake_radiance_capacity_);
+      bake_radiance_coordinates_=allocate<BakeRadianceSample>(bake_radiance_capacity_);
+    }else if(!material)output_=allocate<uint32_t>(mapped_capacity_?mapped_capacity_*(mapped_field_?10:3):chunk_pixels*(finite_.resolution?3:10));
     if(mapped_capacity_)coordinates_=allocate<MappedSample>(mapped_capacity_);
     stop();
     upload_common(input.common,stop);
@@ -87,7 +91,8 @@ public:
 
   void read(size_t first,std::span<Pixel> rows,const std::function<bool()> &cancelled) override {
     static_assert(sizeof(Pixel)==10*sizeof(uint32_t));
-    if(finite_.resolution||mapped_capacity_||bake_uv_capacity_)throw std::logic_error("Expected a contiguous exact GPU emission raster");
+    if(finite_.resolution||mapped_capacity_||bake_uv_capacity_||bake_radiance_capacity_)
+      throw std::logic_error("Expected a contiguous exact GPU emission raster");
     read_exact(first,rows,cancelled,[&](size_t at,size_t count){
       if(texture_set_)device_.render_texture_set(view_,at,count,output_,true);
       else device_.render(view_,at,count,output_);
@@ -138,6 +143,21 @@ public:
     device_.download(pixels.data(),output_,pixels.size_bytes());
     paint_compute::checkpoint(cancelled);
     validate_exact(std::span<const Pixel>(pixels));
+  }
+
+  void read_bake_radiance(std::span<const BakeRadianceSample> samples,std::span<Radiance> pixels,
+                          const std::function<bool()> &cancelled) override {
+    if(samples.empty()||samples.size()!=pixels.size()||samples.size()>bake_radiance_capacity_)
+      throw std::invalid_argument("Invalid GPU Bake radiance batch");
+    paint_compute::checkpoint(cancelled);
+    for(const auto &sample:samples)
+      if(!bake_material::finite_uv(sample.paint_uv)||!bake_material::finite_uv(sample.image_uv))
+        throw std::invalid_argument("Invalid Bake radiance sample coordinate");
+    device_.upload(bake_radiance_coordinates_,samples.data(),samples.size_bytes());
+    device_.render_bake_radiance(view_,mapped_source_,bake_radiance_coordinates_,samples.size(),output_);
+    device_.download(pixels.data(),output_,pixels.size_bytes());
+    paint_compute::checkpoint(cancelled);
+    validate_exact(std::span<const Radiance>(pixels));
   }
 
   void read_bake_uv(std::span<const BakeUvSample> samples,std::span<BakedEmissionSample> output,
@@ -329,6 +349,7 @@ private:
     for(const auto &pixel:pixels){
       const auto status=std::bit_cast<uint32_t>(pixel[0]);
       if(status==invalid_uv)throw std::runtime_error("MToon UV overflow");
+      if(status==source_radiance_overflow)throw std::overflow_error("Emission Bake source multiplication overflows FLOAT");
       if(status==radiance_overflow)throw std::overflow_error("Baked emission radiance exceeds FLOAT range");
       for(unsigned k=0;k<3;++k)if(!std::isfinite(pixel[k]))
         throw std::invalid_argument("GPU emission produced an invalid native FLOAT coefficient or radiance");
@@ -375,6 +396,7 @@ private:
   FiniteGrid finite_;
   MappedSourceImage mapped_source_{};
   MappedSample *coordinates_=nullptr;
+  BakeRadianceSample *bake_radiance_coordinates_=nullptr;
   BakeUvSample *bake_uv_samples_=nullptr;
   BakeUvPoint *bake_uv_points_=nullptr;
   BakeUvGeometry bake_uv_geometry_{};
@@ -385,6 +407,7 @@ private:
   size_t bake_uv_faces_=0,bake_uv_triangles_=0;
   size_t mapped_capacity_=0;
   size_t bake_uv_capacity_=0;
+  size_t bake_radiance_capacity_=0;
   bool mapped_field_=false;
   bool texture_set_=false;
   uint32_t *output_=nullptr;

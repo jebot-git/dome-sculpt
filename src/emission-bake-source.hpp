@@ -2,12 +2,15 @@
 #pragma once
 #include "dome/scene.hpp"
 #include "dome/source-maps.hpp"
+#include "emission-raster-device.hpp"
 namespace dome::detail {
 class SourceBakeNormalResolver;
 struct EmissionBakeBatch {
   PaintSourceTexture source;
-  std::function<std::array<float,2>(uint32_t,std::array<float,3>)> coordinates;
-  std::function<std::array<float,3>(uint32_t,std::array<float,3>,std::array<float,3>)> resolve;
+  std::shared_ptr<const PaintOverlayPacket> overlay;
+  std::array<float,3> background{};
+  float legacy_strength=1;
+  std::function<EmissionRasterDevice::BakeRadianceSample(uint32_t,std::array<float,3>)> sample;
 };
 // Private immutable raw source/overlay view for asset-worker Bake. Empty keeps
 // the legacy UV0 dense-composite route unchanged.

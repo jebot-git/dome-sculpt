@@ -65,7 +65,7 @@ elseif(DOME_COMPUTE_BACKEND STREQUAL "ONEAPI")
   set(paint_compute_source src/paint-composite-sycl.cpp src/paint-grid-sycl.cpp
     src/paint-source-coordinate-sycl.cpp src/emission-raster-sycl.cpp
     src/emission-raster-bake-sycl.cpp src/emission-raster-typed-sycl.cpp
-    src/emission-raster-finite-sycl.cpp src/emission-raster-mapped-sycl.cpp src/source-material-raster-sycl.cpp
+    src/emission-raster-finite-sycl.cpp src/emission-raster-mapped-sycl.cpp src/bake-radiance-sycl.cpp src/source-material-raster-sycl.cpp
     src/emission-raster-texture-set-sycl.cpp
     src/emission-raster-texture-set-source-sycl.cpp src/portable-normal-raster-sycl.cpp
     src/portable-normal-certificate-sycl.cpp src/source-uv-sampler-sycl.cpp)

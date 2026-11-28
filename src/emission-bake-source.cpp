@@ -94,6 +94,9 @@ struct Source {
     const auto uv=coordinates(triangle,bary,toon?mtoon_coordinate(toon->textures[size_t(slot)]):role.texcoord,bool(toon));
     return toon?mtoon_uv_validated(*toon,slot,uv,0,1):uv;
   }
+  std::array<float,2> paint_coordinates(uint32_t triangle,std::array<float,3> bary)const {
+    return bake_paint_coordinates(paint_domain.get(),triangle,bary,coordinates(triangle,bary,0,false));
+  }
   std::array<float,3> resolve(uint32_t triangle,std::array<float,3> bary,
       std::array<float,3> image_value)const {
     stop();
@@ -106,7 +109,7 @@ struct Source {
     }
     BakedEmissionSample replacement;
     if(packet){
-      const auto uv=bake_paint_coordinates(paint_domain.get(),triangle,bary,coordinates(triangle,bary,0,false));
+      const auto uv=paint_coordinates(triangle,bary);
       const auto values=sample_overlay_values(*packet,uv[0],uv[1],false);
       for(size_t k=0;k<3;++k){replacement.legacy[k]=values[2][k];replacement.absolute[k]=values[4][k];}
       replacement.coverage=values[3][3];
@@ -813,14 +816,24 @@ emission_bake_source(const SculptObject &object,const std::function<bool()> &can
   // Only const ownership escapes; no caller's mutable object/material is read
   // from the worker after this capture or from a rendering callback.
   std::shared_ptr<const Source> immutable=std::move(source);
-  if(batch&&immutable->role.image&&!immutable->physical_background){
+  if(batch){
     auto work=std::make_shared<EmissionBakeBatch>();
-    work->source=immutable->role;
-    work->coordinates=[immutable](uint32_t triangle,std::array<float,3> bary){
-      return immutable->image_coordinates(triangle,bary);
-    };
-    work->resolve=[immutable](uint32_t triangle,std::array<float,3> bary,std::array<float,3> image){
-      return immutable->resolve(triangle,bary,image);
+    work->overlay=immutable->packet;
+    work->background=immutable->background;
+    work->legacy_strength=immutable->legacy_strength;
+    if(!immutable->physical_background)work->source=immutable->role;
+    work->sample=[immutable](uint32_t triangle,std::array<float,3> bary){
+      immutable->stop();
+      EmissionRasterDevice::BakeRadianceSample sample;
+      if(immutable->role.image&&!immutable->physical_background){
+        const auto uv=immutable->image_coordinates(triangle,bary);
+        std::copy_n(uv.begin(),2,sample.image_uv);
+      }
+      if(immutable->packet){
+        const auto uv=immutable->paint_coordinates(triangle,bary);
+        std::copy_n(uv.begin(),2,sample.paint_uv);
+      }
+      return sample;
     };
     *batch=std::move(work);
   }

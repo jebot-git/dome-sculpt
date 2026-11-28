@@ -55,6 +55,13 @@ owners. Raw tangent-frame evaluation and explicit prepared normal resolvers
 remain on the worker.
 [GPU Bake normal evidence](validation/bake-normal-gpu-20261128.json)
 
+Native and typed HDR Bake sources use GPU radiance resolution. The GPU
+filters the original image and sparse legacy and absolute coefficients in
+their independent coordinate domains, then preserves the native FLOAT
+rounding and overflow rules. Explicit physical backgrounds and sources without
+images use the same path. Retained polygon and caller-provided source resolvers
+still run on the worker.
+
 Eligible 512–2048 current-grid RGB8 Bake materials now composite color, ORM
 and legacy emission on the selected GPU. Their ordered paint, coverage,
 native normal-map output, and GLB export match the preceding implementation.

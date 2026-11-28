@@ -11,7 +11,6 @@
 #include "bake-paint-coordinates.hpp"
 #include "emission-bake-source.hpp"
 #include "normal-bake-encoding.hpp"
-#include "source-uv-sampler.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake.hpp"
 #include "dome/brush.hpp"
@@ -216,7 +215,7 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o,
     m.material.validate();
     if(m.emission_batch){
       const auto &batch=*m.emission_batch;
-      if(!m.resolved_emission||!batch.source.image||!batch.coordinates||!batch.resolve)
+      if(!m.resolved_emission||!batch.sample)
         throw std::invalid_argument("GPU emission Bake requires a complete immutable source");
       batch.source.validate(8);
     }
@@ -424,20 +423,21 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   size_t pixels=size_t(o.resolution)*o.resolution;
   BakeResult result; result.coverage.resize(pixels);
   std::vector<std::array<float,3>> emission;if(float_emission)emission.resize(pixels);
-  using Sampler=detail::SourceUvSampler;
+#ifndef DOME_BAKE_RAY_REFERENCE
+  using RadianceDevice=detail::EmissionRasterDevice;
   struct EmissionHit {
     uint32_t material,triangle,texel;
     std::array<float,3> bary;
   };
-  const bool gpu_emission=compute_backend()!="CPU"&&std::ranges::any_of(source.materials,
+  const bool gpu_emission=std::ranges::any_of(source.materials,
       [](const auto &m){return bool(m.emission_batch);});
-  const size_t emission_capacity=gpu_emission?std::min(Sampler::max_batch,pixels):0;
+  const size_t emission_capacity=gpu_emission?std::min(RadianceDevice::mapped_batch,pixels):0;
   std::vector<EmissionHit> pending;
   pending.reserve(emission_capacity);
-  std::vector<Sampler::Coordinate> emission_uv(emission_capacity);
-  std::vector<uint32_t> emission_words(4*emission_capacity);
+  std::vector<RadianceDevice::BakeRadianceSample> emission_samples(emission_capacity);
+  std::vector<RadianceDevice::Radiance> emission_values(emission_capacity);
   uint32_t resident_material=UINT32_MAX;
-  std::unique_ptr<Sampler> resident_sampler;
+  std::unique_ptr<RadianceDevice> resident_radiance;
   auto flush_emission=[&]{
     if(pending.empty())return;
     cancel(o);
@@ -451,31 +451,27 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       while(end<pending.size()&&pending[end].material==slot){
         if((end&1023)==0)cancel(o);
         const auto &hit=pending[end];
-        const auto uv=batch.coordinates(hit.triangle,hit.bary);
-        emission_uv[end-first]={uv[0],uv[1]};
+        emission_samples[end-first]=batch.sample(hit.triangle,hit.bary);
         ++end;
       }
       if(slot!=resident_material){
-        // Hold one image upload at a time even when one target crosses
-        // several material sets. Neighboring batches may reuse it.
-        resident_sampler.reset();
-        resident_sampler=detail::upload_source_uv_sampler(batch.source,true,Sampler::Output::LinearRgba,
-            emission_capacity,Sampler::Transform::SourceAffine);
+        // Hold one emission image and its sparse field at a time across
+        // material sets. Neighboring batches can reuse those device owners.
+        resident_radiance.reset();
+        resident_radiance=detail::create_bake_radiance_device(batch.overlay.get(),
+            batch.source.image?&batch.source:nullptr,batch.background,batch.legacy_strength,emission_capacity,o.cancelled);
         resident_material=slot;
       }
       const size_t count=end-first;
-      resident_sampler->read(std::span(emission_uv).first(count),std::span(emission_words).first(4*count));
+      resident_radiance->read_bake_radiance(std::span(emission_samples).first(count),
+          std::span(emission_values).first(count),o.cancelled);
       cancel(o);
-      for(size_t i=0;i<count;++i){
-        const auto &hit=pending[first+i];
-        const auto *values=emission_words.data()+4*i;
-        emission[hit.texel]=batch.resolve(hit.triangle,hit.bary,
-            {std::bit_cast<float>(values[0]),std::bit_cast<float>(values[1]),std::bit_cast<float>(values[2])});
-      }
+      for(size_t i=0;i<count;++i)emission[pending[first+i].texel]=emission_values[i];
       first=end;
     }
     pending.clear();
   };
+#endif
   if((o.encode_target_normal&&dual_normal)||canonical_pair_error)
     result.maps.mtoon_normal={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
   if (!o.writable.empty()) for (size_t i=0;i<pixels;++i) if (!o.writable[i]) result.coverage[i]=4;
@@ -537,10 +533,13 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     auto high_normal=normalized(hit->normal);
     if(float_emission){
       if(retained&&retained->emission)emission[at]=*retained->emission;
-      else if(gpu_emission&&m.emission_batch){
+#ifndef DOME_BAKE_RAY_REFERENCE
+      else if(m.emission_batch){
         pending.push_back({material_id,hit->triangle,uint32_t(at),hit->barycentric});
         if(pending.size()==emission_capacity)flush_emission();
-      }else if(m.resolved_emission)emission[at]=m.resolved_emission(hit->triangle,hit->barycentric);
+      }
+#endif
+      else if(m.resolved_emission)emission[at]=m.resolved_emission(hit->triangle,hit->barycentric);
       else emission[at]=channels.emission;
     }
     auto pbr_color=channels.color;
@@ -937,9 +936,9 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
 #ifndef DOME_BAKE_RAY_REFERENCE
   flush_ambient();
   device_query.reset();
-#endif
   flush_emission();
-  resident_sampler.reset();
+  resident_radiance.reset();
+#endif
   if(o.progress)o.progress(.9f);
   cancel(o); if (o.padding) pad(result,o,emission); cancel(o);
   if(float_emission){

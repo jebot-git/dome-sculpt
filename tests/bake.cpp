@@ -6,6 +6,7 @@
 #include "bake-ray-device.hpp"
 #include "bake-ray-query.hpp"
 #include "dome/color-preparation.hpp"
+#include "emission-raster-device.hpp"
 #include "paint-overlay-sample.hpp"
 #include "source-color-fixtures.hpp"
 #endif
@@ -451,6 +452,81 @@ void sparse_material_device_sampling(){
   }
   check(true,"GPU sparse material and canonical normal match independent filtering through masks, padding and FLOAT coverage");
 }
+
+void bake_radiance_device_sampling(){
+  namespace raster=detail;
+  using Device=raster::EmissionRasterDevice;
+  constexpr uint32_t resolution=64;
+  auto paint=std::make_shared<PaintedMesh>(quad(-1,1,0,.17f,.83f,.18f,.82f),resolution);
+  BakedTextures baked;
+  baked.maps.color=baked.maps.metal_rough={resolution,resolution,std::vector<uint8_t>(resolution*resolution*4,255)};
+  baked.coverage.assign(resolution*resolution,197);
+  baked.emission_field=BakedEmissionField::generate_compact(resolution,[](size_t at){
+    const float alpha=float(at%53+13)/127.f;
+    return BakedEmissionSample{{alpha*.32f,alpha*.86f,alpha*.45f},
+        {alpha*float(at%29)*18700.f,alpha*1e-24f,alpha*float(at%19)},alpha};
+  });
+  paint->install_bake(baked);
+  const Brush dab{{-.27f,.13f,0},{-.27f,.13f,0},{0,0,1},.75f,.78f};
+  PaintSettings settings;
+  settings.channel=PaintChannel::Emission;settings.emission={.21f,.67f,.78f};
+  paint->begin_stroke();paint->stamp(dab,settings);check(paint->end_stroke(),"HDR fixture has a legacy relative stroke");
+  settings.channel=PaintChannel::Mask;settings.mask=.23f;
+  paint->begin_stroke();paint->stamp(dab,settings);check(paint->end_stroke(),"HDR fixture has a fractional sparse mask");
+  paint->add_layer("Absolute emission");
+  paint->layer_properties("Absolute emission",true,.47f);
+  settings.channel=PaintChannel::Emission;settings.emission_units=PaintEmissionUnits::Physical;
+  settings.emission={57.f,1e-20f,2.1f};
+  paint->begin_stroke();paint->stamp(dab,settings);check(paint->end_stroke(),"HDR fixture has an absolute FLOAT stroke");
+  const auto packet=raster::PaintOverlayFactory::capture(*paint);
+  const auto original=paint->encode();
+  PaintSourceTexture image;
+  image.image=std::make_shared<const Image>(Image{3,2,{255,17,15,255,0,178,3,255,68,75,211,255,
+                                                       9,250,80,255,157,50,208,255,19,84,38,255}});
+  image.wrap_s=33648;image.wrap_t=33071;image.uv_transform={.78f,-.43f,.38f,.678f,-.2f,1.7f};
+  std::vector<Device::BakeRadianceSample> samples;
+  for(unsigned i=0;i<1009;++i)samples.push_back({{float(i*83%1031)/851-.15f,float(i*191%1033)/863-.07f},
+                                                     {float(i*31%1033)/613-.73f,float(i*7%1031)/737-.37f}});
+  const std::array<float,3> background{4.77f,9.63f,3.54e-12f};
+  constexpr float strength=3.71f;
+  for(const bool textured:{false,true}){
+    auto device=raster::create_bake_radiance_device(packet.get(),textured?&image:nullptr,background,strength,samples.size(),{});
+    std::vector<Device::Radiance> actual(samples.size());
+    device->read_bake_radiance(samples,actual,{});
+    for(size_t i=0;i<samples.size();++i){
+      const auto &sample=samples[i];
+      const auto overlay=raster::sample_overlay_values(*packet,sample.paint_uv[0],sample.paint_uv[1],false);
+      const auto texel=textured?sample_source_texture(image,sample.image_uv[0],sample.image_uv[1],true):
+          std::array<float,4>{1,1,1,1};
+      const BakedEmissionSample sample_value{{overlay[2][0],overlay[2][1],overlay[2][2]},
+          {overlay[4][0],overlay[4][1],overlay[4][2]},overlay[3][3]};
+      auto original_light=background;
+      for(unsigned c=0;c<3;++c)original_light[c]=float(double(background[c])*texel[c]);
+      if(sample_value.resolve(original_light,strength)!=actual[i])
+        throw std::runtime_error("GPU Bake radiance differs from native ordered arithmetic at "+std::to_string(i));
+    }
+    check(rejects([&]{device->read_bake_radiance(samples,actual,[]{return true;});})&&paint->encode()==original,
+          "Cancelled HDR sampling preserves the captured sparse source");
+  }
+  constexpr float maximum=std::numeric_limits<float>::max();
+  auto edge=std::make_shared<PaintedMesh>(quad(),resolution);
+  baked.emission_field=BakedEmissionField::generate_compact(resolution,[](size_t){
+    return BakedEmissionSample{{1,0,0},{maximum,0,std::numeric_limits<float>::denorm_min()},1};
+  });
+  edge->install_bake(std::move(baked));
+  const auto edge_packet=raster::PaintOverlayFactory::capture(*edge);
+  const std::array<Device::BakeRadianceSample,1> point{{{{.43f,.64f},{}}}};
+  std::array<Device::Radiance,1> result{};
+  auto bound=raster::create_bake_radiance_device(edge_packet.get(),nullptr,{-0.f,0.f,0.f},0,1,{});
+  bound->read_bake_radiance(point,result,{});
+  check(result[0]==Device::Radiance{maximum,0,std::numeric_limits<float>::denorm_min()},
+        "GPU radiance preserves the FLOAT endpoints above and below normal intensity");
+  auto overflow=raster::create_bake_radiance_device(edge_packet.get(),nullptr,{},maximum,1,{});
+  bool rejected=false;
+  try{overflow->read_bake_radiance(point,result,{});}catch(const std::overflow_error &){rejected=true;}
+  check(rejected,"GPU recognizes overflow during the ordered HDR resolve");
+  check(true,"GPU Bake radiance exactly matches the native masked mixed HDR oracle with and without an original image");
+}
 #endif
 } // namespace
 int main()try {
@@ -462,6 +538,7 @@ int main()try {
   resident_cage_projection();
   original_material_device_sampling();
   sparse_material_device_sampling();
+  bake_radiance_device_sampling();
 #endif
   auto low=quad();BakeSource source;source.mesh=quad();
   BakeOptions options;options.resolution=32;options.padding=0;options.ao_samples=0;

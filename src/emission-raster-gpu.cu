@@ -39,6 +39,11 @@ __global__ void render_mapped_field_pixels(DeviceInput input,MappedSourceImage i
     emission_raster::render<false,false,true>(input,sample.texel,out+10*index,image,{sample.u,sample.v});
   }
 }
+__global__ void render_bake_radiance_pixels(DeviceInput input,MappedSourceImage image,
+    const EmissionRasterDevice::BakeRadianceSample *samples,size_t count,uint32_t *out){
+  const size_t index=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+  if(index<count)render_bake_radiance(input,image,samples[index],out+3*index);
+}
 __global__ void filter_bake_uv_pixels(Bake bake,const EmissionRasterDevice::BakeUvSample *samples,
                                       size_t count,uint32_t *out){
   const size_t index=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
@@ -120,6 +125,12 @@ public:
       const EmissionRasterDevice::MappedSample *samples,size_t count,uint32_t *out){
     constexpr size_t block=128;
     render_mapped_field_pixels<<<(count+block-1)/block,block,0,stream_>>>(input,image,samples,count,out);
+    checked(DOME_DEVICE(GetLastError)());
+  }
+  void render_bake_radiance(DeviceInput input,MappedSourceImage image,
+      const EmissionRasterDevice::BakeRadianceSample *samples,size_t count,uint32_t *out){
+    constexpr size_t block=128;
+    render_bake_radiance_pixels<<<(count+block-1)/block,block,0,stream_>>>(input,image,samples,count,out);
     checked(DOME_DEVICE(GetLastError)());
   }
   void filter_bake_uv(Bake bake,const EmissionRasterDevice::BakeUvSample *samples,size_t count,uint32_t *out){

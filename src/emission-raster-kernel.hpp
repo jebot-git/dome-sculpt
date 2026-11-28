@@ -3,6 +3,7 @@
 
 #include "emission-raster-device.hpp"
 #include "bake-uv-normal-kernel.hpp"
+#include "bake-texture-filter-kernel.hpp"
 #include "paint-composite-kernel.hpp"
 #include "paint-source-coordinate-kernel.hpp"
 #include "source-uv-sampler-kernel.hpp"
@@ -40,6 +41,7 @@ struct FiniteGrid {
 
 inline constexpr uint32_t one32=0x3f800000, max32=0x7f7fffff, invalid=0x7fc00000, invalid_uv=0x7fc00001;
 inline constexpr uint32_t radiance_overflow=0x7fc00002;
+inline constexpr uint32_t source_radiance_overflow=0x7fc00003;
 inline constexpr uint64_t one64=0x3ff0000000000000ull, sign64=1ull<<63;
 
 DOME_EMISSION_FN uint32_t magnitude(uint32_t value){return value&0x7fffffffu;}
@@ -380,6 +382,37 @@ DOME_EMISSION_FN void filter_finite(const DeviceInput &input,SourceTextureAxis c
 DOME_EMISSION_FN void filter_finite(const DeviceInput &input,FiniteGrid grid,uint32_t x,uint32_t y,
     uint32_t (&value)[7]){
   filter_finite(input,grid.axis[x],grid.axis[y],value);
+}
+
+DOME_EMISSION_FN void render_bake_radiance(const DeviceInput &input,MappedSourceImage image,
+    const EmissionRasterDevice::BakeRadianceSample &sample,uint32_t *out){
+  uint32_t sampled[4]{one32,one32,one32,one32};
+  if(image.rgba)
+    sample_mapped_source(image,{sample.image_uv[0],sample.image_uv[1]},*input.quantization,sampled,0);
+  uint32_t background[3];
+  const auto limit=widen(max32);
+  for(unsigned c=0;c<3;++c){
+    const auto product=product64(widen(input.background[c]),widen(sampled[c]));
+    if((product&~sign64)>limit){out[0]=source_radiance_overflow;return;}
+    background[c]=narrow(product);
+  }
+  uint32_t value[7]{};
+  if(input.padding){
+    const auto column=bake_material::clamped_axis(sample.paint_uv[0],input.resolution);
+    const auto row=bake_material::clamped_axis(sample.paint_uv[1],input.resolution);
+    filter_finite(input,column,row,value);
+  }
+  if(!valid_coefficients(value,true)){out[0]=invalid;return;}
+  const auto remaining=complement(value[6]);
+  for(unsigned c=0;c<3;++c){
+    // Association and filtering are FLOAT. Preserve the separately rounded
+    // image product and the ordered binary64 radiance resolve at any scale.
+    const auto base=product64(widen(background[c]),remaining);
+    const auto legacy=product64(widen(value[c]),widen(input.strength));
+    const auto radiance=sum64(sum64(base,legacy),widen(value[c+3]));
+    if((radiance&~sign64)>limit){out[0]=radiance_overflow;return;}
+    out[c]=narrow(radiance);
+  }
 }
 
 DOME_EMISSION_FN void resolve_finite(const DeviceInput &input,const uint32_t (&value)[7],

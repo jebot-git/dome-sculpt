@@ -139,8 +139,7 @@ ORM and legacy emission over the sampled source maps. This covers paint-only
 materials without original role images. Arc matched 3,556 samples against the
 native FLOAT reference. The five-layer 1024² fixture remained byte-identical.
 On that fixture, the warm Bake fell from 0.68 to 0.46 seconds and the first
-Bake rose from 7.23 to 9.76 seconds. The worker retains explicit FLOAT radiance
-resolvers and ordered publication.
+Bake rose from 7.23 to 9.76 seconds. The worker retains ordered publication.
 [GPU sparse Bake evidence](validation/bake-overlay-gpu-20261128.json)
 
 Bake also filters original tangent-normal images and canonical RGB8 baked
@@ -153,6 +152,13 @@ still own their frame evaluation. The 1024² derivative-frame fixture and the
 512² supplied-frame fixture both produced byte-identical native projects.
 Warm Arc Bake took 0.54 and 0.13 seconds, down from 0.62 and 0.14 seconds.
 [GPU Bake normal evidence](validation/bake-normal-gpu-20261128.json)
+
+HDR Bake resolves captured native and typed emission sources on the selected
+GPU. The same batch samples the original image, filters sparse legacy and
+absolute FLOAT paint through the retained padding, and resolves the final
+radiance using the original ordered binary64 arithmetic. The path also
+covers constant sources and explicit physical backgrounds. The worker still
+owns retained polygon field resolvers and ordered native publication.
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
@@ -474,13 +480,13 @@ checks pass through the native OpenXR loader with synthetic tracking.
 CUDA and ROCm compile, and all three backends reject an unavailable GPU.
 [Animated mask evidence](validation/mtoon-animation-mask-gpu-20261128.json)
 
-HDR Bake now samples donor textures on the selected GPU from the actual
+The initial HDR Bake stage sampled donor textures on the selected GPU from the actual
 source triangle and barycentrics. The batch uses the transported PBR
 carrier or the typed MToon role's original UV set. It preserves the
 source sampler's binary64 affine evaluation, wrap, filtering and color
 decoding. Up to 16,384 hits share a batch, with one source image resident
-at a time. The worker still resolves overlay coverage and FLOAT
-coefficients and publishes only the completed Bake.
+at a time. That checkpoint resolved overlay coverage and FLOAT coefficients
+on the worker before publication.
 
 The mixed PBR and MToon fixture reproduces all 65,536 FLOAT texels and
 coverage exactly. A 512-pixel Bake with a 2×2 source image produces a

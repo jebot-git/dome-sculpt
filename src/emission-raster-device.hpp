@@ -35,6 +35,7 @@ public:
   using Pixel=std::array<float,10>;
   using Radiance=std::array<float,3>;
   struct MappedSample { uint32_t texel; float u,v; };
+  struct BakeRadianceSample { float paint_uv[2]{},image_uv[2]{}; };
   struct BakeUvSample {
     uint32_t texels[4]{};
     float weights[4]{};
@@ -58,6 +59,7 @@ public:
   virtual void read_finite(size_t first,std::span<Radiance>,const std::function<bool()> &) = 0;
   virtual void read_mapped(std::span<const MappedSample>,std::span<Radiance>,const std::function<bool()> &) = 0;
   virtual void read_mapped_field(std::span<const MappedSample>,std::span<Pixel>,const std::function<bool()> &) = 0;
+  virtual void read_bake_radiance(std::span<const BakeRadianceSample>,std::span<Radiance>,const std::function<bool()> &) = 0;
   virtual void read_bake_uv(std::span<const BakeUvSample>,std::span<BakedEmissionSample>,const std::function<bool()> &) = 0;
   virtual void read_bake_uv_maps(std::span<const BakeUvSample>,std::span<BakeUvMapsPixel>,
                                  std::span<BakedEmissionSample>,const std::function<bool()> &) = 0;
@@ -80,6 +82,8 @@ std::unique_ptr<EmissionRasterDevice> create_mapped_emission_raster_device(
 std::unique_ptr<EmissionRasterDevice> create_mapped_emission_field_device(
     const PaintedMesh &,const PaintSourceTexture &,std::array<float,3> background,float legacy_strength,size_t capacity,
     const std::function<bool()> &);
+std::unique_ptr<EmissionRasterDevice> create_bake_radiance_device(const PaintOverlayPacket *,const PaintSourceTexture *,
+    std::array<float,3> background,float legacy_strength,size_t capacity,const std::function<bool()> &);
 std::unique_ptr<EmissionRasterDevice> create_bake_uv_emission_device(const BakedEmissionField &,size_t capacity,
     const std::function<bool()> &);
 std::unique_ptr<EmissionRasterDevice> create_bake_uv_maps_device(const BakedTextures &,uint32_t resolution,
@@ -182,7 +186,7 @@ struct Input {
   std::array<uint32_t,3> background{};
   uint32_t strength=0,resolution=0;
   std::vector<SourceTextureAxis> finite_axis;
-  size_t mapped_capacity=0,bake_uv_capacity=0;
+  size_t mapped_capacity=0,bake_uv_capacity=0,bake_radiance_capacity=0;
   bool physical_bake=false,texture_set=false,mapped_field=false;
 };
 Input describe_bake_overlay(const PaintOverlayPacket &,MaterialInput &,bool separate_pbr,bool include_emission,

@@ -72,6 +72,22 @@ int main(int argc,char**argv)try{
  check(scalar_field.emission_field->encode()==batched_field.emission_field->encode()&&
        scalar_field.coverage==batched_field.coverage,
        "Batches across mixed PBR and typed materials preserve exact FLOAT radiance and padding");
+ auto physical=typed_source;
+ auto explicit_light=std::make_shared<SourceMaterialBindings>(*binding);
+ explicit_light->physical_emission=std::array<float,3>{8.f,2.25f,1e-17f};
+ physical.material_bindings=std::move(explicit_light);
+ auto &physical_material=mixed.materials[1];
+ physical_material.resolved_emission=detail::emission_bake_source(physical,{},nullptr,&physical_material.emission_batch);
+ check(physical_material.emission_batch&&!physical_material.emission_batch->source.image,
+       "Explicit physical radiance overrides the genuine typed image in the Bake batch");
+ reference.materials[1]=physical_material;
+ reference.materials[1].emission_batch.reset();
+ const auto explicit_scalar=bake_mesh(raw,reference,mixed_options);
+ const auto explicit_batch=bake_mesh(raw,mixed,mixed_options);
+ check(explicit_scalar.emission_field->encode()==explicit_batch.emission_field->encode()&&
+       explicit_scalar.coverage==explicit_batch.coverage&&
+       explicit_batch.emission_field->encode()!=batched_field.emission_field->encode(),
+       "A physical background preserves exact FLOAT radiance across textured and constant material batches");
  for(size_t kind=0;kind<3;++kind){SourcePaintOptions limited;if(kind==0)limited.max_coordinate_bytes=1;else if(kind==1)limited.max_working_bytes=1;else limited.max_work=1;
   check(refuses([&]{prepare_source_paint(original,atlas,ids,authored,limited);})&&scene.encode()==before,"Prospective independent-source coordinate/working/work quota changed source");}
  size_t capture_polls=0;bool cancel=false;auto cancellable=detail::emission_bake_source(o,[&]{++capture_polls;return cancel;});cancel=true;
