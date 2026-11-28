@@ -1,0 +1,100 @@
+{
+  "date": "2026-11-28",
+  "product": "f3db9e0d3027acef437d31fd2726fbae85a8210e",
+  "preceding": "7308e1cbcc17e27830c3da84572fdc97a796f622",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Refined surface Mirror on native unskinned meshes with plain strict UV0 paint and representable native frames. GPU overlap search with host clipping, correspondence proof and transactional mesh authoring.",
+  "arc_a770": {
+    "application_sha256": "f537ab99ef23bd2d8f0502a6ec1eacfd7917ccbd2c6a843c33714b65ea37372b",
+    "render_node": "/dev/dri/renderD129",
+    "release": {
+      "tests": [
+        "key-mirror-vertex",
+        "key-mirror-refinement",
+        "xr-mirror-controls",
+        "application-missing-gpu",
+        "key-mirror-relative-owning",
+        "key-mirror-refinement-authoring",
+        "key-mirror-correspondence",
+        "key-mirror-refinement-missing-gpu",
+        "shapekey-mirror-openxr"
+      ],
+      "log_sha256": "68cf48831fdfa6352ec9cdb8b265cea40175805f9d883fe16b3818041eb584be"
+    },
+    "detached_geometry": {
+      "checks": 99,
+      "project_allocation_failure_prefixes": 28,
+      "scaled_input_triangles": 10000,
+      "scaled_output_triangles": 60000,
+      "scaled_logical_work_units": 1045824,
+      "scaled_ordered_corners_and_barycentrics_match_independent_fixture": true
+    },
+    "native_authoring": {
+      "checks": 10,
+      "project_sha256": "ffc0ecd27a8d8c8f6d80e22ad31d05e9030972a666d84fc85b11fa219ea21932",
+      "headless_reference_archive_identical": true
+    },
+    "nested_domed_wayland": {
+      "driver_checks": 9,
+      "saved_project_checks": 5,
+      "report_sha256": "89664fb52d4a6e790276be95b58f914db4adae3f16dbc22a7632e49da0a4bd1d",
+      "full_log_sha256": "5d14f402ec35f3e43c68afcf908694eff82c08c73887076567c99dd605de1fcd",
+      "compute_trace_sha256": "794fb5902c966d0b054535b719ec9a947e5b1ec732405cb1b68e3bc57bed09b4",
+      "preserved_outputs": {
+        "mirror-before.dsculpt": "73a5d3f3eb976fe396f76cb8273fa1d221664369ef2fe3b163cc21312c690ac2",
+        "mirror-after.dsculpt": "df747a82ea9a3beea72045ec59b185532e17d118aaeeefb6940ee1d452bd6480",
+        "mirror-modal.png": "f86173210c3fc1999cd7342957df67c4c6f78985fc37f26049bc0eb1905d5043"
+      }
+    },
+    "synthetic_openxr": {
+      "checks": 46,
+      "physical_headset": false,
+      "report_sha256": "83065af0983abe399cfb033e16732290963ff326cef2a9cac969a26882f9b0ad",
+      "refinement_projects": {
+        "refined-source.dsculpt": "93b13694ab66341cfc0445b66167641bf71c4f1977bb9403c8a263435292e75b",
+        "accept-3.dsculpt": "b8910142af797eeb9fb3fbe09ed3e4d53d90645c3dc9ab13e029b0eebf94edd0"
+      },
+      "unchanged_preceding_captures": {
+        "accept-0.dsculpt": "cf3a4871e1d88af8e8313ba2772e406fef16e5c9bbbf2129b9be5347437e3992",
+        "accept-1.dsculpt": "6a5ce46bca85bcde074bc2251b1ddf69684d6a3b1336aeb83ff2b0db3b481080",
+        "accept-2.dsculpt": "16ea54370d05fb55095be502ff9926c03c06e953f724b123304b080f361b0451",
+        "cancel-0.dsculpt": "8e16ca54b46ba261d92562c5aa0667c14121df4db80cd233367e66799910d23d",
+        "focus-0.dsculpt": "8e16ca54b46ba261d92562c5aa0667c14121df4db80cd233367e66799910d23d",
+        "source.dsculpt": "8e16ca54b46ba261d92562c5aa0667c14121df4db80cd233367e66799910d23d"
+      }
+    }
+  },
+  "headless_reference": {
+    "tests": [
+      "cpu-reference-install-refused",
+      "key-mirror-refinement",
+      "key-mirror-refinement-authoring",
+      "xr-mirror-controls"
+    ],
+    "log_sha256": "a091367fd4da6aa338af2c40851e223ffb04461712151bdede88d64d41280540"
+  },
+  "vendor_build_and_missing_device": {
+    "cuda": {
+      "compiled_device_object_sha256": "c7a7537acc039a2d2cf7d0e07caabcd83d2f8d4e4ea6965818c52a100d0559d9",
+      "missing_gpu_probe_log_sha256": "ac257dffa119f17ebb768298c54d91dc3d557d6fd33eecba16bcd0d7e4e1eb81",
+      "positive_device_run": false
+    },
+    "rocm": {
+      "compiled_device_object_sha256": "63a8d2ca88acadd0ba4c54de0ae8da6da39d1a230e765ba784f77da547e5e144",
+      "missing_gpu_probe_log_sha256": "e8c54e8130c0f87cb24fdcf3da1d8b7f82ce0a90bb3b41b5d1e7628eb7518779",
+      "positive_device_run": false
+    }
+  },
+  "scoped_asan_ubsan": {
+    "instrumented": [
+      "src/shapekey-refinement.cpp",
+      "src/key-mirror-refinement.cpp",
+      "tests/key-mirror-refinement.cpp"
+    ],
+    "geometry_checks": 99,
+    "authoring_checks": 10,
+    "geometry_log_sha256": "71b281c74dc9ecdd2f6d29c16321f7b5e915468d87a098096f543e52c621d21a",
+    "authoring_log_sha256": "ee6718d97f7a285c40d3ab1949689b314b7d1100d9f9f49f7c76223f8aa97d6c",
+    "leak_detection": false
+  }
+}

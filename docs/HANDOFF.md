@@ -186,6 +186,23 @@ Arc shader and independent GLB checks pass for the prepared and retained
 fixtures. Scoped ASan/UBSan covers the prepared fixture.
 [Key material preview evidence](validation/key-material-preview-20261128.json)
 
+Refined surface is available in the existing FLTK and OpenXR Mirror controls.
+The selected GPU searches a resident reflected triangle BVH in bounded
+batches. The worker clips the paired triangles and checks surface coverage
+before publishing the new topology. Existing shapekey IDs and weights,
+writable UV pins and seams, hidden and visible paint layers, and their
+composited texels survive. Restore recovers the original mesh and fields
+exactly. The native Save reopens with an editable mirrored key, and one
+Undo or Redo moves between the original and refined projects. Native DomeD
+Wayland and synthetic OpenXR pass on Arc A770. The 10,000-triangle fixture
+matches the headless oracle at every ordered corner and barycentric record.
+CUDA and ROCm compile the device code and refuse absent devices. The mode
+currently admits native unskinned meshes with plain strict UV0 paint and
+representable native frames. Refined Mirror for imported, skinned and
+retained materials and Bake, physical headset and positive AMD and NVIDIA
+execution remain open.
+[Refined surface Mirror evidence](validation/key-mirror-refinement-gpu-20261128.json)
+
 Ambient occlusion in Bake now traces the biased hemisphere on the selected
 GPU against the existing immutable source BVH. The device returns one
 blocked-ray count per projected texel. Long traversals resume on the device
