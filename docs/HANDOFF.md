@@ -597,9 +597,16 @@ Cancel, ordered Save, Undo/Redo and Standard GLB recovery pass. The portable
 re-import differs by one channel value out of 255. All 31 focused Release
 cases pass. Synthetic OpenXR controller Scale and Apply also save an edited
 atlas with both normal maps, the FLOAT Bake and the original source sampling.
-UV raster transfer and normal encoding run on the host. Topology-changing
-transfer remains open.
+The selected compute GPU now filters baked FLOAT emission. Arc handles
+dense and compact native storage, including subnormal values and radiance above
+the brush limit. The original fixture produces byte-identical projects and GLBs.
+All 31 focused Arc Release tests pass, along with native DomeD Wayland export
+and synthetic OpenXR export and UV Apply. The CUDA and ROCm kernels compile.
+Atlas correspondence, editable layer transfer, byte-channel filtering, tangent
+conversion and native field packing run on the host. Topology-changing transfer
+remains open.
 [Paired Bake UV evidence](validation/prepared-mtoon-uv-bake-20261128.json)
+[GPU Bake UV evidence](validation/prepared-mtoon-uv-gpu-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
