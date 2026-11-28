@@ -27,6 +27,18 @@ and refuse missing devices.
 Open avatar parts still use surface methods. Production-size assemblies,
 positive AMD and NVIDIA runs, and physical headset testing remain open.
 [GPU volume binding evidence](validation/gpu-volume-binding-20261128.json)
+
+Surface Heat now solves on the selected GPU for open and closed surfaces.
+The worker prepares the visibility and sparse factors. The GPU keeps the
+matrix and all iterative vectors resident through the refined solve. Only
+convergence scalars return during iteration. Twelve retained and native
+VRoid archives match the preceding output byte for byte. Nested Wayland
+and synthetic OpenXR pass on Arc A770. The larger owning cases took 12.7–14.8
+seconds on Arc in the focused run. The preceding host-solver run took
+4.3–7.0 seconds on the same fixtures. Dispatch and convergence latency still
+need work. CUDA and ROCm kernels compile and refuse unavailable devices.
+[GPU Surface Heat evidence](validation/gpu-surface-heat-20261128.json)
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.

@@ -297,6 +297,13 @@ Wayland bind, Save and Undo/Redo reproduce the expected weights. The retained
 and native CC0 VRoid articulation cases pass with exact prior project output.
 [Visible seed evidence](validation/surface-heat-visible-seeds-20261128.json)
 
+Surface Heat now keeps its screened matrix, incomplete Cholesky factor and
+iterative weight fields on the selected GPU. The background worker still
+prepares geometry, visibility, and the factor. Each joint uploads its seed
+field and reads back the certified solution. The original residual,
+maximum-principle and partition checks still apply.
+[GPU Surface Heat evidence](validation/gpu-surface-heat-20261128.json)
+
 Volume Geodesic binds consistently oriented closed meshes to internal
 deforming bones. It checks topology and seeds on the worker and propagates
 through the certified material on the selected GPU. The Arc A770 results

@@ -92,7 +92,8 @@ and mask painting use a stable mesh and persisted UVs; see [painting](docs/PAINT
 On desktop, **Scene → Select objects** opens the shared scene hierarchy with
 checkboxes. Apply the selection, then open **Bind or transfer skin**. Choose
 **Automatic (surface heat)** and check **Bind explicitly selected meshes** to
-bind the selection to the reference rig in one Undo step.
+bind the selection to the reference rig in one Undo step. The screened weight
+solve runs on the selected compute GPU and supports open meshes.
 
 Use **Volume geodesic** for a closed rest mesh with deforming bones inside it.
 Set **Volume cell size (mm)** to resolve the thinnest material that must carry

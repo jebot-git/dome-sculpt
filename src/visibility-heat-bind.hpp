@@ -2,93 +2,11 @@
 #pragma once
 #include "visibility-geodesic-bind.hpp"
 #include "screened-continuation-solve.hpp"
+#include "surface-heat-field.hpp"
 #include "closed-mesh-source-domain.hpp"
 namespace dome::detail {
 enum class HeatDomainPolicy { IntrinsicSurface, ClosedMaterial, ComponentHandleSupport };
 namespace visibility_heat {
-// Same bounded IC-PCG linear solve as continuation, with no probability-range
-// requirement on a signed residual CORRECTION. Original fields are certified
-// separately after one fixed true-residual iterative-refinement pass.
-template <class System, class Budget, class Preconditioner>
-void solve_linear(const System &s, std::span<const double> rhs,
-                        std::span<double> x, Preconditioner &ic, Budget &budget,
-                        ContinuationReport &report) {
-  const size_t n = rhs.size();
-  std::vector<double> r(rhs.begin(), rhs.end()), z(n), p(n), ap(n);
-  std::fill(x.begin(), x.end(), 0);
-  double squared = 0;
-  for (double v : rhs) {
-    budget.step();
-    squared += v * v;
-  }
-  if (!squared)
-    throw std::runtime_error("Continuation omitted an eligible control");
-  double scale = std::sqrt(squared);
-  ic.apply(r, z, budget);
-  p = z;
-  double rho = std::inner_product(r.begin(), r.end(), z.begin(), 0.);
-  budget.step(n * 2);
-  for (size_t iteration = 0; iteration < 4096; ++iteration) {
-    budget.stop();
-    s.multiply(p, ap, budget);
-    double curvature = std::inner_product(p.begin(), p.end(), ap.begin(), 0.);
-    budget.step(n);
-    if (!(curvature > 0) || !(rho > 0) || !std::isfinite(curvature))
-      throw std::runtime_error("Continuation PCG lost positive curvature");
-    double alpha = rho / curvature, error = 0;
-    budget.step(n * 2);
-    for (size_t i = 0; i < n; ++i) {
-      x[i] += alpha * p[i];
-      r[i] -= alpha * ap[i];
-      error += r[i] * r[i];
-    }
-    ++report.iterations;
-    if (std::sqrt(error) <= 1e-9 * scale || iteration == 4095) {
-      s.multiply(x, ap, budget);
-      error = 0;
-      budget.step(n);
-      for (size_t i = 0; i < n; ++i) {
-        r[i] = rhs[i] - ap[i];
-        error += r[i] * r[i];
-      }
-      double residual = std::sqrt(error) / scale;
-      if (residual <= 1e-9) {
-        report.residual = std::max(report.residual, residual);
-        return;
-      }
-      if (iteration == 4095)
-        break;
-      ic.apply(r, z, budget);
-      p = z;
-      rho = std::inner_product(r.begin(), r.end(), z.begin(), 0.);
-      budget.step(n * 2);
-      continue;
-    }
-    ic.apply(r, z, budget);
-    double next = std::inner_product(r.begin(), r.end(), z.begin(), 0.);
-    double beta = next / rho;
-    budget.step(2 * n);
-    for (size_t i = 0; i < n; ++i)
-      p[i] = z[i] + beta * p[i];
-    rho = next;
-  }
-  throw std::runtime_error("Continuation failed original residual bound");
-}
-
-template<class System,class Preconditioner>
-void refined_solve(const System&s,std::span<const double>rhs,std::span<double>x,
-    Preconditioner&ic,weight_surface::Budget&work,ContinuationReport&report){
-  solve_linear(s,rhs,x,ic,work,report);
-  std::vector<double>defect(rhs.size()),correction(rhs.size()),ap(rhs.size());
-  s.multiply(x,ap,work);double norm=0,original=0;
-  for(size_t i=0;i<rhs.size();++i){work.step(4);defect[i]=rhs[i]-ap[i];norm+=defect[i]*defect[i];original+=rhs[i]*rhs[i];}
-  if(norm>0){solve_linear(s,defect,correction,ic,work,report);for(size_t i=0;i<x.size();++i){work.step();x[i]+=correction[i];}}
-  s.multiply(x,ap,work);double error=0;
-  for(size_t i=0;i<x.size();++i){work.step(4);const auto value=x[i];if(!std::isfinite(value)||value < -1e-9||value > 1+1e-9)throw std::runtime_error("Refined heat violates original maximum principle");report.minimum=std::min(report.minimum,value);const double e=rhs[i]-ap[i];error+=e*e;}
-  const double residual=std::sqrt(error/original);
-  if(!std::isfinite(residual)||residual>1e-9)throw std::runtime_error("Refined heat violates original replayed residual");report.residual=std::max(report.residual,residual);
-}
-
 struct Prepared {
   weight_surface::System system;
   size_t visible=0,occluded=0;
@@ -108,7 +26,7 @@ inline Prepared prepare(const Mesh&m,const Skeleton&rig,BindOptions options,
      !options.limits.max_influences||options.limits.max_influences>32||!std::isfinite(options.limits.prune)||options.limits.prune<0||options.limits.prune>=1)
     throw std::invalid_argument("Invalid positive visibility heat domain/options");
   // Concurrent CSR/map construction, exact owning BVH/scratch, source masks,
-  // IC factors, all PCG vectors and staged top-K raw output are forecast first.
+  // IC factors, device CSR and PCG vectors, plus staged top-K output, are forecast first.
   bytes.add(65536);bytes.add(n,1024+2*(sizeof(VertexWeights)+options.limits.max_influences*sizeof(Influence)+64));bytes.add(corners,384);bytes.add(bones,2048+4*sizeof(RigMatrix));
   work.step_items(n,4);work.step_items(corners,4*std::bit_width(corners+1)+4);work.step_items(bones,256);
   m.validate();rig.validate();
@@ -222,7 +140,8 @@ inline VisibilityGeodesicResult visibility_heat_bind(const Mesh&m,const Skeleton
   if(maximum_bytes<65536||maximum_bytes>256u*1024u*1024u)throw std::invalid_argument("Heat workspace bound");
   weight_surface::Budget work{0,options.maximum_work,cancelled};work.stop();visibility_geodesic::Bytes bytes{0,maximum_bytes};
   auto prepared=visibility_heat::prepare(m,rig,options,work,bytes,sources,policy);auto&s=prepared.system;const size_t n=m.positions.size();
-  ContinuationIC ic(s,work);std::vector<double>rhs(n),field(n),sum(n);std::vector<VertexWeights>rows(n);for(auto&r:rows)r.reserve(options.limits.max_influences+1);
+  std::optional<visibility_heat::FieldSolver> solver;
+  std::vector<double>rhs(n),field(n),sum(n);std::vector<VertexWeights>rows(n);for(auto&r:rows)r.reserve(options.limits.max_influences+1);
   ContinuationReport proof;
   std::vector<uint32_t>sole(n,UINT32_MAX);
   for(size_t i=0;i<n;++i){work.step(8);auto mask=prepared.component_sources[s.parent[i]];size_t count=0;uint32_t joint=UINT32_MAX;for(size_t k=0;k<4;++k){count+=std::popcount(mask[k]);if(mask[k])joint=uint32_t(k*64+std::countr_zero(mask[k]));}if(count==1)sole[i]=joint;}
@@ -232,7 +151,10 @@ inline VisibilityGeodesicResult visibility_heat_bind(const Mesh&m,const Skeleton
 
   for(uint32_t bone=0;bone<rig.bones.size();++bone)if(rig.bones[bone].deform){
     bool active=false;for(size_t row=0;row<n;++row){work.step(4);bool yes=(s.seeds[row][bone/64]&(uint64_t(1)<<(bone%64)))!=0;rhs[row]=yes&&sole[row]==UINT32_MAX?s.heat[row]/s.ties[row]:0;active|=rhs[row]>0;}
-    if(active)visibility_heat::refined_solve(s,rhs,field,ic,work,proof);else std::fill(field.begin(),field.end(),0);
+    if(active){
+      if(!solver)solver.emplace(s,work);
+      solver->solve(rhs,field,work,proof);
+    }else std::fill(field.begin(),field.end(),0);
     for(size_t row=0;row<n;++row){work.step();if(sole[row]!=UINT32_MAX)field[row]=sole[row]==bone?1.:0.;}
     for(size_t row=0;row<n;++row){work.step(8);sum[row]+=field[row];if(field[row]<=0)continue;auto&r=rows[row];r.push_back({bone,float(field[row])});if(r.size()>options.limits.max_influences){auto small=std::min_element(r.begin(),r.end(),[&](auto a,auto b){work.step();return a.weight==b.weight?a.joint>b.joint:a.weight<b.weight;});r.erase(small);}}
   }

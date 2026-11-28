@@ -68,6 +68,11 @@ public:
       diagonal_[i] = std::sqrt(pivot);
     }
   }
+  const auto &starts() const noexcept {return starts_;}
+  const auto &columns() const noexcept {return columns_;}
+  const auto &values() const noexcept {return values_;}
+  const auto &diagonal() const noexcept {return diagonal_;}
+
   void apply(std::span<const double> rhs, std::span<double> out,
              Budget &budget) const {
     const size_t n = diagonal_.size();
