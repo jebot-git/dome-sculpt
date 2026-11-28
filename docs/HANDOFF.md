@@ -638,9 +638,16 @@ new source triangles and padding. Its native project and both GLBs match
 byte for byte. All 40 focused Arc tests, native DomeD Wayland export,
 synthetic OpenXR export and controller Apply, and the headless sanitizer
 reference pass. CUDA and ROCm Release applications link, and both compute
-fixtures refuse execution without a usable device. Editable-layer footprint
-construction and source staging, Mikk tangent generation and native field
-packing still run on the host.
+fixtures refuse execution without a usable device. When the resident staging
+fits the worker budget, editable layers now upload only authored common tiles,
+prepared color tiles, and packed FLOAT coefficients. The GPU resolves their
+footprints and samples those tiles directly. Layers that need smaller staging
+use the bounded GPU batch path. The paired fixture's editable-layer uploads
+fell from 466,928 to 147,696 bytes, including source tables. Its native project
+and both GLBs match byte for byte. All 40 focused Arc tests, native Wayland
+export, synthetic OpenXR controller Apply and the headless sanitizer
+reference pass. CUDA and ROCm Release builds link and refuse missing devices.
+Mikk tangent generation and native field packing still run on the host.
 Topology-changing transfer remains open.
 [Paired Bake UV evidence](validation/prepared-mtoon-uv-bake-20261128.json)
 [GPU Bake UV evidence](validation/prepared-mtoon-uv-gpu-20261128.json)
@@ -648,6 +655,7 @@ Topology-changing transfer remains open.
 [GPU Bake tangent conversion evidence](validation/prepared-mtoon-uv-normal-gpu-20261128.json)
 [GPU editable paint UV evidence](validation/prepared-mtoon-uv-layer-gpu-20261128.json)
 [GPU Bake UV correspondence evidence](validation/prepared-mtoon-uv-points-gpu-20261128.json)
+[GPU resident editable-layer evidence](validation/prepared-mtoon-uv-resident-gpu-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with

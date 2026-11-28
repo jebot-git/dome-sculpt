@@ -86,11 +86,13 @@ emission from its original dense or packed field and preserves subnormal
 values and the full finite baked radiance range. Apply rejects a result if
 its nonzero energy cannot be represented with the rounded coverage. The
 selected device also filters editable paint from the authored coverage and
-FLOAT data. The worker stages each distinct source texel once per batch and
-reconstructs native sparse tiles from the results. Bake filtering resolves
+FLOAT data. It can resolve editable-layer footprints directly against
+resident sparse source tiles. When resident staging exceeds the worker
+budget, the worker stages each distinct source texel per batch for the GPU.
+It reconstructs native sparse tiles from the results. Bake filtering resolves
 atlas correspondence on the device from the source triangles, padding owners
-and destination barycentric coordinates. Editable-layer source staging, Mikk
-tangent generation and native field storage run on the host.
+and destination barycentric coordinates. Mikk tangent generation and native
+field storage run on the host.
 Independently selectable portable material variants,
 topology-changing transfer and animated UVs remain open.
 

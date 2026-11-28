@@ -202,6 +202,9 @@ The selected GPU also filters editable layers for this UV Apply path,
 including channel-specific coverage, masks, legacy and FLOAT emission.
 For Bake maps, the device resolves the source correspondence and padding
 ownership from the destination triangle and its barycentric coordinates.
+Editable layers can also resolve that correspondence on the device and
+sample native sparse tiles directly. The bounded GPU staging path handles
+layers that exceed the residency budget.
 Topology-changing transfer, broader deformation and physical headset
 workflows remain open.
 [Prepared MToon1 Bake evidence](validation/prepared-mtoon-bake-20261128.json)
@@ -213,6 +216,7 @@ workflows remain open.
 [GPU Bake tangent conversion evidence](validation/prepared-mtoon-uv-normal-gpu-20261128.json)
 [GPU editable paint UV evidence](validation/prepared-mtoon-uv-layer-gpu-20261128.json)
 [GPU Bake UV correspondence evidence](validation/prepared-mtoon-uv-points-gpu-20261128.json)
+[GPU resident editable-layer evidence](validation/prepared-mtoon-uv-resident-gpu-20261128.json)
 
 ## Current validation — 2026-11-27
 
