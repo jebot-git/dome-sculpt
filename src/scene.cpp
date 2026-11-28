@@ -1469,17 +1469,27 @@ Scene::surfaces(bool atlas, const std::function<bool()> &cancelled) const {
 std::vector<ObjectSurface> Scene::preview_surfaces(const std::function<bool()> &cancelled) const {
   return surfaces_impl(false, true, cancelled);
 }
-std::vector<ObjectSurface> Scene::export_surfaces(const std::function<bool()> &cancelled) const {
-  bool sets=false;for(const auto&o:objects_)sets|=o.visible&&bool(o.texture_sets);
-  auto result=sets?preview_surface_bundles(cancelled,{}):preview_surfaces(cancelled);
+namespace {
+std::vector<ObjectSurface> export_surface_views(const Scene &scene,const std::function<bool()> &cancelled,
+                                                 bool allow_paint_atlas) {
+  bool sets=false;for(const auto&o:scene.objects())sets|=o.visible&&bool(o.texture_sets);
+  auto result=sets?scene.preview_surface_bundles(cancelled,{}):scene.preview_surfaces(cancelled);
   for(auto &surface:result){
     if(cancelled&&cancelled())throw std::runtime_error("Source paint export cancelled");
-    const auto &o=object(surface.id);
+    const auto &o=scene.object(surface.id);
     surface.retopo_mtoon_export=detail::RetopoMToonExport::capture(o,cancelled);
     if(o.mesh_active&&o.painted->source_sampling_prepared())
-      detail::source_paint_export(*o.painted,surface,cancelled);
+      detail::source_paint_export(*o.painted,surface,cancelled,allow_paint_atlas);
   }
   return result;
+}
+}
+std::vector<ObjectSurface> Scene::export_surfaces(const std::function<bool()> &cancelled) const {
+  return export_surface_views(*this,cancelled,false);
+}
+std::vector<ObjectSurface> detail::prepare_standard_glb_surfaces(const Scene &scene,
+    const std::function<bool()> &cancelled) {
+  return export_surface_views(scene,cancelled,true);
 }
 std::vector<ObjectSurface> Scene::preview_surfaces(const std::function<bool()> &cancelled, const SculptMesher &mesher) const {
   return surfaces_impl(false, true, cancelled, mesher);

@@ -148,6 +148,114 @@ void certified_paint(const std::filesystem::path &out,const Scene &initial,
         "Partial uniform paint preserves linear color and alpha");
  }
 }
+
+void spatial_paint(const std::filesystem::path &out,const Scene &initial,const ImportAuthoringOptions &options,
+    SurfaceRenderer &native,Fbo &fbo,prepared_normal_consumer::Renderer &consumer) {
+ const auto load=[&](std::string_view tag,bool constant_color,const char *alpha,bool source_orm){
+  auto fixture=source(1,false,alpha,.65f);
+  auto &pbr=fixture.j["materials"][0]["pbrMetallicRoughness"];
+  if(constant_color)pbr["baseColorTexture"]["index"]=1;
+  if(std::string_view(alpha)=="MASK")pbr["baseColorFactor"][3]=1;
+  pbr["roughnessFactor"]=.64f;
+  pbr["metallicFactor"]=.36f;
+  if(source_orm)pbr["metallicRoughnessTexture"]={{"index",0},{"texCoord",1}};
+  const auto input=out/(std::string(tag)+"-input.glb");
+  fixture.save(input);
+  auto scene=prepare_authoring_import(initial,input,options).scene;
+  const auto active=scene.active().id;
+  for(const auto &object:scene.objects())if(object.id!=active)scene.object(object.id).visible=false;
+  scene.active().painted=scene.active().painted->snapshot();
+  return scene;
+ };
+ const auto publish=[&](const Scene &scene,std::string_view tag){
+  const auto exact=scene.encode();
+  Document doc;
+  doc.replace(scene.snapshot());
+  doc.shading(false);
+  settled(doc);
+  const auto reference=draw(native,doc.frame().surface);
+  const auto path=out/(std::string(tag)+".glb"),native_path=out/(std::string(tag)+".dsculpt");
+  auto export_job=doc.export_asset(path);
+  auto save_job=doc.save_async(native_path);
+  export_job.get();
+  save_job.get();
+  color_consumer::Model loaded(path);
+  fbo.bind();
+  consumer.render(loaded.data);
+  const auto error=delta(reference,read());
+  std::cout<<"SPATIAL_STANDARD "<<tag<<" max="<<error<<'\n';
+  check(error<=2,"Independent GLB consumer reproduces spatial paint, original normal and morph");
+  check(doc.copy_scene().encode()==exact&&Scene::load(native_path).encode()==exact,
+        "Direct spatial export and queued Save preserve the full editable owner");
+  return path;
+ };
+ const auto atlas_slot=[&](const cgltf_texture_view &view,const cgltf_primitive &primitive){
+  check(view.texture&&view.texcoord==2&&!view.has_transform&&
+        view.texture->sampler&&view.texture->sampler->min_filter==cgltf_filter_type_linear&&
+        view.texture->sampler->mag_filter==cgltf_filter_type_linear&&
+        view.texture->sampler->wrap_s==cgltf_wrap_mode_clamp_to_edge,
+        "Varying paint samples its own clamped linear TEXCOORD_2 atlas");
+  const auto uv=prepared_normal_consumer::attr(primitive.attributes,primitive.attributes_count,cgltf_attribute_type_texcoord,2);
+  check(uv&&uv->count==prepared_normal_consumer::attr(primitive.attributes,primitive.attributes_count,cgltf_attribute_type_position)->count,
+        "Independent writable UVs have their exact emitted vertex count");
+ };
+ PaintSettings settings;
+ settings.front_only=false;
+ settings.color={.19f,.74f,.24f,.52f};
+ auto color=load("spatial-color",true,"BLEND",true);
+ paint_uniform(*color.active().painted,settings,.28f);
+ color.active().painted->add_layer("Painted light");
+ settings.channel=PaintChannel::Emission;
+ settings.emission={.08f,.15f,.048f};
+ paint_uniform(*color.active().painted,settings,.22f);
+ const auto path=publish(color,"spatial-color");
+ color_consumer::Model painted(path);
+ const auto &p=painted.data->meshes[0].primitives[0];
+ const auto &m=*p.material;
+ atlas_slot(m.pbr_metallic_roughness.base_color_texture,p);
+ atlas_slot(m.emissive_texture,p);
+ check(m.normal_texture.texcoord==1&&m.pbr_metallic_roughness.metallic_roughness_texture.texcoord==1&&
+       m.pbr_metallic_roughness.metallic_roughness_texture.texture->sampler->wrap_s==cgltf_wrap_mode_mirrored_repeat,
+       "Alternate normal and ORM keep their original UVs and sampler while color and emission share the new atlas");
+ const auto parsed_atlas=prepared_normal_consumer::image(m.pbr_metallic_roughness.base_color_texture.texture);
+ check(parsed_atlas.width==64&&parsed_atlas.height==64,"Standard GLB uses the exact authored paint raster size");
+
+ auto orm=load("spatial-orm",false,"OPAQUE",false);
+ settings.channel=PaintChannel::Metallic;settings.metallic=.54f;
+ paint_uniform(*orm.active().painted,settings,.27f);
+ settings.channel=PaintChannel::Roughness;settings.roughness=.82f;
+ paint_uniform(*orm.active().painted,settings,.21f);
+ color_consumer::Model orm_file(publish(orm,"spatial-orm"));
+ const auto &op=orm_file.data->meshes[0].primitives[0];
+ atlas_slot(op.material->pbr_metallic_roughness.metallic_roughness_texture,op);
+ check(op.material->pbr_metallic_roughness.base_color_texture.texcoord==1&&op.material->normal_texture.texcoord==1,
+       "Metal and roughness can share an atlas while textured color and normal stay on UV1");
+
+ auto covered=load("spatial-cover",false,"MASK",false);
+ settings.channel=PaintChannel::Color;
+ settings.color={.73f,.19f,.22f,1};
+ paint_uniform(*covered.active().painted,settings);
+ settings.color={.21f,.44f,.82f,1};
+ paint_uniform(*covered.active().painted,settings,.26f);
+ color_consumer::Model mask(publish(covered,"spatial-cover"));
+ const auto &mp=mask.data->meshes[0].primitives[0];
+ atlas_slot(mp.material->pbr_metallic_roughness.base_color_texture,mp);
+ check(mp.material->alpha_mode==cgltf_alpha_mode_mask&&mp.material->pbr_metallic_roughness.base_color_factor[3]==1,
+       "Fully covered spatial paint replaces an original varying image with exact constant alpha at the MASK cutoff");
+
+ auto unsafe=load("spatial-mask-refusal",true,"MASK",true);
+ settings.color[3]=.36f;
+ paint_uniform(*unsafe.active().painted,settings,.26f);
+ const auto before=unsafe.encode();
+ Document strict;
+ strict.replace(unsafe.snapshot());
+ const auto refused=out/"spatial-refused.glb";
+ {std::ofstream previous(refused,std::ios::binary);previous<<"existing GLB";}
+ auto rejected=strict.export_asset(refused);
+ check(rejects([&]{rejected.get();})&&strict.copy_scene().encode()==before&&
+       file_bytes(refused)==std::vector<uint8_t>({'e','x','i','s','t','i','n','g',' ','G','L','B'}),
+       "Varying alpha that cannot preserve an exact MASK cutoff leaves the previous file and native project intact");
+}
 }
 int main(int argc,char **argv)try{
  if(argc<2||argc>3)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
@@ -187,5 +295,6 @@ int main(int argc,char **argv)try{
   }
  }
  certified_paint(out,initial,options,native,fbo,separate_roles);
+ spatial_paint(out,initial,options,native,fbo,separate_roles);
  std::cout<<"PASS "<<checks<<" source-aware original standard export checks maxerror="<<maximum<<'\n';return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

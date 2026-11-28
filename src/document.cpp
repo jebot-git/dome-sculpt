@@ -8,6 +8,7 @@
 #include "emission-control-scale.hpp"
 #include "emission-source-info.hpp"
 #include "dome/document.hpp"
+#include "source-paint-export.hpp"
 #include "texture-set-bake.hpp"
 #include "skin-methods.hpp"
 #include "native-paint-sampling.hpp"
@@ -4228,7 +4229,8 @@ void Document::file_loop() {
           job->scene.require_exportable_sources();
           const bool physical=detail::requires_native_emission_package(job->scene,cancelled);
           auto native_owner=physical?std::make_shared<const Scene>(job->scene.snapshot()):nullptr;
-          auto surfaces = physical?emission_export_surfaces(*native_owner,cancelled):job->scene.export_surfaces(cancelled);
+          auto surfaces = physical?emission_export_surfaces(*native_owner,cancelled):
+              detail::prepare_standard_glb_surfaces(job->scene,cancelled);
           for (auto &surface : surfaces)
             if (!surface.texture_set_surface && surface.mesh.uv.empty()) unwrap(surface.mesh,1024,4,cancelled);
           GltfExportOptions options; options.recompute_changed_normals = true;
