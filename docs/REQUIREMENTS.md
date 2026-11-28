@@ -44,9 +44,18 @@ grid. Color and prepared PBR, ORM with separate occlusion, and emission keep
 their respective output dimensions within the existing limits of 8,192 texels
 per side and 16,777,216 pixels per image. Paint, padding and Bake sample the original
 native grid. Device readback is bounded and carries the requested planes for
-each output size. Independent retained paint coordinates, physical FLOAT
-emission and other source-aware baking still need GPU coverage.
+each output size. Independent retained paint coordinates and other source-aware
+baking still need GPU coverage.
 [Larger source texture evidence](validation/large-source-texture-gpu-20261128.json)
+
+Native HDR package export and exact replay now compose FLOAT emission
+scanlines on the selected GPU for eligible writable rasters. The device reads
+legacy Bake bytes and dense or compact FLOAT Bake, applies masked layers in
+order and resolves the original UV0 background. Legacy and physical Bake
+retain their binary32 and binary64 rounding rules. The host reads bounded
+chunks for OpenEXR and portable GLB encoding. Typed MToon source sampling and
+finite authoring resampling still need GPU adapters.
+[FLOAT emission raster evidence](validation/float-emission-raster-gpu-20261128.json)
 
 ## Current validation — 2026-11-27
 

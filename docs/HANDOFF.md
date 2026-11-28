@@ -182,6 +182,21 @@ ROCm compile and refuse missing devices. Independent retained-coordinate
 workflows remain open.
 [Larger source texture evidence](validation/large-source-texture-gpu-20261128.json)
 
+Native HDR package export and exact replay now compose ordered FLOAT emission
+on the selected GPU. It uploads packed layer coefficients and legacy, dense
+or compact Bake data once per raster, then reads detached scanlines. Arc
+matches all ten FLOAT values per texel against the preceding host raster,
+including subnormal Bake coverage, hidden layers, masked paint and rotated
+source UV0. A separate oneAPI kernel for Bake without emission layers or a
+sampled background keeps that first device compilation below one second in
+the focused fixture. The general layered program still has a multi-second
+first compilation. The 2048² Standard GLB matches byte for byte across the
+previous build, the current file worker, nested DomeD Wayland and synthetic
+OpenXR. Across three fresh process pairs, the median complete export took
+13.95 seconds on the new path and 10.84 seconds on the preceding revision.
+Typed MToon source sampling and finite Editable resampling remain open.
+[FLOAT emission raster evidence](validation/float-emission-raster-gpu-20261128.json)
+
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
 their hashes verified and their workspace paths preserved. The same sweep

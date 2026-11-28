@@ -1,0 +1,189 @@
+{
+  "date": "2026-11-28",
+  "product_commit": "9f8becdbac126cc5e668858be25b6559069a885d",
+  "previous_published_commit": "4b7bdc3bac75de28c7a19a544b54c432d5a3d27d",
+  "domed_toolkit_commit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "gpu": "Intel Arc A770 / PCI 0000:03:00.0 / renderD129",
+  "scope": "Native writable HDR package export/replay with constant or original UV0 background and ordered editable emission. Typed MToon image sampling and finite Editable GLB resampling remain open.",
+  "application": {
+    "file": "artifacts/float-emission-raster-bake-20261128/evidence/oneapi/dome-sculpt",
+    "sha256": "d0c8867ba7fceaefadc0cee2a1972ccf698583f02287b73c6d4d6bd5a6ac0d17"
+  },
+  "focused_release": {
+    "report": {
+      "file": "artifacts/float-emission-raster-bake-20261128/evidence/oneapi/float-emission-raster-gpu.xml",
+      "sha256": "9edc08cf0f82317961df83a84d06001969e616db058c0bd6d8d8d5d57620ad91"
+    },
+    "passed": 10,
+    "tests": [
+      "baked-emission-native",
+      "emission-raster-compute",
+      "baked-emission-workflow",
+      "baked-emission-source",
+      "baked-emission-uv1-worker",
+      "baked-emission-gpu",
+      "emission-exr-owned",
+      "native-paint32-emission",
+      "native-paint32-emission-mixed",
+      "native-paint32-emission-contracts"
+    ]
+  },
+  "exact_compute_fixture": {
+    "program": {
+      "file": "artifacts/float-emission-raster-bake-20261128/evidence/oneapi/dome-sculpt-emission-raster-compute-test",
+      "sha256": "6b9f2ce837031d77e9e9e1c54ed1a4b8a726921fb340c46010243a5cafd662e2"
+    },
+    "log": {
+      "file": "artifacts/float-emission-raster-bake-20261128/shared-arithmetic.log",
+      "sha256": "9c8ea4eec73e2c8002e81c04a98476860640c24081cce365d22c0a94f5751018"
+    },
+    "pixels_compared_per_mode": 262144,
+    "binary32_values_per_pixel": 10,
+    "milliseconds_by_fixture": {
+      "4": {
+        "device_milliseconds": 445,
+        "prior_host_milliseconds": 10
+      },
+      "0": {
+        "device_milliseconds": 7271,
+        "prior_host_milliseconds": 21
+      },
+      "1": {
+        "device_milliseconds": 13,
+        "prior_host_milliseconds": 27
+      },
+      "2": {
+        "device_milliseconds": 47,
+        "prior_host_milliseconds": 22
+      },
+      "3": {
+        "device_milliseconds": 6,
+        "prior_host_milliseconds": 24
+      }
+    },
+    "mode_order": [
+      "Bake without layers or source image",
+      "Layered original UV0 without Bake",
+      "Legacy Bake with paint",
+      "Dense FLOAT Bake with paint",
+      "Packed FLOAT Bake with paint"
+    ],
+    "scope": "Cold first read for each separate GPU program. Subsequent cases within the same program reuse compiled code."
+  },
+  "synthetic_openxr": {
+    "report": {
+      "file": "artifacts/float-emission-raster-bake-20261128/evidence/xr/report.json",
+      "sha256": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7"
+    },
+    "passed": 10,
+    "renderer": {
+      "file": "artifacts/float-emission-raster-bake-20261128/evidence/xr/graphics.json",
+      "sha256": "f5e95dd9e30ec72eea9479f466264871592da5c103ee4706bf37ac1cdda2751e"
+    },
+    "scope": "Actual application, loader and stereo hardware GL. Controller Standard export, focus-loss rejection and exact native Save."
+  },
+  "nested_domed_wayland": {
+    "report": {
+      "file": "artifacts/float-emission-raster-bake-20261128/evidence/wayland/report.json",
+      "sha256": "1479f58dde45a6650ec4a86a27bfa78dbff2a7235cf3bac585efc465832f849d"
+    },
+    "passed": 7,
+    "compositor_log": {
+      "file": "artifacts/float-emission-raster-bake-20261128/evidence/wayland/compositor.log",
+      "sha256": "b025e7759a85bef2e23e15c2bbb8f446f75ad786fb9afbd2055579ecc44e1650"
+    },
+    "scope": "Native menu, export chooser, cancellation and exact GLB. Outer Xvfb presentation is limited by lack of DRI3."
+  },
+  "headless_sanitizer": {
+    "emission-raster-compute.cpp.log": {
+      "file": "artifacts/float-emission-raster-bake-20261128/evidence/asan/emission-raster-compute.cpp.log",
+      "sha256": "f93fe5d8a263345ed507b3664d1c93145278a5421d37d2bd715632e2b40412a0"
+    },
+    "baked-emission-workflow.cpp.log": {
+      "file": "artifacts/float-emission-raster-bake-20261128/evidence/asan/baked-emission-workflow.cpp.log",
+      "sha256": "536147bd07f4599ce084da08c68ff6a90df3f2f2bffc3968db5dbe39fc3606c3"
+    }
+  },
+  "sanitizer_scope": "Changed host raster/export sources rebuilt against the preceding instrumented headless reference archive.",
+  "missing_devices": {
+    "oneapi": {
+      "file": "artifacts/float-emission-raster-bake-20261128/missing-device.log",
+      "sha256": "df977c1d37da2e1f6b8b345f9f29500647b4997d32099c1cdb7ce648eeba24cc"
+    },
+    "cuda": {
+      "file": "artifacts/float-emission-raster-bake-20261128/cuda-missing.log",
+      "sha256": "b86acfcc198c76dc98b4996d8de8972cb090df338fee38c43013947e5ef20658"
+    },
+    "rocm": {
+      "file": "artifacts/float-emission-raster-bake-20261128/rocm-missing.log",
+      "sha256": "ace1d3c28d071bd6fdad01328ccc74b33ad132361cad8c7c7a4eaef2d6d859e9"
+    }
+  },
+  "whole_application_export": {
+    "input": {
+      "file": "artifacts/hdr-portable-streaming-20261127/release/full-resolution-fixture/portable-varied-hdr-native.dsculpt",
+      "sha256": "ffa7df8ffffecc80f9f468e53cef4fbea3f79f4529293a9ce69255c42a9431a9"
+    },
+    "exact_standard_glb": {
+      "file": "artifacts/float-emission-raster-bake-20261128/evidence/standard.glb",
+      "sha256": "a02a7d0d51fb2425d542994f5434848f65b36f0d1cf42f0ab25c4b48734f420d"
+    },
+    "package_version": 5,
+    "bake_kernel_dispatches": 384,
+    "selected_device_trace": {
+      "file": "artifacts/float-emission-raster-bake-20261128/export-trace.log",
+      "sha256": "7e84eee06b5fb498fb3d508f9eeb6a99c1f2dc4ba5d40a297e10f74b6de144f7"
+    },
+    "source_resolution": [
+      2048,
+      2048
+    ],
+    "timing_scope": "Three alternating fresh before/after processes. Includes project open, first device compilation, render-worker preparation and file encoding.",
+    "before": {
+      "runs": [
+        {
+          "file": "artifacts/float-emission-raster-bake-20261128/export-before-1.time",
+          "sha256": "c034d4ccdfeea9c298ba45325a2409a94fa0c8da87159e89b4fab6638f96db94",
+          "seconds": 11.9,
+          "maximum_rss_kib": 1888
+        },
+        {
+          "file": "artifacts/float-emission-raster-bake-20261128/export-before-2.time",
+          "sha256": "77809ae9939106f76a61cd91178c6ca26132689daf23f4a7f882e664f2dbe333",
+          "seconds": 10.84,
+          "maximum_rss_kib": 1896
+        },
+        {
+          "file": "artifacts/float-emission-raster-bake-20261128/export-before-3.time",
+          "sha256": "e917711fc829298783e161a2c0bb4c02982df8d4e47d25b63764197c7505d97c",
+          "seconds": 10.7,
+          "maximum_rss_kib": 1888
+        }
+      ],
+      "median_seconds": 10.84
+    },
+    "after": {
+      "runs": [
+        {
+          "file": "artifacts/float-emission-raster-bake-20261128/export-after-1.time",
+          "sha256": "c4e2c5e01ddb3095a348d882a2c9f8083b3b0634725cc53ac894d62313f46a52",
+          "seconds": 13.95,
+          "maximum_rss_kib": 1704
+        },
+        {
+          "file": "artifacts/float-emission-raster-bake-20261128/export-after-2.time",
+          "sha256": "bfb30d635f6df1780729233f2e5e092f92f673ef99b8d688d056eb6d2c2a5b8a",
+          "seconds": 13.27,
+          "maximum_rss_kib": 1708
+        },
+        {
+          "file": "artifacts/float-emission-raster-bake-20261128/export-after-3.time",
+          "sha256": "ef43c0a2c4275a7cb314ce3d69f7039474e45bd9bdf2a09b4281c8ca304c74ba",
+          "seconds": 14.6,
+          "maximum_rss_kib": 1896
+        }
+      ],
+      "median_seconds": 13.95
+    }
+  }
+}
