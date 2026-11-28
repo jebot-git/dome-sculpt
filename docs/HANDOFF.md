@@ -385,9 +385,8 @@ The Arc export fixture and the headless ASan/UBSan reference each pass
 ORM, and partial coverage over a constant source image. Seven focused
 Release tests pass. Nested DomeD Wayland and the native OpenXR loader with
 synthetic input produce the same Standard GLB as the file worker.
-Partial paint over a varying source with a nonzero added color still
-requires explicit portable baking. The refusal controls preserve the
-previous file and execute the following native Save.
+The refusal controls preserve the previous file and execute the
+following native Save when a mixed field requires portable baking.
 [Standard GLB source paint evidence](validation/strict-source-paint-glb-20261128.json)
 
 Prepared-source HDR Editable GLB now samples the original emissive role,
@@ -449,6 +448,24 @@ Twelve focused Release tests pass. The Arc and headless sanitizer runs
 each pass 433 checks. The Standard GLB file worker, native menu, and
 synthetic OpenXR controller selection preserve the exact editable project.
 [Spatial Standard GLB evidence](validation/spatial-source-paint-glb-20261128.json)
+
+A uniform partially opaque coat over a varying original texture can now
+stay on that texture's own UVs in Standard GLB. The selected GPU applies
+an affine transform in linear light to original texels for base color,
+metallic-roughness, and emission. Pure scaling stays in material factors.
+Original dimensions and sampler settings survive, along with normal and
+occlusion roles and unpainted components of a shared packed image.
+Constant mask alpha stays in an exact material factor. Independently
+varying paint and background fields and varying mask alpha without a
+cutoff proof still need the explicit portable export.
+
+The two 193 × 89 fixtures pass Khronos validation, per-texel comparison
+and independent rendering within one output byte on Arc. Twelve focused
+Release tests pass. The Arc and headless sanitizer suites each pass 457
+checks. Native DomeD Wayland and synthetic OpenXR emit the same coated
+GLB as the file worker. CUDA and ROCm compile the texel rewrite and
+refuse missing hardware.
+[Uniform source coat evidence](validation/uniform-source-coat-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with

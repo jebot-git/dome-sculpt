@@ -130,6 +130,12 @@ binding. General mixed independent sampling and physical headset
 qualification remain open.
 [Spatial Standard GLB evidence](validation/spatial-source-paint-glb-20261128.json)
 
+A uniform partial coat over a varying source map now stays on its
+original UVs in Standard GLB. The selected GPU transforms source texels
+in linear light for color, metallic-roughness and emission. The export
+keeps the sampler, original image size, and untouched packed channels.
+[Uniform source coat evidence](validation/uniform-source-coat-20261128.json)
+
 ## Current validation — 2026-11-27
 
 The [current handoff](HANDOFF.md) records the exact combined Release, Arc,

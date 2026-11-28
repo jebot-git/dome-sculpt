@@ -1,0 +1,85 @@
+{
+  "date": "2026-11-28",
+  "product": "f9a293e48cce217485c06a72e59b88d988e8416b",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Uniform partial Core PBR paint over varying original images in Standard GLB.",
+  "admission": {
+    "proof": "A uniform premultiplied addition and coverage make each output channel affine in its source sample. Rescale material factors and encode rewritten original texels through the selected backend.",
+    "textures": "Original UV sets, affine texture transform, wrapping and filters including mip selection.",
+    "packing": "Normal, occlusion and untouched packed red, roughness and alpha bytes remain exact.",
+    "masked_alpha": "Constant alpha keeps its exact scalar factor. Refusal of unproved varying alpha preserves the prior export and native owner.",
+    "size_for_test": [
+      193,
+      89
+    ],
+    "texels_compared_per_role": 17177
+  },
+  "arc": {
+    "device": "Intel Arc A770, oneAPI Level Zero and hardware EGL",
+    "checks": 457
+  },
+  "release_ctest": [
+    "emission-raster-finite-compute",
+    "source-material-raster-compute",
+    "emission-raster-mapped-compute",
+    "emission-raster-mapped-missing-gpu",
+    "emission-raster-texture-set-compute",
+    "source-paint-export",
+    "source-paint-bake",
+    "source-paint-authoring",
+    "source-paint-physical-authoring",
+    "vrm1-source-export",
+    "raw-hdr-authoring",
+    "xr-editable-export"
+  ],
+  "asan_ubsan": {
+    "mode": "opt-in headless CPU reference",
+    "checks": 457
+  },
+  "fixtures": {
+    "uniform-coat": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 9440,
+      "sha256": "46fa973d49b84e51227102181a397a220b179df61a1b56bae704f60a2d91e759",
+      "errors": 0,
+      "warnings": 0,
+      "arc_render_error_bytes": 1
+    },
+    "uniform-masked": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 8616,
+      "sha256": "0e71640d3acbd4900d4b02b2db9274e2817a4ea2f9886ccae58ab2b444811123",
+      "errors": 0,
+      "warnings": 0,
+      "arc_render_error_bytes": 1
+    }
+  },
+  "prior_glbs_byte_identical": {
+    "certified-pristine.glb": "aaa46fe3a471e370fbe3a79faebfdf12883642ccee98d75fe892ee9886f7c244",
+    "certified-mask-only.glb": "aaa46fe3a471e370fbe3a79faebfdf12883642ccee98d75fe892ee9886f7c244",
+    "certified-factors.glb": "41d7b80eab1fa1bc7b4adead9bc31ae2f1cd9637f3e0697ef6757c632ed7bf53",
+    "spatial-color.glb": "e68f51a66633e6f97b50b960578072e9968b38851e87419a4027ff42e54824a0",
+    "spatial-orm.glb": "9b48b8c432f9c434719b7399d0be6f33958908b6c6ec7eb772dbfdf3f4eb9cd8",
+    "spatial-cover.glb": "4d01f02d33a75905bf9cb660bf8f13d30082955de757d6eea742348503eb9f34"
+  },
+  "native_wayland": {
+    "checks": 7,
+    "artifact_sha256": "46fa973d49b84e51227102181a397a220b179df61a1b56bae704f60a2d91e759"
+  },
+  "openxr": {
+    "checks": 10,
+    "synthetic_tracking": true,
+    "artifact_sha256": "46fa973d49b84e51227102181a397a220b179df61a1b56bae704f60a2d91e759",
+    "before_and_after_native_sha256": "0d462d552f252e25fd8670db9527dfbd623824ca4df6abe844404b4f149aedc2"
+  },
+  "device_admission": {
+    "oneapi": "Arc A770 trace launches the texel conversion kernel.",
+    "cuda": "Kernel compiled. No usable driver.",
+    "rocm": "Kernel compiled. No eligible device."
+  },
+  "open": [
+    "General varying paint over independently varying source textures.",
+    "Mask cutoffs when the affine alpha varies.",
+    "Physical headset and positive CUDA and ROCm testing."
+  ]
+}
