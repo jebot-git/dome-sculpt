@@ -112,7 +112,9 @@ class GpuApi {
 public:
   using Precision=surface_ray::NativePrecision;
   using Progress=ProjectionProgress<Precision::Scalar>;
-  GpuApi(){checked(DOME_GPU(StreamCreateWithFlags)(&stream_,DOME_GPU(StreamNonBlocking)));}
+  explicit GpuApi(const paint_compute::MaterialAtlas * = nullptr){
+    checked(DOME_GPU(StreamCreateWithFlags)(&stream_,DOME_GPU(StreamNonBlocking)));
+  }
   ~GpuApi(){(void)DOME_GPU(StreamDestroy)(stream_);}
   void *allocate(size_t bytes){
     void *pointer=nullptr;
@@ -200,8 +202,8 @@ std::unique_ptr<bake_raster::Raster> bake_raster::create(std::span<const float> 
   return create_device<bake_rays::GpuApi>(axis,writable);
 }
 std::unique_ptr<bake_material::Sampler> bake_material::upload(const ImageInput (&roles)[RoleCount],Parameters parameters,
-    const PaintOverlayPacket *overlay,const std::function<bool()> &cancelled){
-  return std::make_unique<DeviceSampler<bake_rays::GpuApi>>(roles,parameters,overlay,cancelled);
+    const PaintOverlayPacket *overlay,const std::function<bool()> &cancelled,const paint_compute::MaterialAtlas *atlas){
+  return std::make_unique<DeviceSampler<bake_rays::GpuApi>>(roles,parameters,overlay,cancelled,atlas);
 }
 } // namespace dome::detail
 #undef DOME_GPU

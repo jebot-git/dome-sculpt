@@ -212,6 +212,11 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o,
   for (size_t field=0;field<source.materials.size();++field) {
     const auto &m=source.materials[field];
     const bool owns_field=!retained.empty()&&bool(retained[field].sample);
+    const auto *atlas=retained.empty()?nullptr:retained[field].atlas.get();
+    if(atlas&&(!owns_field||!m.maps||m.maps->source_only||!m.maps_are_composited||!m.maps->overlay||
+       atlas->resolution()!=m.maps->overlay->resolution()||
+       bool(atlas->plane(2))==retained[field].emission_background.has_value()))
+      throw std::invalid_argument("Resident atlas differs from its retained Bake material owner");
     m.material.validate();
     if(m.emission_batch){
       const auto &batch=*m.emission_batch;
@@ -259,6 +264,10 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o,
               throw std::invalid_argument("Physical source emission requires its explicit radiance-preserving bake adapter");
           }
         if(m.maps->color.width||m.maps->metal_rough.width||m.maps->emission.width||m.maps->normal.width)throw std::invalid_argument("Raw bake source cannot also contain derived maps");
+      }else if(atlas){
+        for(const auto *image:{&m.maps->color,&m.maps->metal_rough,&m.maps->emission,&m.maps->pbr_color})
+          if(image->width||image->height||!image->rgba.empty())
+            throw std::invalid_argument("Resident Bake atlas conflicts with a host material image");
       }else{
         m.maps->color.validate();
         m.maps->metal_rough.validate();
@@ -714,7 +723,8 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     const auto &material=source.materials[i];
     const PaintSourceTexture *retained_image=retained_field(i)?&source_fields[i].normal_image:nullptr;
     const auto &input=material_inputs.emplace_back(material,o.separate_pbr_color,
-        sample_normals&&needs_map(i)?normal_image(material):nullptr,sample_normals,retained_image);
+        sample_normals&&needs_map(i)?normal_image(material):nullptr,sample_normals,retained_image,
+        retained_field(i)?source_fields[i].atlas.get():nullptr);
     device_material[i]=input.needs_sampling();
     have_device_materials|=device_material[i];
   }
@@ -748,7 +758,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
         }
         if(resident_input!=material_id){
           material_sampler.reset();
-          material_sampler=shade_device::upload(input.images,input.parameters,input.overlay,o.cancelled);
+          material_sampler=shade_device::upload(input.images,input.parameters,input.overlay,o.cancelled,input.atlas);
           resident_input=material_id;
         }
         const auto count=end-first;

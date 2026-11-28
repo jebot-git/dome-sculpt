@@ -23,6 +23,7 @@
 #include "texture-set-bake.hpp"
 #include "texture-set-field-source.hpp"
 #include "polygon-surface-preview.hpp"
+#include "paint-composite-backend.hpp"
 #include "baked-normal-field.hpp"
 #include "gltf-document.hpp"
 #include "cgltf.h"
@@ -800,7 +801,18 @@ void retained_bake_source(bool prepared,bool physical,bool affine=false,bool ref
   const auto member=texture_set_view(source_object,set);
   const auto read=member.source->read_view(member);
   const auto maps=detail::PolygonSurfacePaintCodec::preview(*read,member.material_bindings,member.material);
-  const auto bake_maps=detail::PolygonSurfacePaintCodec::preview_for_bake(member,{});
+  const auto budgeted=detail::PolygonSurfacePaintCodec::preview_for_bake(member,{},0);
+  check(!budgeted.atlas,"Retained Bake respects the shared device atlas budget");
+  const auto &bake_maps=budgeted.maps;
+  if(compute_backend()!="CPU"){
+   const size_t atlas_bytes=size_t(read->resolution())*read->resolution()*(physical?8:12);
+   const auto resident=detail::PolygonSurfacePaintCodec::preview_for_bake(member,{},atlas_bytes);
+   check(resident.atlas&&resident.atlas->bytes()==atlas_bytes&&resident.atlas->resolution()==read->resolution()&&
+         bool(resident.atlas->plane(2))==!physical&&resident.maps->color.rgba.empty()&&
+         resident.maps->metal_rough.rgba.empty()&&resident.maps->emission.rgba.empty()&&
+         resident.maps->baked_base==bake_maps->baked_base&&resident.maps->normal.rgba==bake_maps->normal.rgba,
+         "Retained Bake accepts an exact-fit atlas without host copies and keeps its original normal owner");
+  }
   const auto same_image=[](const Image &a,const Image &b){
    return a.width==b.width&&a.height==b.height&&a.rgba==b.rgba;
   };

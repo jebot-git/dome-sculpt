@@ -3,7 +3,9 @@
 #include "paint-composite-kernel.hpp"
 #include <array>
 #include <functional>
+#include <memory>
 #include <span>
+#include <stdexcept>
 #include <vector>
 namespace dome::paint_compute {
 struct BakeImages {
@@ -190,6 +192,40 @@ void visit_native_tile_uploads(const Input &,
 // Selected backend only: all image results remain detached until every chunk
 // and the final cancellation check succeed. No renderer/model memory aliases.
 Result composite(const Input &,const std::function<bool()> &cancelled={});
+// Three native RGB8/RGBA8 planes shared directly with the Bake sampler.
+// The allocation lives through all sampling batches and owns no scene data.
+class MaterialAtlas {
+  struct Storage;
+  friend struct MaterialAtlasSyclAccess;
+  std::shared_ptr<Storage> storage_;
+  OutputView planes_;
+  uint32_t resolution_;
+
+  MaterialAtlas(std::shared_ptr<Storage> storage,uint8_t *pixels,uint32_t resolution,bool emission)
+      :storage_(std::move(storage)),resolution_(resolution) {
+    const size_t plane_bytes=size_t(resolution)*resolution*4;
+    planes_.images[0]=pixels;
+    planes_.images[1]=pixels+plane_bytes;
+    if(emission)planes_.images[2]=pixels+2*plane_bytes;
+  }
+public:
+  uint32_t resolution() const noexcept {return resolution_;}
+  const uint8_t *plane(unsigned index) const noexcept {return planes_.images[index];}
+  size_t bytes() const noexcept {return size_t(resolution_)*resolution_*(plane(2)?12:8);}
+  static std::shared_ptr<const MaterialAtlas> compile(const Input &,const std::function<bool()> &);
+};
+
+inline void validate_material_atlas(const Input &input,const std::function<bool()> &cancelled){
+  validate(input,cancelled);
+  const auto grids=input.output_grids();
+  if((input.native_channels!=(Color|Orm)&&input.native_channels!=material_channels)||
+     grids[0].channels!=input.native_channels||grids[0].extent!=input.native_extent()||grids[1].channels)
+    throw std::invalid_argument("Resident material atlas needs native color and ORM with optional RGB8 emission");
+}
+inline OutputView material_atlas_chunk(OutputView view,size_t first){
+  for(auto &plane:view.images)if(plane)plane+=first*4;
+  return view;
+}
 inline constexpr size_t chunk_pixels=65536,maximum_pixels=4*1024*1024,maximum_tile_bytes=128*1024*1024;
 inline constexpr size_t maximum_output_pixels=16*1024*1024;
 inline constexpr uint32_t maximum_extent=8192;

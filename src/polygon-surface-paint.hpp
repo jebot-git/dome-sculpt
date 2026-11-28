@@ -3,7 +3,12 @@
 #include "polygon-surface-codec.hpp"
 #include "dome/material-bindings.hpp"
 namespace dome {struct TextureSetView;struct TextureSetLimits;}
+namespace dome::paint_compute {class MaterialAtlas;}
 namespace dome::detail {
+struct PolygonBakePreview {
+ std::shared_ptr<const TextureMaps> maps;
+ std::shared_ptr<const paint_compute::MaterialAtlas> atlas;
+};
 // Typed private envelope seam. An actual replayed node grants only its exact
 // current geometry/grid correspondence, never another field or arbitrary Paint.
 // Public Paint6 calls require the actual synchronous Scene39 owning scope;
@@ -15,7 +20,7 @@ struct PolygonSurfacePaintCodec {
      std::shared_ptr<const PolygonSurfacePreview> cached={});
  static std::shared_ptr<TextureMaps> preview_retained_material(const TextureSetView &,size_t &,
      const TextureSetLimits &,std::shared_ptr<const PolygonSurfacePreview> cached={});
- static std::shared_ptr<const TextureMaps> preview_for_bake(const TextureSetView &,const std::function<bool()> &,
+ static PolygonBakePreview preview_for_bake(const TextureSetView &,const std::function<bool()> &,size_t atlas_budget,
      std::shared_ptr<const PolygonSurfacePreview> cached={});
  static nlohmann::json encode(const PaintedMesh &,
      const std::shared_ptr<const SourceMaterialBindings> &,PolygonSurfaceNodeWriter &,

@@ -202,19 +202,19 @@ std::unique_ptr<Raster> upload(const Image &image,const std::function<bool()> &c
 }
 }
 namespace paint_compute {
-Result composite(const Input &in,const std::function<bool()> &cancelled){
- validate(in,cancelled);const auto &q=quantization();
+namespace {
+void composite_on_device(const Input &in,const std::function<bool()> &cancelled,Result *result,OutputView resident={}){
+ const auto &q=quantization();
  Buffer<Layer> layers(std::max(size_t(1),in.layers.size()));Buffer<uint32_t> tiles(std::max(size_t(1),in.tiles.size()));
  const auto host_padding=in.padding_view();
  Buffer<Pixel> pixels(std::max(size_t(1),in.packed_texels()));Buffer<int32_t> padding(host_padding.size());Buffer<Quantization> quant(1);
- Buffer<uint8_t> output(output_scratch_bytes);
+ Buffer<uint8_t> output(result?output_scratch_bytes:0);
  Buffer<uint8_t> baked(in.image_bytes());
  Buffer<detail::SourceTextureAxis> axes(in.axis_count());
  Buffer<SourceTerms> terms(in.term_count());
  Buffer<SourcePixelTaps> mapped(in.coupled_source_count()*chunk_pixels);
  Buffer<uint32_t> color_tiles(in.color_tiles.size());
  Buffer<ColorPixel> color_pixels(in.color_pixels.size());
- Result result(in);
  try{
   checkpoint(cancelled);
   if(!in.layers.empty())checked(DS_COPY(layers.data,in.layers.data(),in.layers.size()*sizeof(Layer),DS_TO_DEVICE));
@@ -247,11 +247,12 @@ Result composite(const Input &in,const std::function<bool()> &cancelled){
    if(!grid.channels)break;
    auto source=in.device_sources(baked.data,axes.data);
    const auto coordinates=in.device_coordinate_jobs(terms.data,mapped.data,chunk_pixels,source,grid.channels);
-   const auto out=scratch_view(output.data,grid,!result.pixels.empty());
+   const auto scratch=result?scratch_view(output.data,grid,!result->pixels.empty()):OutputView{};
    for(size_t first=0;first<grid.extent.size();){
     checkpoint(cancelled);
     const auto count=std::min(chunk_pixels,grid.extent.size()-first);
     source.first=uint32_t(first);
+    const auto out=result?scratch:material_atlas_chunk(resident,first);
     if(coordinates.size){
      map_source_coordinates<<<(count*coordinates.size+255)/256,256>>>(coordinates,grid.extent.width,source.first,count);
      checked(DS_LAST_ERROR());
@@ -259,7 +260,7 @@ Result composite(const Input &in,const std::function<bool()> &cancelled){
     paint_pixels<<<(count+255)/256,256>>>(in.parameters,layers.data,tiles.data,pixels.data,padding.data,
         bake,prepared,source,quant.data,out,grid,first,count);
     checked(DS_LAST_ERROR());checked(DS_SYNC());
-    read_output(result.view(grid,first),out,count,[&](auto *target,const auto *device,size_t bytes){
+    if(result)read_output(result->view(grid,first),out,count,[&](auto *target,const auto *device,size_t bytes){
      checked(DS_COPY(target,device,bytes,DS_TO_HOST));
     });
     first+=count;
@@ -267,7 +268,28 @@ Result composite(const Input &in,const std::function<bool()> &cancelled){
   }
   checkpoint(cancelled);
  }catch(...){(void)DS_SYNC();throw;}
+}
+}
+
+Result composite(const Input &in,const std::function<bool()> &cancelled){
+ validate(in,cancelled);
+ Result result(in);
+ composite_on_device(in,cancelled,&result);
  return result;
+}
+
+struct MaterialAtlas::Storage {
+ Buffer<uint8_t> pixels;
+ explicit Storage(size_t bytes):pixels(bytes){}
+};
+
+std::shared_ptr<const MaterialAtlas> MaterialAtlas::compile(const Input &in,const std::function<bool()> &cancelled){
+ validate_material_atlas(in,cancelled);
+ const bool emission=in.native_channels&Emission;
+ auto storage=std::make_shared<Storage>(in.native_extent().size()*(emission?12:8));
+ auto atlas=std::shared_ptr<MaterialAtlas>(new MaterialAtlas(storage,storage->pixels.data,in.parameters.resolution,emission));
+ composite_on_device(in,cancelled,nullptr,atlas->planes_);
+ return atlas;
 }
 }
 

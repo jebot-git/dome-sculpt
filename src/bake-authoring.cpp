@@ -25,6 +25,7 @@
 #include "polygon-surface-paint.hpp"
 #include "polygon-surface-preview.hpp"
 #include "paint-overlay-packet.hpp"
+#include "paint-composite-backend.hpp"
 #include "emission-authority.hpp"
 #include "emission-paint-access.hpp"
 #include "affine-surface.hpp"
@@ -121,6 +122,9 @@ std::vector<detail::RetainedSourceBakeField> capture_texture_set_bake_source(
   std::vector<detail::RetainedSourceBakeField> fields;
   fields.reserve(collection->additional().size()+1);
   TextureSetLimits limits;limits.cancelled=cancelled;
+  // The Bake may revisit donors across raster batches. Keep their atlases
+  // ready within one texture-set workspace allowance for the whole donor.
+  size_t atlas_budget=limits.maximum_bytes;
   const auto capture=[&](const TextureSetView &field) {
     if (cancelled && cancelled())
       throw std::runtime_error("Texture-set Bake source capture cancelled");
@@ -145,7 +149,10 @@ std::vector<detail::RetainedSourceBakeField> capture_texture_set_bake_source(
     const auto preview=pose.field(field,deformed);
     if(deformed)preview->validate_bake_world(field.domain->triangles(),
         placement?placement->world():AffineTransform{},cancelled);
-    material.maps=detail::PolygonSurfacePaintCodec::preview_for_bake(field,cancelled,preview);
+    auto captured=detail::PolygonSurfacePaintCodec::preview_for_bake(field,cancelled,atlas_budget,preview);
+    material.maps=std::move(captured.maps);
+    resolved.atlas=std::move(captured.atlas);
+    if(resolved.atlas)atlas_budget-=resolved.atlas->bytes();
     const auto packet=material.maps->overlay;
     if(detail::overlay_uses_float_emission(*packet)||detail::hdr_emission(field.material.emissive)||
        detail::physical_emission(*field.material_bindings))

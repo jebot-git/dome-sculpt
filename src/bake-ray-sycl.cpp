@@ -4,6 +4,7 @@
 #include "bake-raster-device-job.hpp"
 #include "bake-ray-device-query.hpp"
 #include "paint-composite-kernel.hpp"
+#include "paint-composite-sycl-context.hpp"
 #include "surface-ray-softfloat.hpp"
 
 namespace dome::detail {
@@ -23,10 +24,13 @@ void launch_boundary(sycl::queue &,SurfaceView,const ProjectionRay *,ProjectionH
 
 namespace {
 class SyclApi {
-  sycl::queue queue_{sycl::gpu_selector_v,[](sycl::exception_list errors){
-    for(auto error:errors)std::rethrow_exception(error);
-  },sycl::property_list{sycl::property::queue::in_order{}}};
+  sycl::queue queue_;
 public:
+  explicit SyclApi(const paint_compute::MaterialAtlas *atlas=nullptr)
+      :queue_(atlas?paint_compute::MaterialAtlasSyclAccess::queue(*atlas):
+        sycl::queue{sycl::gpu_selector_v,[](sycl::exception_list errors){
+          for(auto error:errors)std::rethrow_exception(error);
+        },sycl::property_list{sycl::property::queue::in_order{}}}){}
   using Precision=surface_ray::SoftPrecision;
   using Progress=ProjectionProgress<Precision::Scalar>;
   void *allocate(size_t bytes){
@@ -112,7 +116,7 @@ std::unique_ptr<bake_raster::Raster> bake_raster::create(std::span<const float> 
   return create_device<bake_rays::SyclApi>(axis,writable);
 }
 std::unique_ptr<bake_material::Sampler> bake_material::upload(const ImageInput (&roles)[RoleCount],Parameters parameters,
-    const PaintOverlayPacket *overlay,const std::function<bool()> &cancelled){
-  return std::make_unique<DeviceSampler<bake_rays::SyclApi>>(roles,parameters,overlay,cancelled);
+    const PaintOverlayPacket *overlay,const std::function<bool()> &cancelled,const paint_compute::MaterialAtlas *atlas){
+  return std::make_unique<DeviceSampler<bake_rays::SyclApi>>(roles,parameters,overlay,cancelled,atlas);
 }
 } // namespace dome::detail

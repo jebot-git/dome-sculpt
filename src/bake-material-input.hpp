@@ -3,6 +3,7 @@
 #include "bake-material-device.hpp"
 #include "dome/bake.hpp"
 #include "dome/source-maps.hpp"
+#include "paint-composite-backend.hpp"
 #include "paint-overlay-packet.hpp"
 
 namespace dome::detail::bake_material {
@@ -19,9 +20,11 @@ struct MaterialInput {
   const PaintSourceMaps *source=nullptr;
   const PaintOverlayPacket *overlay=nullptr;
   const PaintSourceTexture *retained_normal=nullptr;
+  const paint_compute::MaterialAtlas *atlas=nullptr;
 
   MaterialInput(const BakeMaterial &material,bool separate_pbr,const Image *normal,bool sample_normals=false,
-                const PaintSourceTexture *retained=nullptr):retained_normal(retained) {
+                const PaintSourceTexture *retained=nullptr,const paint_compute::MaterialAtlas *resident=nullptr)
+      :retained_normal(retained),atlas(resident) {
     const auto &factor=material.material;
     std::copy_n(factor.color.begin(),4,parameters.color);
     std::copy_n(factor.emissive.begin(),3,parameters.emission);
@@ -42,7 +45,7 @@ struct MaterialInput {
       set(Orm,source->metal_rough);
       if(!material.emission_batch)set(Emission,source->emission);
       set(Occlusion,source->occlusion);
-    }else if(material.maps){
+    }else if(material.maps&&!atlas){
       const auto &maps=*material.maps;
       images[Color]={&maps.color,nullptr,material.repeat_uv};
       images[Orm]={&maps.metal_rough,nullptr,material.repeat_uv};
@@ -58,7 +61,7 @@ struct MaterialInput {
   }
 
   bool needs_sampling() const {
-    return overlay||std::ranges::any_of(images,[](const auto &role){return role.image!=nullptr;});
+    return atlas||overlay||std::ranges::any_of(images,[](const auto &role){return role.image!=nullptr;});
   }
 
   Coordinates coordinates(const Mesh &mesh,uint32_t triangle,std::array<float,3> bary,
@@ -70,7 +73,7 @@ struct MaterialInput {
     std::array<std::array<float,2>,8> source_uv;
     unsigned ready=0;
     for(unsigned i=0;i<RoleCount;++i){
-      if(!images[i].image)continue;
+      if(!images[i].image&&(!atlas||i>Emission||!atlas->plane(i)))continue;
       auto uv=i==TangentNormal?high_uv:paint_uv;
       if(i==TangentNormal&&retained_normal)uv=normal_uv;
       else if(const auto *original=images[i].original){

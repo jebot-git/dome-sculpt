@@ -8,6 +8,7 @@
 namespace dome {
 struct Image;
 struct PaintSourceTexture;
+namespace paint_compute {class MaterialAtlas;}
 namespace detail {class PaintOverlayPacket;}
 namespace detail::bake_material {
 enum Role { Color, Orm, Emission, Occlusion, PbrColor, TangentNormal, RoleCount };
@@ -41,6 +42,6 @@ public:
 };
 
 std::unique_ptr<Sampler> upload(const ImageInput (&)[RoleCount],Parameters,const PaintOverlayPacket *overlay=nullptr,
-                                const std::function<bool()> &cancelled={});
+                                const std::function<bool()> &cancelled={},const paint_compute::MaterialAtlas *atlas=nullptr);
 } // namespace detail::bake_material
 } // namespace dome

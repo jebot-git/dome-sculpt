@@ -79,6 +79,9 @@ std::unique_ptr<SourceMaterialRaster> upload_material(const Input &,const Materi
 }
 }
 namespace dome::paint_compute {
+std::shared_ptr<const MaterialAtlas> MaterialAtlas::compile(const Input &,const std::function<bool()> &){
+ throw std::logic_error("Select a GPU backend for resident Bake material atlases");
+}
 Result composite(const Input &in,const std::function<bool()> &cancelled){
  validate(in,cancelled);const auto &q=quantization();
  Result out(in);

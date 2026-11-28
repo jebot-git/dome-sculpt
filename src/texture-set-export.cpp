@@ -786,8 +786,8 @@ public:
 };
 
 using NativeTileEntry=std::pair<const PaintTile *,size_t>;
-std::shared_ptr<TextureMaps> composite_device_grid(const PaintedMesh &paint,const Material &material,
-    const SparseExportGrid &grid,const TextureSetLimits &limits,TextureSetGridMode mode,std::array<bool,2> covered){
+paint_compute::Input material_grid_input(const PaintedMesh &paint,const Material &material,
+    const SparseExportGrid &grid,const TextureSetLimits &limits,TextureSetGridMode mode){
  using namespace paint_compute;
  static_assert(sizeof(PaintPixel)==sizeof(Pixel)&&sizeof(PaintTile)==Input::tile_bytes);
  const bool typed=mode==TextureSetGridMode::NativeMToonHdr;
@@ -843,6 +843,16 @@ std::shared_ptr<TextureMaps> composite_device_grid(const PaintedMesh &paint,cons
   }
   input.tiles[slot]=uint32_t(input.native_tiles.size()-1);
  }
+ return input;
+}
+
+std::shared_ptr<TextureMaps> composite_device_grid(const PaintedMesh &paint,const Material &material,
+    const SparseExportGrid &grid,const TextureSetLimits &limits,TextureSetGridMode mode,std::array<bool,2> covered){
+ using namespace paint_compute;
+ const bool typed=mode==TextureSetGridMode::NativeMToonHdr;
+ const bool legacy=mode==TextureSetGridMode::RetainedLdr;
+ const auto &bake=paint.baked();
+ const auto input=material_grid_input(paint,material,grid,limits,mode);
  const auto count=grid.padding.size();
  auto result=paint_compute::composite(input,limits.cancelled);
  auto maps=std::make_shared<TextureMaps>();
@@ -850,7 +860,7 @@ std::shared_ptr<TextureMaps> composite_device_grid(const PaintedMesh &paint,cons
  maps->color={r,r,std::move(result.planes[0])};
  maps->metal_rough={r,r,std::move(result.planes[1])};
  if(legacy)maps->emission={r,r,std::move(result.planes[2])};
- if(normal&&!typed)maps->normal={r,r,std::move(result.normals)};
+ if(!input.bake.normal.empty()&&!typed)maps->normal={r,r,std::move(result.normals)};
  const auto coverage_image=[&](bool full){
   if(!full)return Image{1,1,{0,0,0,255}};
   Image image{r,r,std::vector<uint8_t>(count*4)};
@@ -993,6 +1003,15 @@ void charge_native_material_grid_work(const PaintedMesh &paint,size_t &work,cons
  const SparseExportGrid grid(paint,work,limits);
  charge_native_grid(paint,grid,work,limits,mode);
  if(mode==TextureSetGridMode::RetainedLdr)(void)legacy_coverage(paint,work,limits);
+}
+
+std::shared_ptr<const paint_compute::MaterialAtlas> compile_resident_bake_grid(const PaintedMesh &paint,
+    const Material &material,size_t &work,const TextureSetLimits &limits,TextureSetGridMode mode){
+ if(!retained_color_grid(paint)||(mode!=TextureSetGridMode::RetainedLdr&&mode!=TextureSetGridMode::RetainedHdr))
+  throw std::invalid_argument("Resident Bake atlas needs its retained color grid");
+ const SparseExportGrid grid(paint,work,limits);
+ charge_native_grid(paint,grid,work,limits,mode);
+ return paint_compute::MaterialAtlas::compile(material_grid_input(paint,material,grid,limits,mode),limits.cancelled);
 }
 
 std::shared_ptr<TextureMaps> compile_native_material_grid(const PaintedMesh &paint,const Material &material,

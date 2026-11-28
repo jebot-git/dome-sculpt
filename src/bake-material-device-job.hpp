@@ -111,11 +111,18 @@ template<class Api> class DeviceSampler final:public Sampler {
   }
 
   DeviceSampler(const ImageInput (&roles)[RoleCount],Parameters parameters,const PaintOverlayPacket *overlay,
-                const std::function<bool()> &cancelled,ImageLayout layout)
-      :images_(api_,layout.bytes),table_(api_,1),coordinates_(api_,batch_capacity),results_(api_,batch_capacity) {
-    if(!layout.bytes&&!overlay)throw std::logic_error("Missing Bake material images or paint");
+                const std::function<bool()> &cancelled,const paint_compute::MaterialAtlas *atlas,ImageLayout layout)
+      :api_(atlas),images_(api_,layout.bytes),table_(api_,1),coordinates_(api_,batch_capacity),results_(api_,batch_capacity) {
+    if(!layout.bytes&&!overlay&&!atlas)throw std::logic_error("Missing Bake material images or paint");
     view_.parameters=parameters;
     try {
+      // The captured Bake field owns these planes through every batch.
+      if(atlas){
+        const auto resolution=atlas->resolution();
+        for(unsigned role=Color;role<=Emission;++role)if(const auto *pixels=atlas->plane(role))
+          view_.images[role]={{pixels,resolution,resolution,33071,33071,false,role!=Orm,
+                               SourceUvSampler::Output::LinearRgba},false};
+      }
       for(unsigned i=0;i<RoleCount;++i){
         const auto &role=roles[i];
         if(!role.image)continue;
@@ -142,8 +149,8 @@ template<class Api> class DeviceSampler final:public Sampler {
   }
 public:
   DeviceSampler(const ImageInput (&roles)[RoleCount],Parameters parameters,const PaintOverlayPacket *overlay,
-                const std::function<bool()> &cancelled)
-      :DeviceSampler(roles,parameters,overlay,cancelled,layout(roles)){}
+                const std::function<bool()> &cancelled,const paint_compute::MaterialAtlas *atlas)
+      :DeviceSampler(roles,parameters,overlay,cancelled,atlas,layout(roles)){}
 
   void read(std::span<const Coordinates> coordinates,std::span<Values> values,
             const std::function<bool()> &cancelled) override {

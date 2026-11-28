@@ -1903,7 +1903,8 @@ void finish_polygon_maps(TextureMaps &maps,const PaintedMesh &paint,
 }
 
 std::shared_ptr<TextureMaps> compile_retained_polygon_preview(const TextureSetView &field,const PaintedMesh &paint,
-    size_t &work,const TextureSetLimits &limits,std::shared_ptr<const detail::PolygonSurfacePreview> cached){
+    size_t &work,const TextureSetLimits &limits,std::shared_ptr<const detail::PolygonSurfacePreview> cached,
+    size_t atlas_budget=0,std::shared_ptr<const paint_compute::MaterialAtlas> *atlas=nullptr){
   using namespace detail;
   const auto &binding=field.material_bindings;
   if(!cached)cached=field.source->source_preview();
@@ -1919,7 +1920,12 @@ std::shared_ptr<TextureMaps> compile_retained_polygon_preview(const TextureSetVi
   if(work>limits.maximum_work||normal_bytes/2>limits.maximum_work-work)
     throw std::length_error("Retained normal carriage exceeds its work limit");
   work+=normal_bytes/2; // Copy and validate both normal images at texel granularity.
-  auto maps=compile_native_material_grid(paint,field.material,work,limits,mode);
+  std::shared_ptr<TextureMaps> maps;
+  const size_t atlas_bytes=size_t(paint.resolution())*paint.resolution()*(mode==TextureSetGridMode::RetainedLdr?12:8);
+  if(atlas&&atlas_bytes<=atlas_budget&&compute_backend()!="CPU"){
+    *atlas=compile_resident_bake_grid(paint,field.material,work,limits,mode);
+    maps=std::make_shared<TextureMaps>();
+  }else maps=compile_native_material_grid(paint,field.material,work,limits,mode);
   auto packet=PaintOverlayFactory::capture_native_emission(paint,limits.cancelled);
   finish_polygon_maps(*maps,paint,binding,std::move(packet),cached,limits.cancelled);
   return maps;
@@ -1957,20 +1963,22 @@ std::shared_ptr<TextureMaps> detail::PolygonSurfacePaintCodec::preview_retained_
   return compile_retained_polygon_preview(field,*paint,work,limits,std::move(cached));
 }
 
-std::shared_ptr<const TextureMaps> detail::PolygonSurfacePaintCodec::preview_for_bake(const TextureSetView &field,
-    const std::function<bool()> &cancelled,std::shared_ptr<const PolygonSurfacePreview> cached){
+detail::PolygonBakePreview detail::PolygonSurfacePaintCodec::preview_for_bake(const TextureSetView &field,
+    const std::function<bool()> &cancelled,size_t atlas_budget,std::shared_ptr<const PolygonSurfacePreview> cached){
   TextureSetLimits limits;
   limits.cancelled=cancelled;
   const auto paint=texture_set_source_read_view(field,limits);
   if(!retained_material_grid(field))
-    return preview(*paint,field.material_bindings,field.material,cancelled,std::move(cached));
+    return {preview(*paint,field.material_bindings,field.material,cancelled,std::move(cached)),{}};
   check_polygon_preview_budget(*paint);
   // This is one donor member under the original Bake preview byte limit.
   // Its 16 layers may cover the whole writable grid, independently of the
   // aggregate budgets used by preview and export across a collection.
   limits.maximum_work=512'000'000;
   size_t work=0;
-  return compile_retained_polygon_preview(field,*paint,work,limits,std::move(cached));
+  PolygonBakePreview result;
+  result.maps=compile_retained_polygon_preview(field,*paint,work,limits,std::move(cached),atlas_budget,&result.atlas);
+  return result;
 }
 bool detail::EmissionExportAccess::requires_preview(const PaintedMesh &paint,const Material &material,
     const SourceMaterialBindings *binding) {

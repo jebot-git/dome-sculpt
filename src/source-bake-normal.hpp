@@ -3,6 +3,7 @@
 #include "dome/bake.hpp"
 #include "dome/source-maps.hpp"
 #include <span>
+namespace dome::paint_compute {class MaterialAtlas;}
 namespace dome::detail {
 class AffineInteractionFrame;
 class PaintOverlayPacket;
@@ -53,6 +54,7 @@ struct RetainedSourceBakeField {
  std::function<Vec3(uint32_t,std::array<float,3>,std::array<float,4>)> transport_normal;
  PaintSourceTexture normal_image;
  std::optional<std::array<float,3>> emission_background;
+ std::shared_ptr<const paint_compute::MaterialAtlas> atlas;
 };
 struct SourceBakePlacement {
  // Transformed native Mikk corners, in original logical triangle order.
