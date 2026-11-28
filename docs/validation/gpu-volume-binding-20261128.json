@@ -1,0 +1,105 @@
+{
+  "date": "2026-11-28",
+  "product": "d446b09c0cc2f2d9a6d6e3932674b6e63d6de8a0",
+  "qualified_source": "e289424a",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "reference_source": "6a184f1fd4115020a9062bd96804e3d8a43cef20",
+  "scope": "GPU propagation of internal deforming bone fields through certified closed rest meshes.",
+  "arc_release": {
+    "backend": "ONEAPI Level Zero",
+    "application_sha256": "3a468168ea49b4851179014d274291b37c54dd4580d8165807695969f339ea03",
+    "focused": {
+      "passed": 32,
+      "junit_sha256": "bcac3d1ab82657288b7393cb31aa58a5ce14b0b03e84a3031a43bf2451444293"
+    },
+    "additional_affine_and_surface_regression": {
+      "passed": 3,
+      "junit_sha256": "cd52cefb2453361eae487ae36c53cbf9df051b35ecd4e11c2ea6c20872e186cb"
+    },
+    "no_gpu_refusal": "FAIL No device of requested type 'info::device_type::gpu' available.",
+    "device_cancellation_after_dispatch_keeps_output_exact": true,
+    "propagation_budget_failure_keeps_report_exact": true,
+    "device_cancellation_retry_matches_analytic_chain": true
+  },
+  "numerical": {
+    "connected_U": [
+      {
+        "cell_mm": 4,
+        "vertices": 338,
+        "continuous_max_absolute_weight_error": 0.00788485,
+        "headless_reference_max_absolute_weight_difference": 5.960464477539063e-08,
+        "headless_reference_joint_ids_match": true,
+        "gpu_passes": 112,
+        "gpu_node_relaxations": 323456,
+        "gpu_and_host_planned_peak_bytes": 1417639,
+        "traced_sycl_propagation_kernel": true,
+        "ur_trace_sha256": "5f52171d0c8ea9d18a2130d099db2f9ad550f9c7d566945be1c4178e14602da3"
+      },
+      {
+        "cell_mm": 1,
+        "vertices": 338,
+        "continuous_max_absolute_weight_error": 0.00684791,
+        "headless_reference_max_absolute_weight_difference": 5.960464477539063e-08,
+        "headless_reference_joint_ids_match": true,
+        "gpu_passes": 448,
+        "gpu_node_relaxations": 73623424,
+        "gpu_and_host_planned_peak_bytes": 16896029,
+        "traced_sycl_propagation_kernel": true,
+        "ur_trace_sha256": "c2b8d8b5bc740432686c4229fe717d3533c04361ecc0645f9739422153d3f88a"
+      }
+    ],
+    "disconnected_solid_cross_weight": 0.0,
+    "additional_four_mm_geometry_cases": {
+      "phase1": 0.00771371,
+      "phase2": 0.00874521,
+      "reverse": 0.00788485,
+      "alternate": 0.00788485,
+      "rotate": 0.00781523
+    }
+  },
+  "headless_reference": {
+    "build": "Explicit CPU-only reference configuration with desktop and OpenXR disabled",
+    "focused": {
+      "passed": 3,
+      "junit_sha256": "74ea83332a7a848a1b1d3d5d3d67b894450f077bf1459ab0fe0823e377530998"
+    },
+    "allocation_boundaries": 542
+  },
+  "native_authoring": {
+    "bound_archive_sha256": "0d8ae86e2d3e19da790e2f48d7a4e456f5303cfbc5498645f7ece8aecd2090d9",
+    "preserved_active_morph_and_authored_paint": true,
+    "open_target_rolls_back_entire_batch": true,
+    "grouped_undo_redo": true,
+    "one_saved_archive_matches_native_wayland_and_openxr": true
+  },
+  "nested_wayland": {
+    "checks": 7,
+    "dma_buf_render_node": "/dev/dri/renderD129",
+    "report_sha256": "d92e0fe3d238e586c604e5afc9b93eeabf5fd1a70efc2fa3ada9a3f5c4975ace"
+  },
+  "synthetic_openxr": {
+    "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "stereo_submissions": 67,
+    "acquires": 134,
+    "image_waits": 134,
+    "releases": 134,
+    "report_sha256": "43a46a35dcdaed02fc610ae4598c743bfacd86ad95502acdfd6374c3cd99f3c6"
+  },
+  "cuda_and_rocm": {
+    "cuda": {
+      "kernel_object_sha256": "d697355c208300c51dcf58c80c220be72c21db267c9dc3b04327fffb84e94cbd",
+      "missing_device_refusal": "CUDA driver version is insufficient for CUDA runtime version"
+    },
+    "rocm": {
+      "kernel_object_sha256": "af61663b2418f35689c5c63f2c64d66e8c578906f1afaf6c713daed853b81b54",
+      "missing_device_refusal": "no ROCm-capable device is detected"
+    }
+  },
+  "limits": [
+    "Mesh validation, topology, exact path and seed preparation stay on the background host worker.",
+    "CPU field propagation is compiled only for the headless CPU reference configuration.",
+    "CUDA sm_86 and ROCm gfx1030 have compilation, link and missing-device evidence for the volume backend. Positive hardware runs remain open.",
+    "The closed-volume tests cover native closed fixtures and reflections. Open avatar parts still need surface binding or transfer.",
+    "Physical headset, production-size avatar assemblies, and full current Release regression remain open."
+  ]
+}
