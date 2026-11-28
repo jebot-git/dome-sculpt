@@ -1,0 +1,100 @@
+{
+  "date": "2026-11-28",
+  "product": "7b76ae4baf5a82911e60b8a05b6a2bd6cea76f78",
+  "preceding": "7e126497c2f617ce3d40ffa3d4f75332c0803b61",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "GPU atlas compositing for eligible retained polygon PBR Bake donors. Legacy color, ORM, emission and coverages compare byte for byte. FLOAT emission uses its independent retained resolver.",
+  "oneapi_arc_release": {
+    "application_sha256": "b7c0859846a33cebbe6569e95cd18d0ce7ec01bfb4d926282ac828a3bf498ea6",
+    "fltk_core_sha256": "35aa46ebf11f5f3a9772d926b05a24938572471d9dbcf3e2718e98376fadbdb3",
+    "bake_regression": {
+      "passed": 27,
+      "synthetic_openxr": 4,
+      "log_sha256": "6b9199ebcca5389438513908be5aa0703e810acf48e8ed254fd63d0402440d4d",
+      "junit_sha256": "e74539b644bcd0b0f29cdf3fcaa4388bbb96fad1ef19156bd98811d068de36ca"
+    },
+    "retained_regression": {
+      "passed": 6,
+      "synthetic_openxr": 1,
+      "log_sha256": "ca03afd46aee0b0643d801c3bffae0011f6b38058eca3123966d33828788d36a",
+      "junit_sha256": "9e3c1bb55993488c66ef8b0b68e82bf42c3157c3ff0f1b4b2b69344a2a41a1db"
+    },
+    "overlap_between_regressions": [
+      "texture-set-retained-bake-source"
+    ],
+    "identical_regression_project_sha256": {
+      "affine-target.dsculpt": "7b72d9389b8365f9f330f53a70278789bb4f90183312584d0336d1c601c68b6b",
+      "mixed-before.dsculpt": "172a4a4084468e1f3d4b16c7dbe569633c329002ea78d8a595250f13705c658e",
+      "mixed-baked.dsculpt": "17338f40b4521cce6880102778bce603e72d13a2b877724e2c19c2b62ddfa37c",
+      "retained-bake-source.dsculpt": "27578419255b987de8c64a534a070bb3125b3d09269443cb769e26dd91cf25ad"
+    },
+    "prepared_hdr_bake": {
+      "donor_fields": 2,
+      "donor_resolution": 512,
+      "target_resolution": 1024,
+      "projected_texels": 430336,
+      "projection_rays": 0,
+      "identical_project_sha256": "9783c773289c0914f41364ea99ba692a71cc6790e0e0ad074ec57e864d079554",
+      "seconds_first_then_repeats": {
+        "preceding": [
+          6.64365,
+          0.539238,
+          0.539686
+        ],
+        "candidate": [
+          7.33834,
+          0.507212,
+          0.499463
+        ]
+      },
+      "median_repeat_seconds": {
+        "preceding": 0.539462,
+        "candidate": 0.5033375
+      },
+      "log_sha256": "abbafb825bd5bc9de3e2f43b5b1853a5da9b854dad7a6bef91a25c6ad659834f"
+    },
+    "wayland": {
+      "passed": 15,
+      "report_sha256": "3206993dcd5a5c556e4a8584dc324197fcbb72c60819d1efa07f2d98534a9aa7",
+      "runtime_maps_sha256": "e9e786e1037f6c74be09bebf6b7727a88a8190befc2ee82ed54a10e490afd535",
+      "log_sha256": "73ceb02c01635b06559179321da5b01a986e00d0db7561fe65b8d347340bd3de"
+    }
+  },
+  "gpu_requirement": {
+    "missing_device_entry_points_refused": [
+      "desktop",
+      "OpenXR",
+      "command-line demo export"
+    ],
+    "cpu_configurations_refused": [
+      "default app",
+      "test opt-in with UI enabled",
+      "test opt-in with OpenXR enabled"
+    ],
+    "log_sha256": "6fe07746d3b4fe39b800b8aefc254a3ea65dd328ffaee35f8f87bc38eacdd9f9"
+  },
+  "headless_reference": {
+    "passed": 5,
+    "log_sha256": "d24e48b9f13ab99ea29bb651b93a96582f7a500fecb6094f812df28c8473736c",
+    "asan_ubsan_retained_checks": 1179,
+    "sanitizer_log_sha256": "8feef5e3d1f85ffea44e870c43708fd44fb1ecce862530cc504b2dfde9cbbb0f"
+  },
+  "vendor_compile_only": {
+    "cuda": {
+      "bake.cpp": "b8c1df69bad60c4b9450a33e419ebc4bb7956ec384836f94ca552a3988dae824",
+      "bake-authoring.cpp": "57e11fe5e6ec5311f9442b960bbc61d8cb37894d0d890996b923a4c35d1de5d7",
+      "paint.cpp": "21ed28f431dea3100e7df9c2cc4c42d175ebf3aa99d22c1e4119ba80bdd611e8"
+    },
+    "rocm": {
+      "bake.cpp": "97c7f64fa02fcaf61b6e0e987312c43cfea2bae7d8975428e8f01209d0978333",
+      "bake-authoring.cpp": "f6247b5a1e5ee38e12111a2e906e1651ae9e1209b774c4dc0fce504ec48f1ae1",
+      "paint.cpp": "d9e148ddaad3bd3ae88ca2077b2bfdf3090f72a43dd2045f565a1230eec5b75f"
+    }
+  },
+  "limits": [
+    "Scope is the existing eligible retained PBR material model. Other retained models keep their previous atlas preparation.",
+    "Atlas output still travels through the worker before GPU sampling. Triangle validation and posed frame transport remain on the worker.",
+    "The timing measures matching-topology Bake after donor resize and edit setup. Each executable runs the first Bake followed by two repeats in the same process. This is one paired fixture.",
+    "AMD and NVIDIA device execution and physical OpenXR acceptance remain open."
+  ]
+}

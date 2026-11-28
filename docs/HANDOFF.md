@@ -177,6 +177,17 @@ and 6.41 seconds on the first run, up from 2.27. The ordinary app completes
 retained Bake and exact Save/Undo through DomeD Wayland and synthetic OpenXR.
 [Retained GPU Bake evidence](validation/retained-bake-gpu-20261128.json)
 
+Bake now uses the GPU material grid compositor for eligible retained polygon
+PBR donors. The color and ORM atlases, legacy emission and coverage match
+the preceding output. HDR emission uses the original FLOAT field directly.
+A 1024² Bake from two 512² retained HDR material grids produced the same
+project bytes. The median repeat on Arc took 0.50 seconds, down from 0.54,
+and the first Bake took 7.34 seconds, up from 6.64. The worker still carries
+the compiled atlas between compositing and sampling. Desktop, OpenXR and
+command-line export refused to start with GPU devices masked. DomeD Wayland
+and synthetic OpenXR exercised the updated Bake path on Arc.
+[Retained Bake atlas evidence](validation/retained-bake-atlas-gpu-20261128.json)
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.

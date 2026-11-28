@@ -68,6 +68,15 @@ coordinates. Normal-frame transport and logical triangle validation stay with
 the existing field owner.
 [Retained GPU Bake evidence](validation/retained-bake-gpu-20261128.json)
 
+Bake compiles eligible retained polygon PBR donor atlases on the selected
+GPU before sampling the donor. The same material grid compositor serves
+the viewport, export and Bake. Legacy fields keep exact color, ORM, emission
+and coverage. FLOAT fields keep their original sparse radiance and omit the
+intermediate byte emission image. The compiled atlas still passes through
+the worker before the device samples it. Other retained material models
+still use their existing atlas preparation.
+[Retained Bake atlas evidence](validation/retained-bake-atlas-gpu-20261128.json)
+
 Eligible 512–2048 current-grid RGB8 Bake materials now composite color, ORM
 and legacy emission on the selected GPU. Their ordered paint, coverage,
 native normal-map output, and GLB export match the preceding implementation.
