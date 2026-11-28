@@ -66,6 +66,14 @@ native projects and exports match byte for byte. CUDA and ROCm compile the
 new query and refuse unavailable devices.
 [GPU weight transfer evidence](validation/gpu-weight-transfer-20261128.json)
 
+Weight transfer onto an existing different rig now preserves the recipient's
+bind matrices, pose, joint slots and source attachment. It identifies joints by
+shared source node IDs, declared humanoid roles or exact names. The matching
+hierarchy is checked before the transfer. A sampled influence with no
+compatible joint rejects the complete operation. Recipient-side locks,
+native Restore, and Undo keep their existing semantics.
+[Joint correspondence evidence](validation/skin-joint-transfer-20261128.json)
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.

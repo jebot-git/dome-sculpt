@@ -95,6 +95,8 @@ void edit_skin_dialog(Document &doc) {
       for(auto *field:budgets)if(bounded)field->activate();else field->deactivate();
       if(bounded&&has_selection)selected->activate();else selected->deactivate();
       hint->label(volume?"Bind closed meshes with internal deform bones.\nChoose a cell size fine enough for the thinnest part.":anatomical?"Complete retained unskinned source group.\nAnatomical surface/contact weights in REST.\nFour influences with originals retained.":
+        method==SkinAuthoringMode::Transfer&&scene->object(target).deformation&&scene->object(target).deformation->skeleton?
+        "Different rigs keep the target rest and pose.\nMatch original joint IDs, humanoid roles or exact names.":
         scene->object(target).texture_sets?"Bind in the reference rest frame.\nA visible original VRM 1.0 rig also links poses and avatar export.":
         heat?"Automatic weights from visible bone support.\nKeep paint, morphs and pose.\nDifferent rest rigs need explicit joint mapping.":
         "Bind in the reference rest frame.\nKeep target paint, morphs and pose.\nDifferent rigs need joint mapping.");

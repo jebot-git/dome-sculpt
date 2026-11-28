@@ -1218,6 +1218,34 @@ void skinned_texture_accessory(const std::filesystem::path &out, Scene initial) 
   check(Scene::load(saved).encode() == bound.encode() && doc.undo() && doc.copy_scene().encode() == before &&
         doc.redo() && doc.copy_scene().encode() == bound.encode(),
         "The linked bind is one undoable asset operation and the ordered Save restores its exact source authority");
+  {
+    // An independent donor can change weights without acquiring ownership of
+    // a garment already linked to the original imported avatar instance.
+    auto transferred=bound.snapshot();
+    const auto donor=transferred.add("Independent garment weight donor",Volume{});
+    auto &donor_object=transferred.object(donor);
+    donor_object.painted=std::make_shared<PaintedMesh>(collar.painted->mesh(),64);
+    donor_object.mesh_active=true;
+    donor_object.affine_edit=std::make_shared<const NativeAffineEdit>(bound.world_matrix(accessory));
+    auto donor_shape=deformation;
+    donor_shape.source_skin_instance=0;
+    donor_shape.source_skin_node=0;
+    donor_shape.source_skin_joints.clear();
+    for(auto &row:donor_shape.skin->vertices)row={{head,1.f}};
+    transferred.set_deformation(donor,donor_shape);
+    auto options=bind;
+    options.reference=donor;
+    check(author_skin(transferred,accessory,options),"An independent donor transfers onto the existing linked garment");
+    const auto &updated=transferred.object(accessory);
+    auto original_state=*updated.deformation;
+    original_state.skin=deformation.skin;
+    const auto &mesh=collar.painted->mesh();
+    check(updated.group==collar.group&&updated.affine_edit==collar.affine_edit&&
+          updated.texture_sets==paint&&updated.deformation->skin->vertices==donor_shape.skin->vertices&&
+          original_state.encode(mesh)==deformation.encode(mesh)&&
+          Scene::decode(transferred.encode()).encode()==transferred.encode(),
+          "Foreign transfer keeps the original avatar link, bind matrices, paint, morph and pose on native reopen");
+  }
   auto appended = append_native_scene(bound, bound);
   const auto copied = appended.scene.active().id;
   const auto &appended_skin = *appended.scene.active().deformation;

@@ -4,6 +4,7 @@
 #include "dome/rig.hpp"
 #include "automatic-humanoid-support.hpp"
 #include "morph-normal-basis.hpp"
+#include "skin-joint-transfer.hpp"
 #include "weight-transfer-device.hpp"
 #ifdef DOME_WEIGHT_TRANSFER_REFERENCE
 #include "weight-transfer-kernel.hpp"
@@ -669,9 +670,24 @@ SkinWeights transfer_weights(const Mesh &source, const SkinWeights &w,
                              const Mesh &dest, size_t bones, float maximum,
                              WeightLimits limits,
                              const std::function<bool()> &cancelled,size_t maximum_work) {
+  return detail::transfer_weights_with_joint_map(source,w,dest,bones,bones,{},maximum,limits,cancelled,maximum_work);
+}
+SkinWeights detail::transfer_weights_with_joint_map(const Mesh &source,const SkinWeights &w,
+    const Mesh &dest,size_t source_bones,size_t target_bones,std::span<const uint32_t> joint_map,
+    float maximum,WeightLimits limits,const std::function<bool()> &cancelled,size_t maximum_work) {
   mesh_valid(source);
   mesh_valid(dest);
-  w.validate(source.positions.size(), bones);
+  w.validate(source.positions.size(),source_bones);
+  if(!target_bones||target_bones>256||
+     (joint_map.empty()?source_bones!=target_bones:joint_map.size()!=source_bones))
+    throw std::invalid_argument("Weight-transfer joint map dimensions differ from the rigs");
+  std::bitset<256> used_targets;
+  for(auto joint:joint_map){
+    if(joint==UINT32_MAX)continue;
+    if(joint>=target_bones||used_targets.test(joint))
+      throw std::invalid_argument("Weight-transfer joint map repeats or exceeds a target joint");
+    used_targets.set(joint);
+  }
   if (!std::isfinite(maximum) || maximum <= 0 || maximum > 10000)
     throw std::invalid_argument("Invalid weight transfer radius");
   stop(cancelled);
@@ -691,13 +707,21 @@ SkinWeights transfer_weights(const Mesh &source, const SkinWeights &w,
     const std::array bary{hit.weight.a,hit.weight.b,hit.weight.c};
     std::map<uint32_t, float> sum;
     for (int k = 0; k < 3; k++)
-      for (auto i : w.vertices[source.indices[t * 3 + k]])
-        sum[i.joint] += i.weight * bary[k];
+      for (auto i : w.vertices[source.indices[t * 3 + k]]) {
+        const float contribution=i.weight*bary[k];
+        const auto joint=joint_map.empty()?i.joint:joint_map[i.joint];
+        if(joint==UINT32_MAX){
+          if(contribution==0.f)continue;
+          throw std::invalid_argument("Donor joint "+std::to_string(i.joint)+
+              " has no compatible target joint at vertex "+std::to_string(v));
+        }
+        sum[joint]+=contribution;
+      }
     VertexWeights row;
     for (auto [joint, value] : sum)
       row.push_back({joint, value});
     out.vertices.push_back(
-        normalize_weights(std::move(row), bones, {}, limits));
+        normalize_weights(std::move(row),target_bones,{},limits));
   };
 #ifdef DOME_WEIGHT_TRANSFER_REFERENCE
   const auto surface=index.surface();
@@ -740,7 +764,7 @@ SkinWeights transfer_weights(const Mesh &source, const SkinWeights &w,
     }
   }
 #endif
-  out.validate(dest.positions.size(), bones);
+  out.validate(dest.positions.size(),target_bones);
   stop(cancelled);
   return out;
 }

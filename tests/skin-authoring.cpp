@@ -62,8 +62,129 @@ Scene fixture() {
   s.duplicate(1);s.object(2).deformation.reset();s.select(2);
   return s;
 }
+
+Scene mapped_fixture(bool roles) {
+  auto scene=fixture();
+  if(roles){
+    auto source=*scene.object(1).deformation;
+    source.humanoid=HumanoidMapping{{{"hips",0},{"spine",1}}};
+    scene.set_deformation(1,source);
+  }
+  const auto &rest=scene.object(2).painted->mesh();
+  DeformationState receiver(rest);
+  Skeleton skeleton;
+  skeleton.bones={
+    {roles?"Garment spine":"tip",2,{{0,.42f,0}},.2f},
+    {"Garment pin",-1,{},.1f},
+    {roles?"Garment pelvis":"root",-1,{{.03f,0,0}},.3f}};
+  skeleton.inverse_bind_override=skeleton.inverse_bind();
+  receiver.skeleton=skeleton;
+  receiver.skin=SkinWeights{{{{1,.125f},{2,.875f}},{{0,.75f},{1,.25f}},{{1,.5f},{2,.5f}}}};
+  receiver.pose={skeleton.bones[0].rest,skeleton.bones[1].rest,skeleton.bones[2].rest};
+  receiver.pose[0].translation.z=.25f;
+  receiver.pose[2].translation.z=-.15f;
+  if(roles)receiver.humanoid=HumanoidMapping{{{"hips",2},{"spine",0}}};
+  receiver.morphs=MorphSet(rest);
+  auto moved=rest.positions;
+  moved[2].z+=.05f;
+  receiver.morphs->set_target(rest,"Garment fold",moved);
+  receiver.morph_weights={.25f};
+  scene.set_deformation(2,receiver);
+  return scene;
+}
+
+void mapped_transfer() {
+  for(bool roles:{false,true}){
+    auto scene=mapped_fixture(roles);
+    const auto original=scene.encode();
+    const auto before=scene.object(2);
+    const auto deform=*before.deformation;
+    SkinAuthoringOptions options;
+    options.reference=1;
+    options.mode=SkinAuthoringMode::Transfer;
+    options.locks={0,1,0};
+    Document document;
+    document.replace(scene);
+    check(document.wait_mesh(),"Mapped transfer fixture publishes the recipient surface");
+    document.bind_skin(options,document.draft_scene().source);
+    check(document.wait_asset()&&document.frame().state->error.empty(),"Native worker accepts the verified rig correspondence");
+    const auto after=document.copy_scene();
+    const auto &value=*after.object(2).deformation;
+    auto unchanged=value;
+    unchanged.skin=deform.skin;
+    const auto &mesh=before.painted->mesh();
+    check(unchanged.encode(mesh)==deform.encode(mesh)&&after.object(2).painted->mesh_owner()==before.painted->mesh_owner()&&
+          same_bind_remainder(after,2,before,original),
+          "Mapped transfer keeps the receiver rest rig, inverse binds, pose, morph and paint");
+    const auto &rows=value.skin->vertices;
+    for(size_t vertex=0;vertex<rows.size();++vertex){
+      const auto weight=[&](uint32_t joint){
+        for(auto item:rows[vertex])if(item.joint==joint)return item.weight;
+        return 0.f;
+      };
+      const std::array locks{.125f,.25f,.5f};
+      const std::array incoming_spine{.2f,.6f,1.f};
+      check(weight(1)==locks[vertex]&&std::abs(weight(0)-(1-locks[vertex])*incoming_spine[vertex])<1e-6f,
+            "Reordered transfer preserves receiver-side locks and maps to receiver joint slots");
+    }
+    check(document.undo()&&document.copy_scene().encode()==original&&document.redo()&&
+          document.copy_scene().encode()==after.encode(),"Mapped rig transfer is one exact Undo and Redo step");
+    auto retry=after.snapshot();
+    check(!author_skin(retry,2,options)&&retry.encode()==after.encode(),"An identical mapped transfer is a true no-op");
+  }
+
+  auto wrong=mapped_fixture(false);
+  auto shape=*wrong.object(2).deformation;
+  shape.skeleton->bones[0].parent=-1;
+  wrong.set_deformation(2,shape);
+  const auto before=wrong.encode();
+  SkinAuthoringOptions options;
+  options.reference=1;
+  options.mode=SkinAuthoringMode::Transfer;
+  bool bad_hierarchy=false;
+  try{(void)author_skin(wrong,2,options);}
+  catch(const std::invalid_argument &error){bad_hierarchy=std::string_view(error.what()).find("hierarchy differs")!=std::string_view::npos;}
+  check(bad_hierarchy&&wrong.encode()==before,"A same-name joint in a different branch is refused atomically");
+
+  auto partial=fixture();
+  auto donor=*partial.object(1).deformation;
+  donor.skin=SkinWeights{{{{0,1.f}},{{0,1.f}},{{1,1.f}}}};
+  partial.set_deformation(1,donor);
+  auto mesh=partial.object(2).painted->mesh();
+  mesh.positions={{-.06f,0,-.01f},{.06f,0,-.01f},{0,0,.01f}};
+  mesh.normals.assign(3,{0,1,0});
+  DeformationState subset(mesh);
+  subset.skeleton=Skeleton{{donor.skeleton->bones[0]}};
+  partial.object(2).painted=std::make_shared<PaintedMesh>(mesh,64);
+  partial.set_deformation(2,subset);
+  auto missing=partial.snapshot();
+  mesh.positions.back().y=.08f;
+  missing.object(2).painted=std::make_shared<PaintedMesh>(mesh,64);
+  subset.source=morph_topology_id(mesh);
+  missing.set_deformation(2,subset);
+  check(author_skin(partial,2,options)&&std::ranges::all_of(partial.object(2).deformation->skin->vertices,
+        [](const auto &row){return row==VertexWeights{{0,1.f}};}),
+        "An unmatched donor joint with zero sampled weight does not prevent subset transfer");
+  const auto missing_before=missing.encode();
+  bool missing_joint=false;
+  try{(void)author_skin(missing,2,options);}
+  catch(const std::invalid_argument &error){missing_joint=std::string_view(error.what()).find("Donor joint 1")!=std::string_view::npos;}
+  check(missing_joint&&missing.encode()==missing_before,"A nonzero unmatched influence refuses the complete transfer");
+}
 }
 int main(int argc,char **argv) try {
+  if(argc==3 && std::string_view(argv[1])=="--mapped-ui-fixture"){
+    const std::filesystem::path out=argv[2];
+    std::filesystem::create_directories(out);
+    auto scene=mapped_fixture(true);
+    scene.save(out/"before.dsculpt");
+    SkinAuthoringOptions options;
+    options.reference=1;
+    options.mode=SkinAuthoringMode::Transfer;
+    if(!author_skin(scene,2,options))throw std::runtime_error("Mapped UI fixture did not bind");
+    scene.save(out/"bound.dsculpt");
+    return 0;
+  }
   if(argc==3 && std::string_view(argv[1])=="--ui-fixture") {fixture().save(argv[2]);return 0;}
   if(argc==3 && std::string_view(argv[1])=="--ui-unbound-fixture") {
     auto scene=fixture();scene.select(1);auto d=*scene.active().deformation;d.skin.reset();
@@ -86,6 +207,7 @@ int main(int argc,char **argv) try {
       throw std::runtime_error("The persisted Restore capsule does not reproduce the exact original Scene");
     return 0;
   }
+  mapped_transfer();
   auto scene=fixture();scene.object(1).transform={{1,2,3},{0,.70710678f,0,.70710678f},2};
   scene.object(2).transform={{-.5f,1,2},{0,0,.38268343f,.92387953f},.5f};
   auto source_world=scene.world_transform(1),target_world=scene.world_transform(2);

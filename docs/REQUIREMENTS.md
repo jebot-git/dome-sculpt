@@ -996,6 +996,13 @@ bounded batches. It keeps the original world-distance test and selects the
 lowest source triangle ID on equal distance. Native normalization, locked
 influences and transactional publication use the returned barycentric hits.
 [GPU weight transfer evidence](validation/gpu-weight-transfer-20261128.json)
+Existing rigs can receive transferred weights under shared original joint
+IDs, corresponding humanoid roles or hierarchy-compatible exact joint names.
+The operation preserves the recipient rest rig, pose, inverse binds and joint
+locks. An existing VRM attachment keeps its original avatar link when the
+donor is independent. Unmatched nonzero contributions reject the entire
+transfer. Manual correspondence for arbitrary unrelated rigs remains open.
+[Joint correspondence evidence](validation/skin-joint-transfer-20261128.json)
 Surface Heat accounts for native texture-set rasters, layers and canonical Bake
 data, including FLOAT emission. It preserves shared owners and rejects stale
 secondary paint edits, cancellation and insufficient memory before publication.

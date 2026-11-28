@@ -24,8 +24,8 @@ struct SkinAuthoringOptions {
   // bind methods use the owning
   // anatomical resource block (same500M/256MiB/512MiB ceilings).
   size_t maximum_work = 50'000'000;
-  // Locks refer to the target's existing exact joint identities. No names or
-  // nearest bones are used to guess a correspondence between different rigs.
+  // Locks refer to the target's existing joint slots, including transfers
+  // from another rig with a verified correspondence.
   std::vector<uint8_t> locks;
   AnatomicalSkinOptions anatomical;
   float volume_cell_size = .01f; // World metres.
@@ -37,7 +37,8 @@ float skin_distance_slider(float metres);
 // Automatic binding accepts fitted skeletons without weights. Transfer requires
 // an already skinned reference. Source and destination placements are converted
 // explicitly; paint, original appearance, morphs and native source identities
-// stay intact. An existing different rig is rejected rather than discarded.
+// stay intact. Transfer between different rigs maps the donor's weights to
+// the receiver's existing joints and requires every sampled influence to map.
 bool author_skin(Scene &, uint64_t target, const SkinAuthoringOptions &,
                  const std::function<bool()> &cancelled = {});
 // Positive screened surface heat with exact nearest/visibility seeds and

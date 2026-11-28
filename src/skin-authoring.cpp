@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/skin-authoring.hpp"
 #include "skin-affine.hpp"
+#include "skin-joint-transfer.hpp"
 #include "automatic-humanoid-bind.hpp"
 #include "normal-frame-runtime.hpp"
 #include "polygon-conversion.hpp"
 #include "source-rest-scene.hpp"
+#include "source-rigid-pose.hpp"
 #include "source-skin-link.hpp"
 #include <nlohmann/json.hpp>
 namespace dome {
@@ -124,10 +126,21 @@ bool author_skin(Scene &scene,uint64_t target_id,const SkinAuthoringOptions &opt
   bool same_placement=exact_metric?reference_matrix.matrix()==target_matrix.matrix():equal_placement(reference_world,target_world);
   if(exact_metric&&!same_placement)skeleton=detail::skin_reframe(*source.skeleton,change,placement_work);
   if(same_placement) { skeleton=*source.skeleton; pose=source.pose; }
-  if(existing && target.deformation->source_skin_joints.empty() && target.deformation->skeleton->encode()!=skeleton.encode())
+  const bool linked=existing&&!target.deformation->source_skin_joints.empty();
+  const bool different_rig=existing&&(!linked||options.mode==SkinAuthoringMode::Transfer)&&
+      target.deformation->skeleton->encode()!=skeleton.encode();
+  bool different_attachment=false;
+  if(linked&&options.mode==SkinAuthoringMode::Transfer){
+    const auto owner=detail::source_skin_link(scene.group_path(target.group),*target.deformation);
+    const auto donor=detail::source_rig_instance(scene,reference);
+    different_attachment=!donor||!detail::same_source_skin_instance(*owner,*donor)||owner->source_node!=donor->source_node;
+  }
+  const bool keep_target_rig=options.mode==SkinAuthoringMode::Transfer&&(different_rig||different_attachment);
+  if(different_rig&&!linked&&!keep_target_rig)
     throw std::invalid_argument("Target has a different rest rig; use an explicit joint-mapping workflow");
+  const auto target_bones=keep_target_rig?target.deformation->skeleton->bones.size():skeleton.bones.size();
   if((!options.locks.empty() && (!existing || !target.deformation->skin ||
-       options.locks.size()!=skeleton.bones.size())) ||
+       options.locks.size()!=target_bones)) ||
      std::any_of(options.locks.begin(),options.locks.end(),[](uint8_t v){return v>1;}))
     throw std::invalid_argument("Skin locks require the target's exact existing joint identities");
   if(existing && target.deformation->skin && !options.locks.empty()) {
@@ -171,11 +184,20 @@ bool author_skin(Scene &scene,uint64_t target_id,const SkinAuthoringOptions &opt
       weights=solve_automatic(rest,world_rig);
     }else weights=solve_automatic(rest,*source.skeleton);
   } else {
+    std::vector<uint32_t> joints;
+    if(keep_target_rig){
+      if(linked)detail::authenticate_native_source_skin(scene,target,cancelled);
+      joints=detail::transfer_joint_map(scene,reference,target,placement_work);
+    }
+    const auto transfer=[&](const Mesh &mesh,float distance,size_t budget){
+      return detail::transfer_weights_with_joint_map(mesh,*source.skin,rest,source.skeleton->bones.size(),
+          target_bones,joints,distance,options.limits,cancelled,budget);
+    };
     if(exact_metric){
       auto source_mesh=detail::skin_world_mesh(reference.painted->mesh(),reference_metric,placement_work);
-      weights=transfer_weights(source_mesh,*source.skin,rest,skeleton.bones.size(),options.transfer_distance,options.limits,cancelled,placement_work.remaining());
-    }else weights=transfer_weights(reference.painted->mesh(),*source.skin,rest,skeleton.bones.size(),
-                             options.transfer_distance/reference_world.scale,options.limits,cancelled,options.maximum_work);
+      weights=transfer(source_mesh,options.transfer_distance,placement_work.remaining());
+    }else weights=transfer(reference.painted->mesh(),options.transfer_distance/reference_world.scale,
+                            keep_target_rig?placement_work.remaining():options.maximum_work);
   }
   if(!options.locks.empty()) for(size_t vertex=0;vertex<weights.vertices.size();++vertex) {
     if(!(vertex%1024)) stop(cancelled);
@@ -183,7 +205,7 @@ bool author_skin(Scene &scene,uint64_t target_id,const SkinAuthoringOptions &opt
     std::erase_if(candidate,[&](const Influence &i){return options.locks.at(i.joint);});
     for(auto influence:target.deformation->skin->vertices.at(vertex))
       if(options.locks.at(influence.joint)) candidate.push_back(influence);
-    candidate=normalize_weights(std::move(candidate),skeleton.bones.size(),options.locks,options.limits);
+    candidate=normalize_weights(std::move(candidate),target_bones,options.locks,options.limits);
   }
   if(existing && target.deformation->skin) {
     bool same=true;
@@ -195,13 +217,15 @@ bool author_skin(Scene &scene,uint64_t target_id,const SkinAuthoringOptions &opt
       if(equal)row=old;else same=false;
     }
     if(same){
+      if(keep_target_rig){stop(cancelled);return false;}
       Scene linked=scene;
       if(!detail::link_native_source_skin(linked,target_id,options.reference,cancelled))return false;
       linked.validate(false);stop(cancelled);scene=std::move(linked);return true;
     }
   }
   auto next=target.deformation ? *target.deformation : DeformationState(target.painted->mesh());
-  next.skeleton=std::move(skeleton); next.skin=std::move(weights);
+  if(!keep_target_rig)next.skeleton=std::move(skeleton);
+  next.skin=std::move(weights);
   if(!existing) {
     next.pose=std::move(pose); next.humanoid=source.humanoid;
     if(source.landmarks) {
@@ -233,7 +257,7 @@ bool author_skin(Scene &scene,uint64_t target_id,const SkinAuthoringOptions &opt
   Scene result=scene;
   result.object(target.id).deformation=std::make_shared<const DeformationState>(std::move(next));
   result.object(target.id).rig_source=std::move(original);
-  detail::link_native_source_skin(result,target.id,options.reference,cancelled);
+  if(!keep_target_rig)detail::link_native_source_skin(result,target.id,options.reference,cancelled);
   result.validate(false); stop(cancelled); scene=std::move(result);return true;
 }
 } // namespace dome
