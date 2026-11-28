@@ -142,12 +142,10 @@ std::vector<detail::RetainedSourceBakeField> capture_texture_set_bake_source(
         : field.painted->preview(field.material,cancelled);
       return;
     }
-    const auto paint=detail::texture_set_source_read_view(field,limits);
     const auto preview=pose.field(field,deformed);
     if(deformed)preview->validate_bake_world(field.domain->triangles(),
         placement?placement->world():AffineTransform{},cancelled);
-    material.maps=detail::PolygonSurfacePaintCodec::preview(*paint,field.material_bindings,
-        field.material,cancelled,preview);
+    material.maps=detail::PolygonSurfacePaintCodec::preview_for_bake(field,cancelled,preview);
     const auto packet=material.maps->overlay;
     if(detail::overlay_uses_float_emission(*packet)||detail::hdr_emission(field.material.emissive)||
        detail::physical_emission(*field.material_bindings))

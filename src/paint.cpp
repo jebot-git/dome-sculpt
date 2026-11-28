@@ -1868,6 +1868,19 @@ bool PaintedMesh::redo() {
   return true;
 }
 namespace {
+void check_polygon_preview_budget(const PaintedMesh &paint){
+  const size_t pixels=size_t(paint.resolution())*paint.resolution(),limit=256*1024*1024;
+  size_t prospective=paint.storage_bytes();
+  const auto charge=[&](size_t count,size_t bytes){
+    if(prospective>limit||count>(limit-prospective)/bytes)
+      throw std::length_error("Polygon preview exceeds prospective material/float workspace");
+    prospective+=count*bytes;
+  };
+  charge(pixels,64);
+  charge(paint.mesh().positions.size(),128);
+  charge(paint.mesh().indices.size(),512);
+}
+
 void finish_polygon_maps(TextureMaps &maps,const PaintedMesh &paint,
     const std::shared_ptr<const SourceMaterialBindings> &binding,
     std::shared_ptr<const detail::PaintOverlayPacket> packet,
@@ -1888,6 +1901,29 @@ void finish_polygon_maps(TextureMaps &maps,const PaintedMesh &paint,
   maps.polygon_surface->validate_maps(maps);
   paint_compute::checkpoint(cancelled);
 }
+
+std::shared_ptr<TextureMaps> compile_retained_polygon_preview(const TextureSetView &field,const PaintedMesh &paint,
+    size_t &work,const TextureSetLimits &limits,std::shared_ptr<const detail::PolygonSurfacePreview> cached){
+  using namespace detail;
+  const auto &binding=field.material_bindings;
+  if(!cached)cached=field.source->source_preview();
+  binding->validate();
+  binding->polygon_surface_transfer->validate_current(paint);
+  field.material.validate();
+  const auto mode=retained_grid_mode(field);
+  const auto normal_bytes=retained_hdr_normal_bytes(field);
+  const auto map_bytes=native_material_grid_bytes(paint,mode);
+  if(map_bytes>limits.maximum_bytes||normal_bytes>limits.maximum_bytes-map_bytes||
+     native_material_grid_scratch_bytes(paint,mode)>limits.maximum_bytes-map_bytes-normal_bytes)
+    throw std::length_error("Retained preview exceeds its material and normal byte limit");
+  if(work>limits.maximum_work||normal_bytes/2>limits.maximum_work-work)
+    throw std::length_error("Retained normal carriage exceeds its work limit");
+  work+=normal_bytes/2; // Copy and validate both normal images at texel granularity.
+  auto maps=compile_native_material_grid(paint,field.material,work,limits,mode);
+  auto packet=PaintOverlayFactory::capture_native_emission(paint,limits.cancelled);
+  finish_polygon_maps(*maps,paint,binding,std::move(packet),cached,limits.cancelled);
+  return maps;
+}
 }
 
 std::shared_ptr<const TextureMaps> detail::PolygonSurfacePaintCodec::preview(const PaintedMesh&paint,
@@ -1895,9 +1931,7 @@ std::shared_ptr<const TextureMaps> detail::PolygonSurfacePaintCodec::preview(con
     std::shared_ptr<const detail::PolygonSurfacePreview>cached){
   paint_compute::checkpoint(cancelled);material.validate();if(!binding||!binding->polygon_surface_transfer)throw std::invalid_argument("Polygon preview requires its actual current owning field");
   binding->validate();const auto&owner=binding->polygon_surface_transfer;owner->validate_current(paint);
-  const size_t pixels=size_t(paint.resolution())*paint.resolution(),limit=256*1024*1024;size_t prospective=paint.storage_bytes();
-  const auto charge=[&](size_t n,size_t unit){if(prospective>limit||n>(limit-prospective)/unit)throw std::length_error("Polygon preview exceeds prospective material/float workspace");prospective+=n*unit;};
-  charge(pixels,64);charge(paint.mesh().positions.size(),128);charge(paint.mesh().indices.size(),512);
+  check_polygon_preview_budget(paint);
   auto packet=PaintOverlayFactory::capture_native_emission(paint,cancelled);
   const auto hdr=[](const auto&v){return std::any_of(v.begin(),v.end(),[](float x){return x>1;});};
   const bool physical=overlay_uses_float_emission(*packet)||hdr(material.emissive)||binding->physical_emission||hdr(binding->native_reference.emission);
@@ -1920,24 +1954,23 @@ std::shared_ptr<TextureMaps> detail::PolygonSurfacePaintCodec::preview_retained_
     throw std::invalid_argument("Retained preview requires its actual PBR material member");
   field.source->authenticate_owner(field.source);
   const auto paint=field.source->read_view(field,limits);
-  const auto &binding=field.material_bindings;
-  if(!cached)cached=field.source->source_preview();
-  binding->validate();
-  binding->polygon_surface_transfer->validate_current(*paint);
-  field.material.validate();
-  const auto mode=retained_grid_mode(field);
-  const auto normal_bytes=retained_hdr_normal_bytes(field);
-  const auto map_bytes=native_material_grid_bytes(*paint,mode);
-  if(map_bytes>limits.maximum_bytes||normal_bytes>limits.maximum_bytes-map_bytes||
-     native_material_grid_scratch_bytes(*paint,mode)>limits.maximum_bytes-map_bytes-normal_bytes)
-    throw std::length_error("Retained preview exceeds its material and normal byte limit");
-  if(work>limits.maximum_work||normal_bytes/2>limits.maximum_work-work)
-    throw std::length_error("Retained normal carriage exceeds its work limit");
-  work+=normal_bytes/2; // Copy and validate both normal images at texel granularity.
-  auto maps=compile_native_material_grid(*paint,field.material,work,limits,mode);
-  auto packet=PaintOverlayFactory::capture_native_emission(*paint,limits.cancelled);
-  finish_polygon_maps(*maps,*paint,binding,std::move(packet),cached,limits.cancelled);
-  return maps;
+  return compile_retained_polygon_preview(field,*paint,work,limits,std::move(cached));
+}
+
+std::shared_ptr<const TextureMaps> detail::PolygonSurfacePaintCodec::preview_for_bake(const TextureSetView &field,
+    const std::function<bool()> &cancelled,std::shared_ptr<const PolygonSurfacePreview> cached){
+  TextureSetLimits limits;
+  limits.cancelled=cancelled;
+  const auto paint=texture_set_source_read_view(field,limits);
+  if(!retained_material_grid(field))
+    return preview(*paint,field.material_bindings,field.material,cancelled,std::move(cached));
+  check_polygon_preview_budget(*paint);
+  // This is one donor member under the original Bake preview byte limit.
+  // Its 16 layers may cover the whole writable grid, independently of the
+  // aggregate budgets used by preview and export across a collection.
+  limits.maximum_work=512'000'000;
+  size_t work=0;
+  return compile_retained_polygon_preview(field,*paint,work,limits,std::move(cached));
 }
 bool detail::EmissionExportAccess::requires_preview(const PaintedMesh &paint,const Material &material,
     const SourceMaterialBindings *binding) {

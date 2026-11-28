@@ -15,6 +15,8 @@ struct PolygonSurfacePaintCodec {
      std::shared_ptr<const PolygonSurfacePreview> cached={});
  static std::shared_ptr<TextureMaps> preview_retained_material(const TextureSetView &,size_t &,
      const TextureSetLimits &,std::shared_ptr<const PolygonSurfacePreview> cached={});
+ static std::shared_ptr<const TextureMaps> preview_for_bake(const TextureSetView &,const std::function<bool()> &,
+     std::shared_ptr<const PolygonSurfacePreview> cached={});
  static nlohmann::json encode(const PaintedMesh &,
      const std::shared_ptr<const SourceMaterialBindings> &,PolygonSurfaceNodeWriter &,
      PaintImageArchive &,NormalSamplingArchive * = nullptr,

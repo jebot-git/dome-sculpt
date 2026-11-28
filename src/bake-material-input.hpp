@@ -46,7 +46,8 @@ struct MaterialInput {
       const auto &maps=*material.maps;
       images[Color]={&maps.color,nullptr,material.repeat_uv};
       images[Orm]={&maps.metal_rough,nullptr,material.repeat_uv};
-      if(!material.emission_batch)images[Emission]={&maps.emission,nullptr,material.repeat_uv};
+      if(!material.emission_batch&&!maps.emission.rgba.empty())
+        images[Emission]={&maps.emission,nullptr,material.repeat_uv};
       if(separate_pbr&&!maps.pbr_color.rgba.empty())images[PbrColor]={&maps.pbr_color};
     }
     if(retained_normal)images[TangentNormal]={retained_normal->image.get(),retained_normal};

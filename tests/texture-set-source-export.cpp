@@ -800,6 +800,20 @@ void retained_bake_source(bool prepared,bool physical,bool affine=false,bool ref
   const auto member=texture_set_view(source_object,set);
   const auto read=member.source->read_view(member);
   const auto maps=detail::PolygonSurfacePaintCodec::preview(*read,member.material_bindings,member.material);
+  const auto bake_maps=detail::PolygonSurfacePaintCodec::preview_for_bake(member,{});
+  const auto same_image=[](const Image &a,const Image &b){
+   return a.width==b.width&&a.height==b.height&&a.rgba==b.rgba;
+  };
+  check(same_image(bake_maps->color,maps->color)&&same_image(bake_maps->metal_rough,maps->metal_rough)&&
+        bake_maps->transparent==maps->transparent&&bake_maps->baked_base==maps->baked_base,
+        "Retained Bake compiles identical RGBA and ORM on the original atlas and preserves its owner");
+  if(physical)
+   check(bake_maps->emission.rgba.empty()&&bake_maps->overlay->resolution()==maps->overlay->resolution(),
+         "Retained FLOAT Bake uses the original sparse emission and omits the byte emission atlas");
+  else
+   check(same_image(bake_maps->emission,maps->emission)&&same_image(bake_maps->color_coverage,maps->color_coverage)&&
+         same_image(bake_maps->emission_coverage,maps->emission_coverage),
+         "Retained RGB8 Bake keeps the legacy emission and independent coverages byte for byte");
   for(const auto triangle:member.domain->triangles()){
    const auto start=size_t(triangle)*3;
    const auto a=low.uv.at(low.indices[start]),b=low.uv.at(low.indices[start+1]),c=low.uv.at(low.indices[start+2]);

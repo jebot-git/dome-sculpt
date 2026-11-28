@@ -114,7 +114,7 @@ Channels material_base(const BakeMaterial &m,const Mesh &mesh,size_t triangle,
   }
   const auto color=sample(m.maps->color,uv,m.repeat_uv,true), orm=sample(m.maps->metal_rough,uv,m.repeat_uv,false);
   for (int i=0;i<4;++i) result.color[i]=color[i]*(m.maps_are_composited?1:result.color[i]);
-  if(!m.emission_batch){
+  if(!m.emission_batch&&!m.maps->emission.rgba.empty()){
     const auto emission=sample(m.maps->emission,uv,m.repeat_uv,true);
     for (int i=0;i<3;++i) result.emission[i]=emission[i]*(m.maps_are_composited?1:result.emission[i]);
   }
@@ -259,7 +259,14 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o,
               throw std::invalid_argument("Physical source emission requires its explicit radiance-preserving bake adapter");
           }
         if(m.maps->color.width||m.maps->metal_rough.width||m.maps->emission.width||m.maps->normal.width)throw std::invalid_argument("Raw bake source cannot also contain derived maps");
-      }else{m.maps->color.validate(); m.maps->metal_rough.validate(); m.maps->emission.validate();}
+      }else{
+        m.maps->color.validate();
+        m.maps->metal_rough.validate();
+        // A retained FLOAT field supplies its own emission at the hit. Only
+        // that authenticated path may omit the legacy image entirely.
+        if(!owns_field||!retained[field].emission_background||m.maps->emission.width||
+           m.maps->emission.height||!m.maps->emission.rgba.empty())m.maps->emission.validate();
+      }
       if(m.maps->pbr_color.width||m.maps->pbr_color.height||!m.maps->pbr_color.rgba.empty()) {
         if(m.maps->source_only||!m.maps_are_composited)throw std::invalid_argument("Separate baked source PBR colors require an explicit resolved composite");
         m.maps->pbr_color.validate();
