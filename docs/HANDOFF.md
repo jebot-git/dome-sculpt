@@ -217,6 +217,15 @@ matches byte for byte. The paired median repeat was about 0.48 seconds
 on both builds. Normal frames still use the retained field owner.
 [Bake material transfer evidence](validation/bake-material-transfer-20261128.json)
 
+The selected GPU now determines Bake gutter owners. The frontier respects
+the requested radius, routes around protected texels and misses, and
+preserves row-order ties. The 1024² HDR Bake padded 88,064 texels and saved
+a byte-identical project. The Arc trace recorded a 1 MiB coverage upload and 688 KiB of
+owner pairs, plus 128 bytes of frontier counts. Median repeat time was
+0.49 seconds on both builds. The first Bake took 7.28 seconds with GPU
+padding and 7.15 seconds with the preceding FIFO.
+[GPU Bake padding evidence](validation/bake-padding-gpu-20261128.json)
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.

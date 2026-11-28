@@ -101,6 +101,14 @@ paint kernels use the same packed record, including the invalid-coordinate
 flag and normal alpha coverage. FLOAT radiance has its own sampling path.
 [Bake material transfer evidence](validation/bake-material-transfer-20261128.json)
 
+Bake resolves seam padding on the selected GPU. An eight-neighbor frontier
+visits fillable texels in shortest-path order. Ties select the earliest
+projected seed in row order, matching the original FIFO. Protected texels,
+misses and other projected texels are barriers. The device returns padded
+texel pairs, and the worker copies the original RGB8 and FLOAT channels
+from the projected seed into the detached result.
+[GPU Bake padding evidence](validation/bake-padding-gpu-20261128.json)
+
 Eligible 512–2048 current-grid RGB8 Bake materials now composite color, ORM
 and legacy emission on the selected GPU. Their ordered paint, coverage,
 native normal-map output, and GLB export match the preceding implementation.

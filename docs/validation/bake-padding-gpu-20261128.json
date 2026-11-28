@@ -1,0 +1,178 @@
+{
+  "date": "2026-11-28",
+  "product": "3a457ba8f27ed4dd9e114c76db16f025e3ae8403",
+  "preceding": "95677d78dd9fa4843ba2e84c02130d1d424b441f",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "GPU Bake gutter ownership and nearest original seed selection with exact row-order ties and obstacle handling.",
+  "oneapi_arc_release": {
+    "application_sha256": "eca2d6a2ac06f01961e913263ed6014ea6a92a174c6f76272b632a877988d549",
+    "fltk_core_sha256": "35aa46ebf11f5f3a9772d926b05a24938572471d9dbcf3e2718e98376fadbdb3",
+    "bake_regression": {
+      "passed": 27,
+      "synthetic_openxr": 4,
+      "log_sha256": "456fb56e2e1ef4d9c310bb1aead7f7a9025ac43b08791cc81c2b17083f42f213",
+      "junit_sha256": "afa146fa99ec67a714d3f4cff69f276e37dc6491aa915e52e7e20ecd96c3e72e"
+    },
+    "retained_regression": {
+      "passed": 6,
+      "synthetic_openxr": 1,
+      "log_sha256": "86d9c45b606d9cd943d97154e8a4b42edee7bf5a1266bd8c1634e1c5f523581e",
+      "junit_sha256": "e4544567cae3a3ab14a854bfe2d204a48f2051b948e6f13a412696cf7fab3cdc"
+    },
+    "paint_export_regression": {
+      "passed": 10,
+      "synthetic_openxr": 0,
+      "log_sha256": "6cc36a63a310161be3e776dc5deefac17efc31f0b05995af6d43acd606ca9c63",
+      "junit_sha256": "b1f5069625880486a32f3b813258ddf8334334089a1aeced822fd25d12ed13ab"
+    },
+    "overlap_between_regressions": [
+      "texture-set-retained-bake-source"
+    ],
+    "identical_regression_project_sha256": {
+      "affine-target.dsculpt": "7b72d9389b8365f9f330f53a70278789bb4f90183312584d0336d1c601c68b6b",
+      "mixed-before.dsculpt": "172a4a4084468e1f3d4b16c7dbe569633c329002ea78d8a595250f13705c658e",
+      "mixed-baked.dsculpt": "17338f40b4521cce6880102778bce603e72d13a2b877724e2c19c2b62ddfa37c",
+      "retained-bake-source.dsculpt": "27578419255b987de8c64a534a070bb3125b3d09269443cb769e26dd91cf25ad"
+    },
+    "prepared_hdr_bake": {
+      "donor_fields": 2,
+      "donor_resolution": 512,
+      "target_resolution": 1024,
+      "projected_texels": 430336,
+      "projection_rays": 0,
+      "radius": 32,
+      "padded_texels": 88064,
+      "identical_project_sha256": "44483f96ad4d918771d8b457f768dccc55825f30c844b174d44cfd60663f9c49",
+      "seconds_first_then_repeats": {
+        "preceding": [
+          7.15003,
+          0.49375,
+          0.492554
+        ],
+        "candidate": [
+          7.28376,
+          0.48638,
+          0.485335
+        ]
+      },
+      "median_repeat_seconds": {
+        "preceding": 0.49315200000000003,
+        "candidate": 0.4858575
+      },
+      "log_sha256": "35745361526f1c288d0acaa68ed547937f1a23afb59349438a2c9817e1d6eff3",
+      "unified_runtime_trace": {
+        "scope": "First Bake on the same persisted donor after input setup. End markers exclude setup and publication I/O.",
+        "copy_count_and_bytes_order": [
+          "count",
+          "bytes"
+        ],
+        "measurements": {
+          "preceding": {
+            "trace_sha256": "a0195132b35c8de9396d43bf19196328747734792330d14cce92ad1085e44f73",
+            "copy_counts_and_bytes": {
+              "device_to_host": [
+                124,
+                34642160
+              ],
+              "host_to_device": [
+                227,
+                45391144
+              ]
+            },
+            "device_memory_allocations": 51,
+            "device_queue_creations": 5,
+            "resident_2m_allocations": 2,
+            "full_material_result_buffer_allocations": 0,
+            "hdr_material_result_buffer_allocations": 2,
+            "radiance_result_buffer_allocations": 2
+          },
+          "candidate": {
+            "trace_sha256": "152980fefbec79e14d70fc543b2658a9f2f7d80c1ed7660530453b2f399b6133",
+            "copy_counts_and_bytes": {
+              "device_to_host": [
+                158,
+                35346800
+              ],
+              "host_to_device": [
+                228,
+                46439720
+              ]
+            },
+            "device_memory_allocations": 56,
+            "device_queue_creations": 6,
+            "resident_2m_allocations": 2,
+            "full_material_result_buffer_allocations": 0,
+            "hdr_material_result_buffer_allocations": 2,
+            "radiance_result_buffer_allocations": 2
+          }
+        },
+        "bytes_added_by_device_padding": {
+          "host_to_device": 1048576,
+          "device_to_host": 704640
+        },
+        "readback_breakdown": {
+          "texture_owner_pairs_bytes": 704512,
+          "frontier_count_bytes": 128
+        }
+      }
+    },
+    "maximum_atlas": {
+      "resolution": 4096,
+      "projected_seed": 16777215,
+      "padded_texels": 6,
+      "log_sha256": "5d44b93540a175c50593d737a4a05198827bb4f3341a34158b10636c7a1e646e"
+    },
+    "ui_fixture": {
+      "radius": 8,
+      "projected_texels": 780,
+      "padded_texels": 1504,
+      "reference_project_sha256": "7580b79915dbfc4adabd72b4f6961ec61015717b89f73d46ea12b6a3f681f012",
+      "cancelled_project_sha256": "2eda23a0f3f58b991e95695252c606cec23cfdae93880e8a28e794988b0e0d24"
+    },
+    "padded_synthetic_openxr": {
+      "passed": 19,
+      "physical_headset": false,
+      "log_sha256": "f956ec5daf026e2a3cc579a3b10e8b966080dbe5dc96fbc1aa2490a94aab59d2",
+      "report_sha256": "adabf84b795df8d36f9ed533335dab271845709f2d8d68cbd0741d595311b18b"
+    },
+    "wayland": {
+      "passed": 15,
+      "report_sha256": "3206993dcd5a5c556e4a8584dc324197fcbb72c60819d1efa07f2d98534a9aa7",
+      "runtime_maps_sha256": "87a3b2a1eced7f49bd1c1cd304684b01003c6c8e82293d0236a04ee12b440e19",
+      "log_sha256": "73ceb02c01635b06559179321da5b01a986e00d0db7561fe65b8d347340bd3de"
+    }
+  },
+  "missing_device": {
+    "target": "OneAPI direct Bake padding probe with the Arc device masked",
+    "result": "No device of requested type 'info::device_type::gpu' available.",
+    "log_sha256": "8681f2e4968434fab815c4332c1ee4cede1fc6c70ad6cdfe8cc8d9b9cea675bf"
+  },
+  "headless_reference": {
+    "passed": 5,
+    "log_sha256": "20468c03d7c2a74fdd3cdc0be94a187eb9df2925a5ae362ca65c41d026d5699f",
+    "asan_ubsan_retained_checks": 1191,
+    "sanitizer_log_sha256": "664fb3fd6cef60e02f27b23fa4ebbbbe288c429515cbcb44996b8dd711d3ac51",
+    "asan_ubsan_frontier_checks": [
+      "PASS GPU padding matches the native FIFO across distance, ties, obstacles, boundaries and readback chunks",
+      "PASS Cancelling the device padding frontier publishes no owner pairs"
+    ],
+    "frontier_sanitizer_log_sha256": "b61ce663e38f3c59e22aaab85d44b1aed3298b41d61b248210a879c0be103ebb"
+  },
+  "vendor_compile_only": {
+    "cuda": {
+      "bake-ray-gpu.cu": "691048d84c6080151e5d30b64d9a8fadaa98fefe05d2c1060de194489e6b462f",
+      "bake.cpp": "4b7fb695646e97bab8100c0983c839d2e3009428ee5c8d1c58260387aaba5407"
+    },
+    "rocm": {
+      "bake-ray-gpu.cu": "3e194a88e4648c2719a448b382716f54bf2f959a21752663e1d68f1091fbb194",
+      "bake.cpp": "b471c2665d26c738938c2e687ff4b35f8366258d8c101fdda301413e1ba0a0c4"
+    }
+  },
+  "limits": [
+    "The worker stages the coverage and copies each channel from the returned original seed into the native result.",
+    "The standalone sanitizer control executes the common frontier in reverse dispatch order on the host. Real Arc runs qualify parallel device ownership.",
+    "The maximum-size test covers ownership and bounds at 4096, with six gutter destinations.",
+    "Timing is one paired matching-topology fixture with two repeat runs per executable.",
+    "AMD and NVIDIA hardware execution and physical OpenXR acceptance remain open."
+  ]
+}
