@@ -46,7 +46,8 @@ elseif(DOME_COMPUTE_BACKEND STREQUAL "ONEAPI")
   set(paint_compute_source src/paint-composite-sycl.cpp src/paint-grid-sycl.cpp
     src/paint-source-coordinate-sycl.cpp src/emission-raster-sycl.cpp
     src/emission-raster-bake-sycl.cpp src/emission-raster-typed-sycl.cpp
-    src/emission-raster-finite-sycl.cpp)
+    src/emission-raster-finite-sycl.cpp src/emission-raster-texture-set-sycl.cpp
+    src/emission-raster-texture-set-source-sycl.cpp)
 else()
   message(FATAL_ERROR "Unknown DOME_COMPUTE_BACKEND=${DOME_COMPUTE_BACKEND}")
 endif()
@@ -179,7 +180,8 @@ if(BUILD_TESTING)
   target_link_options(dome-sculpt-emission-raster-compute-test PRIVATE "LINKER:--wrap=_ZN4dome15compute_backendEv")
   add_test(NAME emission-raster-compute COMMAND dome-sculpt-emission-raster-compute-test)
   add_test(NAME emission-raster-finite-compute COMMAND dome-sculpt-emission-raster-compute-test --finite)
-  set_tests_properties(emission-raster-compute emission-raster-finite-compute PROPERTIES TIMEOUT 300)
+  add_test(NAME emission-raster-texture-set-compute COMMAND dome-sculpt-emission-raster-compute-test --texture-set)
+  set_tests_properties(emission-raster-compute emission-raster-finite-compute emission-raster-texture-set-compute PROPERTIES TIMEOUT 300)
   add_executable(dome-sculpt-source-artist-normal-bake-test tests/source-artist-normal-bake.cpp)
   target_include_directories(dome-sculpt-source-artist-normal-bake-test PRIVATE src)
   target_link_libraries(dome-sculpt-source-artist-normal-bake-test PRIVATE dome-sculpt-core)

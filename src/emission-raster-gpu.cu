@@ -26,6 +26,12 @@ __global__ void render_finite_pixels(DeviceInput input,FiniteGrid grid,size_t fi
   const size_t index=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
   if(index<count)emission_raster::render_finite(input,grid,first+index,out+3*index);
 }
+template<bool mapped>
+__global__ void render_texture_set_pixels(DeviceInput input,size_t first,size_t count,uint32_t *out,bool coefficients){
+  const size_t index=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+  const unsigned channels=coefficients?10:4;
+  if(index<count)emission_raster::render_texture_set<mapped>(input,first+index,out+channels*index,coefficients);
+}
 class Device {
 public:
   Device(){
@@ -60,6 +66,13 @@ public:
   void render_finite(DeviceInput input,FiniteGrid grid,size_t first,size_t count,uint32_t *out){
     constexpr size_t block=128;
     render_finite_pixels<<<(count+block-1)/block,block,0,stream_>>>(input,grid,first,count,out);
+    checked(DOME_DEVICE(GetLastError)());
+  }
+  void render_texture_set(DeviceInput input,size_t first,size_t count,uint32_t *out,bool coefficients){
+    constexpr size_t block=128;
+    if(input.source.coordinates.columns)
+      render_texture_set_pixels<true><<<(count+block-1)/block,block,0,stream_>>>(input,first,count,out,coefficients);
+    else render_texture_set_pixels<false><<<(count+block-1)/block,block,0,stream_>>>(input,first,count,out,coefficients);
     checked(DOME_DEVICE(GetLastError)());
   }
 private:

@@ -7,6 +7,7 @@
 #include "normal-frame-runtime.hpp"
 #include "emission-authority.hpp"
 #include "emission-export.hpp"
+#include "emission-raster-device.hpp"
 #include "paint-emission-sample.hpp"
 #include "texture-set-native-grid.hpp"
 #include "texture-set-surface.hpp"
@@ -16,12 +17,14 @@
 #include "affine-interaction.hpp"
 #include "normal-bake-encoding.hpp"
 #include "dome/material-bindings.hpp"
+#include "dome/brush.hpp"
 #include "dome/material-visibility.hpp"
 #include "dome/paint-sampling.hpp"
 #include <bit>
 #include <cstring>
 #include <limits>
 #include <map>
+#include <mutex>
 #include <numeric>
 namespace dome::detail {
 namespace {
@@ -1025,6 +1028,18 @@ std::shared_ptr<TextureMaps> compile_native_material_grid(const PaintedMesh &pai
 }
 
 namespace {
+using EmissionPreview=EmissionRasterDevice::TextureSetPreview;
+size_t emission_read_count(uint32_t resolution){
+ return std::min(size_t(resolution)*16,emission_raster::chunk_pixels);
+}
+
+size_t emission_device_scratch(const PaintedMesh &paint,bool buffered){
+ if(compute_backend()=="CPU")return 0;
+ const auto resolution=paint.resolution();
+ return emission_raster_staging_bytes(paint)+2*resolution*sizeof(paint_compute::SourceTerms)+
+     (buffered?emission_read_count(resolution)*sizeof(EmissionPreview):0);
+}
+
 std::optional<BakedEmissionSample> shared_baked_emission(const BakedTextures &bake,size_t &work,
     const TextureSetLimits &limits) {
  if(bake.emission_field){
@@ -1114,7 +1129,11 @@ public:
  const auto &constant_samples() const { return constants_; }
  const auto &constant_counts() const { return constant_counts_; }
  size_t working_bytes() const {
-  return sizeof(*this)+(grid_?grid_->tile_layers.capacity()*sizeof(uint16_t):0);
+  return sizeof(*this)+(grid_?grid_->tile_layers.capacity()*sizeof(uint16_t):0)+
+      (uses_device()?emission_device_scratch(*paint_,false):0);
+ }
+ bool uses_device() const {
+  return compute_backend()!="CPU"&&constant_counts_[0]+constant_counts_[1]<size_t(resolution)*resolution;
  }
  bool varying_typed_source() const { return typed_source_&&typed_source_->aligned; }
  std::array<float,3> background(uint32_t x,uint32_t y) const {
@@ -1134,11 +1153,39 @@ public:
       baked_emission_texel(*paint_->baked(),size_t(grid_->padding[at])):sampler_.sample_texel(x,y);
   return coefficients(contribution,background(x,y));
  }
- EmissionExrPixel pixel(uint32_t x,uint32_t y)const{
-  const auto kind=sample_kind(size_t(y)*resolution+x);
-  return kind==SampleKind::Varying?sample_variable(x,y):constants_[size_t(kind)];
+ void read_preview(size_t first,std::span<EmissionPreview> pixels,const TextureSetLimits &limits){
+  const std::lock_guard lock(mutex_);
+  device(limits).read_texture_set_preview(first,pixels,limits.cancelled);
+ }
+ void read(size_t first,std::span<EmissionExrPixel> pixels,const TextureSetLimits &limits){
+  const auto size=size_t(resolution)*resolution;
+  if(first>size||pixels.size()>size-first)throw std::logic_error("Texture-set HDR read exceeds its owning raster");
+  stop(limits);
+  const bool gpu=uses_device();
+  if(gpu&&!pixels.empty()){
+   const std::lock_guard lock(mutex_);
+   device(limits).read(first,pixels,limits.cancelled);
+  }
+  for(size_t i=0;i<pixels.size();++i){
+   if((i&1023)==0)stop(limits);
+   const auto at=first+i;
+   const auto kind=sample_kind(at);
+   if(kind!=SampleKind::Varying)pixels[i]=constants_[size_t(kind)];
+   else if(!gpu)pixels[i]=sample_variable(uint32_t(at%resolution),uint32_t(at/resolution));
+  }
  }
 private:
+ EmissionRasterDevice &device(const TextureSetLimits &limits){
+  if(!device_){
+   if(working_bytes()>limits.maximum_bytes)
+    throw ExportBudgetExceeded("Texture-set FLOAT device staging exceeds working budget");
+   const auto *source=source_.image&&!typed_source_?&source_:nullptr;
+   const auto *aligned=typed_source_?typed_source_->aligned.get():nullptr;
+   const auto constant=typed_source_&&!aligned?background(0,0):background_;
+   device_=create_texture_set_emission_device(*paint_,source,aligned,constant,legacy_strength_,limits.cancelled);
+  }
+  return *device_;
+ }
  EmissionExrPixel coefficients(const BakedEmissionSample &q,std::array<float,3> background) const {
   const auto rgb=q.resolve(background,legacy_strength_);
   return {rgb[0],rgb[1],rgb[2],q.legacy[0],q.legacy[1],q.legacy[2],
@@ -1153,19 +1200,35 @@ private:
  std::optional<SparseExportGrid> grid_;
  std::array<EmissionExrPixel,2> constants_{};
  std::array<size_t,2> constant_counts_{};
+ std::unique_ptr<EmissionRasterDevice> device_;
+ std::mutex mutex_;
  bool shared_bake_=false;
 public:
  uint32_t resolution;
 };
 TextureSetExportEmission compile_emission(const TextureSetView &field,size_t &work,
     const TextureSetLimits &limits,bool authored_mtoon) {
- const TextureSetEmissionSamples samples(field,work,2,limits,authored_mtoon);
+ TextureSetEmissionSamples samples(field,work,2,limits,authored_mtoon);
  const auto resolution=samples.resolution;
  const auto count=size_t(resolution)*resolution;
  std::array<float,3> peak{};
  const auto &constant_counts=samples.constant_counts();
  const auto &constants=samples.constant_samples();
  using Kind=TextureSetEmissionSamples::SampleKind;
+ std::vector<EmissionPreview> batch(samples.uses_device()?std::min(count,emission_read_count(resolution)):0);
+ size_t first=0,valid=0;
+ const auto varying=[&](size_t at){
+  if(batch.empty()){
+   const auto value=samples.sample_variable(uint32_t(at%resolution),uint32_t(at/resolution));
+   return EmissionPreview{value[0],value[1],value[2],value[9]};
+  }
+  if(at<first||at-first>=valid){
+   first=at;
+   valid=std::min(batch.size(),count-first);
+   samples.read_preview(first,std::span(batch).first(valid),limits);
+  }
+  return batch[at-first];
+ };
  const auto row_size=samples.varying_typed_source()?resolution:0;
  std::vector<MToonSourceTap> previous(row_size),row(row_size);
  double source_filter_error=0;
@@ -1175,14 +1238,15 @@ TextureSetExportEmission compile_emission(const TextureSetView &field,size_t &wo
  for(uint32_t y=0;y<resolution;++y){
   stop(limits);
   for(uint32_t x=0;x<resolution;++x){
-   if(samples.sample_kind(size_t(y)*resolution+x)!=Kind::Varying)continue;
-   const auto rgb=samples.sample_variable(x,y);
+   const size_t at=size_t(y)*resolution+x;
+   if(samples.sample_kind(at)!=Kind::Varying)continue;
+   const auto rgb=varying(at);
    for(size_t k=0;k<3;++k)peak[k]=std::max(peak[k],rgb[k]);
    if(!row_size)continue;
    const auto background=samples.background(x,y);
    auto &tap=row[x];
    for(size_t k=0;k<3;++k)tap.background[k]=background[k];
-   tap.uncovered=1.-rgb[9];
+   tap.uncovered=1.-rgb[3];
    if(!x||!y)continue;
    const std::array<const MToonSourceTap *,4> taps{&previous[x-1],&previous[x],&row[x-1],&tap};
    for(size_t k=0;k<3;++k)source_filter_error=std::max(source_filter_error,mtoon_source_filter_error(taps,k));
@@ -1196,7 +1260,7 @@ TextureSetExportEmission compile_emission(const TextureSetView &field,size_t &wo
  auto &image=out.image;
  image.width=image.height=resolution;
  image.rgba.resize(count*4);
- const auto encode=[&](const EmissionExrPixel &rgb){
+ const auto encode=[&](const auto &rgb){
    std::array<uint8_t,4> pixel{0,0,0,255};
    for(size_t k=0;k<3;++k){
     const float linear=peak[k]>0?rgb[k]/peak[k]:0.f;
@@ -1219,7 +1283,7 @@ TextureSetExportEmission compile_emission(const TextureSetView &field,size_t &wo
   for(uint32_t x=0;x<resolution;++x){
    const size_t at=size_t(y)*resolution+x;
    const auto kind=samples.sample_kind(at);
-   const auto pixel=kind==Kind::Varying?encode(samples.sample_variable(x,y)):encoded_constants[size_t(kind)];
+   const auto pixel=kind==Kind::Varying?encode(varying(at)):encoded_constants[size_t(kind)];
    std::copy(pixel.begin(),pixel.end(),image.rgba.data()+at*4);
   }
  }
@@ -1290,6 +1354,7 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
   charge(bytes,1,sizeof(TextureSetExportField)+field.name.size()+field.material.name.size()+258,limits.maximum_bytes);
   const auto resolution=field.painted->resolution();
   const bool hdr=texture_set_physical_emission(field);
+  if(hdr)scratch=std::max(scratch,emission_device_scratch(*field.painted,true));
   const bool mtoon=field.material_bindings&&field.material_bindings->has_mtoon;
   if(mtoon&&field.material_bindings->roles[size_t(MToonSlot::Normal)].image){
    charge(bytes,draw.count,sizeof(MToonNormalCorner),limits.maximum_bytes);
@@ -1902,6 +1967,8 @@ std::optional<MToonFloatPreview> compile_editable_mtoon_float_preview(
   charge(bytes,1,native_material_grid_bytes(*field.painted,TextureSetGridMode::NativeMToonHdr),budget.maximum_bytes);
   const auto resolution=field.painted->resolution();
   charge(bytes,size_t(resolution)*resolution,4,budget.maximum_bytes);
+  if(emission_device_scratch(*field.painted,true)>budget.maximum_bytes-bytes)
+   throw ExportBudgetExceeded("Typed FLOAT emission device staging exceeds working budget");
 
   TextureSetExportField candidate;
   candidate.set=field.id;
@@ -2025,17 +2092,12 @@ EmissionExportRaster texture_set_emission_raster(const TextureSetView &field,con
         field.material.toon||field.appearance||(field.material_bindings&&field.material_bindings->has_mtoon)))
   throw std::invalid_argument("Texture-set HDR requires its actual physical material member");
  size_t work=0;
- TextureSetEmissionSamples samples(field,work,1,limits,authored_mtoon);
- const auto resolution=samples.resolution;
- const auto working_bytes=samples.working_bytes();
+ auto samples=std::make_shared<TextureSetEmissionSamples>(field,work,1,limits,authored_mtoon);
+ const auto resolution=samples->resolution;
+ const auto working_bytes=samples->working_bytes();
  return {resolution,2,working_bytes,
-      [samples=std::move(samples),cancelled=limits.cancelled,resolution](uint32_t y,std::span<EmissionExrPixel> rows){
-        if(size_t(y)>resolution||rows.size()>size_t(resolution-y)*resolution)
-         throw std::logic_error("Texture-set HDR read exceeds its owning raster");
-        for(size_t i=0;i<rows.size();++i){
-         if((i&1023)==0&&cancelled&&cancelled())throw std::runtime_error("Texture-set HDR raster cancelled");
-         rows[i]=samples.pixel(uint32_t(i%resolution),y+uint32_t(i/resolution));
-        }
+      [samples=std::move(samples),limits,resolution](uint32_t y,std::span<EmissionExrPixel> rows){
+        samples->read(size_t(y)*resolution,rows,limits);
       }};
 }
 

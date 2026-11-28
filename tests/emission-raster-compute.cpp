@@ -184,6 +184,55 @@ void compare_finite(Fixture fixture,uint32_t extent,bool original){
   std::cout<<"PASS finite fixture="<<int(fixture)<<" source="<<original<<" extent="<<extent<<' '
            <<pixels.size()<<" exact RGB FLOAT pixels in "<<milliseconds<<" ms\n";
 }
+
+enum class SetBackdrop { Constant, Core, MToon };
+void compare_texture_set(Fixture fixture,SetBackdrop backdrop){
+  const auto scene=model(fixture);
+  const auto &paint=*scene.active().painted;
+  const auto *source=backdrop==SetBackdrop::Core?&paint.source_maps()->emission:nullptr;
+  const auto background=scene.active().material.emissive;
+  constexpr float strength=6.125f;
+  Image aligned;
+  if(backdrop==SetBackdrop::MToon){
+    aligned={resolution,resolution,std::vector<uint8_t>(size_t(resolution)*resolution*4)};
+    for(size_t i=0;i<aligned.rgba.size();++i)aligned.rgba[i]=uint8_t((i*53u)^(i/73));
+  }
+  const auto begin=std::chrono::steady_clock::now();
+  auto device=detail::create_texture_set_emission_device(paint,source,aligned.rgba.empty()?nullptr:&aligned,
+                                                         background,strength,{});
+  std::vector<Pixel> got(size_t(resolution)*resolution),expected(got.size());
+  device->read(0,got,{});
+  const auto elapsed=std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-begin).count();
+  const detail::PaintEmissionSampler sampler(paint);
+  for(size_t at=0;at<expected.size();++at){
+    const auto x=uint32_t(at%resolution),y=uint32_t(at/resolution);
+    auto bg=background;
+    if(source){
+      const auto texel=sample_source_texture(*source,(float(x)+.5f)/resolution,(float(y)+.5f)/resolution,true);
+      for(unsigned k=0;k<3;++k)bg[k]*=texel[k];
+    }else if(!aligned.rgba.empty()){
+      for(unsigned k=0;k<3;++k)bg[k]*=mtoon_srgb_to_linear(aligned.rgba[4*at+k]/255.f);
+    }
+    const auto p=sampler.sample_texel(x,y);
+    const auto rgb=p.resolve(bg,strength);
+    expected[at]={rgb[0],rgb[1],rgb[2],p.legacy[0],p.legacy[1],p.legacy[2],
+                  p.absolute[0],p.absolute[1],p.absolute[2],p.coverage};
+  }
+  check(exact(expected,got),"Texture-set device changed an authored FLOAT coefficient or resolved radiance");
+  std::vector<Pixel> stripe(2*resolution+7);
+  const size_t first=19*resolution+73;
+  device->read(first,stripe,{});
+  check(exact(std::span(expected).subspan(first,stripe.size()),stripe),"Partial texture-set GPU read changed indexing");
+  std::vector<detail::EmissionRasterDevice::TextureSetPreview> preview(stripe.size());
+  device->read_texture_set_preview(first,preview,{});
+  for(size_t i=0;i<preview.size();++i){
+    const auto &full=expected[first+i];
+    const std::array compact{full[0],full[1],full[2],full[9]};
+    check(std::memcmp(preview[i].data(),compact.data(),sizeof(compact))==0,"Compact texture-set preview changed RGB or coverage");
+  }
+  std::cout<<"PASS texture-set fixture="<<int(fixture)<<" backdrop="<<int(backdrop)<<' '
+           <<got.size()<<" exact FLOAT texels in "<<elapsed<<" ms\n";
+}
 }
 
 std::string_view actual_backend() asm("__real__ZN4dome15compute_backendEv");
@@ -191,6 +240,36 @@ std::string_view wrapped_backend() asm("__wrap__ZN4dome15compute_backendEv");
 std::string_view wrapped_backend(){return host_reference?"CPU":actual_backend();}
 
 int main(int argc,char **argv)try{
+  if(argc>1&&std::string_view(argv[1])=="--texture-set"){
+    compare_texture_set(Fixture::BakeOnly,SetBackdrop::Constant);
+    compare_texture_set(Fixture::LegacyBake,SetBackdrop::Core);
+    compare_texture_set(Fixture::DenseBake,SetBackdrop::Core);
+    compare_texture_set(Fixture::PackedBake,SetBackdrop::MToon);
+    auto scene=model(Fixture::BakeOnly);
+    auto &paint=*scene.active().painted;
+    auto bake=*paint.baked();
+    constexpr auto maximum=std::numeric_limits<float>::max();
+    bake.emission_field=BakedEmissionField::generate_compact(resolution,[](size_t){
+      return BakedEmissionSample{{.5f,0,0},{maximum,0,0},1};
+    });
+    paint.install_bake(std::move(bake));
+    auto device=detail::create_texture_set_emission_device(paint,nullptr,nullptr,{0,0,0},maximum,{});
+    detail::EmissionRasterDevice::TextureSetPreview pixel;
+    bool refused=false;
+    try{device->read_texture_set_preview(size_t(resolution)*resolution/2+resolution/2,std::span(&pixel,1),{});}
+    catch(const std::overflow_error &error){refused=std::string_view(error.what())=="Baked emission radiance exceeds FLOAT range";}
+    check(refused,"The typed preview must preserve FLOAT overflow refusal");
+    return 0;
+  }
+  if(argc>1&&std::string_view(argv[1])=="--missing-texture-set"){
+    const auto scene=model(Fixture::BakeOnly);
+    try{
+      auto device=detail::create_texture_set_emission_device(*scene.active().painted,nullptr,nullptr,{1,1,1},1,{});
+      Pixel one;
+      device->read(0,std::span(&one,1),{});
+    }catch(const std::exception &error){std::cout<<"REFUSED "<<error.what()<<'\n';return 0;}
+    throw std::runtime_error("Missing selected device returned a texture-set FLOAT raster");
+  }
   if(argc>1&&std::string_view(argv[1])=="--finite"){
     compare_finite(Fixture::BakeOnly,512,false);
     compare_finite(Fixture::LegacyBake,256,false);

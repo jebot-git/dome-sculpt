@@ -37,6 +37,7 @@ struct FiniteGrid {
 };
 
 inline constexpr uint32_t one32=0x3f800000, max32=0x7f7fffff, invalid=0x7fc00000, invalid_uv=0x7fc00001;
+inline constexpr uint32_t radiance_overflow=0x7fc00002;
 inline constexpr uint64_t one64=0x3ff0000000000000ull, sign64=1ull<<63;
 
 DOME_EMISSION_FN uint32_t magnitude(uint32_t value){return value&0x7fffffffu;}
@@ -173,12 +174,11 @@ DOME_EMISSION_FN void render(const DeviceInput &input,size_t at,uint32_t *destin
 
 // The finite view uses the editor's FLOAT over and bilinear filtering of
 // separately premultiplied roles, before resolving them against the material.
-DOME_EMISSION_FN void finite_texel(const DeviceInput &input,uint32_t x,uint32_t y,uint32_t (&value)[7]){
-  const auto owner=input.padding[size_t(y)*input.resolution+x];
+DOME_EMISSION_FN void authoring_texel(const DeviceInput &input,size_t at,uint32_t (&value)[7]){
+  const auto owner=input.padding[at];
   if(owner<0)return;
   base(input.bake,*input.quantization,size_t(owner),value);
-  x=uint32_t(owner)%input.resolution;
-  y=uint32_t(owner)/input.resolution;
+  const auto x=uint32_t(owner)%input.resolution,y=uint32_t(owner)/input.resolution;
   const auto tile=(y/32)*(input.resolution/32)+x/32,within=(y%32)*32+x%32;
   for(unsigned layer=0;layer<input.layer_count;++layer)
     apply_layer<true>(input,layer,input.entries[size_t(layer)*input.tiles_per_layer+tile],within,value);
@@ -203,7 +203,8 @@ DOME_EMISSION_FN void render_finite(const DeviceInput &input,FiniteGrid grid,siz
     uint32_t filtered[7]{};
     for(unsigned i=0;i<columns;++i){
       uint32_t sample[7]{};
-      finite_texel(input,i?column.second:column.first,j?row.second:row.first,sample);
+      const size_t texel=size_t(j?row.second:row.first)*input.resolution+(i?column.second:column.first);
+      authoring_texel(input,texel,sample);
       for(unsigned k=0;k<7;++k)filtered[k]=i?finite_lerp(filtered[k],sample[k],fx):sample[k];
     }
     for(unsigned k=0;k<7;++k)value[k]=j?finite_lerp(value[k],filtered[k],fy):filtered[k];
@@ -227,6 +228,45 @@ DOME_EMISSION_FN void render_finite(const DeviceInput &input,FiniteGrid grid,siz
     }
     out[k]=narrow(radiance);
   }
+}
+
+template<bool mapped=false>
+DOME_EMISSION_FN void render_texture_set(const DeviceInput &input,size_t at,uint32_t *out,bool coefficients){
+  uint32_t value[7]{};
+  authoring_texel(input,at,value);
+  if(!valid_coefficients(value,true)){
+    out[0]=invalid;
+    return;
+  }
+  uint32_t background[]{input.background[0],input.background[1],input.background[2]};
+  const auto &source=input.source;
+  if constexpr(mapped){
+    const auto x=uint32_t(at%input.resolution),y=uint32_t(at/input.resolution);
+    const auto &job=source.coordinates;
+    float rgba[4];
+    paint_compute::sample_source_taps(source.rgba,job.width,job.nearest,
+        paint_compute::source_coordinates(job,x,y),true,*input.quantization,rgba);
+    for(unsigned k=0;k<3;++k)background[k]=product(background[k],paint_compute::bits(rgba[k]));
+  }else if(source.aligned_mtoon_linear){
+    const auto *pixel=source.rgba+4*at;
+    for(unsigned k=0;k<3;++k)
+      background[k]=product(background[k],paint_compute::bits(source.aligned_mtoon_linear[pixel[k]]));
+  }
+  // Texture sets resolve the authored binary32 coefficients in binary64,
+  // with the backdrop sampled at the display texel, including in padding.
+  const auto residual=complement(value[6]);
+  for(unsigned k=0;k<3;++k){
+    const auto shade=product64(widen(background[k]),residual);
+    const auto legacy=product64(widen(value[k]),widen(input.strength));
+    const auto radiance=sum64(sum64(shade,legacy),widen(value[k+3]));
+    if((radiance&~sign64)>widen(max32)){
+      out[0]=radiance_overflow;
+      return;
+    }
+    out[k]=narrow(radiance);
+  }
+  if(coefficients)for(unsigned k=0;k<7;++k)out[3+k]=value[k];
+  else out[3]=value[6];
 }
 }
 #undef DOME_EMISSION_MATH

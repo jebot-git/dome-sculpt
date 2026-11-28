@@ -22,6 +22,7 @@ public:
     view_.layers=upload(std::span(input.layers));
     view_.entries=upload(std::span(input.entries));
     view_.quantization=upload(std::span(&paint_compute::quantization(),1));
+    texture_set_=input.texture_set;
     finite_={upload(std::span(input.finite_axis)),uint32_t(input.finite_axis.size())};
     output_=allocate<uint32_t>(chunk_pixels*(finite_.resolution?3:10));
     stop();
@@ -47,6 +48,7 @@ public:
       view_.source.rgba=upload(input.source);
       view_.source.coordinates.columns=upload(std::span(input.columns));
       view_.source.coordinates.rows=upload(std::span(input.rows));
+      view_.source.aligned_mtoon_linear=upload(input.aligned_mtoon_linear);
     }
     stop();
   }
@@ -54,22 +56,18 @@ public:
   void read(size_t first,std::span<Pixel> rows,const std::function<bool()> &cancelled) override {
     static_assert(sizeof(Pixel)==10*sizeof(uint32_t));
     if(finite_.resolution)throw std::logic_error("Expected an exact GPU emission raster");
-    const auto size=size_t(view_.resolution)*view_.resolution;
-    if(first>size||rows.size()>size-first)throw std::out_of_range("GPU emission read exceeds its owning grid");
-    while(!rows.empty()){
-      paint_compute::checkpoint(cancelled);
-      auto batch=rows.first(std::min(rows.size(),chunk_pixels));
-      device_.render(view_,first,batch.size(),output_);
-      device_.download(batch.data(),output_,batch.size_bytes());
-      for(const auto &pixel:batch){
-        if(std::bit_cast<uint32_t>(pixel[0])==invalid_uv)throw std::runtime_error("MToon UV overflow");
-        for(unsigned k=0;k<3;++k)if(!std::isfinite(pixel[k]))
-          throw std::invalid_argument("GPU emission produced an invalid native FLOAT coefficient or radiance");
-      }
-      rows=rows.subspan(batch.size());
-      first+=batch.size();
-    }
-    paint_compute::checkpoint(cancelled);
+    read_exact(first,rows,cancelled,[&](size_t at,size_t count){
+      if(texture_set_)device_.render_texture_set(view_,at,count,output_,true);
+      else device_.render(view_,at,count,output_);
+    });
+  }
+
+  void read_texture_set_preview(size_t first,std::span<TextureSetPreview> pixels,const std::function<bool()> &cancelled) override {
+    static_assert(sizeof(TextureSetPreview)==4*sizeof(uint32_t));
+    if(!texture_set_)throw std::logic_error("Expected a texture-set GPU emission raster");
+    read_exact(first,pixels,cancelled,[&](size_t at,size_t count){
+      device_.render_texture_set(view_,at,count,output_,false);
+    });
   }
 
   void read_finite(size_t first,std::span<Radiance> pixels,const std::function<bool()> &cancelled) override {
@@ -92,6 +90,28 @@ public:
   }
 
 private:
+  template<class Output,class Render>
+  void read_exact(size_t first,std::span<Output> pixels,const std::function<bool()> &cancelled,Render render){
+    const auto size=size_t(view_.resolution)*view_.resolution;
+    if(first>size||pixels.size()>size-first)throw std::out_of_range("GPU emission read exceeds its owning grid");
+    while(!pixels.empty()){
+      paint_compute::checkpoint(cancelled);
+      auto batch=pixels.first(std::min(pixels.size(),chunk_pixels));
+      render(first,batch.size());
+      device_.download(batch.data(),output_,batch.size_bytes());
+      for(const auto &pixel:batch){
+        const auto status=std::bit_cast<uint32_t>(pixel[0]);
+        if(status==invalid_uv)throw std::runtime_error("MToon UV overflow");
+        if(status==radiance_overflow)throw std::overflow_error("Baked emission radiance exceeds FLOAT range");
+        for(unsigned k=0;k<3;++k)if(!std::isfinite(pixel[k]))
+          throw std::invalid_argument("GPU emission produced an invalid native FLOAT coefficient or radiance");
+      }
+      pixels=pixels.subspan(batch.size());
+      first+=batch.size();
+    }
+    paint_compute::checkpoint(cancelled);
+  }
+
   template<class T>T *allocate(size_t count){
     return count?static_cast<T *>(device_.allocate(count*sizeof(T))):nullptr;
   }
@@ -150,6 +170,7 @@ private:
   Device device_;
   DeviceInput view_;
   FiniteGrid finite_;
+  bool texture_set_=false;
   uint32_t *output_=nullptr;
 };
 }

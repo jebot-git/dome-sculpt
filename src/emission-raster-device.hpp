@@ -14,8 +14,10 @@ public:
   virtual ~EmissionRasterDevice() = default;
   using Pixel=std::array<float,10>;
   using Radiance=std::array<float,3>;
+  using TextureSetPreview=std::array<float,4>; // RGB radiance, coverage
   virtual void read(size_t first,std::span<Pixel>,const std::function<bool()> &) = 0;
   virtual void read_finite(size_t first,std::span<Radiance>,const std::function<bool()> &) = 0;
+  virtual void read_texture_set_preview(size_t first,std::span<TextureSetPreview>,const std::function<bool()> &) = 0;
 };
 
 std::unique_ptr<EmissionRasterDevice> create_emission_raster_device(
@@ -24,6 +26,9 @@ std::unique_ptr<EmissionRasterDevice> create_emission_raster_device(
 std::unique_ptr<EmissionRasterDevice> create_finite_emission_raster_device(
     const PaintedMesh &,const PaintSourceTexture *,std::array<float,3> background,
     uint32_t resolution,float offset,const std::function<bool()> &);
+std::unique_ptr<EmissionRasterDevice> create_texture_set_emission_device(
+    const PaintedMesh &,const PaintSourceTexture *,const Image *aligned_mtoon,
+    std::array<float,3> background,float strength,const std::function<bool()> &);
 size_t emission_raster_staging_bytes(const PaintedMesh &) noexcept;
 
 namespace emission_raster {
@@ -48,6 +53,7 @@ struct Bake {
 struct Source {
   paint_compute::SourceCoordinateJob coordinates;
   const uint8_t *rgba=nullptr;
+  const float *aligned_mtoon_linear=nullptr;
   uint32_t sampler_affine[6]{};
   bool typed_transform=false;
 };
@@ -60,12 +66,13 @@ struct Input {
   BakedEmissionField::StorageView bake;
   std::span<const uint8_t> legacy_bake,bake_coverage;
   std::span<const uint8_t> source;
+  std::span<const float> aligned_mtoon_linear;
   std::vector<paint_compute::SourceTerms> columns,rows;
   Source source_sampler;
   std::array<uint32_t,3> background{};
   uint32_t strength=0,resolution=0;
   std::vector<SourceTextureAxis> finite_axis;
-  bool physical_bake=false;
+  bool physical_bake=false,texture_set=false;
 };
 std::unique_ptr<EmissionRasterDevice> upload(const Input &,const std::function<bool()> &);
 }
