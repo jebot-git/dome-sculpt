@@ -12,6 +12,7 @@
 #include <span>
 
 namespace dome {struct MToonTexture;struct PaintSourceTexture;}
+namespace dome::paint_grid {struct Pixel;struct Tables;}
 namespace dome::detail {
 class SourceMaterialRaster {
 public:
@@ -63,6 +64,8 @@ public:
   virtual void read_bake_uv_points(std::span<const BakeUvPoint>,std::span<BakeUvMapsPixel>,
                                    std::span<BakedEmissionSample>,const std::function<bool()> &) = 0;
   virtual void read_texture_set_preview(size_t first,std::span<TextureSetPreview>,const std::function<bool()> &) = 0;
+  virtual void read_uv_layer(std::span<const BakeUvPoint>,std::span<paint_grid::Pixel>,
+                             const std::function<bool()> &) = 0;
 };
 
 std::unique_ptr<EmissionRasterDevice> create_emission_raster_device(
@@ -82,6 +85,9 @@ std::unique_ptr<EmissionRasterDevice> create_bake_uv_emission_device(const Baked
 std::unique_ptr<EmissionRasterDevice> create_bake_uv_maps_device(const BakedTextures &,uint32_t resolution,
     std::span<const EmissionRasterDevice::BakeUvFrame>,size_t capacity,const std::function<bool()> &,
     EmissionRasterDevice::BakeUvSource source={});
+size_t resident_uv_layer_bytes(const PaintLayer &,uint32_t resolution,size_t triangles,size_t capacity);
+std::unique_ptr<EmissionRasterDevice> create_resident_uv_layer(const PaintLayer &,uint32_t resolution,
+    EmissionRasterDevice::BakeUvSource,size_t capacity,const paint_grid::Tables &,const std::function<bool()> &);
 std::unique_ptr<EmissionRasterDevice> create_texture_set_emission_device(
     const PaintedMesh &,const PaintSourceTexture *,const Image *aligned_mtoon,
     std::array<float,3> background,float strength,const std::function<bool()> &);
@@ -134,6 +140,21 @@ struct BakeUvRequests {
   const EmissionRasterDevice::BakeUvSample *taps=nullptr;
   const EmissionRasterDevice::BakeUvPoint *points=nullptr;
 };
+struct UvLayerEntry {uint32_t common=absent,pbr=absent,physical=absent;};
+struct UvLayer {
+  const UvLayerEntry *entries=nullptr;
+  const uint8_t *common=nullptr,*pbr=nullptr;
+  const PackedField *physical=nullptr;
+  const uint32_t *words=nullptr;
+  const paint_grid::Tables *tables=nullptr;
+  bool prepared=false;
+};
+struct UvLayerInput {
+  std::vector<UvLayerEntry> entries;
+  std::vector<const PaintColorTile *> pbr;
+  const paint_grid::Tables *tables=nullptr;
+  bool prepared=false;
+};
 struct Source {
   paint_compute::SourceCoordinateJob coordinates;
   const uint8_t *rgba=nullptr;
@@ -152,6 +173,7 @@ struct Input {
   const BakedTextures *bake_uv_maps=nullptr;
   std::span<const EmissionRasterDevice::BakeUvFrame> bake_uv_frames;
   EmissionRasterDevice::BakeUvSource bake_uv_source;
+  const UvLayerInput *uv_layer=nullptr;
   std::span<const uint8_t> source;
   std::span<const float> aligned_mtoon_linear;
   std::vector<paint_compute::SourceTerms> columns,rows;

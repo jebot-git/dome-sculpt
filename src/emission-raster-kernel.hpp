@@ -56,17 +56,13 @@ DOME_EMISSION_MATH uint32_t finite_over(uint32_t below,uint32_t above,uint32_t c
 DOME_EMISSION_FN bool bounded(uint32_t value,uint32_t limit){
   return magnitude(value)==0||value<=limit;
 }
-DOME_EMISSION_FN EmissionRasterDevice::BakeUvSample bake_uv_sample(const BakeUvRequests &requests,size_t at){
-  if(!requests.points)return requests.taps[at];
-  const auto &point=requests.points[at];
-  EmissionRasterDevice::BakeUvSample result;
+DOME_EMISSION_FN paint_grid::MappedTaps bake_uv_taps(const BakeUvGeometry &geometry,
+    const EmissionRasterDevice::BakeUvPoint &point){
+  paint_grid::MappedTaps result;
   if(point.face==UINT32_MAX)return result;
-  result.face=point.face;
-  result.bary[0]=point.bary[0];
-  result.bary[1]=point.bary[1];
+  result.covered=true;
   const float weights[]{point.bary[0],point.bary[1],
       paint_compute::sub(paint_compute::sub(1,point.bary[0]),point.bary[1])};
-  const auto &geometry=requests.geometry;
   const auto &triangle=geometry.triangles[point.face];
   const auto extent=paint_grid::integer(int32_t(geometry.resolution));
   const int last=int(geometry.resolution)-1;
@@ -93,13 +89,65 @@ DOME_EMISSION_FN EmissionRasterDevice::BakeUvSample bake_uv_sample(const BakeUvR
     const auto x=tap&1?fractions[0]:sum64(one64,fractions[0]^sign64);
     const auto y=tap&2?fractions[1]:sum64(one64,fractions[1]^sign64);
     result.texels[tap]=uint32_t(owner);
-    result.weights[tap]=bake_uv_normal::narrow(product64(x,y));
+    result.weights[tap]=product64(x,y);
+  }
+  return result;
+}
+DOME_EMISSION_FN EmissionRasterDevice::BakeUvSample bake_uv_sample(const BakeUvRequests &requests,size_t at){
+  if(!requests.points)return requests.taps[at];
+  const auto &point=requests.points[at];
+  const auto taps=bake_uv_taps(requests.geometry,point);
+  EmissionRasterDevice::BakeUvSample result;
+  if(taps.covered){
+    result.face=point.face;
+    result.bary[0]=point.bary[0];
+    result.bary[1]=point.bary[1];
+  }
+  for(unsigned i=0;i<4;++i){
+    result.texels[i]=taps.texels[i];
+    result.weights[i]=bake_uv_normal::narrow(taps.weights[i]);
   }
   return result;
 }
 DOME_EMISSION_FN void unpack(PackedField field,const uint32_t *data,size_t index,uint32_t (&result)[7]){
   size_t next=field.offset+index*field.stride;
   for(unsigned k=0;k<7;++k)result[k]=field.mask&(1u<<k)?data[next++]:field.constants[k];
+}
+DOME_EMISSION_FN paint_grid::Pixel uv_layer_texel(const UvLayer &layer,uint32_t r,uint32_t texel){
+  const auto x=texel%r,y=texel/r;
+  const auto &tile=layer.entries[size_t(y/32)*(r/32)+x/32];
+  const auto within=size_t(y%32)*32+x%32;
+  paint_grid::Pixel out;
+  if(tile.common!=absent){
+    const auto *common=layer.common+(size_t(tile.common)*tile_pixels+within)*14;
+    for(unsigned c=0;c<9;++c)out.values[c]=common[c];
+    for(unsigned c=0;c<4;++c)out.coverage[c]=common[c+9];
+    out.mask=common[13];
+    out.present|=1;
+  }
+  if(layer.prepared){
+    const auto *pbr=tile.pbr==absent?out.values:layer.pbr+(size_t(tile.pbr)*tile_pixels+within)*4;
+    for(unsigned c=0;c<4;++c)out.values[c+9]=pbr[c];
+    if(tile.pbr!=absent)out.present|=2;
+  }
+  if(tile.physical!=absent){
+    unpack(layer.physical[tile.physical],layer.words,within,out.emission);
+    out.present|=4;
+  }else{
+    for(unsigned c=0;c<3;++c)out.emission[c]=narrow(layer.tables->srgb[out.values[6+c]]);
+    out.emission[6]=narrow(layer.tables->unit[out.coverage[3]]);
+  }
+  return out;
+}
+DOME_EMISSION_FN paint_grid::Pixel filter_uv_layer(const UvLayer &layer,const BakeUvGeometry &geometry,
+    const EmissionRasterDevice::BakeUvPoint &point){
+  const auto taps=bake_uv_taps(geometry,point);
+  if(!taps.covered)return {};
+  const auto layout=paint_grid::editable_layout(layer.prepared,true);
+  paint_grid::FilterAccumulator result;
+  for(unsigned k=0;k<4;++k)if(taps.weights[k])
+    result.tap(uv_layer_texel(layer,geometry.resolution,taps.texels[k]),taps.weights[k],layout,*layer.tables,false);
+  return result.finish(layout,*layer.tables);
 }
 DOME_EMISSION_FN void physical_base(const Bake &bake,size_t at,uint32_t (&value)[7]){
   if(bake.dense){

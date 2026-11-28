@@ -7,6 +7,7 @@
 #include "emission-raster-device.hpp"
 #include "paint-emission-sample.hpp"
 #include "paint-overlay-sample.hpp"
+#include "paint-grid-filter-kernel.hpp"
 #include "texture-set-resample.hpp"
 #include <chrono>
 #include <cstring>
@@ -372,7 +373,42 @@ void compare_uv_layers(){
       }
     }
   };
+  using Device=detail::EmissionRasterDevice;
+  const std::array triangles{Device::BakeUvTriangle{{{1,0},{0,1},{0,0}}},
+                             Device::BakeUvTriangle{{{0,1},{1,0},{1,1}}}};
+  const auto resident_compare=[&]{
+    auto resident=detail::create_resident_uv_layer(layer,extent,{triangles,padding},capacity,detail::uv_paint_tables(),{});
+    std::vector<Device::BakeUvPoint> points(capacity);
+    std::vector<detail::FilteredPaintTexel> expected(capacity);
+    std::vector<paint_grid::Pixel> actual(capacity);
+    for(size_t first=0;first<probes;first+=capacity){
+      const auto count=std::min(capacity,probes-first);
+      for(size_t i=0;i<count;++i){
+        const auto at=first+i;
+        points[i]={};
+        expected[i]={};
+        if(at%11==0)continue;
+        const auto face=uint32_t(at%2);
+        const float a=at%43?float(at%97)/97:1,b=(1-a)*float(at%41)/41;
+        points[i]={face,{a,b}};
+        const float weights[]{a,b,1-a-b};
+        std::array<float,2> uv{};
+        for(unsigned corner=0;corner<3;++corner)for(unsigned axis=0;axis<2;++axis)
+          uv[axis]+=triangles[face].uv[corner][axis]*weights[corner];
+        expected[i]=detail::filter_paint_layer(layer,extent,detail::paint_bilinear_taps(extent,uv,padding,true));
+      }
+      resident->read_uv_layer(std::span(points).first(count),std::span(actual).first(count),{});
+      for(size_t i=0;i<count;++i){
+        const auto result=detail::decode_uv_paint_pixel(actual[i]);
+        const auto &reference=expected[i];
+        if(reference.common!=result.common||std::memcmp(&reference.emission,&result.emission,sizeof(result.emission))||
+           reference.pbr!=result.pbr||reference.pbr_present!=result.pbr_present)
+          throw std::runtime_error("Resident GPU UV paint differs from the native CPU oracle at "+std::to_string(first+i));
+      }
+    }
+  };
   compare();
+  resident_compare();
   layer.emission_tiles.resize(tiles);
   layer.pbr_tiles.resize(tiles);
   for(const auto tile:{1u,3u,9u}){
@@ -387,12 +423,15 @@ void compare_uv_layers(){
     layer.pbr_tiles[tile]=std::move(colors);
   }
   compare();
+  layer.tiles[9]=PaintTile::shared_default();
+  resident_compare();
   bool cancelled=false;
   try{gpu.read(layer,extent,1,footprint,[]{return true;});}
   catch(const std::runtime_error &){cancelled=true;}
   check(cancelled,"Mapped UV paint must respect worker cancellation");
   compare();
   std::cout<<"PASS mapped UV paint exact common bytes, coverage, masks, FLOAT and prepared color "<<3*probes<<" texels\n";
+  std::cout<<"PASS resident GPU UV paint exact common bytes, coverage, masks, FLOAT and prepared color "<<2*probes<<" texels\n";
 }
 
 void compare_uv_correspondence(){

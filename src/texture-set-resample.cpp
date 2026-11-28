@@ -297,17 +297,7 @@ paint_grid::Pixel grid_layer_pixel(const PaintLayer &layer,uint32_t r,uint32_t x
   return p;
 }
 paint_grid::Layout layer_layout(const PaintLayer &layer) {
-  paint_grid::Layout layout;
-  layout.active=layer.pbr_tiles.empty()?0x1ffu:0x1fffu;
-  layout.pbr=layout.active&0x1e00u;
-  layout.srgb=0x1c7u|(7u<<9);
-  layout.groups=4;
-  layout.group[4]=1;
-  layout.group[5]=2;
-  for(unsigned c=6;c<9;++c)layout.group[c]=3;
-  layout.mask=true;
-  if(!layer.emission_tiles.empty())layout.floats=paint_grid::FloatPlane::UnassociatedPaint;
-  return layout;
+  return paint_grid::editable_layout(!layer.pbr_tiles.empty(),!layer.emission_tiles.empty());
 }
 
 void classify_common_reduction_channels(const PaintLayer &layer,paint_grid::Layout &layout,
@@ -948,6 +938,24 @@ FilteredPaintTexel filter_paint_layer(const PaintLayer &layer,uint32_t resolutio
   return result;
 }
 
+const paint_grid::Tables &uv_paint_tables(){return grid_tables();}
+
+FilteredPaintTexel decode_uv_paint_pixel(const paint_grid::Pixel &in){
+  FilteredPaintTexel out;
+  std::copy_n(in.values,9,out.common.data.data());
+  std::copy_n(in.coverage,4,out.common.data.data()+9);
+  out.common.data[13]=in.mask;
+  std::copy_n(in.values+9,4,out.pbr.begin());
+  out.pbr_present=in.present&2;
+  out.emission.coverage=std::clamp(std::bit_cast<float>(in.emission[6]),0.f,1.f);
+  for(size_t k=0;k<3;++k){
+    out.emission.legacy[k]=std::clamp(std::bit_cast<float>(in.emission[k]),0.f,1.f);
+    out.emission.physical[k]=std::clamp(std::bit_cast<float>(in.emission[k+3]),0.f,maximum_native_emission);
+  }
+  out.emission.validate();
+  return out;
+}
+
 struct PaintLayerUvFilter::Impl {
   struct Entry { uint32_t texel=UINT32_MAX,staged=0; };
   const size_t capacity;
@@ -1019,19 +1027,7 @@ std::span<const FilteredPaintTexel> PaintLayerUvFilter::read(const PaintLayer &l
   state.device.run_mapped(layout,state.input,state.taps,state.output,cancelled);
   for(size_t i=0;i<count;++i){
     if((i&255)==0)paint_grid::checkpoint(cancelled);
-    const auto &in=state.output[i];
-    auto &out=state.result[i];
-    std::copy_n(in.values,9,out.common.data.data());
-    std::copy_n(in.coverage,4,out.common.data.data()+9);
-    out.common.data[13]=in.mask;
-    std::copy_n(in.values+9,4,out.pbr.begin());
-    out.pbr_present=in.present&2;
-    out.emission.coverage=std::clamp(std::bit_cast<float>(in.emission[6]),0.f,1.f);
-    for(size_t k=0;k<3;++k){
-      out.emission.legacy[k]=std::clamp(std::bit_cast<float>(in.emission[k]),0.f,1.f);
-      out.emission.physical[k]=std::clamp(std::bit_cast<float>(in.emission[k+3]),0.f,maximum_native_emission);
-    }
-    out.emission.validate();
+    state.result[i]=decode_uv_paint_pixel(state.output[i]);
   }
   return state.result;
 }

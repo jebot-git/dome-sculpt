@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "emission-raster-device.hpp"
+#include "paint-grid-filter-kernel.hpp"
 #include "emission-paint-access.hpp"
 #include "dome/mtoon.hpp"
 #include "dome/scene.hpp"
@@ -292,6 +293,21 @@ std::unique_ptr<EmissionRasterDevice> create_bake_uv_emission_device(const Baked
   return emission_raster::upload(input,cancelled);
 }
 
+namespace {
+void validate_uv_source(EmissionRasterDevice::BakeUvSource source,const std::function<bool()> &cancelled){
+  for(size_t at=0;at<source.triangles.size();++at){
+    if((at&1023)==0)paint_compute::checkpoint(cancelled);
+    for(const auto &uv:source.triangles[at].uv)for(const auto coordinate:uv)
+      if(!std::isfinite(coordinate)||coordinate<0||coordinate>1)
+        throw std::invalid_argument("GPU Bake UV correspondence has an invalid source corner");
+  }
+  for(size_t at=0;at<source.padding.size();++at){
+    if((at&4095)==0)paint_compute::checkpoint(cancelled);
+    if(source.padding[at]>=0&&size_t(source.padding[at])>=source.padding.size())
+      throw std::invalid_argument("GPU Bake UV correspondence has an invalid padding owner");
+  }
+}
+}
 std::unique_ptr<EmissionRasterDevice> create_bake_uv_maps_device(const BakedTextures &bake,
     uint32_t resolution,std::span<const EmissionRasterDevice::BakeUvFrame> frames,
     size_t capacity,const std::function<bool()> &cancelled,EmissionRasterDevice::BakeUvSource source){
@@ -305,17 +321,7 @@ std::unique_ptr<EmissionRasterDevice> create_bake_uv_maps_device(const BakedText
      (!source.triangles.empty()&&(source.padding.size()!=bake.coverage.size()||
          (!frames.empty()&&source.triangles.size()!=frames.size()))))
     throw std::invalid_argument("GPU Bake UV correspondence requires its matching source atlas");
-  for(size_t at=0;at<source.triangles.size();++at){
-    if((at&1023)==0)paint_compute::checkpoint(cancelled);
-    for(const auto &uv:source.triangles[at].uv)for(const auto coordinate:uv)
-      if(!std::isfinite(coordinate)||coordinate<0||coordinate>1)
-        throw std::invalid_argument("GPU Bake UV correspondence has an invalid source corner");
-  }
-  for(size_t at=0;at<source.padding.size();++at){
-    if((at&4095)==0)paint_compute::checkpoint(cancelled);
-    if(source.padding[at]>=0&&size_t(source.padding[at])>=source.padding.size())
-      throw std::invalid_argument("GPU Bake UV correspondence has an invalid padding owner");
-  }
+  validate_uv_source(source,cancelled);
   emission_raster::Input input;
   input.resolution=resolution;
   input.bake_uv_capacity=capacity;
@@ -327,6 +333,75 @@ std::unique_ptr<EmissionRasterDevice> create_bake_uv_maps_device(const BakedText
     input.bake=bake.emission_field->storage();
   }
   return emission_raster::upload(input,cancelled);
+}
+
+size_t resident_uv_layer_bytes(const PaintLayer &layer,uint32_t resolution,size_t triangles,size_t capacity){
+  using namespace emission_raster;
+  size_t common=0,pbr=0,words=0,physical=0;
+  for(const auto &tile:layer.tiles)if(tile&&!PaintTile::is_shared_default(tile.get()))++common;
+  for(const auto &tile:layer.pbr_tiles)if(tile)++pbr;
+  for(const auto &tile:layer.emission_tiles)if(tile){
+    ++physical;
+    words+=EmissionExportAccess::emission_tile(*tile).samples.size()*sizeof(float);
+  }
+  return sizeof(paint_grid::Tables)+triangles*2*sizeof(EmissionRasterDevice::BakeUvTriangle)+
+      size_t(resolution)*resolution*sizeof(int32_t)+
+      capacity*2*(sizeof(EmissionRasterDevice::BakeUvPoint)+sizeof(paint_grid::Pixel))+
+      layer.tiles.size()*(2*sizeof(UvLayerEntry)+sizeof(PaintTile *)+
+          (layer.pbr_tiles.empty()?0:sizeof(PaintColorTile *))+
+          (layer.emission_tiles.empty()?0:sizeof(PhysicalTile)))+
+      common*sizeof(PaintTile)+pbr*sizeof(PaintColorTile)+physical*2*sizeof(PackedField)+words+
+      std::min(common,size_t(16))*sizeof(PaintTile)+std::min(pbr,size_t(16))*sizeof(PaintColorTile)+
+      std::min(words,size_t(65536)*sizeof(float));
+}
+
+std::unique_ptr<EmissionRasterDevice> create_resident_uv_layer(const PaintLayer &layer,uint32_t resolution,
+    EmissionRasterDevice::BakeUvSource source,size_t capacity,const paint_grid::Tables &tables,
+    const std::function<bool()> &cancelled){
+  using namespace emission_raster;
+  paint_compute::checkpoint(cancelled);
+  const auto n=size_t(resolution/32)*(resolution/32);
+  if(resolution<64||resolution>2048||resolution%32||!capacity||
+     capacity>EmissionRasterDevice::mapped_batch||capacity>size_t(resolution)*resolution||
+     source.triangles.empty()||source.padding.size()!=size_t(resolution)*resolution||
+     layer.tiles.size()!=n||(!layer.pbr_tiles.empty()&&layer.pbr_tiles.size()!=n)||
+     (!layer.emission_tiles.empty()&&layer.emission_tiles.size()!=n))
+    throw std::invalid_argument("Invalid resident GPU UV layer source");
+  validate_uv_source(source,cancelled);
+  UvLayerInput uv;
+  uv.entries.resize(n);
+  uv.prepared=!layer.pbr_tiles.empty();
+  uv.tables=&tables;
+  Input input;
+  input.bake_uv_capacity=capacity;
+  input.bake_uv_source=source;
+  input.resolution=resolution;
+  input.uv_layer=&uv;
+  input.common.reserve(n);
+  if(uv.prepared)uv.pbr.reserve(n);
+  if(!layer.emission_tiles.empty())input.physical.reserve(n);
+  size_t offset=0;
+  for(size_t at=0;at<n;++at){
+    if((at&255)==0)paint_compute::checkpoint(cancelled);
+    auto &entry=uv.entries[at];
+    if(const auto *tile=layer.tiles[at].get();tile&&!PaintTile::is_shared_default(tile)){
+      entry.common=uint32_t(input.common.size());
+      input.common.push_back(tile);
+    }
+    if(uv.prepared&&layer.pbr_tiles[at]){
+      entry.pbr=uint32_t(uv.pbr.size());
+      uv.pbr.push_back(layer.pbr_tiles[at].get());
+    }
+    if(!layer.emission_tiles.empty()&&layer.emission_tiles[at]){
+      entry.physical=uint32_t(input.physical.size());
+      auto &field=input.physical.emplace_back(EmissionExportAccess::emission_tile(*layer.emission_tiles[at]));
+      if(offset>UINT32_MAX||field.samples.size()>UINT32_MAX-offset)
+        throw std::length_error("Resident UV paint coefficients exceed addressable storage");
+      field.field.offset=uint32_t(offset);
+      offset+=field.samples.size();
+    }
+  }
+  return upload(input,cancelled);
 }
 
 std::unique_ptr<EmissionRasterDevice> create_finite_emission_raster_device(

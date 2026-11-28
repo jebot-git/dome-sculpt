@@ -24,4 +24,10 @@ void launch_bake_uv_maps(sycl::queue &queue,BakeUvMaps maps,Bake bake,BakeUvRequ
     if(emission)filter_bake_uv(bake,sample,emission+7*at);
   });
 }
+void launch_resident_uv_layer(sycl::queue &queue,UvLayer layer,BakeUvGeometry geometry,
+    const EmissionRasterDevice::BakeUvPoint *points,size_t count,paint_grid::Pixel *output){
+  queue.parallel_for(sycl::range<1>{count},[=](sycl::id<1> id){
+    output[id[0]]=filter_uv_layer(layer,geometry,points[id[0]]);
+  });
+}
 }

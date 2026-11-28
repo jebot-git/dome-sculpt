@@ -38,6 +38,19 @@ struct Layout {
   uint8_t common_constants[6]{};
   uint64_t emission_constants[float_channels-1]{};
 };
+DOME_GRID_FN Layout editable_layout(bool prepared,bool physical){
+  Layout layout;
+  layout.active=prepared?0x1fffu:0x1ffu;
+  layout.pbr=layout.active&0x1e00u;
+  layout.srgb=0x1c7u|(7u<<9);
+  layout.groups=4;
+  layout.group[4]=1;
+  layout.group[5]=2;
+  for(unsigned c=6;c<9;++c)layout.group[c]=3;
+  layout.mask=true;
+  if(physical)layout.floats=FloatPlane::UnassociatedPaint;
+  return layout;
+}
 struct Rectangle { uint32_t x, y, width, height; };
 struct Batch {
   uint32_t from, to;

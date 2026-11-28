@@ -2,6 +2,7 @@
 #pragma once
 #include "dome/texture-set-resolution.hpp"
 #include <functional>
+namespace dome::paint_grid {struct Tables;struct Pixel;}
 namespace dome::detail {
 struct PaintBilinearTap {
   size_t texel = 0;
@@ -17,6 +18,8 @@ std::array<PaintBilinearTap,4> paint_bilinear_taps(uint32_t resolution,
     std::array<float,2> uv,std::span<const int32_t> padding,bool require_padding_owner=false);
 FilteredPaintTexel filter_paint_layer(const PaintLayer &,uint32_t resolution,
     const std::array<PaintBilinearTap,4> &);
+const paint_grid::Tables &uv_paint_tables();
+FilteredPaintTexel decode_uv_paint_pixel(const paint_grid::Pixel &);
 class PaintLayerUvFilter {
   struct Impl;
   std::unique_ptr<Impl> impl_;

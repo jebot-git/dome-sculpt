@@ -5,7 +5,9 @@
 #include "paint-composite-backend.hpp"
 #include <algorithm>
 #include <cmath>
+#include <cstring>
 #include <stdexcept>
+#include <type_traits>
 
 namespace dome::detail::emission_raster {
 template<class Device>
@@ -23,6 +25,16 @@ public:
         bake_uv_geometry_={upload(input.bake_uv_source.triangles),upload(input.bake_uv_source.padding),input.resolution};
         bake_uv_points_=allocate<BakeUvPoint>(bake_uv_capacity_);
       }else bake_uv_samples_=allocate<BakeUvSample>(bake_uv_capacity_);
+      if(input.uv_layer){
+        const auto &layer=*input.uv_layer;
+        upload_physical(input.physical,stop);
+        uv_layer_={upload(std::span(layer.entries)),upload_layer_tiles<PaintTile>(input.common,stop),
+            upload_layer_tiles<PaintColorTile>(layer.pbr,stop),view_.physical,view_.physical_values,
+            upload(std::span(layer.tables,1)),layer.prepared};
+        uv_layer_output_=allocate<paint_grid::Pixel>(bake_uv_capacity_);
+        stop();
+        return;
+      }
       if(input.physical_bake)output_=allocate<uint32_t>(7*bake_uv_capacity_);
       if(input.bake_uv_maps){
         const auto &bake=*input.bake_uv_maps;
@@ -154,22 +166,36 @@ public:
   }
   void read_bake_uv_points(std::span<const BakeUvPoint> points,std::span<BakeUvMapsPixel> maps,
                           std::span<BakedEmissionSample> emission,const std::function<bool()> &cancelled) override {
-    if(!bake_uv_points_||points.empty()||points.size()>bake_uv_capacity_||
+    if(!bake_uv_maps_output_||
        (maps.empty()&&emission.empty())||(!maps.empty()&&maps.size()!=points.size())||
        (!emission.empty()&&(!view_.bake.physical||emission.size()!=points.size())))
       throw std::invalid_argument("Invalid GPU Bake UV correspondence batch");
+    upload_bake_uv_points(points,cancelled);
+    device_.filter_bake_uv_maps(bake_uv_maps_,view_.bake,{bake_uv_geometry_,nullptr,bake_uv_points_},points.size(),
+                                maps.empty()?nullptr:bake_uv_maps_output_,emission.empty()?nullptr:output_);
+    if(!maps.empty())device_.download(maps.data(),bake_uv_maps_output_,maps.size_bytes());
+    download_bake_uv(emission,cancelled);
+  }
+  void read_uv_layer(std::span<const BakeUvPoint> points,std::span<paint_grid::Pixel> output,
+                     const std::function<bool()> &cancelled) override {
+    if(!uv_layer_output_||points.size()!=output.size())
+      throw std::invalid_argument("Invalid resident UV layer batch");
+    upload_bake_uv_points(points,cancelled);
+    device_.filter_uv_layer(uv_layer_,bake_uv_geometry_,bake_uv_points_,points.size(),uv_layer_output_);
+    device_.download(output.data(),uv_layer_output_,output.size_bytes());
+    paint_compute::checkpoint(cancelled);
+  }
+  void upload_bake_uv_points(std::span<const BakeUvPoint> points,const std::function<bool()> &cancelled) {
+    if(!bake_uv_points_||points.empty()||points.size()>bake_uv_capacity_)
+      throw std::invalid_argument("Invalid GPU UV correspondence batch");
     paint_compute::checkpoint(cancelled);
     for(size_t i=0;i<points.size();++i){
       if((i&1023)==0)paint_compute::checkpoint(cancelled);
       const auto &point=points[i];
       if(point.face!=UINT32_MAX&&(point.face>=bake_uv_triangles_||!valid_bake_uv_bary(point.bary)))
-        throw std::invalid_argument("Invalid GPU Bake UV correspondence point");
+        throw std::invalid_argument("Invalid GPU UV correspondence point");
     }
     device_.upload(bake_uv_points_,points.data(),points.size_bytes());
-    device_.filter_bake_uv_maps(bake_uv_maps_,view_.bake,{bake_uv_geometry_,nullptr,bake_uv_points_},points.size(),
-                                maps.empty()?nullptr:bake_uv_maps_output_,emission.empty()?nullptr:output_);
-    if(!maps.empty())device_.download(maps.data(),bake_uv_maps_output_,maps.size_bytes());
-    download_bake_uv(emission,cancelled);
   }
   static bool valid_bake_uv_bary(const float (&bary)[2]){
     const auto first=double(bary[0]),second=double(bary[1]),third=1.-first-second;
@@ -345,6 +371,24 @@ private:
     if(buffer)device_.upload(buffer,data.data(),data.size_bytes());
     return buffer;
   }
+  template<class T,class Stop> const uint8_t *upload_layer_tiles(std::span<const T *const> tiles,Stop stop){
+    static_assert(std::is_trivially_copyable_v<T>);
+    static_assert(sizeof(PaintTile)==14*tile_pixels&&sizeof(PaintColorTile)==4*tile_pixels);
+    if(tiles.empty())return nullptr;
+    auto *buffer=allocate<uint8_t>(tiles.size()*sizeof(T));
+    constexpr size_t batch_tiles=16;
+    std::vector<uint8_t> staging(std::min(tiles.size(),batch_tiles)*sizeof(T));
+    size_t at=0;
+    while(!tiles.empty()){
+      stop();
+      const auto batch=tiles.first(std::min(tiles.size(),batch_tiles));
+      for(size_t n=0;n<batch.size();++n)std::memcpy(staging.data()+n*sizeof(T),batch[n],sizeof(T));
+      device_.upload(buffer+at,staging.data(),batch.size()*sizeof(T));
+      at+=batch.size()*sizeof(T);
+      tiles=tiles.subspan(batch.size());
+    }
+    return buffer;
+  }
   template<class Stop> void upload_common(std::span<const PaintTile *const> tiles,Stop stop){
     if(tiles.empty())return;
     auto *destination=allocate<CommonPixel>(tiles.size()*tile_pixels);
@@ -402,6 +446,8 @@ private:
   BakeUvGeometry bake_uv_geometry_{};
   BakeUvMaps bake_uv_maps_{};
   BakeUvMapsPixel *bake_uv_maps_output_=nullptr;
+  UvLayer uv_layer_{};
+  paint_grid::Pixel *uv_layer_output_=nullptr;
   size_t bake_uv_faces_=0,bake_uv_triangles_=0;
   size_t mapped_capacity_=0;
   size_t bake_uv_capacity_=0;

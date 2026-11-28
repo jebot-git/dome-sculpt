@@ -50,6 +50,7 @@
 #include "polygon-surface-preview.hpp"
 #include "polygon-surface-archive.hpp"
 #include "paint-composite-backend.hpp"
+#include "paint-grid-filter-kernel.hpp"
 #include "dome/source-maps.hpp"
 #include "source-texture-grid.hpp"
 #include "dome/normal-sampling.hpp"
@@ -4665,6 +4666,18 @@ std::shared_ptr<PaintedMesh> SourcePaintAccess::transfer_bake_uv(const PaintedMe
     converted.maps.metal_rough=blank_image(r);
     if(!bake.emission_field)converted.maps.emission=blank_image(r);
     using Device=detail::EmissionRasterDevice;
+    const auto triangle_count=old.indices.size()/3;
+    const auto describe_uv_source=[&]{
+      std::vector<Device::BakeUvTriangle> triangles(triangle_count);
+      for(size_t face=0;face<triangle_count;++face){
+        if((face&1023)==0)stop();
+        for(size_t corner=0;corner<3;++corner){
+          const auto &uv=old.uv[old.indices[face*3+corner]];
+          std::copy(uv.begin(),uv.end(),triangles[face].uv[corner]);
+        }
+      }
+      return triangles;
+    };
     std::vector<Device::BakeUvFrame> frames;
     if(!old_normals[0]->rgba.empty()){
       reserve(mesh.indices.size()*(2*sizeof(detail::NormalBakeVertex)+4*sizeof(Tangent)));
@@ -4762,7 +4775,6 @@ std::shared_ptr<PaintedMesh> SourcePaintAccess::transfer_bake_uv(const PaintedMe
     }else{
       const size_t row_bytes=sizeof(Device::BakeUvPoint)+sizeof(Device::BakeUvMapsPixel)+
           (bake.emission_field?sizeof(BakedEmissionSample):0);
-      const auto triangle_count=old.indices.size()/3;
       const auto triangle_bytes=triangle_count*sizeof(Device::BakeUvTriangle);
       const auto &padding=source.surface_->padding;
       const auto input_bytes=bake.storage_bytes()+sizeof(paint_compute::Quantization)+std::span(frames).size_bytes()+
@@ -4774,14 +4786,7 @@ std::shared_ptr<PaintedMesh> SourcePaintAccess::transfer_bake_uv(const PaintedMe
       if(!capacity)throw std::length_error("UV transfer cannot stage a GPU Bake filter batch");
       const auto available=remaining-input_bytes-2*capacity*row_bytes;
       const auto device=[&]{
-        std::vector<Device::BakeUvTriangle> triangles(triangle_count);
-        for(size_t face=0;face<triangle_count;++face){
-          if((face&1023)==0)stop();
-          for(size_t corner=0;corner<3;++corner){
-            const auto &uv=old.uv[old.indices[face*3+corner]];
-            std::copy(uv.begin(),uv.end(),triangles[face].uv[corner]);
-          }
-        }
+        const auto triangles=describe_uv_source();
         return detail::create_bake_uv_maps_device(bake,r,frames,capacity,options.cancelled,{triangles,padding});
       }();
       std::vector<Device::BakeUvPoint> requests(capacity);
@@ -4856,26 +4861,52 @@ std::shared_ptr<PaintedMesh> SourcePaintAccess::transfer_bake_uv(const PaintedMe
       const size_t top=tile/surface.columns*side,left=tile%surface.columns*side;
       return surface.texels[(top+within/side)*r+left+within%side];
     };
-    std::unique_ptr<detail::PaintLayerUvFilter> layer_gpu;
-    size_t tiles_per_batch=1;
     for(const auto &layer:source.layers_){
       auto &destination=result->layers_.emplace_back(PaintLayer{layer.id,layer.name,layer.visible,layer.opacity,
           std::vector<std::shared_ptr<const PaintTile>>(tile_count),{}, {}});
       if(std::ranges::none_of(layer.tiles,[](const auto &tile){return bool(tile);}))continue;
       const bool physical=!layer.emission_tiles.empty();
       if(physical)destination.emission_tiles.resize(tile_count);
-      if(!layer_gpu&&compute_backend()!="CPU"){
+      std::unique_ptr<detail::PaintLayerUvFilter> layer_gpu;
+      std::unique_ptr<Device> resident;
+      std::vector<Device::BakeUvPoint> layer_points;
+      std::vector<paint_grid::Pixel> resident_output;
+      size_t tiles_per_batch=1,staging=0;
+      if(compute_backend()!="CPU"){
         tiles_per_batch=std::min(tile_count,detail::PaintLayerUvFilter::max_batch/tile_pixels);
-        while(tiles_per_batch>1&&detail::PaintLayerUvFilter::staging_bytes(tiles_per_batch*tile_pixels)>remaining/2)
-          tiles_per_batch/=2;
-        reserve(detail::PaintLayerUvFilter::staging_bytes(tiles_per_batch*tile_pixels));
-        layer_gpu=std::make_unique<detail::PaintLayerUvFilter>(tiles_per_batch*tile_pixels);
+        const auto capacity=tiles_per_batch*tile_pixels;
+        staging=detail::resident_uv_layer_bytes(layer,r,triangle_count,capacity);
+        if(staging<=remaining/2){
+          reserve(staging);
+          const auto triangles=describe_uv_source();
+          resident=detail::create_resident_uv_layer(layer,r,{triangles,source.surface_->padding},capacity,
+                                                    detail::uv_paint_tables(),options.cancelled);
+          layer_points.resize(capacity);
+          resident_output.resize(capacity);
+        }else{
+          while(tiles_per_batch>1&&detail::PaintLayerUvFilter::staging_bytes(tiles_per_batch*tile_pixels)>remaining/2)
+            tiles_per_batch/=2;
+          staging=detail::PaintLayerUvFilter::staging_bytes(tiles_per_batch*tile_pixels);
+          reserve(staging);
+          layer_gpu=std::make_unique<detail::PaintLayerUvFilter>(tiles_per_batch*tile_pixels);
+        }
       }
       for(size_t first=0;first<tile_count;first+=tiles_per_batch){
         stop();
         const auto count=std::min(tiles_per_batch,tile_count-first);
         std::span<const detail::FilteredPaintTexel> filtered;
-        if(layer_gpu){
+        if(resident){
+          auto points=std::span(layer_points).first(count*tile_pixels);
+          for(size_t at=0;at<points.size();++at){
+            if((at&1023)==0)stop();
+            points[at]={};
+            const auto &texel=texel_at(first+at/tile_pixels,at%tile_pixels);
+            if(!texel.covered())continue;
+            visit(16);
+            points[at]={texel.face,{texel.bary[0],texel.bary[1]}};
+          }
+          resident->read_uv_layer(points,std::span(resident_output).first(points.size()),options.cancelled);
+        }else if(layer_gpu){
           filtered=layer_gpu->read(layer,r,count*tile_pixels,[&](size_t at,auto &taps){
             const auto &texel=texel_at(first+at/tile_pixels,at%tile_pixels);
             if(!texel.covered())return false;
@@ -4893,7 +4924,9 @@ std::shared_ptr<PaintedMesh> SourcePaintAccess::transfer_bake_uv(const PaintedMe
             const auto &texel=texel_at(tile,n);
             if(!texel.covered())continue;
             detail::FilteredPaintTexel sample;
-            if(layer_gpu)sample=filtered[(tile-first)*tile_pixels+n];
+            const auto at=(tile-first)*tile_pixels+n;
+            if(resident)sample=detail::decode_uv_paint_pixel(resident_output[at]);
+            else if(layer_gpu)sample=filtered[at];
             else{
               visit(16);
               sample=detail::filter_paint_layer(layer,r,taps_at(texel));
@@ -4918,6 +4951,7 @@ std::shared_ptr<PaintedMesh> SourcePaintAccess::transfer_bake_uv(const PaintedMe
           }
         }
       }
+      remaining+=staging;
     }
     merge_bake(*result,std::move(converted),BakedNormalWrite::Replace,options.cancelled);
   }

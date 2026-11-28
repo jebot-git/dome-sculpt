@@ -53,6 +53,11 @@ __global__ void filter_bake_uv_map_pixels(BakeUvMaps maps,Bake bake,BakeUvReques
     if(emission)filter_bake_uv(bake,sample,emission+7*index);
   }
 }
+__global__ void filter_uv_layer_pixels(UvLayer layer,BakeUvGeometry geometry,
+    const EmissionRasterDevice::BakeUvPoint *points,size_t count,paint_grid::Pixel *out){
+  const size_t index=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+  if(index<count)out[index]=filter_uv_layer(layer,geometry,points[index]);
+}
 __global__ void sample_material_sources(MappedSourceImage image,const paint_compute::Quantization *q,
     const SourceUvSampler::Coordinate *uv,size_t count,uint32_t *out){
   const size_t index=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
@@ -126,6 +131,12 @@ public:
       size_t count,EmissionRasterDevice::BakeUvMapsPixel *out,uint32_t *emission){
     constexpr size_t block=128;
     filter_bake_uv_map_pixels<<<(count+block-1)/block,block,0,stream_>>>(maps,bake,requests,count,out,emission);
+    checked(DOME_DEVICE(GetLastError)());
+  }
+  void filter_uv_layer(UvLayer layer,BakeUvGeometry geometry,const EmissionRasterDevice::BakeUvPoint *points,
+                       size_t count,paint_grid::Pixel *out){
+    constexpr size_t block=128;
+    filter_uv_layer_pixels<<<(count+block-1)/block,block,0,stream_>>>(layer,geometry,points,count,out);
     checked(DOME_DEVICE(GetLastError)());
   }
   void sample_material(MappedSourceImage image,const paint_compute::Quantization *q,
