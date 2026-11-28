@@ -1,0 +1,175 @@
+{
+  "date": "2026-11-28",
+  "product_commit": "c626cb0e2f7dddc4b738ad16af6e6158aa8096b0",
+  "previous_published_commit": "bf3139fbd86a0fc31144a2bd4acc3c4f58dafc79",
+  "domed_toolkit_commit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "device": "Intel Arc A770 / PCI 0000:03:00.0 / renderD129",
+  "scope": "Retained texture-set normal atlas acceptance, including native and prepared before frames, chart probes, shared edges, shaped endpoints and posed skin.",
+  "app": {
+    "file": "artifacts/retained-normal-certificate-tuned-20261128/evidence/oneapi/dome-sculpt",
+    "sha256": "905a2f79a536296a26e7040637446f99ee97ca6cfe336b6e182ef74315926128"
+  },
+  "raster_test": {
+    "passes": 298,
+    "failures": 728,
+    "precision_checks": 4,
+    "all_definite_verdicts_match": true,
+    "trace": {
+      "file": "artifacts/retained-normal-certificate-tuned-20261128/normal-device.log",
+      "sha256": "d94612119e5449dc6f3f8b65053e8af0c216b0c29383401feb058f3959293826"
+    },
+    "test_total_cold_seconds": 2.95
+  },
+  "regressions": {
+    "passed": 11,
+    "junit": {
+      "file": "artifacts/retained-normal-certificate-tuned-20261128/evidence/oneapi/retained-normal-raster-tests.xml",
+      "sha256": "7d2946df78d5ceddef67e62880a3a81a1057030930af823483eb215259b57fb6"
+    }
+  },
+  "exact_outputs": {
+    "files": 17,
+    "file_sha256_manifest": "3bbf19e86dc63a3a2951dfea982f1f90df202129d64d7e1b5f62903a598969a9",
+    "smooth_standard": {
+      "file": "artifacts/retained-normal-certificate-tuned-20261128/evidence/after/native/native-normal-smooth-bake.glb",
+      "sha256": "464d8fc352a3abc33c81fe74b7d178eabc9b7a3788858a281c77f239219ec65e"
+    },
+    "smooth_editable": {
+      "file": "artifacts/retained-normal-certificate-tuned-20261128/evidence/after/native/native-normal-smooth-editable.glb",
+      "sha256": "13fcf27b38407a18e96901f5be66814923cbd075548af1cfbd2fd68e1ad1a2be"
+    }
+  },
+  "native_fixture_cold": {
+    "previous": {
+      "elapsed_seconds": 2.34,
+      "log": {
+        "file": "artifacts/retained-normal-raster-gpu-20261128/after-native.log",
+        "sha256": "ea3f32412ef52a01700f7a1191aaa7609f65433dd14e499af789a28cde759aae"
+      }
+    },
+    "initial_inlined_kernel": {
+      "elapsed_seconds": 40.57,
+      "log": {
+        "file": "artifacts/retained-normal-certificate-gpu-20261128/after-native.log",
+        "sha256": "29d2de1b329d63026252b35720fdf1cefcc8ca350b6691bde1e2973a89cd0192"
+      }
+    },
+    "shared_interval_arithmetic": {
+      "elapsed_seconds": 4.9,
+      "log": {
+        "file": "artifacts/retained-normal-certificate-tuned-20261128/after-native.log",
+        "sha256": "99547fade13332ef36e00ae7ff39172c45124202b84e818588407a78dd2f788d"
+      }
+    }
+  },
+  "nested_domed_wayland": {
+    "passed": 7,
+    "report": {
+      "file": "artifacts/retained-normal-certificate-tuned-20261128/evidence/wayland/report.json",
+      "sha256": "1479f58dde45a6650ec4a86a27bfa78dbff2a7235cf3bac585efc465832f849d"
+    },
+    "log": {
+      "file": "artifacts/retained-normal-certificate-tuned-20261128/wayland.log",
+      "sha256": "82f486d4effbba5a5f0ae3fed348e223e7f30af543db1a6e61e247141126eda3"
+    },
+    "output": {
+      "file": "artifacts/retained-normal-certificate-tuned-20261128/evidence/wayland/standard.glb",
+      "sha256": "464d8fc352a3abc33c81fe74b7d178eabc9b7a3788858a281c77f239219ec65e"
+    },
+    "compositor_log": {
+      "file": "artifacts/retained-normal-certificate-tuned-20261128/evidence/wayland/compositor.log",
+      "sha256": "508b85545dacf9056317e0ba5a3575a1c00045f946fa421f463e8baed85632f2"
+    }
+  },
+  "actual_loader_synthetic_openxr": {
+    "passed": 10,
+    "report": {
+      "file": "artifacts/retained-normal-certificate-tuned-20261128/evidence/xr/report.json",
+      "sha256": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7"
+    },
+    "log": {
+      "file": "artifacts/retained-normal-certificate-tuned-20261128/xr.log",
+      "sha256": "233217cc18de0f87dd23612778ae28df7d73c7e90f03fe9d12493fa4e92b1523"
+    },
+    "output": {
+      "file": "artifacts/retained-normal-certificate-tuned-20261128/evidence/xr/accept/converted.glb",
+      "sha256": "464d8fc352a3abc33c81fe74b7d178eabc9b7a3788858a281c77f239219ec65e"
+    },
+    "hardware_renderer": {
+      "file": "artifacts/retained-normal-certificate-tuned-20261128/evidence/xr/accept/graphics.json",
+      "sha256": "f5e95dd9e30ec72eea9479f466264871592da5c103ee4706bf37ac1cdda2751e"
+    },
+    "physical_headset": false
+  },
+  "sanitizers": {
+    "mode": "Scoped headless ASan and UBSan",
+    "native_retained": {
+      "file": "artifacts/retained-normal-certificate-tuned-20261128/evidence/asan/texture-set-source-export.cpp.log",
+      "sha256": "c7ba07a258c4eda9f73a124b4191d823e18360cdabb53bd5633a886c61d1264f"
+    },
+    "foundation": {
+      "file": "artifacts/retained-normal-certificate-tuned-20261128/evidence/asan/normal-bake-encoding.cpp.log",
+      "sha256": "49b009876da79f2ded9a7f43018aa5ad49b9bc8ac4d47dabe77e5353a97172ac"
+    }
+  },
+  "missing_device": {
+    "ONEAPI": {
+      "reason": "No device of requested type 'info::device_type::gpu' available.",
+      "log": {
+        "file": "artifacts/retained-normal-certificate-tuned-20261128/missing-device.log",
+        "sha256": "df977c1d37da2e1f6b8b345f9f29500647b4997d32099c1cdb7ce648eeba24cc"
+      }
+    },
+    "CUDA": {
+      "reason": "CUDA driver version is insufficient for CUDA runtime version",
+      "log": {
+        "file": "artifacts/retained-normal-certificate-tuned-20261128/cuda-missing.log",
+        "sha256": "5c2dcee66da1b4192ff9268c4a5f4840581f4df59e67a0fc5306885238a95927"
+      }
+    },
+    "ROCm": {
+      "reason": "no ROCm-capable device is detected",
+      "log": {
+        "file": "artifacts/retained-normal-certificate-tuned-20261128/rocm-missing.log",
+        "sha256": "5f46a85ee6ae667c7f2c0d1198242ae38706b0daf5948e4b3cdec7223a214694"
+      }
+    }
+  },
+  "open": "Alternate-coordinate material evaluation, positive AMD and NVIDIA device tests, and physical headset checks remain open.",
+  "repeated_certificate_profile": {
+    "previous": {
+      "atlas_size": 64,
+      "milliseconds": [
+        10.2399,
+        9.84301,
+        9.56078,
+        9.7892,
+        10.0348
+      ],
+      "warm_median_ms": 9.816105,
+      "work": 18707,
+      "first_failed_resample_work": 543431,
+      "log": {
+        "file": "artifacts/retained-normal-certificate-tuned-20261128/profile-previous.log",
+        "sha256": "826f7378872c5cddf5db4662dd6afde7a3ad72865c931b9e6b0d1db4b14c5e91"
+      }
+    },
+    "current": {
+      "atlas_size": 64,
+      "milliseconds": [
+        10.7069,
+        9.52029,
+        1.26896,
+        1.10661,
+        1.18336
+      ],
+      "warm_median_ms": 1.2261600000000001,
+      "work": 18707,
+      "first_failed_resample_work": 543431,
+      "log": {
+        "file": "artifacts/retained-normal-certificate-tuned-20261128/profile-current.log",
+        "sha256": "cec9d05fa3eefcaad340513d51256b106cef9808f7acd50265cf0a35a6eb050f"
+      }
+    }
+  }
+}

@@ -95,12 +95,18 @@ portable reparameterization still have their own work paths.
 Portable normal reprojection for retained texture sets now uses the selected
 GPU to sample the before normal image, apply the placed before and current
 frames, and encode the destination tangent-space texel. This covers both
-native Bake detail and prepared normal roles. Chart layout, exact evaluation
-for numerically sensitive samples, and the existing independent angular
-certificate retain their native C++ paths. The 0.02-radian acceptance
-threshold and the source normal owners remain part of the actual export
-decision.
+native Bake detail and prepared normal roles. Chart layout and exact
+evaluation for numerically sensitive samples retain their native C++
+paths. The source normal owners remain part of the actual export decision.
 [Retained normal raster evidence](validation/retained-normal-raster-gpu-20261128.json)
+
+The portable normal certificate now tests the same atlas, edge, shape and
+posed-skin probes on the selected GPU. Rounded intervals enclose the
+source and reconstructed directions. A definite verdict must lie wholly
+on one side of the 0.02-radian limit. Ambiguous probes are evaluated by the
+existing full-precision check. The worker retains the original traversal
+and charges the same work through the first failing probe.
+[Retained normal certificate evidence](validation/retained-normal-certificate-gpu-20261128.json)
 
 ## Current validation — 2026-11-27
 

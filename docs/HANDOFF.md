@@ -276,9 +276,26 @@ Arc fixture, 16,163 of 16,384 texels encoded on the GPU and each matched
 the full-precision reference. All 11 focused regressions pass. Seventeen
 worker output files match byte for byte, and nested Wayland and synthetic
 OpenXR produce the exact smooth retained normal package. Scoped sanitizer
-and all three missing-device checks pass. GPU certification of the finished
-map and alternate-coordinate material evaluation remain open.
+and all three missing-device checks pass.
 [Retained normal raster evidence](validation/retained-normal-raster-gpu-20261128.json)
+
+The angular certificate now evaluates retained source and emitted atlas
+probes in bounded device batches. It checks both normal directions with
+outward-rounded intervals and applies the existing 0.02-radian limit.
+Numerically ambiguous probes retain the full-precision check. The worker
+still owns chart construction, ordered probe selection, cancellation and
+work accounting. The source image stays on the device from encoding through
+candidate certification. Shapekey and active skin export use the same
+certificate with their actual posed frames. On Arc, 1,026 definite verdicts
+match the reference and all four threshold probes use full precision.
+All 11 focused regressions pass. Seventeen output files match byte for
+byte, along with the isolated Wayland and synthetic OpenXR exports. Across
+four repeat certifications of the 64-pixel atlas, median time fell from
+9.8 to 1.2 milliseconds. Both builds reject the deliberately enlarged
+512-pixel atlas at work unit 543,431. The tuned cold export fixture took
+4.9 seconds with compilation, up from 2.3 for the previous build.
+Alternate-coordinate material evaluation remains open.
+[Retained normal certificate evidence](validation/retained-normal-certificate-gpu-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
