@@ -316,9 +316,17 @@ weights and the original grid's padding ownership. A bounded GPU batch
 handles layers that exceed the available resident memory. Both paths
 preserve coverage, hidden masks, prepared PBR color and FLOAT emission.
 The worker seals the returned pixels into editable tiles before publication.
-Bake sampling, first transfer of posed prepared normal fields, physical
-headset acceptance, and AMD and NVIDIA execution remain open.
 [GPU Retopology layer sampling evidence](validation/retopo-layer-gpu-20261128.json)
+
+Apply and reapply now also filter Bake coverage, common and prepared PBR
+color, ORM, tangent-space normal samples and emission on the selected GPU.
+The worker keeps linear sample values through affine tangent transport and
+native archive encoding. Imported PBR overlays use the same Bake filter
+before resolving the original source images. Resident and bounded GPU paths
+preserve FLOAT radiance above the editable brush limit. Transfer of
+independent authored normal fields and first transfer from posed prepared
+meshes remain open, along with physical headset and AMD/NVIDIA validation.
+[GPU Retopology Bake sampling evidence](validation/retopo-bake-gpu-20261128.json)
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing

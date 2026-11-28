@@ -1,0 +1,150 @@
+{
+  "date": "2026-11-28",
+  "product": "3a63723a57bae9d346abe80bd7ff017917b4e5fe",
+  "preceding": "ae237731d7cd1ce3b90b378240ecab74be3e2c96",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Apply and reapply use the selected GPU for weighted Bake coverage, color, prepared PBR color, ORM, tangent-space normal values and premultiplied emission. This includes prior Bake compositing on imported PBR. The worker resolves imported source images, transports tangent frames and seals native output. Independent authored normal fields are separate.",
+  "oneapi_arc_release": {
+    "application_sha256": "18d3205257dd8121ffed73e7061b0dfdbeeb9485c391b7677becea74a2a0fd06",
+    "fltk_prefix": "/opt/fltk-vr/toolkit",
+    "bitmap_runtime_prefix": "/opt/fltk-vr/bdf-runtime",
+    "ctest_passed": 52,
+    "ctest_cases": [
+      "application-missing-gpu",
+      "bake",
+      "bake-recipes",
+      "emission-raster-finite-compute",
+      "emission-raster-mapped-compute",
+      "emission-raster-mapped-missing-gpu",
+      "emission-raster-texture-set-compute",
+      "mesh-processing",
+      "retopo",
+      "retopo-cancellation-boundaries",
+      "retopo-edges",
+      "retopology-affine",
+      "retopology-affine-openxr",
+      "retopology-affine-ui-fixture",
+      "retopology-authoring",
+      "retopology-first-material-affine",
+      "retopology-first-material-plain",
+      "retopology-first-material-posed-affine",
+      "retopology-first-material-posed-plain",
+      "retopology-held-admission",
+      "retopology-history-openxr-apply",
+      "retopology-history-openxr-cancel",
+      "retopology-imported-bake-resize",
+      "retopology-imported-mtoon-mixed-hdr",
+      "retopology-imported-mtoon-mixed-ldr",
+      "retopology-imported-mtoon-painted",
+      "retopology-imported-mtoon-resize",
+      "retopology-imported-mtoon-tinted",
+      "retopology-imported-mtoon-unprepared",
+      "retopology-imported-pbr",
+      "retopology-imported-prior-bake",
+      "retopology-mixed-material",
+      "retopology-prepared-color-affine",
+      "retopology-prepared-color-normal-affine",
+      "retopology-prepared-color-normal-first",
+      "retopology-prepared-color-normal-plain",
+      "retopology-prepared-color-normal-uv-affine",
+      "retopology-prepared-color-normal-uv-plain",
+      "retopology-prepared-color-plain",
+      "retopology-prepared-detached-affine",
+      "retopology-reapply-affine",
+      "retopology-reapply-plain",
+      "retopology-save-handoff",
+      "retopology-surface-heat-affine",
+      "retopology-surface-heat-plain",
+      "retopology-worker-accepted-publication",
+      "retopology-worker-faults",
+      "retopology-worker-reporter-recovery",
+      "surface-query-oblique",
+      "texture-set-retained-retopology-affine",
+      "texture-set-retained-retopology-plain",
+      "weight-transfer-batch"
+    ],
+    "ctest_log_sha256": "bd2f080a28dd075391c834435a7a08e5fe60e12a9d1838a1a00d0b7f139e989f",
+    "source_cleanup_object_sha256": "e2368cd72f92cde230d60acff2b89b73b2dc68dffd9e131749da2fd57360071e",
+    "oracle_probe_count_per_path": 8192,
+    "oracle_coverage": "Exact linear values on 4096 legacy imported-overlay samples and 4096 physical Bake samples per device path. Prepared PBR color, signed tangent components, both source padding policies, full-range radiance, subnormal coefficients and cancellation are covered.",
+    "oracle_trace_sha256": "a249c81417e44c67728ecab88303d0d54b0241fc3ce00ce9efae2c4cccf09af6",
+    "bounded_checks": 5,
+    "bounded_scope": "512-pixel source and 64-pixel target. A reduced working budget selects the staged GPU path. The resident run yields identical native bytes and both retain sampled values above the editable brush limit. Source coefficients reach 80,000.",
+    "bounded_trace_sha256": "faaa496cf7bec14985e61b14abbbe47a051b63beee72b7dd7d9d65ca34370962",
+    "bit_identical_archives_to_preceding": {
+      "retopology-affine/0-posed.dsculpt": "988355c6c6dcbf4573a9b48779cd791766d62296002c210061c1d02e99b743d9",
+      "retopology-affine/0-rest.dsculpt": "426af1d247cb474bc11582f50366a6ab0f9d9210dfd35b7b44f1f500bdfa8563",
+      "retopology-affine/1-posed.dsculpt": "385c79543401aec6b68cd1c7ee4126f5cf79f5ac899d203bd9c4406e52308771",
+      "retopology-affine/1-rest.dsculpt": "83b00f0d2405f6c12997e2f2bbe151c7c71f08488f8e82c07759f2aae1a4d2b3",
+      "retopology-affine/2-posed.dsculpt": "bd3997afcfd34c9a3ce839416ee7d1b499d18cf0ffb9bf757c9c010950bfdbb6",
+      "retopology-affine/2-rest.dsculpt": "2c3cac1c7ebfd2b3015b3480ca6ddf58181eb65d54e43a96b6bd79cf5ca3ba1b",
+      "retopology-affine/3-posed.dsculpt": "c135a29975d4287f374009586823d236f809454351124698e156850ba4db7c86",
+      "retopology-affine/3-rest.dsculpt": "8d8755586829067b9445439fa9faada8a580ee51851db2e96d8cfc4006a7ea3d",
+      "retopology-affine/first-native-input.dsculpt": "98122714c96a8dc369d89f8e46deee9dedceb84c1421d6ee0f9115a80187e4b3",
+      "retopology-affine/first-native-material.dsculpt": "f6742867c7b203eca1f73c87513007d351e0f0f56de42b66656f0b657a2c7acf",
+      "retopology-affine/reflected-posed-baked.dsculpt": "0afd286277a7c987159082d5c8c0f606d4bb1ff6653896a01af833807291abfd",
+      "retopology-reapply-affine/before-bind.dsculpt": "2295e66832ff6077701b548bb8af5c2001da207b418329b0b5d07da99b160583",
+      "retopology-reapply-affine/before-reapply.dsculpt": "8ff60d00c6f8a1c00737741c79858f8a5af1f31af3e467fc10b30aeda3949639",
+      "retopology-reapply-affine/patch.dsculpt": "83d3e6d891b2307add0c04f604121140a2b095ce78c3cbb7756f77a49982ee84",
+      "retopology-reapply-affine/reapplied.dsculpt": "006202ab7a79672f9e31a6b7fe28d78486dd98b6ba52e418205713e3cbaa2e4d",
+      "retopology-reapply-affine/reapplied.glb": "95e7acb4305155a8efd2d07b88d2eea5863c879980a843b1598b4d25c3f1c900",
+      "stress-replay/first-native-input.dsculpt": "1b8c90a469c3a1f6ec6b64bbda6d1fb97ae8ff2616b3fad59d06f5e311d7baa6",
+      "stress-replay/first-native-material.dsculpt": "1fbafeb0c630be391128c7c74ecc9ce9afa816857e94489b9eb488c035e55424"
+    },
+    "1024_atlas_checks": 10,
+    "1024_atlas_log_sha256": "65e8bf49d90652c6193378c699898174ace3c962b9161e0a2b8e24d39fa2217b",
+    "1024_atlas_fixture_seconds": 37.46,
+    "1024_atlas_timing_scope": "One isolated end-to-end run including source preparation, Bake, Apply, file I/O, rejection and Clear Bake.",
+    "wayland": {
+      "checks_passed": 10,
+      "renderer": "Zink Vulkan on Intel Arc A770",
+      "report_sha256": "6811b7e50dc8c6e104385da6fdf566dfe56a57c88bcfc0cf7947a0cd86b85bec",
+      "trace_sha256": "aa68cbab2ccb5450c77bbcc7bbbe926e22f774429c7d52c89b19ea7d05fd0f55",
+      "project_sha256": "1d1d39ea9e02ad45aff01b9c4dae7ad7e8dbaa28712dc90cf023258334471738",
+      "standard_glb_sha256": "5143b31b057be81f85acc542dd94742d18ead901084d1371301f24e666dec9e2",
+      "validator_version": "2.0.0-dev.3.10",
+      "validator_errors": 0,
+      "validator_warnings": 0,
+      "validator_report_sha256": "0f77e80801f536c72566d946e34c53c855a61b1bce9b18d5bcab934b8a6dbb6e"
+    },
+    "synthetic_openxr": {
+      "checks_passed": 35,
+      "scope": "Actual loader and hardware-rendered controller fixture cover Apply, editable FLOAT paint, separate GPU-filtered FLOAT Bake with a normal map, focus loss and unconfirmed cancellation.",
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "report_sha256": "8dd448f195c89dde27c2dd31453f0a2c4012f7825850347a670c5d9ac4754a2e",
+      "trace_sha256": {
+        "accept": "aacc4be1275711896183625e0b18aeea1941485b71e9ffd0e9e800c4ed4dbf1f",
+        "focus": "1e0082014b82787e10e99de3f4260fc763f14c11b65e20830ee212d800129117"
+      }
+    }
+  },
+  "headless_reference": {
+    "cases_passed": [
+      "retopology-affine",
+      "retopology-imported-mtoon-painted",
+      "retopology-imported-pbr",
+      "retopology-imported-prior-bake"
+    ],
+    "log_sha256": "b06a5399cbc1b0de1220c262e7be6c7fcbc05a0b350f74deb33c82356d126350"
+  },
+  "sanitizers": {
+    "scope": "ASan and UBSan on host paint, emission raster setup and the owning affine fixture. Release oneAPI kernels ran on Arc. Leak detection was disabled.",
+    "assertions_passed": 434,
+    "log_sha256": "00104499fc771c28d2d0a0c81b78e0ee6ebd537d20c7c47b6e3d89d6470f5a64"
+  },
+  "cuda_and_rocm": {
+    "cuda": {
+      "scope": "Device and host sampling/authoring units compiled. Hardware execution unavailable.",
+      "log_sha256": "65a9aab8d75ace273c70691a06e9c9f216b1a6f1938acab60563a6ccbdb4fb75"
+    },
+    "rocm": {
+      "scope": "Device and host sampling/authoring units compiled. Hardware execution unavailable.",
+      "log_sha256": "fae78625f142511ec71e6c42f4df84ee67faefb9157df307b7c00281ee086984"
+    }
+  },
+  "open_work": [
+    "GPU sampling of independent authored normal fields and original imported images",
+    "First transfer of posed prepared native normal fields",
+    "Physical headset and positive AMD/NVIDIA hardware acceptance"
+  ]
+}
