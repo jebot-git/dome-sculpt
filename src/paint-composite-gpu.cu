@@ -33,6 +33,7 @@
 #include "dome/paint.hpp"
 #include "dome/source-maps.hpp"
 #include "source-uv-sampler-kernel.hpp"
+#include "mixed-normal-raster-kernel.hpp"
 namespace dome {namespace {
 template<class E>void checked(E value){if(value!=DS_SUCCESS)throw std::runtime_error(DS_ERROR_TEXT(value));}
 __global__ void map_source_coordinates(paint_compute::SourceCoordinateBatch batch,uint32_t width,
@@ -115,6 +116,59 @@ std::unique_ptr<SourceUvSampler> upload_source_uv_sampler(
     const PaintSourceTexture &source, bool srgb, SourceUvSampler::Output format, size_t capacity,
     SourceUvSampler::Transform transform) {
   return std::make_unique<GpuSourceUvSampler>(source, srgb, format, capacity, transform);
+}
+}
+namespace detail::mixed_normal {
+namespace {
+__global__ void encode_mixed_normals(View in,Stripe stripe,const paint_compute::Quantization *q,
+    Tap *taps,uint8_t *pixels,size_t count){
+ const size_t i=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+ if(i<count)taps[i]=encode(in,stripe,*q,i,pixels+4*i);
+}
+
+__global__ void certify_mixed_normals(View in,Stripe stripe,const Tap *taps,float *bounds,size_t count){
+ __shared__ float maximum[group_size];
+ const auto local=threadIdx.x;
+ const size_t i=size_t(blockIdx.x)*blockDim.x+local;
+ maximum[local]=i<count?certify(in,stripe,taps,i):0.f;
+ __syncthreads();
+ for(unsigned step=group_size/2;step;step/=2){
+  if(local<step)maximum[local]=high_value(maximum[local],maximum[local+step]);
+  __syncthreads();
+ }
+ if(!local)bounds[blockIdx.x]=maximum[0];
+}
+}
+
+float raster(const Input &in,std::span<uint8_t> rgba,const std::function<bool()> &cancelled){
+ paint_compute::checkpoint(cancelled);
+ validate(in,rgba);
+ const auto limit=capacity(in),groups=(limit+group_size-1)/group_size;
+ Buffer<uint8_t> original(in.original.rgba.size()),detail(in.detail.rgba.size()),
+     coverage(in.coverage.rgba.size()),visible(in.visible.size()),pixels(limit*4);
+ Buffer<paint_compute::Quantization> table(1);
+ Buffer<Tap> taps(limit);
+ Buffer<float> bounds(groups);
+ std::vector<float> bound(groups);
+ const View source{view(in.original,original.data),view(in.detail,detail.data),
+                   coverage.data,visible.data,in.width,in.height,in.scale};
+ const auto &q=paint_compute::quantization();
+ checked(DS_COPY(original.data,in.original.rgba.data(),in.original.rgba.size(),DS_TO_DEVICE));
+ checked(DS_COPY(detail.data,in.detail.rgba.data(),in.detail.rgba.size(),DS_TO_DEVICE));
+ checked(DS_COPY(coverage.data,in.coverage.rgba.data(),in.coverage.rgba.size(),DS_TO_DEVICE));
+ if(visible.data)checked(DS_COPY(visible.data,in.visible.data(),in.visible.size_bytes(),DS_TO_DEVICE));
+ checked(DS_COPY(table.data,&q,sizeof(q),DS_TO_DEVICE));
+ return visit_stripes(in,rgba,cancelled,[&](Stripe batch,std::span<uint8_t> output){
+  encode_mixed_normals<<<(batch.scratch()+group_size-1)/group_size,group_size>>>(
+      source,batch,table.data,taps.data,pixels.data,batch.scratch());
+  checked(DS_LAST_ERROR());
+  const auto blocks=batch.groups();
+  certify_mixed_normals<<<blocks,group_size>>>(source,batch,taps.data,bounds.data,batch.texels());
+  checked(DS_LAST_ERROR());
+  checked(DS_COPY(output.data(),pixels.data+4*size_t(batch.halo)*batch.width,output.size_bytes(),DS_TO_HOST));
+  checked(DS_COPY(bound.data(),bounds.data,blocks*sizeof(float),DS_TO_HOST));
+  return *std::max_element(bound.begin(),bound.begin()+blocks);
+ });
 }
 }
 namespace detail::portable_normal {

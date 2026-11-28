@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/source-uv-bake.hpp"
+#include "mixed-normal-raster.hpp"
 #include "source-uv-sampler.hpp"
 #include <algorithm>
 #include <bit>
@@ -80,6 +81,29 @@ void check_mapped_sampler() {
            std::array<float,12>{0,1,0,1, 0,.5f,0,.5f, 0,0,0,0},
        "Bilinear associated reads exclude uncovered RGB before filtering");
 }
+void check_mixed_normal_raster(){
+ namespace normal=detail::mixed_normal;
+ const Image fine{2,2,{128,128,255,255, 128,128,255,255,
+                       128,128,255,255, 128,128,0,255}};
+ const Image detail{1,1,{140,119,254,255}};
+ const Image uncovered{1,1,{0,0,0,255}};
+ const Image covered{1,1,{255,255,255,255}};
+ std::array<uint8_t,4*4*4> output{};
+ const normal::Input all{fine,detail,uncovered,4,4,1,{}};
+ check(normal::raster(all,output,{})==1,
+       "A visible opposite-facing source normal invalidates the continuous certificate");
+ std::array<uint8_t,5*5> visible{};
+ visible[6]=1;
+ const normal::Input isolated{fine,detail,uncovered,4,4,1,visible};
+ check(normal::raster(isolated,output,{})<.008f&&output[0]==128&&output[2]==255,
+       "The certificate ignores opposite-facing source texels outside the admitted UV cells");
+ const normal::Input fully_covered{fine,detail,covered,4,4,1,{}};
+ check(normal::raster(fully_covered,output,{})<.008f&&output[0]==140&&output[1]==119&&output[2]==254,
+       "A fully covered source certifies the unit Bake direction independently");
+ unsigned polls=0;
+ check(rejects([&]{normal::raster(fully_covered,output,[&]{return ++polls==2;});}),
+       "The mixed normal raster polls cancellation before publishing device output");
+}
 std::shared_ptr<PaintSourceMaps> maps(){auto m=std::make_shared<PaintSourceMaps>();m->color.image=gradient();m->metal_rough.image=flat({64,96,128,255});m->emission.image=flat({32,64,128,255});m->normal.image=flat({255,128,128,255});m->occlusion.image=flat({96,0,0,255});for(auto view:{&m->color,&m->metal_rough,&m->emission,&m->normal,&m->occlusion}){view->min_filter=view->mag_filter=9728;view->wrap_s=view->wrap_t=33071;}m->normal_scale=.75f;m->occlusion_strength=.6f;return m;}
 SourceUvBakeInput input(std::shared_ptr<const PaintedMesh>paint){SourceUvBakeInput i;i.paint=paint;i.target=paint->mesh();for(auto &q:i.target.uv)q={1-q[1],q[0]};for(uint32_t n=0;n<i.target.positions.size();++n)i.source_vertices.push_back(n);return i;}
 std::array<int,4> pixel(const PaintSourceTexture&t,int x=16,int y=48){auto &i=*t.image;size_t at=(size_t(y)*i.width+x)*4;return {i.rgba[at],i.rgba[at+1],i.rgba[at+2],i.rgba[at+3]};}
@@ -146,6 +170,7 @@ SourceUvBakeInput triangles(std::shared_ptr<const PaintedMesh>paint,std::shared_
 }
 int main(int argc,char**argv)try{
  check_mapped_sampler();
+ check_mixed_normal_raster();
  auto source=maps();auto paint=PaintedMesh::from_maps(quad(),source,64);auto before=paint->encode();SourceUvBakeOptions options;options.resolution=64;auto i=input(paint);auto baked=bake_source_uv(i,options);
  check_animated_mask(*source,options,false);
  check_animated_mask(*source,options,true);

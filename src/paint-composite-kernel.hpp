@@ -90,11 +90,13 @@ DOME_PC_FN uint8_t srgb_byte(float v,const Quantization &q){
 }
 DOME_PC_FN float blend(float base,float paint,float a){return add(mul(base,sub(1,a)),mul(paint,a));}
 DOME_PC_FN void sample_source_taps(const uint8_t *image,uint32_t width,bool nearest,SourcePixelTaps taps,bool srgb,
-                                   const Quantization &q,float (&result)[4],bool associate_alpha=false){
+                                   const Quantization &q,float (&result)[4],bool associate_alpha=false,
+                                   const uint8_t *coverage=nullptr){
  const auto column=taps.column,row=taps.row;
  const auto decode=[&](const uint8_t *rgba,unsigned c){
-  const float value=srgb&&c<3?q.srgb[rgba[c]]:q.unit[rgba[c]];
-  return associate_alpha&&c<3?mul(value,q.unit[rgba[3]]):value;
+  const auto byte=c==3&&coverage?coverage[rgba-image]:rgba[c];
+  const float value=srgb&&c<3?q.srgb[byte]:q.unit[byte];
+  return associate_alpha&&c<3?mul(value,q.unit[coverage?coverage[rgba-image]:rgba[3]]):value;
  };
  if(nearest){
   const auto *rgba=image+(size_t(row.first)*width+column.first)*4;

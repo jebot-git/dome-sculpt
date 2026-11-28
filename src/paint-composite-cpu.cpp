@@ -5,6 +5,7 @@
 #include "paint-grid-filter.hpp"
 #include "portable-normal-raster.hpp"
 #include "source-uv-sampler-kernel.hpp"
+#include "mixed-normal-raster-kernel.hpp"
 #include "dome/source-maps.hpp"
 #include <cstring>
 namespace dome::detail {
@@ -68,6 +69,26 @@ std::unique_ptr<SourceUvSampler> upload_source_uv_sampler(
     const PaintSourceTexture &source, bool srgb, SourceUvSampler::Output format, size_t capacity,
     SourceUvSampler::Transform transform) {
   return std::make_unique<ReferenceSourceUvSampler>(source, srgb, format, capacity, transform);
+}
+}
+namespace dome::detail::mixed_normal {
+float raster(const Input &in,std::span<uint8_t> rgba,const std::function<bool()> &cancelled){
+ paint_compute::checkpoint(cancelled);
+ validate(in,rgba);
+ const View source{view(in.original,in.original.rgba.data()),view(in.detail,in.detail.rgba.data()),
+                   in.coverage.rgba.data(),in.visible.empty()?nullptr:in.visible.data(),
+                   in.width,in.height,in.scale};
+ const auto &q=paint_compute::quantization();
+ std::vector<Tap> taps(capacity(in));
+ return visit_stripes(in,rgba,cancelled,[&](Stripe batch,std::span<uint8_t> output){
+  const auto halo=size_t(batch.halo)*batch.width;
+  uint8_t unused[4];
+  for(size_t i=0;i<batch.scratch();++i)
+   taps[i]=encode(source,batch,q,i,i<halo?unused:output.data()+4*(i-halo));
+  float bound=0;
+  for(size_t i=0;i<batch.texels();++i)bound=std::max(bound,certify(source,batch,taps.data(),i));
+  return bound;
+ });
 }
 }
 namespace dome::detail::portable_normal {

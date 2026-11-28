@@ -411,6 +411,18 @@ six Khronos and MToon validations pass. CUDA and ROCm compile the changed
 units. Positive execution on those vendors and physical XR remain open.
 [Independent MToon normal grids evidence](validation/retopo-mixed-normal-20261128.json)
 
+The mixed-resolution normal raster now constructs sample coordinates,
+filters both images, blends and encodes the result, and certifies cells
+on one device queue. Source images, coverage and the triangle-domain mask
+upload once. Adjacent batches share a one-row sampling boundary. The worker
+reads only final RGBA and one angular bound per workgroup. On Arc the
+512-square fixture uses ten batch transfers totaling 1,056,768 bytes.
+The preceding sampler path used 64 batch transfers totaling 12,582,912 bytes.
+Resident uploads in those runs use 856,065 and 333,824 bytes respectively.
+The portable GLB binary chunks and native project are exact. Angular proof
+metadata gains a small binary32 margin, and its associated document digest
+updates. This path retains the existing clamp-linear UV0 admission.
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.
