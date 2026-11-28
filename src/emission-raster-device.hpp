@@ -23,7 +23,8 @@ public:
 
 std::unique_ptr<SourceMaterialRaster> create_source_material_raster(
     const PaintedMesh &,const Material &,const SourceMaterialRaster::Roles &,
-    float occlusion_strength,uint32_t resolution,size_t working_bytes,const std::function<bool()> &);
+    float occlusion_strength,uint32_t resolution,size_t working_bytes,const std::function<bool()> &,
+    bool include_emission=true);
 
 class EmissionRasterDevice {
 public:

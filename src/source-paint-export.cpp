@@ -3,10 +3,14 @@
 #include "dome/brush.hpp"
 #include "dome/material-visibility.hpp"
 #include "current-colors.hpp"
+#include "emission-bake-source.hpp"
+#include "emission-paint-access.hpp"
 #include "emission-raster-device.hpp"
+#include "normal-bake-encoding.hpp"
 #include "paint-overlay-sample.hpp"
 #include "source-extra-uv-authority.hpp"
 #include "source-paint-pairing.hpp"
+#include "source-bake-normal.hpp"
 #include <limits>
 
 namespace dome::detail {
@@ -288,7 +292,147 @@ AtlasAlpha atlas_alpha(const PaintedMesh &paint,const PaintOverlayPacket &packet
 struct PaintAtlas {
   std::shared_ptr<Image> color,orm,emission;
   bool transparent=false;
+  std::shared_ptr<Image> normal;
+  bool includes_occlusion=false;
 };
+
+std::shared_ptr<Image> baked_normal_atlas(const SculptObject &owner,std::span<const int32_t> padding,ProofWork &work) {
+  const auto &paint=*owner.painted;
+  if(paint.baked()->maps.normal.rgba.empty())return {};
+  const auto frames=owner.material_bindings?owner.material_bindings->normal_frames:nullptr;
+  if(!frames||!frames->pbr||frames->pbr->tangents.empty())
+    throw std::invalid_argument("Prepared HDR Bake normals require the source's emitted tangent frame");
+  // Encode the finite baked normal into the same frame glTF emits. The source
+  // normal may use a different UV derivative and the native Bake may use Mikk
+  // on the writable atlas. Neither input vector can be copied verbatim.
+  auto rest=owner;
+  if(rest.deformation){
+    auto deformation=std::make_shared<DeformationState>(*rest.deformation);
+    deformation->morph_weights.clear();
+    deformation->pose.clear();
+    rest.deformation=std::move(deformation);
+  }
+  const auto sample=source_bake_normals(rest,{},SourceBakeNormalOptions{128u*1024u*1024u,work.cancelled});
+  if(!sample)throw std::invalid_argument("Prepared HDR Bake lost its actual native normal resolver");
+  const auto &frame=*frames->pbr;
+  const auto r=paint.resolution();
+  auto normal=std::make_shared<Image>(Image{r,r,std::vector<uint8_t>(padding.size()*4)});
+  uint32_t prior=UINT32_MAX;
+  std::array<NormalBakeVertex,3> columns;
+  for(size_t at=0;at<padding.size();++at){
+    work.charge(1);
+    if((at&1023)==0)work.stop();
+    if(padding[at]!=int32_t(at))continue;
+    const auto [face,bary]=EmissionExportAccess::writable_sample(paint,at);
+    if(face!=prior){
+      for(size_t c=0;c<3;++c){
+        const size_t corner=size_t(face)*3+c;
+        const auto &t=frame.tangents.at(corner);
+        columns[c]=normal_bake_vertex(frame.normals.at(corner),{t[0],t[1],t[2]},t[3],NormalVertexBitangent::UnitCross);
+      }
+      prior=face;
+    }
+    const auto basis=normal_bake_basis(columns,{bary[0],bary[1],bary[2]},NormalFragmentBasis::UnitColumns);
+    const auto encoded=encode_normal_bake(basis,sample(face,bary)[0]);
+    if(!encoded||encoded->quantized_angle_radians>.02)
+      throw std::invalid_argument("Prepared HDR Bake cannot encode its normal in the emitted tangent frame");
+    std::copy(encoded->rgba.begin(),encoded->rgba.end(),normal->rgba.begin()+at*4);
+  }
+  return normal;
+}
+
+PaintAtlas compile_baked_hdr_atlas(const SculptObject &owner,const PaintOverlayPacket &packet,Material &material,
+    const std::function<bool()> &cancelled) {
+  const auto &paint=*owner.painted;
+  const auto &maps=*paint.source_maps();
+  const auto padding=EmissionExportAccess::writable_padding(paint);
+  const auto r=paint.resolution();
+  ProofWork work{cancelled};
+  work.charge(padding.size()*6);
+  AtlasAlpha alpha;
+  if(material.alpha==Material::AlphaMode::Mask){
+    const float original=maps.color.image&&material.color[3]!=0?
+        material.color[3]*constant_channel(*maps.color.image,3,false,work):material.color[3];
+    alpha=atlas_alpha(paint,packet,original,true,work);
+  }
+  const auto image=[&]{return std::make_shared<Image>(Image{r,r,std::vector<uint8_t>(padding.size()*4)});};
+  PaintAtlas atlas{image(),image(),{},alpha.transparent,baked_normal_atlas(owner,padding,work),true};
+  const auto store=[&](size_t at,const paint_compute::Output &pixel){
+    auto *rgba=atlas.color->rgba.data()+at*4;
+    std::copy_n(pixel.color,4,rgba);
+    if(alpha.constant)rgba[3]=255;
+    std::copy_n(pixel.orm,4,atlas.orm->rgba.data()+at*4);
+    atlas.transparent|=!alpha.constant&&pixel.transparent;
+  };
+  const SourceMaterialRaster::Roles roles{maps.color.image?&maps.color:nullptr,
+    maps.metal_rough.image?&maps.metal_rough:nullptr,nullptr,maps.occlusion.image?&maps.occlusion:nullptr};
+  std::array<std::span<const std::array<float,2>>,paint_compute::SourceRoleCount> uv;
+  for(size_t i=0;i<roles.size();++i)if(roles[i])uv[i]=source_texture_coordinates(paint.mesh(),maps,roles[i]->texcoord);
+  if(compute_backend()!="CPU"){
+    constexpr size_t working_bytes=256u*1024u*1024u;
+    auto device=create_source_material_raster(paint,material,roles,maps.occlusion_strength,r,
+        working_bytes-padding.size()*(atlas.normal?12:8),cancelled,false);
+    std::vector<uint32_t> texels;
+    texels.reserve(device->capacity());
+    std::vector<paint_compute::Output> output(device->capacity());
+    const auto flush=[&]{
+      if(texels.empty())return;
+      device->read_material(texels,[&](unsigned role,std::span<SourceUvSampler::Coordinate> coordinates){
+        for(size_t i=0;i<texels.size();++i){
+          if((i&1023)==0)work.stop();
+          const auto q=EmissionExportAccess::writable_source_uv(paint,uv[role],texels[i]);
+          coordinates[i]={q[0],q[1]};
+        }
+      },std::span(output).first(texels.size()),cancelled);
+      for(size_t i=0;i<texels.size();++i)store(texels[i],output[i]);
+      texels.clear();
+    };
+    for(size_t at=0;at<padding.size();++at){
+      if((at&1023)==0)work.stop();
+      if(padding[at]!=int32_t(at))continue;
+      texels.push_back(uint32_t(at));
+      if(texels.size()==device->capacity())flush();
+    }
+    flush();
+  }else{
+    // Independent headless reference. Production builds use the GPU above.
+    auto resolved=std::array{maps.color,maps.metal_rough,maps.emission,maps.occlusion};
+    for(auto &role:resolved)role.texcoord=0;
+    for(size_t at=0;at<padding.size();++at){
+      if((at&1023)==0)work.stop();
+      if(padding[at]!=int32_t(at))continue;
+      auto source=[&](unsigned role,bool srgb){
+        if(!roles[role])return std::array{1.f,1.f,1.f,1.f};
+        const auto q=EmissionExportAccess::writable_source_uv(paint,uv[role],at);
+        return sample_source_texture(resolved[role],q[0],q[1],srgb);
+      };
+      const auto [value,operations]=sample_overlay_texel_owner(packet,at,true);
+      work.charge(operations);
+      const auto color=source(0,true),orm=source(1,false),ao=source(3,false);
+      paint_compute::Output pixel;
+      for(size_t k=0;k<4;++k){
+        const float c=material.color[k]*color[k]*(1-value[3][0])+value[0][k];
+        pixel.color[k]=unorm8(k<3?linear_to_srgb(c):c);
+        if(k==3)pixel.transparent=c<.999f;
+      }
+      pixel.orm[0]=unorm8((1-maps.occlusion_strength*(1-ao[0]))*(1-value[1][3])+value[1][0]);
+      pixel.orm[1]=unorm8(material.roughness*orm[1]*(1-value[3][2])+value[1][1]);
+      pixel.orm[2]=unorm8(material.metallic*orm[2]*(1-value[3][1])+value[1][2]);
+      pixel.orm[3]=255;
+      store(at,pixel);
+    }
+  }
+  for(size_t at=0;at<padding.size();++at){
+    if((at&1023)==0)work.stop();
+    const auto from=padding[at];
+    if(from<0||size_t(from)==at)continue;
+    for(auto *image:{atlas.color.get(),atlas.orm.get(),atlas.normal.get()})if(image)
+      std::copy_n(image->rgba.data()+size_t(from)*4,4,image->rgba.data()+at*4);
+  }
+  material.color={1,1,1,alpha.constant.value_or(1)};
+  material.roughness=material.metallic=1;
+  return atlas;
+}
 
 PaintAtlas compile_atlas(const PaintedMesh &paint,const ObjectSurface &object,const PaintOverlayPacket &packet,
     const OverlayRange &range,PaintSourceMaps &source,Material &material,ProofWork &work) {
@@ -508,9 +652,11 @@ void install_atlas(PaintSourceMaps &source,PaintAtlas atlas,const ObjectSurface 
   if(atlas.color)source.color={};
   if(atlas.orm)source.metal_rough={};
   if(atlas.emission||hdr)source.emission={};
+  if(atlas.normal)source.normal={};
+  if(atlas.includes_occlusion)source.occlusion={};
   if(!source.uses_uv1())source.uv1.reset();
   std::erase_if(source.extra_uv_sets,[&](const auto &entry){return !uses_coordinate(source,entry.first);});
-  if(!atlas.color&&!atlas.orm&&!atlas.emission)return;
+  if(!atlas.color&&!atlas.orm&&!atlas.emission&&!atlas.normal)return;
   const auto set=adopt_atlas_coordinates(source,out,uv0,maximum_bytes);
   const auto enable=[&](PaintSourceTexture &slot,std::shared_ptr<Image> image){
     if(!image)return;
@@ -522,11 +668,18 @@ void install_atlas(PaintSourceMaps &source,PaintAtlas atlas,const ObjectSurface 
   enable(source.color,std::move(atlas.color));
   enable(source.metal_rough,std::move(atlas.orm));
   enable(source.emission,std::move(atlas.emission));
+  if(atlas.normal){
+    enable(source.normal,std::move(atlas.normal));
+    source.normal_scale=1;
+  }
+  if(atlas.includes_occlusion){
+    source.occlusion=source.metal_rough;
+    source.occlusion_strength=1;
+  }
 }
-} // namespace
 
-void source_paint_export(const PaintedMesh &paint,ObjectSurface &out,
-    const std::function<bool()> &cancelled,SourcePaintExport mode) {
+void compile_source_surface(const PaintedMesh &paint,ObjectSurface &out,
+    const std::function<bool()> &cancelled,SourcePaintExport mode,const SculptObject *baked_owner) {
   auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Source paint export cancelled");};
   stop();
   if(!paint.source_sampling_prepared()||!paint.valid_source_sampling_attachment())
@@ -557,7 +710,8 @@ void source_paint_export(const PaintedMesh &paint,ObjectSurface &out,
   auto source=std::make_shared<PaintSourceMaps>(original);
   auto material=out.material;
   PaintAtlas atlas;
-  if(!marker->overlay->empty())
+  if(baked_owner)atlas=compile_baked_hdr_atlas(*baked_owner,*marker->overlay,material,cancelled);
+  else if(!marker->overlay->empty())
     atlas=compile_source_paint(paint,out,*marker->overlay,*source,material,cancelled,
                                mode!=SourcePaintExport::Factors);
   if(original.uv1)source->uv1=std::make_shared<const std::vector<std::array<float,2>>>(remap(*original.uv1));
@@ -580,5 +734,23 @@ void source_paint_export(const PaintedMesh &paint,ObjectSurface &out,
   out.material=std::move(material);
   out.textures=std::move(textures);
   stop();
+}
+} // namespace
+
+void source_paint_export(const PaintedMesh &paint,ObjectSurface &out,
+    const std::function<bool()> &cancelled,SourcePaintExport mode) {
+  compile_source_surface(paint,out,cancelled,mode,nullptr);
+}
+
+void source_baked_hdr_export(const SculptObject &owner,ObjectSurface &out,
+    const std::function<bool()> &cancelled) {
+  const auto &paint=owner.painted;
+  auto marker=source_baked_preview(owner,cancelled);
+  if(!paint||!marker||!source_baked_preview_metadata(*marker)||
+     !paint->source_maps()||marker->overlay->source_baked_geometry()!=paint->mesh_owner()||
+     out.material.emissive!=std::array<float,3>{})
+    throw std::invalid_argument("Prepared HDR Bake requires its actual non-emission material view");
+  out.textures=std::move(marker);
+  compile_source_surface(*paint,out,cancelled,SourcePaintExport::StandardHdr,&owner);
 }
 } // namespace dome::detail

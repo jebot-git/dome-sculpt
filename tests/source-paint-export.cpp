@@ -3,6 +3,7 @@
 #include "mtoon-render.cpp"
 #undef main
 #include "dome/document.hpp"
+#include "dome/bake-authoring.hpp"
 #include "dome/emission-native.hpp"
 #include "dome/import-authoring.hpp"
 #include "dome/material-bindings.hpp"
@@ -681,6 +682,94 @@ void single_surface_emission(const std::filesystem::path &out,const Scene &initi
  doc.export_asset(mapped_retry).get();
  check(file_bytes(mapped_retry)==mapped_bytes,"Reopening mapped HDR reproduces every byte of the GLB");
 }
+void baked_surface_emission(const std::filesystem::path &out,const Scene &initial,
+    const ImportAuthoringOptions &options,SurfaceRenderer &native,Fbo &fbo,
+    prepared_normal_consumer::Renderer &consumer) {
+ auto fixture=source(1,false,"BLEND",0.f);
+ fixture.j["meshes"][0]["primitives"][0]["attributes"].erase("COLOR_0");
+ auto &m=fixture.j["materials"][0];
+ m["emissiveTexture"]={{"index",0},{"texCoord",1}};
+ m["emissiveFactor"]={.02f,.23f,.14f};
+ m["pbrMetallicRoughness"]["metallicRoughnessTexture"]={{"index",0},{"texCoord",1}};
+ fixture.j["samplers"][0]["magFilter"]=9729;
+ fixture.j["samplers"][0]["minFilter"]=9729;
+ const auto input=out/"baked-source-hdr-input.glb";
+ fixture.save(input);
+ auto scene=prepare_authoring_import(initial,input,options).scene;
+ const auto id=scene.active().id;
+ for(const auto &object:scene.objects())if(object.id!=id)scene.object(object.id).visible=false;
+ const auto donor_id=scene.duplicate(id);
+ auto &donor=scene.object(donor_id);
+ auto mesh=donor.painted->mesh();
+ for(auto &position:mesh.positions){position.x+=.035f;position.z+=.003f;}
+ for(auto &normal:mesh.normals)normal=normalized(Vec3{.14f,-.17f,1});
+ donor.painted=std::make_shared<PaintedMesh>(std::move(mesh),64);
+ donor.material.color={.18f,.69f,.29f,.55f};
+ donor.material.emissive={2.3f,.04f,.0008f};
+ donor.appearance.reset();
+ donor.deformation.reset();
+ donor.material_bindings.reset();
+ donor.rig_source.reset();
+ donor.visible=false;
+ scene.select(id);
+ ObjectBakeSettings bake;
+ bake.allow_partial=true;
+ bake.ao_samples=0;
+ bake.padding=2;
+ bake_object(scene,donor_id,bake);
+ auto &recipient=scene.active();
+ const auto baked=recipient.painted->baked();
+ check(baked&&baked->emission_field&&!baked->maps.normal.rgba.empty()&&recipient.bake_recipe&&
+       std::find(baked->coverage.begin(),baked->coverage.end(),0)!=baked->coverage.end()&&
+       std::find(baked->coverage.begin(),baked->coverage.end(),255)!=baked->coverage.end(),
+       "Actual partial Bake retains FLOAT fields, normal detail, source and recipe on the imported atlas");
+ recipient.painted=recipient.painted->snapshot();
+ recipient.painted->add_layer("Physical touch-up");
+ PaintSettings touch;
+ touch.front_only=false;
+ touch.channel=PaintChannel::Emission;
+ touch.emission_units=PaintEmissionUnits::Physical;
+ touch.emission={1.3f,.11f,.32f};
+ paint_uniform(*recipient.painted,touch,.21f);
+
+ const auto exact=scene.encode();
+ Document doc;
+ doc.replace(scene.snapshot());
+ doc.shading(false);
+ settled(doc);
+ const auto reference=draw(native,doc.frame().surface);
+ const auto path=out/"baked-source-hdr.glb",saved=out/"baked-source-hdr.dsculpt";
+ auto export_job=doc.export_asset(path);
+ auto save_job=doc.save_async(saved);
+ export_job.get();
+ save_job.get();
+ color_consumer::Model glb(path);
+ const auto &primitive=glb.data->meshes[0].primitives[0];
+ const auto &material=*primitive.material;
+ check(material.normal_texture.texcoord==2&&material.normal_texture.scale==1&&
+       material.occlusion_texture.texcoord==2&&material.pbr_metallic_roughness.base_color_texture.texcoord==2&&
+       material.pbr_metallic_roughness.metallic_roughness_texture.texcoord==2&&material.emissive_texture.texcoord==2&&
+       material.has_emissive_strength&&primitive.targets_count==1,
+       "Standard GLB carries all baked PBR channels on the writable atlas and keeps original morphs");
+ fbo.bind();
+ consumer.render(glb.data);
+ const auto error=delta(reference,read());
+ std::cout<<"BAKED_SOURCE_STANDARD max="<<error<<'\n';
+ check(error<=8,"Independent GLB renderer reproduces the finite source Bake preview");
+ const auto encoded=file_bytes(path);
+ const auto length=size_t(encoded[12])|(size_t(encoded[13])<<8)|(size_t(encoded[14])<<16)|(size_t(encoded[15])<<24);
+ const auto json=nlohmann::json::parse(encoded.begin()+20,encoded.begin()+20+length);
+ const auto &field=json.at("extras").at("domeSculptEmission").at("images").at(0);
+ check(field.at("object")==id&&field.at("fallback").at("version")==2&&field.at("domain").at("texCoord")==2,
+       "The emitted EXR record keeps the resolved FLOAT variant and exact native atlas owner");
+ auto restored=extract_native_emission(encoded);
+ check(restored&&restored->encode()==exact&&Scene::load(saved).encode()==exact&&doc.copy_scene().encode()==exact,
+       "Prepared-source Bake, original source, touch-up and recipe round-trip exactly through Standard GLB");
+ doc.replace(std::move(*restored));
+ const auto retry=out/"baked-source-hdr-retry.glb";
+ doc.export_asset(retry).get();
+ check(file_bytes(retry)==encoded,"Prepared baked HDR export is byte-identical after native recovery");
+}
 }
 int main(int argc,char **argv)try{
  if(argc<2||argc>3)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
@@ -724,5 +813,6 @@ int main(int argc,char **argv)try{
  spatial_paint(out,initial,options,native,fbo,separate_roles);
  mixed_emission(out,fbo,separate_roles);
  single_surface_emission(out,initial,options,native,fbo,separate_roles);
+ baked_surface_emission(out,initial,options,native,fbo,separate_roles);
  std::cout<<"PASS "<<checks<<" source-aware original standard export checks maxerror="<<maximum<<'\n';return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

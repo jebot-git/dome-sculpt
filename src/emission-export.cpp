@@ -41,7 +41,7 @@ EmissionRgb prepared_background(const SculptObject &object,const PaintSourceText
     const std::function<bool()> &cancelled){
  const auto &paint=*object.painted;
  const auto &binding=object.material_bindings;
- if(!object_has_hdr(object)||!paint.source_sampling_prepared()||!paint.valid_source_sampling_attachment()||paint.baked()||
+ if(!object_has_hdr(object)||!paint.source_sampling_prepared()||!paint.valid_source_sampling_attachment()||
     paint.paint_sampling_domain()||paint.color_projection()||paint.normal_projection()||
     object.material.toon||(binding&&binding->has_mtoon)||retained_mtoon(object.appearance.get()))
   throw std::invalid_argument("Standard HDR requires supported prepared Core PBR paint and source roles");
@@ -433,9 +433,12 @@ EmissionExportPrepared prepare_emission_export(std::span<const ObjectSurface> ob
  }else image=materialize(owning_raster(owner,cancelled,authored_mtoon,false));
  safe.material.emissive={};
  if(entry.prepared_source_mesh){
-  auto paint=EmissionExportAccess::without_emission(*owner.painted);
-  safe.textures=paint->preview(safe.material,cancelled);
-  source_paint_export(*paint,safe,cancelled,SourcePaintExport::StandardHdr);
+  if(owner.painted->baked())source_baked_hdr_export(owner,safe,cancelled);
+  else{
+   auto paint=EmissionExportAccess::without_emission(*owner.painted);
+   safe.textures=paint->preview(safe.material,cancelled);
+   source_paint_export(*paint,safe,cancelled,SourcePaintExport::StandardHdr);
+  }
  }else safe.textures=EmissionExportAccess::other_channels(*owner.painted,safe.material,cancelled);
  if(safe.material_bindings&&!native_domain&&!canonical){auto binding=std::make_shared<SourceMaterialBindings>(*safe.material_bindings);binding->physical_emission.reset();binding->native_reference.emission={};safe.material_bindings=std::move(binding);}
  if(native_domain||canonical){if(!proof){proof=std::shared_ptr<EmissionExportProof>(new EmissionExportProof);proof->scene=options.scene;}proof->entries.push_back({safe.id,safe.material,safe.textures,safe.material_bindings});}
@@ -537,6 +540,7 @@ std::vector<ObjectSurface> emission_export_surfaces(const Scene &scene,const std
   if(cancelled&&cancelled())throw std::runtime_error("HDR export surface extraction cancelled");
   if(!original.visible||original.texture_sets)continue;
   if(!detail::object_has_hdr(original))continue;
+  if(original.painted&&original.painted->source_sampling_prepared()&&original.painted->baked())continue;
   auto &object=detached.object(original.id);
   if(object.painted&&object.painted->has_physical_emission())
    object.painted=detail::EmissionExportAccess::without_emission(*object.painted);
@@ -555,6 +559,7 @@ std::vector<ObjectSurface> emission_export_surfaces(const Scene &scene,const std
   surface.material=original.material;
   surface.material_bindings=original.material_bindings;
   surface.retopo_mtoon_export=detail::RetopoMToonExport::capture(original,cancelled);
+  if(original.painted&&original.painted->source_sampling_prepared()&&original.painted->baked())continue;
   if(original.painted&&detail::object_has_hdr(original)){
    auto maps=std::make_shared<TextureMaps>(*surface.textures);
    maps->overlay=detail::PaintOverlayFactory::capture(*original.painted,cancelled);

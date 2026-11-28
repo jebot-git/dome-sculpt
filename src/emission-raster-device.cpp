@@ -79,7 +79,7 @@ size_t emission_raster_staging_bytes(const PaintedMesh &paint) noexcept {
 namespace {
 emission_raster::Input describe_raster(const PaintedMesh &paint,std::span<const int32_t> padding,
     std::array<float,3> background,float strength,bool authoring_blend,const std::function<bool()> &cancelled,
-    emission_raster::MaterialInput *material=nullptr){
+    emission_raster::MaterialInput *material=nullptr,bool include_emission=true){
   using namespace emission_raster;
   const auto stop=[&]{paint_compute::checkpoint(cancelled);};
   stop();
@@ -91,7 +91,7 @@ emission_raster::Input describe_raster(const PaintedMesh &paint,std::span<const 
   input.resolution=paint.resolution();
   for(unsigned k=0;k<3;++k)input.background[k]=std::bit_cast<uint32_t>(background[k]);
   input.strength=std::bit_cast<uint32_t>(strength);
-  if(auto bake=paint.baked()){
+  if(auto bake=include_emission?paint.baked():nullptr){
     if(bake->emission_field){
       input.physical_bake=true;
       input.bake=bake->emission_field->storage();
@@ -119,7 +119,7 @@ emission_raster::Input describe_raster(const PaintedMesh &paint,std::span<const 
       if((i&255)==0)stop();
       auto &entry=input.entries.emplace_back();
       const auto *tile=layer.tiles[i].get();
-      const auto *physical=layer.emission_tiles.empty()?nullptr:layer.emission_tiles[i].get();
+      const auto *physical=!include_emission||layer.emission_tiles.empty()?nullptr:layer.emission_tiles[i].get();
       if(material){
         auto &material_entry=material->entries.emplace_back();
         if(tile&&!PaintTile::is_shared_default(tile)){
@@ -134,8 +134,8 @@ emission_raster::Input describe_raster(const PaintedMesh &paint,std::span<const 
           }
         }
       }
-      const bool use_mask=physical||(tile&&std::any_of(tile->pixels.begin(),tile->pixels.end(),
-          [](const auto &pixel){return pixel.data[12]!=0;}));
+      const bool use_mask=include_emission&&(physical||(tile&&std::any_of(tile->pixels.begin(),tile->pixels.end(),
+          [](const auto &pixel){return pixel.data[12]!=0;})));
       if(use_mask&&tile&&!PaintTile::is_shared_default(tile)){
         contributes=true;
         const auto [found,inserted]=common_ids.try_emplace(tile,input.common.size());
@@ -240,7 +240,7 @@ void plan_material_upload(const emission_raster::Input &input,emission_raster::M
 
 std::unique_ptr<SourceMaterialRaster> create_source_material_raster(const PaintedMesh &paint,
     const Material &material,const SourceMaterialRaster::Roles &roles,float occlusion_strength,
-    uint32_t resolution,size_t working_bytes,const std::function<bool()> &cancelled){
+    uint32_t resolution,size_t working_bytes,const std::function<bool()> &cancelled,bool include_emission){
   if(!resolution||resolution>8192)throw std::invalid_argument("Invalid portable source material grid");
   emission_raster::MaterialInput raster;
   raster.roles=roles;
@@ -257,7 +257,7 @@ std::unique_ptr<SourceMaterialRaster> create_source_material_raster(const Painte
         bake->maps.pbr_color:bake->maps.color).rgba;
     raster.bake_orm=bake->maps.metal_rough.rgba;
   }
-  auto input=describe_raster(paint,EmissionExportAccess::writable_padding(paint),{},1,true,cancelled,&raster);
+  auto input=describe_raster(paint,EmissionExportAccess::writable_padding(paint),{},1,true,cancelled,&raster,include_emission);
   describe_finite_grid(input,resolution,0);
   plan_material_upload(input,raster,resolution,working_bytes);
   return emission_raster::upload_material(input,raster,cancelled);
