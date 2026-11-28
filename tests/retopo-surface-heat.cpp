@@ -378,6 +378,7 @@ void reapply_patch(bool affine, const std::filesystem::path &out) {
   mask.mask = .15f;
   mask.front_only = false;
   paint.add_layer("Hidden stencil");
+  const auto mask_id=paint.active_layer();
   paint.begin_stroke(); paint.stamp(brush,mask);
   check(paint.end_stroke(), "The old patch has an authored mask");
   paint.layer_properties("Hidden stencil",false,.6f);
@@ -386,6 +387,7 @@ void reapply_patch(bool affine, const std::filesystem::path &out) {
   ink.color = {.82f,.09f,.19f,1};
   ink.front_only = false;
   paint.add_layer("Surface pigment");
+  const auto pigment_id=paint.active_layer();
   paint.begin_stroke(); paint.stamp(brush,ink);
   check(paint.end_stroke(), "The old patch has independent editable pigment above its Bake");
   PaintSettings glow;
@@ -428,12 +430,14 @@ void reapply_patch(bool affine, const std::filesystem::path &out) {
         current.painted->baked()->emission_field && current.painted->has_physical_emission() &&
         current.painted->active_layer()==layer && current.painted->layers().size()==paint.layers().size(),
         "Replacement keeps editable layers, Bake settings, an active layer, and both FLOAT authorities");
-  const auto &mask_layer = current.painted->layers()[1];
-  check(!mask_layer.visible && mask_layer.opacity==.6f && mask_layer.name=="Hidden stencil" &&
-        std::ranges::any_of(mask_layer.tiles,[](const auto &tile) {
+  const auto &layers=current.painted->layers();
+  const auto mask_layer=std::ranges::find(layers,mask_id,&PaintLayer::id);
+  check(mask_layer!=layers.end()&&!mask_layer->visible && mask_layer->opacity==.6f && mask_layer->name=="Hidden stencil" &&
+        std::ranges::any_of(mask_layer->tiles,[](const auto &tile) {
           return tile && std::ranges::any_of(tile->pixels,[](const auto &p) {return p.data[13]<100;});
         }), "The hidden layer retains its opacity and independently editable mask samples");
-  check(std::ranges::any_of(current.painted->layers()[2].tiles,[](const auto &tile) {
+  const auto pigment_layer=std::ranges::find(layers,pigment_id,&PaintLayer::id);
+  check(pigment_layer!=layers.end()&&std::ranges::any_of(pigment_layer->tiles,[](const auto &tile) {
           return tile && std::ranges::any_of(tile->pixels,[](const auto &p) {return p.data[9]>120&&p.data[0]>180;});
         }), "The replacement atlas contains authored pigment samples");
   check(std::ranges::any_of(current.painted->baked()->emission_field->values(),[](const auto &p) {
@@ -691,6 +695,7 @@ void prepared_geometry_edit(bool affine,const std::filesystem::path &out,bool de
   size_t samples=0, normal_only=0;
   float error=0;
   const auto r=paint.resolution();
+  const auto stride=std::clamp(r/32,1u,7u);
   for (uint32_t tri=0;tri<mesh.indices.size()/3;++tri) {
     const auto a=mesh.indices[3*tri], b=mesh.indices[3*tri+1], c=mesh.indices[3*tri+2];
     const auto uv=mesh.uv[a];
@@ -699,7 +704,7 @@ void prepared_geometry_edit(bool affine,const std::filesystem::path &out,bool de
     };
     const auto u=uv_delta(b),v=uv_delta(c);
     const auto det=u[0]*v[1]-v[0]*u[1];
-    for (uint32_t y=1;y<r;y+=7) for (uint32_t x=1;x<r;x+=7) {
+    for (uint32_t y=1;y<r;y+=stride) for (uint32_t x=1;x<r;x+=stride) {
       const auto sx=(x+.5f)/r-uv[0],sy=(y+.5f)/r-uv[1];
       const auto b1=(sx*v[1]-sy*v[0])/det,b2=(u[0]*sy-u[1]*sx)/det;
       const std::array w{1.f-b1-b2,b1,b2};

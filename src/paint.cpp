@@ -2366,6 +2366,11 @@ bool detail::TextureSetPaintAccess::can_resize_raw(const PaintedMesh &paint)noex
     !paint.surface_->paint_domain&&!paint.surface_->original_sampling&&!paint.surface_->source_capture_only&&
     paint.surface_->options.policy!=PaintUvPolicy::PolygonAuthored;
 }
+bool detail::TextureSetPaintAccess::has_authored_layers(const PaintedMesh &paint) noexcept {
+  if(paint.has_paint_data()||paint.layers_.size()!=1||paint.next_!=2) return true;
+  const auto &layer=paint.layers_.front();
+  return layer.id!=1||layer.name!="Paint"||!layer.visible||layer.opacity!=1;
+}
 bool detail::TextureSetPaintAccess::can_resize_unpainted(const PaintedMesh &paint)noexcept{
   return can_resize_raw(paint)&&!paint.allocated_tiles_&&!paint.allocated_color_tiles_&&
     !paint.baked_&&!paint.has_physical_emission();

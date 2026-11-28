@@ -14,6 +14,14 @@ int main(int argc,char **argv)try {
   o.painted->begin_stroke();Brush b;b.from=b.to={0,0,0};b.radius=.22f;b.normal={0,0,1};
   PaintSettings p;p.color={.18f,.65f,.32f,.9f};o.painted->stamp(b,p);
   if(!o.painted->end_stroke())throw std::runtime_error("Real source paint did not change");
+  o.painted->begin_stroke();p.channel=PaintChannel::Emission;
+  p.emission_units=PaintEmissionUnits::Physical;p.emission={3,.4f,.2f};
+  o.painted->stamp(b,p);
+  if(!o.painted->end_stroke())throw std::runtime_error("Real source HDR paint did not change");
+  o.painted->add_layer("保護");
+  o.painted->begin_stroke();p.channel=PaintChannel::Mask;p.mask=0;o.painted->stamp(b,p);
+  if(!o.painted->end_stroke())throw std::runtime_error("Real source mask did not change");
+  o.painted->layer_properties("保護",false,0);
   DeformationState d(m);d.skeleton=Skeleton{{{"root",-1,{},.2f}}};
   d.skin=SkinWeights{};d.skin->vertices.assign(4,{{0,1}});
   d.morphs=MorphSet(m);auto target=m.positions;for(auto &v:target){v.x+=.04f*(v.y+.6f);v.y+=.025f*(v.x+.6f);}

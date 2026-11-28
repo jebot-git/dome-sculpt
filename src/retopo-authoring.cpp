@@ -195,6 +195,8 @@ std::optional<SurfaceHit> detail::RetopoTransfer::match_patch(Vec3 position, Vec
     return hit;
   }
   if (auto spatial = match(position,normal,source_domain)) return spatial;
+  if (first_patch_ && !source_domain)
+    throw std::invalid_argument("A retopology texel has no matching source surface within the projection range");
   return match_retained(position,normal,face,weights,source_domain);
 }
 RetopoWorkspace::RetopoWorkspace(const Scene &scene, const std::function<bool()> &cancelled) {
@@ -862,6 +864,8 @@ private:
   State reproject_canonical(const PaintedMesh &before,const Material &material,
       const std::shared_ptr<const DeformationState> &old_deformation,const SourceMaterialBindings &binding,
       const std::shared_ptr<const DeformationState> &deformation,detail::RetopoTransfer &projection) {
+    if (projection.posed_source())
+      throw std::invalid_argument("Use the rest pose before transferring prepared normal fields to a first patch");
     if (binding.has_mtoon || binding.normal_preparation ||
         binding.polygon_surface_transfer || binding.native_paint_sampling || binding.native_paint_frames ||
         !binding.normal_frames || !binding.normal_frames->pbr || binding.normal_frames->pbr->tangents.empty())
@@ -1086,6 +1090,7 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
   std::shared_ptr<const DeformationState> deformation;
   std::shared_ptr<const SourceMaterialBindings> material;
   std::shared_ptr<const TextureSetCollection> texture_sets;
+  std::shared_ptr<const ObjectBakeRecipe> recipe;
   std::optional<std::array<float,3>> emission;
   const auto patch = std::make_shared<RetopoPatch>(RetopoPatch{source, topology});
   std::shared_ptr<const PolygonOrigin> rig_source, shape_source;
@@ -1093,6 +1098,7 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
     if (previous.retopology->source != source || !previous.mesh_active || !previous.painted ||
         previous.appearance || previous.polygon)
       throw std::invalid_argument("Retopology cannot replace this material or topology authority yet");
+    recipe = previous.bake_recipe;
     detail::authenticate_native_source_skin(scene, previous, cancelled);
     const auto old_world = scene.world_matrix(previous.id);
     const auto desired_world = affine_similarity(transform);
@@ -1160,7 +1166,12 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
     const bool imported = previous.id == source && !sets && previous.mesh_active && previous.painted &&
         previous.appearance && previous.painted->source_maps() && previous.material_bindings &&
         (!previous.material.toon || previous.material_bindings->has_mtoon);
-    const auto resolution = project_materials || imported ? previous.painted->resolution() : 512;
+    const bool native = previous.id == source && !sets && previous.mesh_active && previous.painted &&
+        !previous.appearance && (detail::TextureSetPaintAccess::has_authored_layers(*previous.painted) ||
+                                  previous.material_bindings || previous.bake_recipe);
+    if (native && previous.polygon && previous.polygon->colors)
+      throw std::invalid_argument("Retopology needs a source adapter for the guide's authored corner colors");
+    const auto resolution = project_materials || imported || native ? previous.painted->resolution() : 512;
     unwrap(triangles.mesh, resolution, 4, cancelled);
     PaintSurfaceOptions options;
     options.cancelled = cancelled;
@@ -1174,7 +1185,8 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
       if (binding->has_mtoon)
         material=detail::TextureSetPaintAccess::reproject_retopology_mtoon(*previous.painted,*painted,previous.material,binding,projection,&previous);
       detail::TextureSetPaintAccess::reproject_retopology(*previous.painted,*painted,projection,false,nullptr,&previous,binding->has_mtoon);
-    } else if (project_materials) {
+      recipe = previous.bake_recipe;
+    } else if (project_materials || native) {
       RetopoReplacement replacement(painted, previous.painted->mesh(), scene.world_matrix(source), staged.world_matrix(id),
           {}, triangles.source_faces, {}, cancelled,previous.deformation.get());
       auto current = replacement.project(previous.painted, previous.material, {}, previous.material_bindings,
@@ -1183,13 +1195,14 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
       material = std::move(current.material);
       texture_sets = std::move(current.texture_sets);
       emission = current.emission;
+      recipe = previous.bake_recipe;
     }
   }
   object.painted = std::move(painted); object.mesh_active = true;
   object.material = previous.material; object.retopology = patch;
   if (emission) object.material.emissive = *emission;
   object.material_bindings = std::move(material);
-  if (previous.retopology || texture_sets) object.bake_recipe = previous.bake_recipe;
+  object.bake_recipe = std::move(recipe);
   object.deformation = std::move(deformation);
   object.rig_source = std::move(rig_source);
   object.shape_source = std::move(shape_source);

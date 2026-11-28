@@ -74,6 +74,15 @@ for mode in ('accept','focus','unconfirmed'):
     retained=dict(after['objects'][0]);expected=dict(source)
     retained.pop('visible');expected.pop('visible')
     check(retained==expected,mode+' preserves full original paint, pose, morphs, affine placement and source identities')
+    guide_paint=source['painted'].get('payload',source['painted'])
+    replacement=after['objects'][1]['painted']
+    replacement=replacement.get('payload',replacement)
+    def metadata(layers):
+        return [{key:layer[key] for key in ('id','name','visible','opacity')} for layer in layers]
+    check(replacement['resolution']==guide_paint['resolution'] and replacement['active']==guide_paint['active'] and
+          metadata(replacement['layers'])==metadata(guide_paint['layers']) and
+          bool(replacement['layers'][0]['physical_emission_tiles']) and bool(replacement['layers'][1]['tiles']),
+          mode+' publishes a writable FLOAT layer and hidden mask on the new native patch')
     patch=after['objects'][1]['retopology'];topology=json.loads(patch['topology'])
     positions=sorted(v[1] for v in topology['vertices'])
     want=sorted([[-.2,-.2,0],[.2,-.2,0],[0,.2,0]])

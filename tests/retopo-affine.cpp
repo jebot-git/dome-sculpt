@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "bake-fixture-identity.hpp"
+#include "dome/bake-recipe.hpp"
 #include "dome/document.hpp"
 #include "dome/source-placement.hpp"
 #include <algorithm>
@@ -112,13 +113,112 @@ void bake_patch(Document &doc, uint64_t source, const std::filesystem::path &pat
     red+=rgba[0]>rgba[1]+16;
     hdr+=baked->emission_field->values()[texel].absolute[0]>2;
   }
-  check(green>1000&&red>1000&&hdr>1000,
+  const auto pixels=baked->coverage.size();
+  check(green>pixels/100&&red>pixels/100&&hdr>pixels/100,
         "World-metric projection reaches both sparse painted detail and the unpainted base");
   check(bake_fixture::isolated_scene(accepted,source).encode()==
         bake_fixture::isolated_scene(original,source).encode()&&reloaded.encode()==baked_scene,
         "Bake and reopen preserve the hidden donor, source pose and all paint layers exactly");
   check(doc.undo()&&doc.copy_scene().encode()==before&&doc.redo()&&doc.copy_scene().encode()==baked_scene,
         "Undo and Redo affect only the accepted patch Bake");
+}
+void first_native_material(const std::filesystem::path &out,uint32_t resolution=64){
+  const auto plane=[](float height) {
+    Mesh mesh;
+    mesh.positions={{-1,-1,height},{1,-1,height},{1,1,height},{-1,1,height}};
+    mesh.normals.assign(4,{0,0,1});
+    mesh.indices={0,1,2,0,2,3};
+    mesh.uv={{0,0},{1,0},{1,1},{0,1}};
+    return mesh;
+  };
+  const auto quad=[](float left,float right) {
+    RetopoMesh patch;
+    const std::array<Vec3,4> positions{{{left,-.6f,0},{right,-.6f,0},{right,.6f,0},{left,.6f,0}}};
+    std::array<TopologyID,4> vertices;
+    for(size_t i=0;i<positions.size();++i)vertices[i]=patch.add_vertex({positions[i]});
+    patch.add_face(vertices);
+    return patch;
+  };
+  Scene input;
+  const auto guide=input.active().id;
+  input.active().name="Native painted guide";
+  input.active().mesh_active=true;
+  input.active().painted=std::make_shared<PaintedMesh>(plane(0),resolution);
+  auto &paint=*input.active().painted;
+  Brush brush;brush.radius=.49f;brush.normal={0,0,1};
+  PaintSettings ink;ink.color={.05f,.8f,.1f,1};
+  paint.layer_properties("Ink",true,.75f);
+  paint.begin_stroke();paint.stamp(brush,ink);
+  ink.channel=PaintChannel::Emission;ink.emission_units=PaintEmissionUnits::Physical;ink.emission={3,.1f,.2f};
+  paint.stamp(brush,ink);
+  check(paint.end_stroke(),"Native guide contains both editable color and FLOAT layer emission");
+  paint.add_layer("保護");
+  ink.channel=PaintChannel::Mask;ink.mask=0;
+  paint.begin_stroke();paint.stamp(brush,ink);
+  check(paint.end_stroke(),"Native guide contains a real editable mask");
+  paint.layer_properties("保護",false,0);
+  const auto mask=paint.active_layer(), color=paint.layers().front().id;
+  const auto donor=input.add("Red HDR Bake donor",Volume{});
+  auto &source=input.object(donor);
+  source.mesh_active=true;source.visible=false;
+  source.painted=std::make_shared<PaintedMesh>(plane(.012f),64);
+  source.material.color={1,0,0,1};
+  source.material.emissive={4,.125f,.5f};
+  input.select(guide);
+  ObjectBakeSettings settings;settings.front_mm=20;settings.back_mm=0;settings.ao_samples=0;settings.padding=0;
+  bake_object(input,donor,settings);
+  const auto original=input.encode();
+  input.save(out/"first-native-input.dsculpt");
+  auto accepted=input.snapshot();
+  const auto original_guide=accepted.object(guide).painted;
+  publish_retopology(accepted,quad(-.6f,.6f),guide,{});
+  const auto &result=*accepted.active().painted;
+  check(result.resolution()==resolution&&result.active_layer()==mask&&result.layers().size()==2&&
+      result.layers()[0].id==color&&result.layers()[0].name=="Ink"&&result.layers()[0].opacity==.75f&&
+      result.layers()[1].id==mask&&result.layers()[1].name=="保護"&&!result.layers()[1].visible&&result.layers()[1].opacity==0,
+      "The first patch keeps authored paint resolution, layer order, UTF-8 names, IDs, visibility, opacity and active layer");
+  check(result.baked()&&result.baked()->emission_field&&accepted.active().bake_recipe==input.active().bake_recipe,
+      "The first native patch has its own Bake maps, FLOAT field and exact saved recipe");
+  const auto &baked=*result.baked();
+  size_t tinted=0,protected_pixels=0,emissive_layer=0,emissive_bake=0;
+  for(size_t i=0;i<baked.coverage.size();++i){
+    if(baked.coverage[i]<250)continue;
+    const auto x=uint32_t(i%resolution),y=uint32_t(i/resolution);
+    const auto &pixel=result.pixel(color,x,y);
+    tinted+=pixel.data[9]>180&&pixel.data[1]>pixel.data[0]+30;
+    protected_pixels+=result.pixel(mask,x,y).data[13]<128;
+    emissive_layer+=result.emission_pixel(color,x,y).physical[0]>1;
+    emissive_bake+=baked.emission_field->texel(i).resolve({},1)[0]==4&&
+        baked.maps.color.rgba[i*4]==255&&baked.maps.normal.rgba[i*4+2]>=254;
+  }
+  const auto pixels=size_t(resolution)*resolution;
+  check(tinted>pixels/100&&protected_pixels>pixels/100&&emissive_layer>pixels/100&&emissive_bake>pixels/4,
+      "Projected texels carry editable color and mask detail plus separate FLOAT layer and Bake radiance");
+  check(accepted.object(guide).painted.get()==original_guide.get()&&!accepted.object(guide).visible&&input.encode()==original,
+      "Apply keeps the hidden original paint owner and leaves the source project exact");
+  const auto file=out/"first-native-material.dsculpt";
+  accepted.save(file);
+  check(Scene::load(file).encode()==accepted.encode(),"Native Save and cold Open preserve the complete projected paint and recipe");
+  bool missed=false;
+  try{publish_retopology(input,quad(.64f,1.5f),guide,{});}
+  catch(const std::invalid_argument &e){missed=std::string_view(e.what()).find("no matching source")!=std::string_view::npos;}
+  check(missed&&input.encode()==original,"First Apply rejects partially unmatched painted geometry without publishing an incomplete patch");
+  auto cleared=input.snapshot();
+  cleared.active().painted->clear_bake();
+  publish_retopology(cleared,quad(-.6f,.6f),guide,{});
+  check(!cleared.active().painted->baked()&&cleared.active().bake_recipe&&cleared.active().painted->has_physical_emission(),
+      "A cleared Bake stays cleared while its recipe and editable FLOAT paint survive");
+  Scene empty;
+  empty.active().mesh_active=true;
+  empty.active().painted=std::make_shared<PaintedMesh>(plane(0),64);
+  auto &empty_paint=*empty.active().painted;
+  empty_paint.add_layer("Deleted");
+  empty_paint.delete_layer();
+  publish_retopology(empty,quad(-.6f,.6f),empty.active().id,{});
+  auto cursor=empty.active().painted->snapshot();
+  cursor->add_layer("New layer");
+  check(empty.active().painted->resolution()==64&&cursor->active_layer()==3,
+      "An otherwise empty native layer stack preserves its monotonic ID cursor");
 }
 void topology_transform() {
   RetopoMesh t;std::array<TopologyID,4> v;
@@ -142,8 +242,14 @@ void topology_transform() {
 }
 }
 int main(int argc,char **argv)try {
+  if(argc==3&&std::string_view(argv[1])=="--first-native-1024"){
+    const std::filesystem::path out=argv[2];std::filesystem::create_directories(out);
+    first_native_material(out,1024);
+    std::cout<<"PASS "<<checks<<" native 1024-pixel first-patch material checks\n";return 0;
+  }
   if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
   topology_transform();
+  first_native_material(out);
   const Matrix matrices[]{
     {0,1,0,0,-1,0,0,0,0,0,1,0,.15,-.1,.2,1},
     {1.4,0,0,0,0,.7,0,0,0,0,1.2,0,.15,-.1,.2,1},
@@ -181,6 +287,8 @@ int main(int argc,char **argv)try {
     atlas_gate::release();saved.get();
     check(d.wait_asset()&&!d.frame().state->retopology&&d.frame().state->error.empty(),"Apply and ordered Save finish actual worker publication");
     const auto accepted=d.copy_scene();const auto exact=accepted.encode();
+    check(accepted.active().painted->resolution()==64&&accepted.active().painted->has_physical_emission(),
+          "The first patch carries editable FLOAT paint from the evaluated source");
     check(!accepted.object(source_id).visible&&accepted.object(source_id).painted->encode()==old_paint&&accepted.object(source_id).deformation->encode(accepted.object(source_id).painted->mesh())==old_deform&&accepted.object(source_id).affine_edit==s.active().affine_edit,"Publication retains exact hidden original paint/skin/morph/viseme/placement owner");
     check(accepted.active().retopology->topology.encode()==topology&&Scene::load(path).encode()==exact,"Save/reopen retains editable stable topology and whole exact Scene");
     for(auto &[id,p]:accepted.active().retopology->topology.vertices()){(void)id;check(w.view().source->closest(p.position).distance<2e-6f,"Published topology lies on independently checked evaluated source");}
