@@ -57,7 +57,7 @@ void edit_object_selection(Document &document) {
   Fl::screen_work_area(sx, sy, sw, sh);
   const int row = std::max(28, dx::size + 12);
   const int width = std::min(std::max(480, dx::size * 34), sw - 40);
-  const int height = std::min(row * (int(rows.size()) + 2), sh - 40);
+  const int height = std::min(row * std::min(int(rows.size()) + 2, 16), sh * 3 / 4);
   DomeDialog window(width, height, "Select objects");
   Fl_Scroll scroll(0, 0, width, height - row * 2);
   scroll.type(Fl_Scroll::VERTICAL);
