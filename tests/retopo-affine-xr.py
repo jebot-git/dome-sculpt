@@ -164,6 +164,10 @@ for mode in ('accept','focus','unconfirmed'):
                     transform=material['emissiveTexture']['extensions']['KHR_texture_transform']
                     check(transform['offset']==[.5/256,.5/256],
                           'Standard GLB aligns the emitted HDR texture to both source and paint centers')
+                if 'mixed-float-normal' in fixture.name:
+                    transform=material['normalTexture']['extensions']['KHR_texture_transform']
+                    check(transform['offset']==[.5/256,.5/256],
+                          'Standard GLB aligns the covered normal to both source and Bake centers')
     patch=objects[1]['retopology'];topology=json.loads(patch['topology'])
     positions=sorted(v[1] for v in topology['vertices'])
     want=sorted([[-.2,-.2,0],[.2,-.2,0],[0,.2,0]])

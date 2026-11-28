@@ -10,8 +10,9 @@
 using namespace dome;
 int main(int argc,char **argv)try {
   const bool prepared=argc==3 && std::string_view(argv[2])=="prepared";
-  const bool mixed_float_mtoon=argc==3 && std::string_view(argv[2])=="mixed-float-mtoon";
-  const bool float_bake=argc==3 && std::string_view(argv[2])=="float-mtoon";
+  const bool mixed_normal=argc==3 && std::string_view(argv[2])=="mixed-float-normal-mtoon";
+  const bool mixed_float_mtoon=mixed_normal || (argc==3 && std::string_view(argv[2])=="mixed-float-mtoon");
+  const bool float_bake=mixed_normal || (argc==3 && std::string_view(argv[2])=="float-mtoon");
   const bool float_mtoon=mixed_float_mtoon||float_bake;
   const bool baked_mtoon=float_bake || (argc==3 && std::string_view(argv[2])=="baked-mtoon");
   const bool painted_mtoon=float_mtoon||baked_mtoon || (argc==3 && std::string_view(argv[2])=="painted-mtoon");

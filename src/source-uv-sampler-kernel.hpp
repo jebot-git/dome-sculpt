@@ -58,7 +58,8 @@ inline void sample_mapped_source_channels(MappedSourceImage image,
     coordinates::axis(u, image.width, image.wrap_s, image.nearest),
     coordinates::axis(v, image.height, image.wrap_t, image.nearest)
   };
-  sample_source_taps(image.rgba, image.width, image.nearest, taps, image.srgb, table, color);
+  sample_source_taps(image.rgba,image.width,image.nearest,taps,image.srgb,table,color,
+                    image.format==SourceUvSampler::Output::LinearAssociatedRgba);
 }
 
 #if defined(__CUDACC__) || defined(__HIPCC__)
@@ -78,7 +79,7 @@ inline void sample_mapped_source(MappedSourceImage image,
       rgba |= byte << (8 * c);
     }
     output[at] = rgba;
-  } else if (image.format == Output::LinearRgba) {
+  } else if (image.format == Output::LinearRgba || image.format == Output::LinearAssociatedRgba) {
     for (unsigned c = 0; c < 4; ++c) output[4 * at + c] = bits(color[c]);
   } else {
     output[at] = bits(color[unsigned(image.format)]);

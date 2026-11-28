@@ -70,6 +70,15 @@ void check_mapped_sampler() {
   for(size_t c=0;c<4;++c)exact&=colors[4*at+c]==std::bit_cast<uint32_t>(expected[c]);
  }
  check(exact,"Coupled source affine samples match ordered binary64 reference at arbitrary UVs");
+ source.image=std::make_shared<const Image>(Image{2,1,{0,255,0,255,255,0,255,0}});
+ source.wrap_s=source.wrap_t=33071;
+ auto associated=detail::upload_source_uv_sampler(source,false,Sampler::Output::LinearAssociatedRgba,3);
+ const std::array<Sampler::Coordinate,3> across{{{.25f,.5f},{.5f,.5f},{.75f,.5f}}};
+ std::array<uint32_t,12> weighted{};
+ associated->read(across,weighted);
+ check(std::bit_cast<std::array<float,12>>(weighted)==
+           std::array<float,12>{0,1,0,1, 0,.5f,0,.5f, 0,0,0,0},
+       "Bilinear associated reads exclude uncovered RGB before filtering");
 }
 std::shared_ptr<PaintSourceMaps> maps(){auto m=std::make_shared<PaintSourceMaps>();m->color.image=gradient();m->metal_rough.image=flat({64,96,128,255});m->emission.image=flat({32,64,128,255});m->normal.image=flat({255,128,128,255});m->occlusion.image=flat({96,0,0,255});for(auto view:{&m->color,&m->metal_rough,&m->emission,&m->normal,&m->occlusion}){view->min_filter=view->mag_filter=9728;view->wrap_s=view->wrap_t=33071;}m->normal_scale=.75f;m->occlusion_strength=.6f;return m;}
 SourceUvBakeInput input(std::shared_ptr<const PaintedMesh>paint){SourceUvBakeInput i;i.paint=paint;i.target=paint->mesh();for(auto &q:i.target.uv)q={1-q[1],q[0]};for(uint32_t n=0;n<i.target.positions.size();++n)i.source_vertices.push_back(n);return i;}

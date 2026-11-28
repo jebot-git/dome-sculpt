@@ -394,6 +394,17 @@ after enlarging the paint grid past the image resolution. The current proof
 uses clamp-linear UV0 sampling. Other sampler domains still need adapters.
 [Independent MToon emission grids evidence](validation/retopo-mixed-hdr-20261128.json)
 
+Static standalone MToon 1 retopology also exports covered Bake normals
+when the authored normal and Bake have different power-of-two resolutions.
+The GPU filters the authored normal and the Bake's coverage-weighted RGB
+on a shared half-texel lattice, so uncovered texels cannot bleed into
+filtered detail. The export worker bounds angular error over the patch's
+UV triangles and keeps the Core PBR normal independent. Standard and
+Editable GLB carry the typed normal alongside independent HDR emission.
+The fixture crosses from 64-pixel paint and a 128-pixel source to 256-pixel
+paint while keeping the Bake and native layers. The normal proof covers
+static clamp-linear UV0 sampling in the certified tangent frame.
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.

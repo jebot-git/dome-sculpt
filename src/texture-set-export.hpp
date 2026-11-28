@@ -34,6 +34,7 @@ struct TextureSetExportField {
 };
 struct PortableMToonSetPaint {
   std::shared_ptr<const Image> color, shade, emission, normal;
+  std::array<float,2> normal_texture_offset{};
   float alpha_factor=1;
   // Max component errors for clamp-to-edge bilinear reads in linear units.
   double color_error=0, shade_error=0, shade_interpolation_error=0,

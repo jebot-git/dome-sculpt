@@ -18,6 +18,7 @@
 #include "source-frame-skin.hpp"
 #include "affine-interaction.hpp"
 #include "normal-bake-encoding.hpp"
+#include "source-uv-sampler.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/brush.hpp"
 #include "dome/material-visibility.hpp"
@@ -1959,6 +1960,166 @@ std::vector<uint8_t> retopo_sampled_cells(const Mesh &mesh,std::span<const doubl
  return visible;
 }
 
+std::vector<double> retopo_lattice_knots(uint32_t size){
+ std::vector<double> axis(size+1);
+ for(uint32_t i=0;i<=size;++i)axis[i]=double(i)/size;
+ return axis;
+}
+
+bool retopo_lattice_cell(std::span<const uint8_t> sampled,uint32_t width,uint32_t height,
+                         uint32_t x,uint32_t y){
+ if(sampled.empty())return true;
+ const size_t stride=size_t(width)+1,at=size_t(y)*stride+x;
+ // The final clamp interval has the same boundary values as its neighbor.
+ return sampled[at]||(x+1==width&&sampled[at+1])||(y+1==height&&sampled[at+stride])||
+     (x+1==width&&y+1==height&&sampled[at+stride+1]);
+}
+
+bool retopo_has_unit_uv(const Mesh &mesh){
+ return std::ranges::all_of(mesh.uv,[](const auto &uv){return uv[0]>=0&&uv[0]<=1&&uv[1]>=0&&uv[1]<=1;});
+}
+
+// For any convex weights within a cell, compare a normalized interpolation
+// of the raw vectors with interpolation of their unit directions.
+struct NormalDirections {
+ Vec3 first{},low{},high{};
+ float shortest=std::numeric_limits<float>::infinity(),longest=0,min_dot=1,min_z=1;
+ void add(Vec3 raw){
+  const float norm=length(raw);
+  const Vec3 unit=norm>0?raw/norm:Vec3{};
+  if(longest==0)first=low=high=unit;
+  low={std::min(low.x,unit.x),std::min(low.y,unit.y),std::min(low.z,unit.z)};
+  high={std::max(high.x,unit.x),std::max(high.y,unit.y),std::max(high.z,unit.z)};
+  shortest=std::min(shortest,norm);
+  longest=std::max(longest,norm);
+  min_dot=std::min(min_dot,dot(first,unit));
+  min_z=std::min(min_z,unit.z);
+ }
+ float span() const { return length(high-low); }
+ double error() const {
+  // The length-weighted mean differs from the direction mean by their
+  // covariance divided by mean length. Its normalization costs at most
+  // the direction mean's length deficit and one more covariance term.
+  return 1.-min_dot+.5*(longest-shortest)*span()/shortest;
+ }
+};
+
+double mixed_mtoon_normal_cell_error(const std::array<const MToonNormalTap *,4> &taps){
+ double min_coverage=1,max_coverage=0,quantization=0;
+ for(const auto *tap:taps){
+  min_coverage=std::min(min_coverage,double(tap->coverage));
+  max_coverage=std::max(max_coverage,double(tap->coverage));
+  quantization=std::max(quantization,double(tap->quantization));
+ }
+ constexpr double frame_and_sampling_slack=1e-4;
+ double delta=quantization+frame_and_sampling_slack,minimum_z=1;
+ if(min_coverage<1){
+  NormalDirections original;
+  for(const auto *tap:taps)original.add(tap->original);
+  if(!(original.min_z>0&&original.shortest>1e-12f))return std::acos(-1.);
+  minimum_z=original.min_z;
+  // Filtering the uncovered fraction and the original direction
+  // separately introduces a second covariance between them.
+  delta+=(1-min_coverage)*original.error()+.25*(max_coverage-min_coverage)*original.span();
+ }
+ if(max_coverage>0){
+  NormalDirections detail;
+  for(const auto *tap:taps)if(tap->coverage>0)detail.add(tap->baked);
+  if(!(detail.min_z>0&&detail.shortest>1e-12f))return std::acos(-1.);
+  minimum_z=std::min(minimum_z,double(detail.min_z));
+  // For covered detail, coverage already supplies the normalized
+  // interpolation weights for both the raw and unit directions.
+  delta+=max_coverage*detail.error();
+ }
+ return minimum_z>delta?std::asin(delta/minimum_z):std::acos(-1.);
+}
+
+std::shared_ptr<const Image> compile_mixed_retopo_normal(const TextureSetView &field,
+    const TextureMaps &maps,const MToonMaterial &effective,PortableMToonSetPaint &proof,
+    TextureSetLimits &remaining){
+ using Sampler=SourceUvSampler;
+ const auto &role=field.material_bindings->roles[size_t(MToonSlot::Normal)];
+ const auto &slot=effective.textures[size_t(MToonSlot::Normal)];
+ const auto r=field.painted->resolution();
+ if(!effective.parameters.normal_enabled||!clamp_linear_mtoon_source(role,slot)||
+    aligned_mtoon_source(role,slot,r)||!std::has_single_bit(r)||
+    !std::has_single_bit(role.image->width)||!std::has_single_bit(role.image->height)||
+    role.image->width>2048||role.image->height>2048||r>2048)return {};
+ // The half-texel offset places the knots of both bilinear samplers
+ // exactly on texel centers in the exported image.
+ const auto width=2*std::max(r,role.image->width),height=2*std::max(r,role.image->height);
+ const size_t count=size_t(width)*height,capacity=std::min(count,Sampler::max_batch);
+ size_t bytes=0,work=0;
+ charge(bytes,count,4,remaining.maximum_bytes);
+ charge(bytes,maps.baked_normal.rgba.size(),2,remaining.maximum_bytes);
+ charge(bytes,role.image->rgba.size(),1,remaining.maximum_bytes);
+ charge(bytes,2,Sampler::table_bytes,remaining.maximum_bytes);
+ charge(bytes,capacity,4*(sizeof(Sampler::Coordinate)+4*sizeof(uint32_t)),remaining.maximum_bytes);
+ charge(bytes,width,2*sizeof(MToonNormalTap),remaining.maximum_bytes);
+ charge(bytes,size_t(width+1)*(height+1),1,remaining.maximum_bytes);
+ charge(bytes,size_t(width)+height+2,sizeof(double),remaining.maximum_bytes);
+ charge(work,count,96,remaining.maximum_work);
+ remaining.maximum_work-=work;
+ const auto xs=retopo_lattice_knots(width),ys=retopo_lattice_knots(height);
+ const auto &mesh=field.painted->mesh();
+ const bool unit_uv=retopo_has_unit_uv(mesh);
+ const auto sampled=unit_uv?retopo_sampled_cells(mesh,xs,ys,remaining):std::vector<uint8_t>{};
+ auto masked=std::make_shared<Image>(maps.baked_normal);
+ for(size_t i=0;i<masked->rgba.size();i+=4){
+  if((i&16383)==0)stop(remaining);
+  masked->rgba[i+3]=maps.baked_coverage.rgba[i];
+ }
+ PaintSourceTexture detail;
+ detail.image=std::move(masked);
+ detail.wrap_s=detail.wrap_t=33071;
+ detail.min_filter=detail.mag_filter=9729;
+ auto original_sampler=upload_source_uv_sampler(role,false,Sampler::Output::LinearRgba,capacity);
+ auto detail_sampler=upload_source_uv_sampler(detail,false,Sampler::Output::LinearAssociatedRgba,capacity);
+ std::vector<Sampler::Coordinate> requests(capacity);
+ std::vector<uint32_t> original(capacity*4),baked(capacity*4);
+ std::vector<MToonNormalTap> previous(width),row(width);
+ auto image=std::make_shared<Image>(Image{width,height,std::vector<uint8_t>(count*4,255)});
+ const auto scale=effective.parameters.normal_scale;
+ const auto read=[](uint32_t word){return std::bit_cast<float>(word);};
+ double bound=0;
+ for(size_t first=0;first<count;first+=capacity){
+  stop(remaining);
+  const auto size=std::min(capacity,count-first);
+  for(size_t i=0;i<size;++i){
+   const auto at=first+i;
+   requests[i]={float(xs[at%width]),float(ys[at/width])};
+  }
+  original_sampler->read(std::span(requests).first(size),std::span(original).first(size*4));
+  detail_sampler->read(std::span(requests).first(size),std::span(baked).first(size*4));
+  for(size_t i=0;i<size;++i){
+   const auto at=first+i;
+   const auto x=uint32_t(at%width),y=uint32_t(at/width);
+   const auto *a=original.data()+i*4,*b=baked.data()+i*4;
+   auto &tap=row[x];
+   tap.original={(2*read(a[0])-1)*scale,(2*read(a[1])-1)*scale,2*read(a[2])-1};
+   tap.coverage=std::clamp(read(b[3]),0.f,1.f);
+   const float cover=tap.coverage;
+   tap.baked=cover>1e-8f?Vec3{2*read(b[0])-cover,2*read(b[1])-cover,2*read(b[2])-cover}/cover:Vec3{0,0,1};
+   const auto value=normalized(tap.original)*(1-tap.coverage)+normalized(tap.baked)*tap.coverage;
+   const std::array channels{value.x,value.y,value.z};
+   auto *pixel=image->rgba.data()+at*4;
+   for(size_t k=0;k<3;++k)pixel[k]=uint8_t(std::lround(std::clamp(channels[k]*.5f+.5f,0.f,1.f)*255));
+   tap.quantization=length(normal_rgb(pixel)-value);
+   if(x&&y&&retopo_lattice_cell(sampled,width,height,x,y)){
+    const std::array<const MToonNormalTap*,4> taps{&previous[x-1],&previous[x],&row[x-1],&tap};
+    bound=std::max(bound,mixed_mtoon_normal_cell_error(taps));
+    if(bound>.02)return {};
+   }
+   if(x+1==width)previous.swap(row);
+  }
+ }
+ proof.normal_texture_offset={.5f/width,.5f/height};
+ proof.normal_error_radians=bound;
+ proof.retopo_uv_domain=unit_uv;
+ remaining.maximum_bytes-=count*4;
+ return image;
+}
+
 TextureSetExportEmission compile_mixed_retopo_emission(const TextureSetView &field,
     const PaintSourceTexture &role,size_t &bytes,size_t &work,const TextureSetLimits &limits) {
  using Device=EmissionRasterDevice;
@@ -1983,23 +2144,11 @@ TextureSetExportEmission compile_mixed_retopo_emission(const TextureSetView &fie
  charge(staging,size_t(width)+height+2,sizeof(double),limits.maximum_bytes);
  auto mesh_limits=limits;
  mesh_limits.maximum_work-=work;
- const auto knots=[](uint32_t size){
-  std::vector<double> axis(size+1);
-  for(uint32_t i=0;i<=size;++i)axis[i]=double(i)/size;
-  return axis;
- };
- const auto xs=knots(width),ys=knots(height);
+ const auto xs=retopo_lattice_knots(width),ys=retopo_lattice_knots(height);
  const auto &mesh=paint.mesh();
- const bool unit_uv=std::ranges::all_of(mesh.uv,[](const auto &uv){return uv[0]>=0&&uv[0]<=1&&uv[1]>=0&&uv[1]<=1;});
+ const bool unit_uv=retopo_has_unit_uv(mesh);
  const auto sampled=unit_uv?retopo_sampled_cells(mesh,xs,ys,mesh_limits):std::vector<uint8_t>{};
  work=limits.maximum_work-mesh_limits.maximum_work;
- const auto visible=[&](uint32_t x,uint32_t y){
-  if(sampled.empty())return true;
-  const size_t stride=size_t(width)+1,at=size_t(y)*stride+x;
-  // A final clamp interval has the same boundary values as its neighbor.
-  return sampled[at]||(x+1==width&&sampled[at+1])||(y+1==height&&sampled[at+stride])||
-      (x+1==width&&y+1==height&&sampled[at+stride+1]);
- };
  auto source=role;
  source.texcoord=0;
  source.uv_transform={1,0,0,1,0,0};
@@ -2050,7 +2199,7 @@ TextureSetExportEmission compile_mixed_retopo_emission(const TextureSetView &fie
    peak[k]=std::max(peak[k],sample[k]);
    tap.background[k]=sample[k+3];
   }
-  if(x&&y&&visible(x,y)){
+  if(x&&y&&retopo_lattice_cell(sampled,width,height,x,y)){
    const std::array<const MToonSourceTap*,4> taps{&previous[x-1],&previous[x],&row[x-1],&tap};
    for(size_t k=0;k<3;++k)covariance=std::max(covariance,mtoon_source_filter_error(taps,k));
   }
@@ -2326,17 +2475,23 @@ std::optional<PortableMToonSetPaint> compile_retopo_mtoon_paint(const TextureSet
    charge(normal_work,image->rgba.size(),1,budget.maximum_work);
   budget.maximum_work-=normal_work;
   remaining.maximum_work=budget.maximum_work;
-  std::vector<uint8_t> sampled;
   const auto &mesh=paint.mesh();
-  if(std::ranges::all_of(mesh.uv,[](const auto &uv){return uv[0]>=0&&uv[0]<=1&&uv[1]>=0&&uv[1]<=1;})){
-   const auto knots=mtoon_filter_knots({r});
-   sampled=retopo_sampled_cells(mesh,knots,knots,budget);
-   out.retopo_uv_domain=true;
+  {
+   std::vector<uint8_t> sampled;
+   if(retopo_has_unit_uv(mesh)){
+    const auto knots=mtoon_filter_knots({r});
+    sampled=retopo_sampled_cells(mesh,knots,knots,budget);
+    out.retopo_uv_domain=true;
+   }
+   remaining.maximum_work=budget.maximum_work;
+   out.normal=compose_mtoon_baked_normal(field,*maps,effective,out.normal_error_radians,budget,sampled);
   }
-  remaining.maximum_work=budget.maximum_work;
-  out.normal=compose_mtoon_baked_normal(field,*maps,effective,out.normal_error_radians,budget,sampled);
+  if(out.normal)budget.maximum_bytes-=pixels*4;
+  else {
+   out.normal=compile_mixed_retopo_normal(field,*maps,effective,out,budget);
+   remaining.maximum_work=budget.maximum_work;
+  }
   if(!out.normal)return {};
-  budget.maximum_bytes-=pixels*4;
  }
  remaining.maximum_bytes=budget.maximum_bytes+bytes;
  return out;

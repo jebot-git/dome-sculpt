@@ -2528,8 +2528,10 @@ struct PortableRetopoImages {
  Image core_emission;
  std::array<float,3> core_factor{},mtoon_factor{};
  std::array<float,2> core_emission_offset{},mtoon_emission_offset{};
+ std::array<float,2> mtoon_normal_offset{};
  float core_strength=1,mtoon_strength=1;
  double mtoon_filter_error=0;
+ double mtoon_normal_error=0;
 };
 
 PortableRetopoImages check_portable_retopo_mtoon(const std::filesystem::path &path,const SculptObject &patch,bool ink=false) {
@@ -2623,6 +2625,19 @@ PortableRetopoImages check_portable_retopo_mtoon(const std::filesystem::path &pa
  PortableRetopoImages images{read_image(core.pbr_metallic_roughness.metallic_roughness_texture),
          read_image(toon.pbr_metallic_roughness.base_color_texture),read_image(toon.normal_texture),
          read_image(toon.emissive_texture),read_image(shade)};
+ if(baked_normal&&ink){
+  images.mtoon_normal_error=typed.at("extras").at("domeSculptMToonPaint").at("maximumNormalErrorRadians").get<double>();
+  const auto &authored=binding.roles[size_t(MToonSlot::Normal)].image;
+  const auto r=patch.painted->resolution();
+  if(authored&&(authored->width!=r||authored->height!=r)){
+   const auto w=2*std::max(r,authored->width),h=2*std::max(r,authored->height);
+   const auto &phase=toon.normal_texture.transform;
+   check(toon.normal_texture.has_transform&&images.mtoon_normal.width==w&&images.mtoon_normal.height==h&&
+         phase.offset[0]==.5f/w&&phase.offset[1]==.5f/h&&phase.rotation==0&&phase.scale[0]==1&&phase.scale[1]==1,
+         "The portable normal aligns the sample centers of both independent grids");
+   std::copy_n(phase.offset,2,images.mtoon_normal_offset.begin());
+  }
+ }
  if(portable_float){
   check(core.emissive_texture.texture&&core.emissive_texture.texture!=toon.emissive_texture.texture&&
         strength(core)>1,"The HDR variant and Core each own a radiance texture and strength");
@@ -2690,7 +2705,9 @@ void verify_mixed_retopo_sampling(const Scene &scene,const PortableRetopoImages 
  if(baked_normal)
   check(!derived.baked_normal.rgba.empty()&&!derived.baked_coverage.rgba.empty(),
         "The native renderer exposes the actual covered normal Bake");
- const auto normal=texture(exported.mtoon_normal);
+ auto normal=texture(exported.mtoon_normal);
+ normal.uv_transform[4]=exported.mtoon_normal_offset[0];
+ normal.uv_transform[5]=exported.mtoon_normal_offset[1];
  float max_base=0,max_shade=0,max_emission=0,max_normal=0,max_core_emission=0,view_difference=0;
  size_t painted_samples=0,partial_normals=0;
  const auto &mesh=patch.painted->mesh();
@@ -2741,7 +2758,7 @@ void verify_mixed_retopo_sampling(const Scene &scene,const PortableRetopoImages 
    if(covered>.001f&&covered<.999f)++partial_normals;
    const auto expected=normalized(normalized(source)*(1-covered)+normalized(detail)*covered);
    const auto actual=normalized(direction(linear(normal)));
-   const auto angle=std::acos(std::clamp(dot(expected,actual),-1.f,1.f));
+   const auto angle=std::atan2(length(cross(expected,actual)),dot(expected,actual));
    max_normal=std::max(max_normal,angle);
   }
   for(size_t k=0;k<3;++k){
@@ -2783,6 +2800,12 @@ void verify_mixed_retopo_sampling(const Scene &scene,const PortableRetopoImages 
  if(baked_normal){
   check(partial_normals>100&&max_normal<.02f,"Independent fractional UV reads agree with the covered MToon normal mix");
   std::cout<<"RETOPO_BAKE_MTOON partial="<<partial_normals<<" maximum_angle="<<max_normal<<'\n';
+  if(exported.mtoon_normal_offset[0]!=0){
+   check(max_normal<=exported.mtoon_normal_error,
+         "Fractional reads stay within the continuous angular certificate");
+   std::cout<<"RETOPO_MIXED_NORMAL bound="<<exported.mtoon_normal_error<<" extent="
+            <<exported.mtoon_normal.width<<'x'<<exported.mtoon_normal.height<<'\n';
+  }
  }
 }
 
@@ -2815,6 +2838,8 @@ void standalone_retopo_mtoon(const Scene &guide) {
  const auto &patch=accepted.active();
  const bool baked=bool(guide.active().painted->baked());
  const bool physical=guide.active().painted->has_physical_emission();
+ const auto &normal=patch.material_bindings->roles[size_t(MToonSlot::Normal)].image;
+ const bool mixed_normal=baked&&normal->width!=patch.painted->resolution();
  check(patch.retopology&&patch.retopology->source==guide.active().id&&patch.material_bindings->has_mtoon&&
        !patch.painted->source_maps()&&bool(patch.painted->baked())==baked&&patch.painted->has_paint_data()&&
        patch.painted->layers().size()==2&&!patch.painted->layers().back().visible&&
@@ -2839,7 +2864,7 @@ void standalone_retopo_mtoon(const Scene &guide) {
  if(physical){
   auto unbaked=accepted.snapshot();
   auto writable=unbaked.active().painted->snapshot();
-  if(baked){
+  if(baked&&!mixed_normal){
    writable->clear_bake();
    unbaked.active().painted=writable;
    doc.replace(unbaked);
@@ -2852,7 +2877,8 @@ void standalone_retopo_mtoon(const Scene &guide) {
          "The first patch keeps the larger authored emission image and the original physical paint grid");
    const auto resized=resample_native_texture_grid(unbaked,patch.id,{256});
    check(resized.resolution==256&&unbaked.active().material_bindings==patch.material_bindings&&
-         unbaked.active().painted->has_physical_emission(),"Paint-grid resize preserves the independent source material and its FLOAT paint");
+         unbaked.active().painted->has_physical_emission()&&bool(unbaked.active().painted->baked())==mixed_normal,
+         "Paint-grid resize preserves the independent source material and its FLOAT paint and Bake");
    doc.replace(unbaked);
    ready(doc);
    doc.export_asset("resized-physical-editable.glb",AssetExportFormat::EditableGlb256).get();
@@ -2862,6 +2888,7 @@ void standalone_retopo_mtoon(const Scene &guide) {
   }
   auto hidden=unbaked.snapshot();
   writable=hidden.active().painted->snapshot();
+  if(mixed_normal)writable->clear_bake();
   writable->select_layer(writable->layers().front().id);
   writable->layer_properties("Hidden FLOAT paint",false,1);
   hidden.active().painted=std::move(writable);

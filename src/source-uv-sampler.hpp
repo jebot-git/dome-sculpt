@@ -19,9 +19,11 @@ public:
     float scale[4]{},offset[4]{};
     unsigned channels=0;
   };
-  enum class Output : uint8_t { Red, Green, Blue, Alpha, LinearRgba, EncodedRgba };
+  enum class Output : uint8_t { Red, Green, Blue, Alpha, LinearRgba, EncodedRgba, LinearAssociatedRgba };
   enum class Transform { ResolvedCoordinates, SourceAffine };
-  static constexpr size_t words(Output output) { return output == Output::LinearRgba ? 4 : 1; }
+  static constexpr size_t words(Output output) {
+    return output == Output::LinearRgba || output == Output::LinearAssociatedRgba ? 4 : 1;
+  }
   static constexpr size_t max_batch = 16384;
   static constexpr size_t table_bytes = 2 * 256 * sizeof(float) + 256 * sizeof(uint32_t);
   virtual ~SourceUvSampler() = default;
@@ -56,7 +58,7 @@ protected:
       : capacity_(capacity),words_per_sample_(words(output)),pixel_count_(pixel_count) {
     if (!capacity || capacity > max_batch)
       throw std::invalid_argument("Invalid source UV sample capacity");
-    if (output > Output::EncodedRgba)
+    if (output > Output::LinearAssociatedRgba)
       throw std::invalid_argument("Invalid source UV sample output");
   }
 

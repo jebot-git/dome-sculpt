@@ -910,6 +910,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       if(paint->normal){
         if(!attributes.contains("TANGENT"))throw std::logic_error("Portable MToon Bake needs its canonical tangent stream");
         replace_role(MToonSlot::Normal,paint->normal,MToonEncoding::Normal);
+        typed.textures[size_t(MToonSlot::Normal)].offset=paint->normal_texture_offset;
         params.normal_enabled=true;
         params.normal_scale=1;
       }

@@ -4,7 +4,7 @@
 #include "paint-source-coordinate-kernel.hpp"
 #include "paint-grid-filter.hpp"
 #include "portable-normal-raster.hpp"
-#include "source-uv-sampler.hpp"
+#include "source-uv-sampler-kernel.hpp"
 #include "dome/source-maps.hpp"
 #include <cstring>
 namespace dome::detail {
@@ -22,6 +22,12 @@ public:
   }
 private:
   void dispatch(std::span<const Coordinate> pending, std::span<uint32_t> result) override {
+    if (format_ == Output::LinearAssociatedRgba) {
+      const auto image=mapped_source_image(source_,source_.image->rgba.data(),srgb_,format_,Transform::SourceAffine);
+      for(size_t i=0;i<pending.size();++i)
+        sample_mapped_source(image,pending[i],paint_compute::quantization(),result.data(),i);
+      return;
+    }
     for (size_t i = 0; i < pending.size(); ++i) {
       const auto color = sample_source_texture(source_, pending[i].u, pending[i].v, srgb_);
       if (format_ == Output::EncodedRgba) {
