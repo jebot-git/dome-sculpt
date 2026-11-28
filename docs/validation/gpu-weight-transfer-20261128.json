@@ -1,0 +1,220 @@
+{
+  "date": "2026-11-28",
+  "product": "0b40bf0b9b578c63108a60900bc337456510ec1a",
+  "preceding_product": "2f64c5090ad2722e8c310585ea28db48bae71716",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Nearest-triangle BVH traversal on the selected GPU for production skin weight transfer.",
+  "oneapi_arc": {
+    "application_sha256": "24406b98749b1ec6ef14368fcbe791791e7e3239899a8a6847fcc7b17bf0abd4",
+    "focused": {
+      "passed": 14,
+      "junit_sha256": "3c8863772816c20497651b4a39ffea49a67065d0f24cdc337cfc9075d56b17b7"
+    },
+    "manufactured": {
+      "recipient_rows": 1050,
+      "coincident_source_triangles": 1024,
+      "exact_radius_tie_and_late_refusal": true,
+      "shared_visit_budget_refusal_and_retry": true,
+      "successful_nearest_triangle_kernel_launches": 10,
+      "trace_sha256": "14133b3dfdb91413863ad46676ac1f6ebe9032173a8e64eb571828e3381f6c2f"
+    },
+    "deterministic_gpu_setup_failure_preserves_all_scene_owners_and_exact_retry": true,
+    "gpu_hidden_refusal": "FAIL No device of requested type 'info::device_type::gpu' available."
+  },
+  "native_projects_and_exports_identical_to_preceding_product": [
+    {
+      "artifact": "vrm1-retained-skinned-accessory/linked.dsculpt",
+      "sha256": "48ffe11074fc57363883fcb90826776284b4c63052493b71450ff77cf04a773f"
+    },
+    {
+      "artifact": "vrm1-retained-skinned-accessory/original.vrm",
+      "sha256": "bf957d22403ac3e2cc6367f2ca3bd23125bc9ebff041d5fe555e753bda7ee543"
+    },
+    {
+      "artifact": "vrm1-retained-skinned-accessory/retained-editable.vrm",
+      "sha256": "8f9befba21bf9ccab6d690bf005f41815327e334b30de42d2feb59f1994f5cfd"
+    },
+    {
+      "artifact": "vrm1-retained-skinned-accessory/retained-standard.vrm",
+      "sha256": "db21a5bf2c24b01f51d13aabd7b3e8b1af0276cbd8c37b8e1f827160947d5982"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/bone-source.vrm",
+      "sha256": "42b920a6af6688866142217f85c856a52794e6584d21f02ad4e6f6e2732dd5a4"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/default-bone.dsculpt",
+      "sha256": "43c8f97546459ba4bd3ca30bb1f8ebaaabea278f47885b8bb517d656784c6dcc"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/fitted-editable.vrm",
+      "sha256": "ed674939bdb540c7467d6a0e069feddea473642d1cff8e5608e4c6b2a6140f14"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/fitted-source.vrm",
+      "sha256": "88cb12b387835b4608f1ca63c830052a7ed3d87aebb28841197052d71eb134ac"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/fitted-standard.vrm",
+      "sha256": "4681b53f350af72dad058869bc9e7f646859bfd41d2d8ed1ae7068f39be2acd1"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/head-attached.dsculpt",
+      "sha256": "d4d7845272d975b27a1f4fc04ae97fabcd3a4ba44eda7706885eb0a7bf73b3c9"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/head-editable.vrm",
+      "sha256": "7f12891751295232ad6163c9ac281069dbf68307d4f65925bb152f280828c0d1"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/head-posed.dsculpt",
+      "sha256": "94a559a2225747700ccce8a6966a37c5fb3ad8d638d4b911006436effd00bd60"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/head-source-only.vrm",
+      "sha256": "87c37f55ce7ee3bf14577a63b639feb0e69727682a5648a37a7a98773fa7bc7c"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/head-standard.vrm",
+      "sha256": "48a8ebdb19c8c8b26aef1cf94f7a7ae6157fe72ffefcd4db6431dc10ed14ea13"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/heat-before.dsculpt",
+      "sha256": "91b2e332cafe8d7306943107c02a3c6e7fdeb99628f17d5224ae86819ec1fcd1"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/heat-bound-editable.vrm",
+      "sha256": "d1d94afffd3e8c3136446158f9adb182ddcac4215882d1c94c7f2970ace1875d"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/heat-bound.dsculpt",
+      "sha256": "9967112bcdc766a63f3571529ad3b3d90dd3b7543688e6a773fff1184ddb9849"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/heat-weight-painted-editable.vrm",
+      "sha256": "5e849f5f1f2fe5ccecc515235172392228e0a6a2315f2b274d6584bcd0012577"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/pre-attach.dsculpt",
+      "sha256": "f7ad0654c5ef0c46034345b9bb245c297fd4d7e881d2ac923968e05f737c03db"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/shape-accessory-editable.vrm",
+      "sha256": "e7213dc8d0337f0092ee6418578368ad54aa4821581dfe505aca20e98ef65aea"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/shape-accessory.vrm",
+      "sha256": "ecb1da4deba79390d437dc2b1c83d8fc6e436ef912ca8880f89e0c5743a76740"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/shape-before.dsculpt",
+      "sha256": "1146303ac68bb2f10856cc9c68e5daa4434192b3d8fa1c806eb6386f743ae7ec"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/shape-created.dsculpt",
+      "sha256": "6ec837a53d4df6ac1fe8a25b9bbefc760884b565ef6f0e1611f09703d319cbeb"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/shape-ready-to-export.dsculpt",
+      "sha256": "f50e322d1154f90d2a2f6223fd19437e9ef9a88e7c4a2a7682f15a556ff685b7"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/shape-sculpted.dsculpt",
+      "sha256": "270c7bd41383dc13cb1fd5adb23443e0dd549734de4582f0f5010cd3b8f38143"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/skin-before.dsculpt",
+      "sha256": "d41f31a91208f973a5f7b59f330e36bf1491ed40162c56da38ab838d08292dc8"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/skin-bound.dsculpt",
+      "sha256": "e70e593a428f42a88f23aeeddc87e198ee1c996380e2ecec6cdb8cc2e931ed56"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/skin-pose-editable.vrm",
+      "sha256": "b9645bbe9024e51410bfac996d41eacf791c6216f9272d4d27d767f61a5d99e0"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/skin-pose.vrm",
+      "sha256": "d9bd024c15027da2054e8b00abb726d9b50a49939988861f79339137dd66ec61"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/skin-ready-to-export.dsculpt",
+      "sha256": "4d1aed38839de70ae804cfa722d1b85da2051ba5c7ac8d017316de41815d02ba"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/skin-rest-editable.vrm",
+      "sha256": "d4b8c58b17c3fb1d043c2721d0065d21255a6a3b51a79917706635e5386a1e1e"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/skin-rest.vrm",
+      "sha256": "d8a15596d8eda25c1183c075d7920dad0202facd1632a7638857872d032c2cff"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/skin-weight-painted-editable.vrm",
+      "sha256": "43df51ce1dfa02d059be7780f6b353d2845fb3ab94cfbc473d07cbe2c8ae20f5"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/skin-weight-painted.dsculpt",
+      "sha256": "3071679cc04636954238b91c4656320c76e15996012914a8a464455b49ed314d"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/skinned-source.vrm",
+      "sha256": "02fe7f431dd10781e4de75bd5254042b90a94c6b90a3d5b3d6b4729ef008c553"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/xr-attached.dsculpt",
+      "sha256": "6832a041be3eec2c0d8bd05ee07172edc2ca5149c45225c9051e2afe0c72e62a"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/xr-attachment-editable.vrm",
+      "sha256": "05f2912e2d23fa8dcb6653ff651a5d6015a08416a14a42eff887d2b75419c7de"
+    },
+    {
+      "artifact": "vrm1-source-export/bone-accessory/xr-before-attach.dsculpt",
+      "sha256": "7c2d1d4fae06d49ccca2b21975162deb64060eaeca7fdfa3fd129f3d8dd73be9"
+    }
+  ],
+  "native_wayland_synthetic_openxr_bound_archive_sha256": "e70e593a428f42a88f23aeeddc87e198ee1c996380e2ecec6cdb8cc2e931ed56",
+  "nested_wayland": {
+    "checks": 7,
+    "report_sha256": "e32a6beb124eab2fbb7d1c24ccac6300c67f73861c38462e554402ed7c259291",
+    "successful_nearest_triangle_kernel_launches": 1,
+    "trace_sha256": "49db8c06a14c5bf490a9e32eba2a86f7e5b349f7a3d86a81d660f98ea4f482fb",
+    "dma_buf_render_node": "/dev/dri/renderD129"
+  },
+  "synthetic_openxr": {
+    "checks": 24,
+    "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "stereo_submissions": 77,
+    "acquires": 154,
+    "image_waits": 154,
+    "releases": 154,
+    "report_sha256": "e7d9d784ba84e98ee0bd8ede3cf8f9c283b324a9482c76a468f5c2a26e7c6232"
+  },
+  "headless_reference": {
+    "focused": {
+      "passed": 4,
+      "junit_sha256": "b70006db3b74d91ed1cedc93d06095fa2fd7260d08531a86404b5d91c0abdf6a"
+    },
+    "shared_traversal_and_staging_asan_ubsan_with_checked_host_buffers": [
+      "PASS exact 1050-row transfer, coincident source tie, inclusive radius and late refusal",
+      "PASS shared GPU visit budget and exact retry"
+    ]
+  },
+  "cuda_and_rocm": {
+    "cuda": {
+      "kernel_object_sha256": "89423710cac613257c0beb878b901431e08b9fb6b3c935e3f59ee6bbfe73f478",
+      "missing_device_refusal": "CUDA driver version is insufficient for CUDA runtime version"
+    },
+    "rocm": {
+      "kernel_object_sha256": "83438d58123152861e651e3230a9dd4ef64516c519da709f287fa8b4514e5838",
+      "missing_device_refusal": "no ROCm-capable device is detected"
+    }
+  },
+  "limits": [
+    "The host still builds the BVH and applies native lock, normalization and publication rules. GPU readback consists of compact hits and a visit count.",
+    "Exhaustive allocator denial covers the shared authoring method in the headless reference. The GPU test injects deterministic failure at device upload and verifies exact native rollback and retry.",
+    "CUDA and ROCm compile and link the new backend. Positive runs on those devices, physical XR and a complete current Release sweep remain open."
+  ]
+}
