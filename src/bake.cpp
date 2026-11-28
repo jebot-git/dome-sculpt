@@ -716,23 +716,24 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   std::vector<shade_device::MaterialInput> material_inputs;
   material_inputs.reserve(source.materials.size());
   std::vector<uint8_t> device_material(source.materials.size());
-  bool have_device_materials=false;
+  size_t maximum_coordinate_columns=0;
   for(size_t i=0;i<source.materials.size();++i){
     const bool sample_normals=!source_normals&&!retained_field(i);
     const auto &material=source.materials[i];
     const PaintSourceTexture *retained_image=retained_field(i)?&source_fields[i].normal_image:nullptr;
     const auto &input=material_inputs.emplace_back(material,o.separate_pbr_color,
         sample_normals&&needs_map(i)?normal_image(material):nullptr,sample_normals,retained_image,
-        retained_field(i)?source_fields[i].atlas.get():nullptr);
+        retained_field(i)?source_fields[i].atlas.get():nullptr,
+        retained_field(i)&&source_fields[i].emission_background.has_value());
     device_material[i]=input.needs_sampling();
-    have_device_materials|=device_material[i];
+    maximum_coordinate_columns=std::max(maximum_coordinate_columns,size_t(input.transfer.coordinates.count));
   }
-  const auto material_capacity=have_device_materials?std::min(pixels,shade_device::batch_capacity):0;
+  const auto material_capacity=maximum_coordinate_columns?std::min(pixels,shade_device::batch_capacity):0;
   std::vector<ShadePoint> material_points;
   material_points.reserve(material_capacity);
   std::vector<size_t> material_order;
   material_order.reserve(material_capacity);
-  std::vector<shade_device::Coordinates> material_coordinates(material_capacity);
+  std::vector<shade_device::Uv> material_coordinates(material_capacity*maximum_coordinate_columns);
   std::vector<shade_device::Values> material_sampled(material_capacity),material_results(material_capacity);
   auto flush_materials=[&]{
     if(material_points.empty())return;
@@ -747,17 +748,19 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       while(end<material_order.size()&&id(material_order[end])==material_id)++end;
       if(device_material[material_id]){
         const auto &input=material_inputs[material_id];
+        const auto count=end-first;
+        const auto stride=input.transfer.coordinates.count;
+        auto coordinates=std::span(material_coordinates).first(count*stride);
         for(size_t i=first;i<end;++i){
           if((i&255)==0)cancel(o);
           const auto &point=material_points[material_order[i]];
-          material_coordinates[i-first]=input.coordinates(source.mesh,point.hit.triangle,point.hit.barycentric,
-              point.paint_uv,point.high_uv,point.retained?point.retained->normal_uv:std::array<float,2>{});
+          input.coordinates(source.mesh,point.hit.triangle,point.hit.barycentric,point.paint_uv,point.high_uv,
+              point.retained?point.retained->normal_uv:shade_device::Uv{},coordinates.subspan((i-first)*stride,stride));
         }
         auto &sampler=material_cache.get(material_id,[&](const auto &reserve){
-          return shade_device::upload(input.images,input.parameters,input.overlay,o.cancelled,input.atlas,reserve);
+          return shade_device::upload(input.images,input.parameters,input.transfer,input.overlay,o.cancelled,input.atlas,reserve);
         },[&]{return radiance_cache.trim_idle();});
-        const auto count=end-first;
-        sampler.read(std::span(material_coordinates).first(count),std::span(material_sampled).first(count),o.cancelled);
+        sampler.read(coordinates,std::span(material_sampled).first(count),o.cancelled);
         for(size_t i=first;i<end;++i)material_results[material_order[i]]=material_sampled[i-first];
       }
       first=end;

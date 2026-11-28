@@ -292,15 +292,19 @@ void original_material_device_sampling(){
   texture->source_only=true;texture->source_maps=maps;
   material.maps=texture;
   const device::MaterialInput input(material,false,nullptr,true);
-  std::vector<device::Coordinates> coordinates;
+  const auto columns=input.transfer.coordinates.count;
+  check(columns==2&&input.transfer.results.stride==15,
+        "The five original maps share two coordinate columns and return color, ORM, emission and normal");
+  std::vector<device::Uv> coordinates;
   std::vector<std::array<float,3>> weights;
   for(unsigned y=0;y<37;++y)for(unsigned x=0;x<=y;++x){
     const float u=(x+.3f)/37.f,v=(y-x+.2f)/37.f;
     weights.push_back({u,v,1-u-v});
-    coordinates.push_back(input.coordinates(mesh,0,weights.back(),{},{}));
+    coordinates.resize(coordinates.size()+columns);
+    input.coordinates(mesh,0,weights.back(),{},{},{},std::span(coordinates).last(columns));
   }
-  auto sampler=device::upload(input.images,input.parameters);
-  std::vector<device::Values> values(coordinates.size());
+  auto sampler=device::upload(input.images,input.parameters,input.transfer);
+  std::vector<device::Values> values(weights.size());
   sampler->read(coordinates,values,{});
   for(size_t i=0;i<weights.size();++i){
     const auto color=sample_surface_texture(mesh,*maps,maps->color,0,weights[i],true);
@@ -318,6 +322,9 @@ void original_material_device_sampling(){
     }
     if(!exact)throw std::runtime_error("Device material lost exact extra-UV, affine, sampler or factor semantics");
   }
+  auto invalid=coordinates;
+  invalid.front()[0]=std::numeric_limits<float>::quiet_NaN();
+  check(rejects([&]{sampler->read(invalid,values,{});}),"Invalid coordinates survive the compact GPU result as an explicit error");
   check(true,"GPU original normal and material samples exactly preserve UV1 and UV2, affine filtering and separate occlusion");
 }
 
@@ -415,25 +422,32 @@ void sparse_material_device_sampling(){
     material.material.color={.31f,.67f,.83f,.72f};
     material.material.emissive={.53f,.11f,.41f};
     material.material.roughness=.61f;material.material.metallic=.29f;
-    device::MaterialInput input(material,true,nullptr);
-    input.parameters.separate_pbr=true;
-    input.parameters.include_overlay_emission=true;
-    input.parameters.include_baked_normal=bool(variant);
-    std::vector<device::Coordinates> coordinates;
-    for(unsigned i=0;i<889;++i){
+    auto texture=std::make_shared<TextureMaps>();
+    texture->source_only=true;
+    texture->source_maps=std::make_shared<PaintSourceMaps>();
+    texture->overlay=overlay;
+    texture->baked_base=paint->baked();
+    material.maps=texture;
+    const device::MaterialInput input(material,true,nullptr,true);
+    const auto columns=input.transfer.coordinates.count;
+    check(columns==1+bool(variant)&&input.transfer.results.stride==(variant?19u:15u),
+          "Sparse paint allocates a distinct normal coordinate and result only for covered baked detail");
+    constexpr unsigned sample_count=889;
+    std::vector<device::Uv> coordinates(sample_count*columns);
+    for(unsigned i=0;i<sample_count;++i){
       const std::array uv{float(i*73%883)/713-.17f,float(i*131%887)/727-.11f};
       const std::array canonical_uv{1.f-uv[1],uv[0]};
-      coordinates.push_back(input.coordinates(mesh,0,{1,0,0},uv,canonical_uv));
+      input.coordinates(mesh,0,{1,0,0},uv,canonical_uv,{},std::span(coordinates).subspan(i*columns,columns));
     }
-    auto sampler=device::upload(input.images,input.parameters,overlay.get());
-    std::vector<device::Values> values(coordinates.size());
+    auto sampler=device::upload(input.images,input.parameters,input.transfer,input.overlay);
+    std::vector<device::Values> values(sample_count);
     sampler->read(coordinates,values,{});
     const auto composite=[](float base,float coverage,float added){return base*(1-coverage)+added;};
     for(size_t i=0;i<values.size();++i){
-      const auto [u,v]=coordinates[i].paint_uv;
+      const auto [u,v]=coordinates[i*columns+input.transfer.coordinates.paint];
       const auto common=detail::sample_overlay_values(*overlay,u,v,false);
       const auto pbr=detail::sample_overlay_values(*overlay,u,v,true);
-      const auto normal=covered_normal_oracle(*overlay,coordinates[i].high_uv[0],coordinates[i].high_uv[1]);
+      const auto normal=covered_normal_oracle(*overlay,1.f-v,u);
       const auto &actual=values[i];
       bool exact=actual.roughness==composite(material.material.roughness,common[3][2],common[1][1])&&
           actual.metallic==composite(material.material.metallic,common[3][1],common[1][2])&&

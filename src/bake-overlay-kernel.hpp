@@ -14,19 +14,21 @@ struct OverlayView {
   emission_raster::DeviceInput input;
   emission_raster::MaterialView material;
   CoveredNormalMap normal;
+  CoordinateLayout coordinates;
   bool separate_pbr=false,has_emission=false;
 };
 
-DOME_BAKE_OVERLAY_FN void apply_overlay(const OverlayView &view,const Coordinates &coordinates,Values &value){
+DOME_BAKE_OVERLAY_FN void apply_overlay(const OverlayView &view,const Uv *coordinates,Values &value){
   using namespace paint_compute;
   using namespace emission_raster;
   if(value.invalid)return;
-  if(!finite_uv(coordinates.paint_uv)||(view.normal.rgba&&!finite_uv(coordinates.high_uv))){
+  const auto &uv=coordinates[view.coordinates.paint];
+  if(!finite_uv(uv)||(view.normal.rgba&&!finite_uv(coordinates[view.coordinates.high]))){
     value.invalid=1;
     return;
   }
-  const auto column=clamped_axis(coordinates.paint_uv[0],view.input.resolution);
-  const auto row=clamped_axis(coordinates.paint_uv[1],view.input.resolution);
+  const auto column=clamped_axis(uv[0],view.input.resolution);
+  const auto row=clamped_axis(uv[1],view.input.resolution);
   const auto composite=[](float base,float coverage,float premultiplied){
     return add(mul(base,sub(1,coverage)),premultiplied);
   };
@@ -45,7 +47,14 @@ DOME_BAKE_OVERLAY_FN void apply_overlay(const OverlayView &view,const Coordinate
     for(unsigned c=0;c<3;++c)
       value.emission[c]=composite(value.emission[c],material_float(glow[6]),material_float(glow[c]));
   }
-  if(view.normal.rgba)sample_covered_normal(view.normal,coordinates.high_uv,*view.input.quantization,value.baked_normal);
+  if(view.normal.rgba)sample_covered_normal(view.normal,coordinates[view.coordinates.high],*view.input.quantization,value.baked_normal);
+}
+
+DOME_BAKE_OVERLAY_FN void overlay_sample(const OverlayView &view,const Uv *coordinates,SampleOutput output,size_t sample){
+  auto *row=output.rows+sample*output.layout.stride;
+  auto value=read_sample(output.layout,row);
+  apply_overlay(view,coordinates+sample*view.coordinates.count,value);
+  write_sample(output.layout,row,value);
 }
 } // namespace dome::detail::bake_material
 #undef DOME_BAKE_OVERLAY_FN

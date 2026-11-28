@@ -13,9 +13,16 @@ template<class Api> class DeviceSampler final:public Sampler {
     size_t offset[RoleCount]{},bytes=0;
     bool upload[RoleCount]{};
   };
-  static ImageLayout layout(const ImageInput (&inputs)[RoleCount],const std::function<void(size_t)> &reserve) {
+  static ImageLayout layout(const ImageInput (&inputs)[RoleCount],TransferLayout transfer,bool overlay,
+                            const paint_compute::MaterialAtlas *atlas,const std::function<void(size_t)> &reserve) {
+    const auto &uv=transfer.coordinates;
+    if(!uv.count||uv.count>RoleCount+2||transfer.results.stride!=transfer.results.channel_count()||
+       (overlay&&uv.paint>=uv.count)||(transfer.results.baked_normal&&uv.high>=uv.count))
+      throw std::logic_error("Invalid Bake material transfer layout");
     ImageLayout result;
     for(unsigned i=0;i<RoleCount;++i){
+      if((inputs[i].image||(atlas&&i<=Emission&&atlas->plane(i)))&&uv.roles[i]>=uv.count)
+        throw std::logic_error("Missing Bake material coordinate column");
       if(!inputs[i].image)continue;
       unsigned first=0;
       while(first<i&&inputs[first].image!=inputs[i].image)++first;
@@ -26,15 +33,18 @@ template<class Api> class DeviceSampler final:public Sampler {
         result.upload[i]=true;
       }
     }
-    if(reserve)reserve(result.bytes+sizeof(paint_compute::Quantization)+batch_capacity*(sizeof(Coordinates)+sizeof(Values)));
+    if(reserve)reserve(result.bytes+sizeof(paint_compute::Quantization)+batch_capacity*(
+        sizeof(Uv)*uv.count+sizeof(float)*transfer.results.stride));
     return result;
   }
 
   Api api_;
   Buffer<uint8_t> images_;
   Buffer<paint_compute::Quantization> table_;
-  Buffer<Coordinates> coordinates_;
-  Buffer<Values> results_;
+  Buffer<Uv> coordinates_;
+  Buffer<float> results_;
+  ResultLayout result_layout_;
+  std::vector<float> host_results_;
   View view_{};
   OverlayView overlay_{};
   struct ReleaseAllocation {
@@ -114,12 +124,15 @@ template<class Api> class DeviceSampler final:public Sampler {
     stop();
   }
 
-  DeviceSampler(const ImageInput (&roles)[RoleCount],Parameters parameters,const PaintOverlayPacket *overlay,
+  DeviceSampler(const ImageInput (&roles)[RoleCount],Parameters parameters,TransferLayout transfer,const PaintOverlayPacket *overlay,
                 const std::function<bool()> &cancelled,const paint_compute::MaterialAtlas *atlas,
                 const std::function<void(size_t)> &reserve,ImageLayout layout)
-      :api_(atlas),images_(api_,layout.bytes),table_(api_,1),coordinates_(api_,batch_capacity),results_(api_,batch_capacity) {
+      :api_(atlas),images_(api_,layout.bytes),table_(api_,1),coordinates_(api_,batch_capacity*transfer.coordinates.count),
+       results_(api_,batch_capacity*transfer.results.stride),result_layout_(transfer.results),
+       host_results_(batch_capacity*result_layout_.stride) {
     if(!layout.bytes&&!overlay&&!atlas)throw std::logic_error("Missing Bake material images or paint");
     view_.parameters=parameters;
+    view_.coordinates=overlay_.coordinates=transfer.coordinates;
     try {
       // The captured Bake field owns these planes through every batch.
       if(atlas){
@@ -153,24 +166,29 @@ template<class Api> class DeviceSampler final:public Sampler {
     if(cancelled&&cancelled())throw std::runtime_error("Mesh baking cancelled");
   }
 public:
-  DeviceSampler(const ImageInput (&roles)[RoleCount],Parameters parameters,const PaintOverlayPacket *overlay,
+  DeviceSampler(const ImageInput (&roles)[RoleCount],Parameters parameters,TransferLayout transfer,const PaintOverlayPacket *overlay,
                 const std::function<bool()> &cancelled,const paint_compute::MaterialAtlas *atlas,
                 const std::function<void(size_t)> &reserve)
-      :DeviceSampler(roles,parameters,overlay,cancelled,atlas,reserve,layout(roles,reserve)){}
+      :DeviceSampler(roles,parameters,transfer,overlay,cancelled,atlas,reserve,layout(roles,transfer,overlay,atlas,reserve)){}
 
-  void read(std::span<const Coordinates> coordinates,std::span<Values> values,
+  void read(std::span<const Uv> coordinates,std::span<Values> values,
             const std::function<bool()> &cancelled) override {
-    if(coordinates.empty()||coordinates.size()>batch_capacity||values.size()!=coordinates.size())
+    const auto count=values.size();
+    if(!count||count>batch_capacity||coordinates.size()!=count*view_.coordinates.count)
       throw std::logic_error("Invalid Bake material sample batch");
     poll(cancelled);
     try {
       api_.upload(coordinates_.data,coordinates.data(),coordinates.size_bytes());
-      api_.sample_bake_material(view_,coordinates_.data,table_.data,results_.data,coordinates.size());
-      if(overlay_.input.padding)
-        api_.composite_bake_overlay(overlay_,coordinates_.data,results_.data,coordinates.size());
-      api_.read(values.data(),results_.data,values.size_bytes());
+      const SampleOutput output{result_layout_,results_.data};
+      api_.sample_bake_material(view_,coordinates_.data,table_.data,output,count);
+      if(overlay_.input.padding)api_.composite_bake_overlay(overlay_,coordinates_.data,output,count);
+      api_.read(host_results_.data(),results_.data,count*result_layout_.stride*sizeof(float));
       poll(cancelled);
-      for(const auto &value:values)if(value.invalid)throw std::runtime_error("Source UV sampling exceeds finite bounds");
+      for(size_t i=0;i<count;++i){
+        const auto value=read_sample(result_layout_,host_results_.data()+i*result_layout_.stride);
+        if(value.invalid)throw std::runtime_error("Source UV sampling exceeds finite bounds");
+        values[i]=value;
+      }
     }catch(...){api_.drain();throw;}
   }
 };

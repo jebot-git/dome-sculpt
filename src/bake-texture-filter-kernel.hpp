@@ -10,7 +10,7 @@
 #endif
 
 namespace dome::detail::bake_material {
-DOME_BAKE_FILTER_FN bool finite_uv(const float (&uv)[2]){
+DOME_BAKE_FILTER_FN bool finite_uv(const auto &uv){
   return uv[0]>=-FLT_MAX&&uv[0]<=FLT_MAX&&uv[1]>=-FLT_MAX&&uv[1]<=FLT_MAX;
 }
 
@@ -38,7 +38,7 @@ struct CoveredNormalMap {
 
 // Premultiplied XYZ and coverage are independent of the original image and
 // carry the current writable UV0/Mikk frame to the existing normal resolver.
-DOME_BAKE_FILTER_FN void sample_covered_normal(const CoveredNormalMap &map,const float (&uv)[2],
+DOME_BAKE_FILTER_FN void sample_covered_normal(const CoveredNormalMap &map,const auto &uv,
     const paint_compute::Quantization &table,float (&filtered)[4]){
   using namespace paint_compute;
   const auto x=clamped_axis(uv[0],map.resolution),y=clamped_axis(uv[1],map.resolution);

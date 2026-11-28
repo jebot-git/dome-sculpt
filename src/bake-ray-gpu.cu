@@ -93,18 +93,15 @@ __global__ void prepare_cage(const bake_raster::ProjectionFace *faces,bake_raste
   }
 }
 
-__global__ void bake_material_samples(bake_material::View view,const bake_material::Coordinates *coordinates,
-    const paint_compute::Quantization *table,bake_material::Values *values,size_t count){
+__global__ void bake_material_samples(bake_material::View view,const bake_material::Uv *coordinates,
+    const paint_compute::Quantization *table,bake_material::SampleOutput output,size_t count){
   const size_t i=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
-  if(i<count)values[i]=bake_material::evaluate(view,coordinates[i],*table);
+  if(i<count)bake_material::evaluate_sample(view,coordinates,*table,output,i);
 }
-__global__ void bake_overlay_samples(bake_material::OverlayView view,const bake_material::Coordinates *coordinates,
-                                    bake_material::Values *values,size_t count){
+__global__ void bake_overlay_samples(bake_material::OverlayView view,const bake_material::Uv *coordinates,
+                                    bake_material::SampleOutput output,size_t count){
   const size_t i=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
-  if(i>=count)return;
-  auto value=values[i];
-  bake_material::apply_overlay(view,coordinates[i],value);
-  values[i]=value;
+  if(i<count)bake_material::overlay_sample(view,coordinates,output,i);
 }
 
 class GpuApi {
@@ -161,16 +158,16 @@ public:
     prepare_cage<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(faces,settings,samples,count,rays,status);
     checked(DOME_GPU(GetLastError)());
   }
-  void sample_bake_material(bake_material::View view,const bake_material::Coordinates *coordinates,
-                            const paint_compute::Quantization *table,bake_material::Values *values,size_t count){
+  void sample_bake_material(bake_material::View view,const bake_material::Uv *coordinates,
+                            const paint_compute::Quantization *table,bake_material::SampleOutput output,size_t count){
     constexpr unsigned lanes=128;
-    bake_material_samples<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(view,coordinates,table,values,count);
+    bake_material_samples<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(view,coordinates,table,output,count);
     checked(DOME_GPU(GetLastError)());
   }
-  void composite_bake_overlay(bake_material::OverlayView view,const bake_material::Coordinates *coordinates,
-                               bake_material::Values *values,size_t count){
+  void composite_bake_overlay(bake_material::OverlayView view,const bake_material::Uv *coordinates,
+                               bake_material::SampleOutput output,size_t count){
     constexpr unsigned lanes=128;
-    bake_overlay_samples<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(view,coordinates,values,count);
+    bake_overlay_samples<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(view,coordinates,output,count);
     checked(DOME_GPU(GetLastError)());
   }
 
@@ -206,10 +203,10 @@ std::unique_ptr<Query> upload(const Surface &surface,std::span<const Vec3> patte
 std::unique_ptr<bake_raster::Raster> bake_raster::create(std::span<const float> axis,std::span<const uint8_t> writable){
   return create_device<bake_rays::GpuApi>(axis,writable);
 }
-std::unique_ptr<bake_material::Sampler> bake_material::upload(const ImageInput (&roles)[RoleCount],Parameters parameters,
+std::unique_ptr<bake_material::Sampler> bake_material::upload(const ImageInput (&roles)[RoleCount],Parameters parameters,TransferLayout transfer,
     const PaintOverlayPacket *overlay,const std::function<bool()> &cancelled,const paint_compute::MaterialAtlas *atlas,
     const std::function<void(size_t)> &reserve){
-  return std::make_unique<DeviceSampler<bake_rays::GpuApi>>(roles,parameters,overlay,cancelled,atlas,reserve);
+  return std::make_unique<DeviceSampler<bake_rays::GpuApi>>(roles,parameters,transfer,overlay,cancelled,atlas,reserve);
 }
 } // namespace dome::detail
 #undef DOME_GPU

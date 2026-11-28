@@ -9,8 +9,8 @@
 
 namespace dome::detail {
 namespace bake_material {
-void launch_material(sycl::queue &,View,const Coordinates *,const paint_compute::Quantization *,Values *,size_t);
-void launch_overlay(sycl::queue &,OverlayView,const Coordinates *,Values *,size_t);
+void launch_material(sycl::queue &,View,const Uv *,const paint_compute::Quantization *,SampleOutput,size_t);
+void launch_overlay(sycl::queue &,OverlayView,const Uv *,SampleOutput,size_t);
 }
 namespace bake_raster {
 void launch_raster(sycl::queue &,View,const Span *,uint32_t span_count,uint32_t count,uint32_t first,Sample *);
@@ -61,13 +61,13 @@ public:
                          const bake_raster::Sample *samples,size_t count,ProjectionRay *rays,uint32_t *status){
     bake_raster::launch_cage_rays(queue_,faces,settings,samples,count,rays,status);
   }
-  void sample_bake_material(bake_material::View view,const bake_material::Coordinates *coordinates,
-                            const paint_compute::Quantization *table,bake_material::Values *values,size_t count){
-    bake_material::launch_material(queue_,view,coordinates,table,values,count);
+  void sample_bake_material(bake_material::View view,const bake_material::Uv *coordinates,
+                            const paint_compute::Quantization *table,bake_material::SampleOutput output,size_t count){
+    bake_material::launch_material(queue_,view,coordinates,table,output,count);
   }
-  void composite_bake_overlay(bake_material::OverlayView view,const bake_material::Coordinates *coordinates,
-                               bake_material::Values *values,size_t count){
-    bake_material::launch_overlay(queue_,view,coordinates,values,count);
+  void composite_bake_overlay(bake_material::OverlayView view,const bake_material::Uv *coordinates,
+                               bake_material::SampleOutput output,size_t count){
+    bake_material::launch_overlay(queue_,view,coordinates,output,count);
   }
 
   void trace(SurfaceView surface,const Frame *frames,const Vec3 *pattern,size_t samples,float maximum,
@@ -118,9 +118,9 @@ std::unique_ptr<Query> upload(const Surface &surface,std::span<const Vec3> patte
 std::unique_ptr<bake_raster::Raster> bake_raster::create(std::span<const float> axis,std::span<const uint8_t> writable){
   return create_device<bake_rays::SyclApi>(axis,writable);
 }
-std::unique_ptr<bake_material::Sampler> bake_material::upload(const ImageInput (&roles)[RoleCount],Parameters parameters,
+std::unique_ptr<bake_material::Sampler> bake_material::upload(const ImageInput (&roles)[RoleCount],Parameters parameters,TransferLayout transfer,
     const PaintOverlayPacket *overlay,const std::function<bool()> &cancelled,const paint_compute::MaterialAtlas *atlas,
     const std::function<void(size_t)> &reserve){
-  return std::make_unique<DeviceSampler<bake_rays::SyclApi>>(roles,parameters,overlay,cancelled,atlas,reserve);
+  return std::make_unique<DeviceSampler<bake_rays::SyclApi>>(roles,parameters,transfer,overlay,cancelled,atlas,reserve);
 }
 } // namespace dome::detail

@@ -21,9 +21,11 @@ struct MaterialInput {
   const PaintOverlayPacket *overlay=nullptr;
   const PaintSourceTexture *retained_normal=nullptr;
   const paint_compute::MaterialAtlas *atlas=nullptr;
+  TransferLayout transfer{};
 
   MaterialInput(const BakeMaterial &material,bool separate_pbr,const Image *normal,bool sample_normals=false,
-                const PaintSourceTexture *retained=nullptr,const paint_compute::MaterialAtlas *resident=nullptr)
+                const PaintSourceTexture *retained=nullptr,const paint_compute::MaterialAtlas *resident=nullptr,
+                bool retained_radiance=false)
       :retained_normal(retained),atlas(resident) {
     const auto &factor=material.material;
     std::copy_n(factor.color.begin(),4,parameters.color);
@@ -58,35 +60,53 @@ struct MaterialInput {
     else if(sample_normals&&source&&source->normal.image&&source->normal_scale>0&&material.normal_strength>0)
       images[TangentNormal]={source->normal.image.get(),&source->normal};
     parameters.include_baked_normal=sample_normals&&covered_normal_image(material);
-  }
-
-  bool needs_sampling() const {
-    return atlas||overlay||std::ranges::any_of(images,[](const auto &role){return role.image!=nullptr;});
-  }
-
-  Coordinates coordinates(const Mesh &mesh,uint32_t triangle,std::array<float,3> bary,
-                          std::array<float,2> paint_uv,std::array<float,2> high_uv,
-                          std::array<float,2> normal_uv={}) const {
-    Coordinates result{};
-    std::copy_n(paint_uv.begin(),2,result.paint_uv);
-    if(parameters.include_baked_normal)std::copy_n(high_uv.begin(),2,result.high_uv);
-    std::array<std::array<float,2>,8> source_uv;
-    unsigned ready=0;
+    auto &layout=transfer.coordinates;
+    const auto add=[&](uint8_t domain){
+      const auto end=domains.begin()+layout.count;
+      if(const auto found=std::find(domains.begin(),end,domain);found!=end)
+        return uint8_t(found-domains.begin());
+      const auto column=layout.count++;
+      domains[column]=domain;
+      return column;
+    };
     for(unsigned i=0;i<RoleCount;++i){
       if(!images[i].image&&(!atlas||i>Emission||!atlas->plane(i)))continue;
-      auto uv=i==TangentNormal?high_uv:paint_uv;
-      if(i==TangentNormal&&retained_normal)uv=normal_uv;
+      auto domain=uint8_t(i==TangentNormal?High:Paint);
+      if(i==TangentNormal&&retained_normal)domain=RetainedNormal;
       else if(const auto *original=images[i].original){
-        const unsigned set=original->texcoord;
-        if(!(ready&(1u<<set))){
-          source_uv[set]=source_texture_uv(mesh,*source,int(set),triangle,bary);
-          ready|=1u<<set;
-        }
-        uv=source_uv[set];
+        if(unsigned(original->texcoord)>=Paint)throw std::invalid_argument("Bake texture coordinate set exceeds bounds");
+        domain=original->texcoord;
       }
-      result.uv[i][0]=uv[0];result.uv[i][1]=uv[1];
+      layout.roles[i]=add(domain);
     }
-    return result;
+    if(overlay)layout.paint=add(Paint);
+    if(parameters.include_baked_normal)layout.high=add(High);
+
+    auto &output=transfer.results;
+    output.emission=!retained_radiance&&!material.resolved_emission;
+    output.pbr=images[PbrColor].image||(overlay&&parameters.separate_pbr);
+    output.normal=bool(images[TangentNormal].image);
+    output.baked_normal=parameters.include_baked_normal;
+    output.stride=output.channel_count();
   }
+
+  bool needs_sampling() const {return transfer.coordinates.count!=0;}
+
+  void coordinates(const Mesh &mesh,uint32_t triangle,std::array<float,3> bary,
+                   Uv paint_uv,Uv high_uv,Uv normal_uv,std::span<Uv> row) const {
+    for(size_t i=0;i<row.size();++i){
+      const auto domain=domains[i];
+      switch(domain){
+        case Paint: row[i]=paint_uv;break;
+        case High: row[i]=high_uv;break;
+        case RetainedNormal: row[i]=normal_uv;break;
+        default: row[i]=source_texture_uv(mesh,*source,domain,triangle,bary);break;
+      }
+    }
+  }
+private:
+  // glTF coordinate sets occupy the eight lower domain IDs.
+  enum : uint8_t { Paint=8,High,RetainedNormal };
+  std::array<uint8_t,RoleCount+2> domains{};
 };
 } // namespace dome::detail::bake_material
