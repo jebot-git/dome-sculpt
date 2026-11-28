@@ -273,6 +273,19 @@ need qualification.
 [Multi-source Bake controls](BAKE-RECIPES.md#project-from-several-source-objects) ·
 [Validation evidence](validation/bake-group-20261128.json)
 
+Retopology placement, moving, face orientation, edge extrusion, Snap and
+Relax use the selected GPU for nearest-surface queries. The editing worker
+uploads the immutable source BVH once per session and reuses it through
+subsequent gestures. Snap and each Jacobi relaxation step submit batches.
+The device keeps the original binary64 distance, segment and first-arrival
+tie rules. Intel Arc uses integer binary64 arithmetic for this query. The
+focused Arc run matched all 293 reference queries including position,
+barycentrics, distance and normals bit for bit. It also covered a thin
+triangle that required multiple device passes, cancellation and retry.
+Nested DomeD Wayland and synthetic OpenXR exercised the regular Retopology
+controls through Save and acceptance or cancellation.
+[GPU Retopology projection evidence](validation/retopo-projection-gpu-20261128.json)
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.

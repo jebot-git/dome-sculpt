@@ -1,0 +1,78 @@
+{
+  "date": "2026-11-28",
+  "product": "4a0adec3fa7fc0e7afab4f649950ab0b9943e84d",
+  "preceding": "31d17de7e99c43b86332a674c4bc83886489c645",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Unfiltered nearest-surface projection for native Retopology authoring, with resident source geometry, batching and binary64 geometry.",
+  "oneapi_arc_release": {
+    "application_sha256": "1947211ecbd9274f3a045864e1e4ece0951faecf50badcdf580ebb2ccb0640c0",
+    "ctest_passed": 22,
+    "ctest_cases": [
+      "retopology-affine-ui-fixture",
+      "bake",
+      "retopology-affine-openxr",
+      "retopology-imported-pbr",
+      "retopology-imported-prior-bake",
+      "retopology-imported-bake-resize",
+      "retopology-authoring",
+      "retopo",
+      "retopology-worker-reporter-recovery",
+      "retopology-affine",
+      "retopology-held-admission",
+      "retopology-save-handoff",
+      "retopology-history-openxr-apply",
+      "retopology-history-openxr-cancel",
+      "retopo-edges",
+      "application-missing-gpu",
+      "retopo-cancellation-boundaries",
+      "mesh-processing",
+      "surface-query-oblique",
+      "weight-transfer-batch",
+      "retopology-worker-accepted-publication",
+      "retopology-worker-faults"
+    ],
+    "ctest_log_sha256": "bc22b4b0c8a10f99712f858d702f097b5b59039f28f355b494940ecf44ebca6f",
+    "native_qualification": {
+      "kernel": "dome::detail::retopo_surface::NearestTriangles",
+      "trace_sha256": "3f5aa40f9dda94bc5705e0548637ca72de8c7b4d3564dd56bdff657359e85cd1",
+      "exact_reference_hits": 293,
+      "continuation_triangles": 2048,
+      "injected_worker_boundaries": 256,
+      "covers": "Exact first-hit ties, thin triangles, independent barycentrics and normals, work bounds, cancellation, atomic retry and source preservation."
+    },
+    "wayland": {
+      "checks_passed": 9,
+      "report_sha256": "827451964a0796964c97d1c4acb8f5e94052863d500c15fc139dde49bfb5f632",
+      "client_trace_sha256": "d95282518db7e707ddf23286be0534d3c245358e4d6e80d29f6d2544ecf0f87e",
+      "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+      "renderer": "Zink Vulkan on Intel Arc A770",
+      "project_sha256": "7c7f7c623b00cf772eb134feb31f3c1e49f9b9bb6468c1b2f04b2f36db7fee02",
+      "export_sha256": "705016df3902769a470f8547302f021323ab0c0cc8980ee4889449a12b29c325",
+      "covers": "Universal menu, real pointer placement, quad creation, Apply, ordered Save, Undo, Redo and standard GLB."
+    },
+    "synthetic_openxr": {
+      "checks_passed": 31,
+      "report_sha256": "5534a7347e04fdb37705e2898bb1bf50630baf9122cc7adabfc9ba7f860ec143",
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "accept_and_focus_project_sha256": "92d8a714ff979bc73f4a9a7c5f1a2c570c55ea11d19b66c5f39031e91922da78",
+      "committed_prefix_and_unconfirmed_project_sha256": "1a01b16e482c4fbafca0a9cce55a8e5b80457df6b9bd0c8fd85a53ff1ca99c41"
+    },
+    "fixture_recovery": "The XR runner now waits for the rendered Face control to become enabled. The allocation fixture uses valid host alignment and injects the submission boundary separately from driver internals."
+  },
+  "sanitizers": {
+    "scope": "Host ASan and UBSan on the mesh processing and retopology translation units and native fixture, linked to the matching oneAPI Release core and exercised on Arc. Leak detection was disabled.",
+    "assertions_passed": 50,
+    "log_sha256": "abe0d7d44b62a94205072a5be6443e1faf1143250d1b987d9e66926d396c614c"
+  },
+  "cuda_and_rocm": {
+    "cuda": {
+      "scope": "Compiled device traversal and host projection integration. Hardware execution was unavailable.",
+      "log_sha256": "36324d45d8d08f58e9d48960d63a5449772256efdb26253fb420e13c9eb1c972"
+    },
+    "rocm": {
+      "scope": "Compiled device traversal and host projection integration. Hardware execution was unavailable.",
+      "log_sha256": "c73293207f8adc7f89c5226263d70c63977d07ecdaa6ec3035a58ea282de54b3"
+    }
+  },
+  "physical_headset": false
+}
