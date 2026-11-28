@@ -289,6 +289,14 @@ expected saved project for each CC0 base. Physical headset verification
 remains open.
 [Mixed-target frontend evidence](validation/surface-heat-mixed-frontends-20261128.json)
 
+Surface Heat resolves missing component seeds by ranking visible, eligible
+handles within the configured radius before solving. The native folded-panel
+fixture verifies occlusion, exact distance ties, a farther visible candidate,
+nondeforming bones, and atomic refusal with an insufficient radius. A native
+Wayland bind, Save and Undo/Redo reproduce the expected weights. The retained
+and native CC0 VRoid articulation cases pass with exact prior project output.
+[Visible seed evidence](validation/surface-heat-visible-seeds-20261128.json)
+
 Surface Heat now covers independent native paint frames, authored POSITION
 domains and prepared normal and corner-color recipes. Binding after key
 creation and rebinding after Mirror keep the original role coordinates,

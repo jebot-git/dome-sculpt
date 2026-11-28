@@ -779,6 +779,17 @@ the native accessory alongside the retained part on both CC0 VRoid bases.
 Both controller binds match the independent worker output byte for byte.
 [Mixed-target frontend evidence](validation/surface-heat-mixed-frontends-20261128.json)
 
+Surface Heat now searches for the nearest visible bone when the first seed
+pass leaves a component unsupported. It applies the same seed radius and
+handle eligibility, preserves exact distance ties, and completes seeding
+before the weight solve. A folded accessory with a blocked closest ray now
+binds to the two equally close visible bones. A shorter radius that reaches
+only the blocked bone refuses atomically. The nested Wayland bind, ordered
+Save, Undo and Redo match the native fixture. Release, the headless sanitizer
+reference and the existing VRoid articulation suites pass. Eight prior
+VRoid worker and OpenXR projects reproduce byte for byte.
+[Visible seed validation](validation/surface-heat-visible-seeds-20261128.json)
+
 Surface Heat now accepts editable retopology patches and their retained rig
 origins. Admission counts the stable topology records and shared patch
 owner before allocating a request. Plain and reflected, sheared source

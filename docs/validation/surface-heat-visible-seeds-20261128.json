@@ -1,0 +1,124 @@
+{
+  "product": "0702ad5c0fc251766a04568fbce306a0a6f84a21",
+  "reference_product": "f4ef7d68",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "date": "2026-11-28",
+  "scope": "Surface Heat seed admission for positive diffusion components left unsupported by the closest permitted handles.",
+  "folded_native_fixture": {
+    "previous_product_refused": true,
+    "blocked_bone_distance_mm": 24,
+    "nearest_visible_distance_mm": 37.736,
+    "farther_visible_distance_mm": 41,
+    "accepted_radius_mm": 45,
+    "refused_radius_mm": 30,
+    "visible_tie_weights": {
+      "left": 0.5,
+      "right": 0.5
+    },
+    "farther_and_nondeforming_weights": 0,
+    "single_admissible_bone_weight": 1,
+    "refusal_and_paint_owners_exact": true,
+    "bound_archive_release_sanitizer_wayland_sha256": "5b2cc5d6e1cfda417446f55588d03a5f7472dbb95049d49c8bf938968f0a2d47"
+  },
+  "release": {
+    "backend": "ONEAPI",
+    "application_sha256": "002784607ae0808c6f65c90e4643f7739756842e416096e9f1fd8fd5e0f8705d",
+    "passed_cases": [
+      "anatomical-female-fixture",
+      "anatomical-male-fixture",
+      "retopology-surface-heat-affine",
+      "retopology-surface-heat-plain",
+      "surface-heat-current-components",
+      "surface-heat-current-head-stress",
+      "surface-heat-current-mixed-generic",
+      "surface-heat-female-articulation",
+      "surface-heat-female-mixed-openxr",
+      "surface-heat-female-mixed-targets",
+      "surface-heat-female-owning",
+      "surface-heat-female-public",
+      "surface-heat-female-quality",
+      "surface-heat-male-articulation",
+      "surface-heat-male-mixed-openxr",
+      "surface-heat-male-mixed-targets",
+      "surface-heat-male-owning",
+      "surface-heat-male-public",
+      "surface-heat-male-quality",
+      "surface-heat-native",
+      "surface-heat-native-female-global",
+      "surface-heat-native-female-local",
+      "surface-heat-native-female-owning",
+      "surface-heat-native-female-public",
+      "surface-heat-native-male-global",
+      "surface-heat-native-male-local",
+      "surface-heat-native-male-owning",
+      "surface-heat-native-male-public",
+      "vrm1-attachment-openxr",
+      "vrm1-source-export"
+    ],
+    "junit_sha256": "b9affcfbffa09f3646d314cf62197d6834e9fbff74aaf3704c14ac97effb865e",
+    "native_fixture_rerun_junit_sha256": "194e083cff3fcfd2a6f1f726f8ec6cd7d77cbb3089079b71a071e936edb81b48"
+  },
+  "headless_asan_ubsan": {
+    "native_fixture_passed_checks": 30
+  },
+  "nested_wayland": {
+    "checks": [
+      "Native Wayland client publishes the Dome Sculpt identity",
+      "Skin binding opens from the universal menu",
+      "Native Wayland options set Surface Heat and the 45 mm seed radius",
+      "Wayland Surface Heat matches the independent concave bind byte for byte",
+      "Universal Undo restores the unbound folded mesh exactly",
+      "Universal Redo restores the concave field exactly",
+      "Wayland client and worker close normally"
+    ],
+    "compute_device": "Intel Arc A770"
+  },
+  "synthetic_openxr_vroid_workflows": {
+    "female": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_submissions": 89
+    },
+    "male": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_submissions": 89
+    }
+  },
+  "previous_vroid_projects_matching_byte_for_byte": [
+    {
+      "project": "surface-heat/female-public/accepted.dsculpt",
+      "sha256": "a1b6071045c898a446f549cee7cc0bcef86d5b8d665a2687a11927b76a7fd895"
+    },
+    {
+      "project": "surface-heat/native-female-public/accepted.dsculpt",
+      "sha256": "a05aba3142dca30bd9844e0dc651247867a8cceced58897119c322aa025c9f26"
+    },
+    {
+      "project": "surface-heat/female-mixed-targets/bound.dsculpt",
+      "sha256": "cb633926eb4403a4a74ee452396e0bea2f4eb7e450d6ca3628bce819a4d25d70"
+    },
+    {
+      "project": "surface-heat/female-mixed-targets/mixed-xr.dsculpt",
+      "sha256": "520a05a8d698b86d252fff411d842d09282ac8249db0b38e21eab82427b6a2c2"
+    },
+    {
+      "project": "surface-heat/male-public/accepted.dsculpt",
+      "sha256": "00b1d46aa7937b0a4a69555c855f3d0be188c55c643a756df48834523ac27847"
+    },
+    {
+      "project": "surface-heat/native-male-public/accepted.dsculpt",
+      "sha256": "76dc328851bcffb9f5a70aba5f65187715fe2890ca31bba1c214259c46d11064"
+    },
+    {
+      "project": "surface-heat/male-mixed-targets/bound.dsculpt",
+      "sha256": "97a48c703f975d3661163a8f874eb1f8a8ce462ee4b8a69dfdfb88d0be3dbcd1"
+    },
+    {
+      "project": "surface-heat/male-mixed-targets/mixed-xr.dsculpt",
+      "sha256": "6926e4c3ffc4dbb7605d374a83b0c9012029d5f330737676b5e6d402e52e198c"
+    }
+  ],
+  "limits": [
+    "This is seed admission for the existing surface solve. General volumetric weight solving and physical headset qualification remain open.",
+    "The native Wayland client and nested compositor use the Arc. The outer Xvfb presentation lacks DRI3."
+  ]
+}
