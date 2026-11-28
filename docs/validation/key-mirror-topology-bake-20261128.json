@@ -1,0 +1,104 @@
+{
+  "date": "2026-11-28",
+  "product": "3a38ed26ab938a3da140e539360827414a308bca",
+  "preceding": "bfe6244700bb96ea6ee34daf49dc061a82bf797c",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Replay saved cage and ordered matching-source Bake on an authenticated native Refined Surface result. Refuse stale topology or out-of-range donor samples before publication.",
+  "arc_a770": {
+    "application_sha256": "b7ce5d39071f7690815736da4bc968efda5d9b9016b673a0c6484ae85f6d47ae",
+    "render_node": "/dev/dri/renderD129",
+    "release": {
+      "tests": [
+        "key-mirror-topology-bake",
+        "refined-cage-bake-openxr",
+        "bake-workflow",
+        "key-mirror-vertex",
+        "bake-recipes",
+        "bake-projection-policy",
+        "key-mirror-refinement",
+        "xr-mirror-control-faults",
+        "key-mirror-refinement-authoring",
+        "xr-mirror-controls",
+        "key-mirror-refinement-baked",
+        "key-mirror-relative-owning",
+        "bake-custom-cage",
+        "application-missing-gpu",
+        "key-mirror-refinement-rigged",
+        "baked-textures",
+        "key-mirror-refinement-missing-gpu",
+        "shapekey-mirror-openxr"
+      ],
+      "log_sha256": "16e7207e00303fe09004f485dba1c2bec18a50e902aa6ee733499584efd045e1"
+    },
+    "native_authoring": {
+      "independently_sampled_skewed_cage_vertices": 9,
+      "maximum_cage_position_error_metres": 3.01639e-08,
+      "matching_rebake_uses_original_triangles_and_no_projection_rays": true,
+      "stale_source_and_out_of_range_matching_fail_atomically": true,
+      "applies_again_after_a_second_refined_surface_edit": true,
+      "ordered_save_and_undo_redo": true,
+      "release_and_reference_and_sanitized_archives_identical": true,
+      "archives": {
+        "cage-source.dsculpt": "21065e2518681315d6ca583fb3abf38c88de3ac5209f30cbe9a92c385acc3087",
+        "cage-refined.dsculpt": "5749aa62362f601268353355b50c42e16bc0d1a50ea5b2d5e4c5ac6d0f6faeb3",
+        "cage-rebaked.dsculpt": "c8b8aca0a9b2e439002d90c22f87ea98989c8569848a1c199ccdfbbf455f2cc2",
+        "matching-source.dsculpt": "a0d0d5b5921fc18f1cc86ce0630b4e24ab7cfcbccef9053cf0a0699dcb3b2d7a",
+        "matching-refined.dsculpt": "7caf4ce1d61b7fed861fa8dc6d13a8b0c971521ea0ef6f6b694ffc1aed8484e0",
+        "matching-rebaked.dsculpt": "44af5b9fb6f4cea2bccf8d1ec2493d47ba87fa8188fda804f8c8449a410d6254"
+      }
+    },
+    "nested_domed_wayland": {
+      "checks": 12,
+      "report_sha256": "cc4a6010099b1bd34bc86f7228465573f3a41b84ed92fdac9884cf5ca15065de",
+      "log_sha256": "221bd24ade8aad36694c152d270f1ed22c8c84e7a57a42ab05d3a820920383ac",
+      "compute_trace_sha256": "fba9f1021ba81f696848eb10bae34d056f1f7cbff7a6d260a3e4c83a9ef5dec9",
+      "replays_reflected_bvh_and_cage_rays": true
+    },
+    "synthetic_openxr": {
+      "refined_cage_recall_checks": 19,
+      "refinement_regression_checks": 58,
+      "physical_headset": false,
+      "report_sha256": "49d48b846a7e3331993b67cff7a8066da278737ac1dc109f75946981e67c9644",
+      "mirror_regression_report_sha256": "9ec4c2875e39e54340b9b12c62c889f8342a02b241b6d82ed10da408c1c0dcab",
+      "saved_projects": {
+        "source.dsculpt": "6ac3767fe8345f41d3a3c5367476698669c40ab1d07700696f050583382e95f7",
+        "reference.dsculpt": "238943a058d5c5ef414dfc07b9289100a139dbca79274be7cb05540593bdf91c",
+        "accept.dsculpt": "238943a058d5c5ef414dfc07b9289100a139dbca79274be7cb05540593bdf91c",
+        "cancel.dsculpt": "6ac3767fe8345f41d3a3c5367476698669c40ab1d07700696f050583382e95f7",
+        "focus.dsculpt": "6ac3767fe8345f41d3a3c5367476698669c40ab1d07700696f050583382e95f7"
+      },
+      "preceding_strict_mirror_captures": {
+        "accept-0.dsculpt": "cf3a4871e1d88af8e8313ba2772e406fef16e5c9bbbf2129b9be5347437e3992",
+        "accept-1.dsculpt": "6a5ce46bca85bcde074bc2251b1ddf69684d6a3b1336aeb83ff2b0db3b481080",
+        "accept-2.dsculpt": "16ea54370d05fb55095be502ff9926c03c06e953f724b123304b080f361b0451",
+        "cancel-0.dsculpt": "8e16ca54b46ba261d92562c5aa0667c14121df4db80cd233367e66799910d23d",
+        "focus-0.dsculpt": "8e16ca54b46ba261d92562c5aa0667c14121df4db80cd233367e66799910d23d",
+        "source.dsculpt": "8e16ca54b46ba261d92562c5aa0667c14121df4db80cd233367e66799910d23d"
+      }
+    }
+  },
+  "headless_reference": {
+    "tests": [
+      "cpu-reference-install-refused",
+      "key-mirror-refinement",
+      "key-mirror-refinement-authoring",
+      "key-mirror-refinement-rigged",
+      "key-mirror-refinement-baked",
+      "key-mirror-topology-bake",
+      "xr-mirror-controls"
+    ],
+    "log_sha256": "b562a1971182cb98528195169a1e05a47b949a54fbc5cea5e542e6f5932ee2d7"
+  },
+  "scoped_asan_ubsan": {
+    "instrumented": [
+      "src/refined-bake.cpp",
+      "src/key-mirror-refinement.cpp",
+      "src/shapekey-refinement.cpp",
+      "src/bake-recipe.cpp",
+      "tests/key-mirror-refinement.cpp"
+    ],
+    "geometry_log_sha256": "71b281c74dc9ecdd2f6d29c16321f7b5e915468d87a098096f543e52c621d21a",
+    "topology_bake_log_sha256": "878ae8c0c87e41405cc765a4f560c617ffb568a453a7983890b0d6d2f115bc41",
+    "leak_detection": false
+  }
+}

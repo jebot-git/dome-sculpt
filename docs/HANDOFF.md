@@ -226,10 +226,27 @@ The full-coverage GLB carries the original embedded normal texture, baked
 tangents and both keys. All 17 selected Arc Release tests pass, including
 58 synthetic OpenXR assertions. Nested DomeD Wayland and scoped ASan/UBSan
 pass. The two native projects and full-coverage GLB match the headless
-reference byte for byte. Retained materials, legacy dynamic normals, and
-rebaking with a topology-bound cage or matching source still need their
-own adapters.
+reference byte for byte. Retained materials and legacy dynamic normals
+still need their own adapters.
 [Native baked Mirror evidence](validation/key-mirror-baked-20261128.json)
+
+Cage and matching-source recipes created before a new Refined surface
+operation can rebake on its result. The recipe retains the plane,
+tolerance, and before/after topology identities. Bake replays GPU
+correspondence against the actual Shape Restore mesh and checks the
+indexed result. The existing ordered cage is sampled at refined vertices.
+Matching source triangles use their original face and barycentric
+coordinates and keep the original world projection limits. Reordered
+sources fail atomically. A fixture also reapplies Refined surface and
+rebakes successfully. The exact corner proof retains an already paired
+layout when the clipping path meets a numerically unresolved contact.
+All 18 selected Arc Release tests and the focused ASan/UBSan tests pass.
+Nested DomeD Wayland and synthetic OpenXR recall the cage and save the exact
+native rebake. The matching-donor and cage projects agree byte for byte with
+the headless reference. Older refinements predate the recipe record and
+can acquire it by restoring the original shape and applying Refined surface
+again.
+[Topology-dependent Bake evidence](validation/key-mirror-topology-bake-20261128.json)
 
 Ambient occlusion in Bake now traces the biased hemisphere on the selected
 GPU against the existing immutable source BVH. The device returns one
