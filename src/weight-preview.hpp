@@ -22,6 +22,7 @@ struct WeightFalloffPreview {
   std::vector<WeightBrush> prefix;
   std::vector<std::vector<float>> maxima;
   std::unique_ptr<weight_brush::Query> query;
+  bool resident=false;
 };
 WeightEditResult preview_weights(std::span<const WeightPaintSurface>,size_t bones,std::span<const WeightBrush>,
     WeightEditOptions,WeightFalloffPreview &,const std::function<bool()> &cancelled);

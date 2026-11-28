@@ -20,13 +20,15 @@ struct Counter {
 class SyclApi : public SyclSurfaceMemory {
 public:
   void reset(uint32_t *value){queue_.fill(value,uint32_t(0),1);}
-  void brush(weight_brush::Stroke stroke,const Vec3 *points,size_t count,
+  void clear_brush(float *values,size_t count){queue_.fill(values,0.f,count);}
+  void brush(weight_brush::Stroke stroke,const Vec3 *points,float *previous,size_t count,
       weight_brush::Hit *hits,uint32_t *size){
     queue_.parallel_for(sycl::range<1>{count},[=](sycl::id<1> id){
-      const auto alpha=weight_brush::strongest(stroke,points[id[0]]);
+      const auto i=id[0];
+      const auto alpha=weight_brush::changed_falloff(stroke,points[i],previous?previous+i:nullptr);
       if(alpha!=0){
         Counter used{size};
-        hits[used.add(1)]={uint32_t(id[0]),alpha};
+        hits[used.add(1)]={uint32_t(i),alpha};
       }
     });
   }

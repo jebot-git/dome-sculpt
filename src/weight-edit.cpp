@@ -8,6 +8,20 @@ namespace dome::detail::weight_brush {
 namespace {
 class ReferenceQuery final:public Query {
   std::vector<Capsule> direct_,reflected_;
+  std::vector<Vec3> cached_points_;
+  std::vector<float> cached_hits_;
+
+  size_t dispatch(std::span<const Vec3> points,unsigned sides,std::span<Hit> hits,
+                  std::span<float> previous={}){
+    if(points.size()!=hits.size())throw std::logic_error("Invalid weight brush reference positions");
+    const Stroke stroke{direct_.data(),reflected_.data(),uint32_t(direct_.size()),sides};
+    size_t count=0;
+    for(size_t i=0;i<points.size();++i){
+      const auto alpha=changed_falloff(stroke,points[i],previous.empty()?nullptr:&previous[i]);
+      if(alpha!=0)hits[count++]={uint32_t(i),alpha};
+    }
+    return count;
+  }
 public:
   ReferenceQuery(std::span<const Capsule> direct,std::span<const Capsule> reflected):
       direct_(direct.begin(),direct.end()),reflected_(reflected.begin(),reflected.end()) {}
@@ -16,12 +30,40 @@ public:
     reflected_.assign(reflected.begin(),reflected.end());
   }
   size_t search(std::span<const Vec3> points,unsigned sides,std::span<Hit> hits) override {
-    const Stroke stroke{direct_.data(),reflected_.data(),uint32_t(direct_.size()),sides};
+    return dispatch(points,sides,hits);
+  }
+  bool cache_points(std::span<const std::span<const Vec3>> surfaces,
+                    const std::function<bool()> &cancelled) override {
+    if(!cached_points_.empty())throw std::logic_error("A weight preview already owns its posed vertices");
     size_t count=0;
-    for(size_t i=0;i<points.size();++i)
-      if(const auto alpha=strongest(stroke,points[i]);alpha!=0)
-        hits[count++]={uint32_t(i),alpha};
-    return count;
+    for(auto part:surfaces){
+      if(part.size()>maximum_vertices-count)throw std::length_error("Weight preview vertex budget exceeded");
+      count+=part.size();
+    }
+    if(!count)return false;
+    std::vector<Vec3> points;
+    std::vector<float> maxima;
+    try{
+      points.reserve(count);
+      maxima.resize(count);
+    }catch(const std::bad_alloc &){return false;}
+    for(auto part:surfaces){
+      if(cancelled&&cancelled())throw std::runtime_error("Weight painting cancelled");
+      points.insert(points.end(),part.begin(),part.end());
+    }
+    cached_points_=std::move(points);
+    cached_hits_=std::move(maxima);
+    return true;
+  }
+  void clear_cached_hits() override {
+    if(cached_hits_.empty())throw std::logic_error("Weight preview has no cached hits");
+    std::ranges::fill(cached_hits_,0.f);
+  }
+  size_t search_cached(size_t first,unsigned sides,std::span<Hit> hits) override {
+    if(first>cached_points_.size()||hits.size()>cached_points_.size()-first||hits.empty())
+      throw std::logic_error("Invalid cached weight brush range");
+    return dispatch(std::span(cached_points_).subspan(first,hits.size()),sides,hits,
+                    std::span(cached_hits_).subspan(first,hits.size()));
   }
 };
 }
@@ -45,6 +87,9 @@ float influence(const VertexWeights &weights, uint32_t joint) {
 namespace field=detail::weight_brush;
 field::Capsule capsule(const WeightBrush &brush,Vec3 from,Vec3 to){
   return field::capsule(from,to,brush.radius,brush.strength,brush.pressure);
+}
+std::span<const Vec3> posed_positions(const WeightPaintSurface &surface){
+  return surface.positions.empty()?std::span<const Vec3>(surface.rest->positions):surface.positions;
 }
 } // namespace
 WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
@@ -71,7 +116,7 @@ WeightEditResult edit_stroke(std::span<const WeightPaintSurface> surfaces,size_t
       !bounded(brush.to) || !std::isfinite(brush.radius) || brush.radius <= 0 ||
       brush.radius > 100 || !unit(brush.strength) || !unit(brush.pressure) ||
       !unit(brush.value) || surfaces.empty() || surfaces.size() > 10000 ||
-      options.maximum_vertices > 2'000'000 || !options.maximum_vertices ||
+      options.maximum_vertices > field::maximum_vertices || !options.maximum_vertices ||
       !options.maximum_work || options.maximum_work > 100'000'000 ||
       (!options.locks.empty() && options.locks.size() != bones) ||
       !options.limits.max_influences || options.limits.max_influences > 32 ||
@@ -155,15 +200,14 @@ WeightEditResult edit_stroke(std::span<const WeightPaintSurface> surfaces,size_t
     surface.weights->validate(count, joints.bones);
     if (!surface.positions.empty() && surface.positions.size() != count)
       throw std::invalid_argument("Weight preview position count differs from rest topology");
-    auto positions = surface.positions.empty()
-        ? std::span<const Vec3>(surface.rest->positions) : surface.positions;
-    for (auto p : positions)
+    for (auto p : posed_positions(surface))
       if (!bounded(p)) throw std::invalid_argument("Weight position outside finite coordinate bounds");
   }
   const size_t tests_per_vertex=brushes.size()*(options.symmetry?2:1);
   const size_t batch=std::min(field::batch_capacity,
       field::batch_capsules/(std::max(tail.size(),size_t{1})*(options.symmetry?2:1)));
   if(preview&&!prefix){
+    if(preview->resident)preview->query->clear_cached_hits();
     preview->maxima.clear();
     for(const auto &surface:surfaces)preview->maxima.emplace_back(surface.rest->positions.size(),0);
   }
@@ -172,6 +216,7 @@ WeightEditResult edit_stroke(std::span<const WeightPaintSurface> surfaces,size_t
   bool staged=false;
   std::vector<field::Hit> hits;
   WeightEditResult result;
+  size_t offset=0;
   for(size_t part=0;part<surfaces.size();++part){
     const auto &surface=surfaces[part];
     const auto &mesh = *surface.rest;
@@ -193,7 +238,9 @@ WeightEditResult edit_stroke(std::span<const WeightPaintSurface> surfaces,size_t
         row.erase(std::unique(row.begin(), row.end()), row.end());
       }
     }
-    const auto positions=surface.positions.empty()?std::span<const Vec3>(mesh.positions):surface.positions;
+    const auto positions=posed_positions(surface);
+    const auto part_start=offset;
+    offset+=positions.size();
     const unsigned sides=(joints.direct?field::Direct:0u)|
                          (joints.mirrored&&options.symmetry?field::Reflected:0u);
     const auto assign=[&](size_t vertex,float signed_alpha){
@@ -238,21 +285,30 @@ WeightEditResult edit_stroke(std::span<const WeightPaintSurface> surfaces,size_t
       if(!tail.empty()){
         if(!staged){
           if(query)query->set_capsules(direct_stroke,reflected_stroke);
-          else query=field::upload(direct_stroke,reflected_stroke,preview!=nullptr);
+          else {
+            query=field::upload(direct_stroke,reflected_stroke,preview!=nullptr);
+            if(preview){
+              std::vector<std::span<const Vec3>> posed;
+              posed.reserve(surfaces.size());
+              for(const auto &input:surfaces)posed.push_back(posed_positions(input));
+              preview->resident=query->cache_points(posed,cancelled);
+            }
+          }
           hits.resize(std::min(batch,vertices));
           staged=true;
         }
-        affected=query->search(positions.subspan(first,count),sides,std::span(hits).first(count));
+        const auto output=std::span(hits).first(count);
+        affected=preview&&preview->resident?query->search_cached(part_start+first,sides,output):
+            query->search(positions.subspan(first,count),sides,output);
         step(0);
       }
       if(preview){
         auto row=std::span(preview->maxima[part]).subspan(first,count);
         for(const auto &hit:std::span(hits).first(affected)){
-          auto &prior=row[hit.vertex];
-          const auto before=std::abs(prior),after=std::abs(hit.alpha);
           // This is the same maximum as a full replay. A direct capsule
           // wins a tie regardless of which prefix supplied it.
-          if(after>before||(after==before&&hit.alpha>prior))prior=hit.alpha;
+          auto &prior=row[hit.vertex];
+          if(preview->resident||field::stronger(hit.alpha,prior))prior=hit.alpha;
         }
         for(size_t v=0;v<count;++v)if(row[v]!=0)assign(first+v,row[v]);
       }else{

@@ -79,5 +79,18 @@ DOME_WEIGHT_BRUSH_FN float strongest(Stroke brush,Vec3 p) {
   }
   return direct>=mirror?direct:-mirror;
 }
+
+DOME_WEIGHT_BRUSH_FN bool stronger(float next,float previous) {
+  const float a=next<0?-next:next,b=previous<0?-previous:previous;
+  return a>b||(a==b&&next>previous);
+}
+
+DOME_WEIGHT_BRUSH_FN float changed_falloff(Stroke brush,Vec3 point,float *previous) {
+  const auto alpha=strongest(brush,point);
+  if(!previous)return alpha;
+  if(!stronger(alpha,*previous))return 0;
+  *previous=alpha;
+  return alpha;
+}
 }
 #undef DOME_WEIGHT_BRUSH_FN

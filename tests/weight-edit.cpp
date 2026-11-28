@@ -125,8 +125,42 @@ void check_incremental_preview(){
             "After cancellation a fresh preview reproduces exact weights from the immutable base");
   }
 }
+void check_resident_preview(){
+  namespace field=detail::weight_brush;
+  const std::array<Vec3,2> points{{{-1,0,0},{1,0,0}}};
+  const auto source=std::span<const Vec3>(points);
+  const std::array spans{source.first(1),std::span<const Vec3>{},source.last(1)};
+  const std::array left{field::capsule(points[0],points[0],.2f,.6f,1)};
+  const std::array right{field::capsule(points[1],points[1],.2f,.6f,1)};
+  const std::array weaker{field::capsule(points[1],points[1],.2f,.3f,1)};
+  auto query=field::upload(left,right,true);
+  unsigned polls=0;
+  rejects([&]{query->cache_points(spans,[&]{return ++polls==2;});},
+          "An interrupted posed upload leaves no partial resident geometry");
+  require(query->cache_points(spans,{})&&polls==2,
+          "A resident brush can retry the same immutable surface list after cancellation");
+  std::array<field::Hit,2> hits;
+  constexpr auto both=field::Direct|field::Reflected;
+  require(query->search_cached(0,both,hits)==2&&hits[0].vertex==0&&hits[0].alpha==.6f&&
+          hits[1].vertex==1&&hits[1].alpha==-.6f,
+          "Compacted resident hits preserve order across separate linked surfaces");
+  require(query->search_cached(0,both,hits)==0,
+          "Repeated samples do not return unchanged resident falloff");
+  query->set_capsules(weaker,left);
+  require(query->search_cached(1,both,std::span(hits).first(1))==0,
+          "Weaker direct samples preserve the stronger reflected winner without a readback payload");
+  query->set_capsules(right,left);
+  require(query->search_cached(1,both,std::span(hits).first(1))==1&&hits[0].vertex==0&&hits[0].alpha==.6f,
+          "A resident direct sample replaces a tied reflected winner at the correct batch offset");
+  rejects([&]{query->search_cached(1,both,hits);},"Resident query rejects an overflow of its posed range");
+  query->clear_cached_hits();
+  require(query->search_cached(0,both,hits)==2&&hits[0].vertex==0&&hits[0].alpha==-.6f&&
+          hits[1].vertex==1&&hits[1].alpha==.6f,
+          "Clearing the falloff lets edited prefixes replay against the same resident geometry");
+}
 int main() try {
   check_brush_batches();
+  check_resident_preview();
   check_incremental_preview();
   auto mesh=plane(); SkinWeights skin; skin.vertices.assign(4,{{0,1}});
   auto original=skin.vertices; auto topology=morph_topology_id(mesh);

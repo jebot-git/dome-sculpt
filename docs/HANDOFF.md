@@ -111,6 +111,21 @@ Nested DomeD Wayland and synthetic OpenXR keep their preceding saves
 byte for byte. CUDA and ROCm compile and reject unavailable devices.
 [Incremental weight preview evidence](validation/weight-preview-prefix-20261128.json)
 
+The live preview keeps posed vertices and their strongest signed falloff
+in one bounded device allocation per array. A new capsule batch reads
+only changed winners, with direct-side priority on ties. Replacing a
+prefix clears its falloff and reuses the same posed vertices.
+If the resident allocation is unavailable, the existing bounded GPU
+batching path still evaluates the stroke. Cancellation drains uploads
+and releases the unpublished preview state.
+Arc traces over 96 prefixes of the 19-part CC0 VRoid fixture reduce posed
+vertex uploads from 11,348,352 bytes to 118,212 bytes. Hit payload readback
+falls from 381,232 to 170,184 bytes. An injected resident-allocation failure
+takes the staged route and restores the same final project as full replay.
+Every intermediate skin matches full replay in the timing runs. Median
+worker time across 96 prefixes changes from 660 to 646 ms, with overlapping
+trial timings. Physical headset latency still requires qualification.
+
 Ambient occlusion in Bake now traces the biased hemisphere on the selected
 GPU against the existing immutable source BVH. The device returns one
 blocked-ray count per projected texel. Long traversals resume on the device

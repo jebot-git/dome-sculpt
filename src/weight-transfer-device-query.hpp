@@ -81,6 +81,9 @@ class DeviceQuery final:public Query {
   Buffer<Vec3> points_{api_,batch_capacity};
   Buffer<Hit> hits_{api_,batch_capacity};
   Buffer<uint32_t> count_{api_,1};
+  std::unique_ptr<Buffer<Vec3>> cached_points_;
+  std::unique_ptr<Buffer<float>> cached_hits_;
+  size_t cached_count_=0;
   uint32_t capsules_=0;
   bool mirror_=false;
 
@@ -105,19 +108,74 @@ public:
     mirror_=!reflected.empty();
   }
 
+  bool cache_points(std::span<const std::span<const Vec3>> surfaces,
+                    const std::function<bool()> &cancelled) override {
+    if(cached_points_)throw std::logic_error("A weight preview already owns its posed vertices");
+    size_t count=0;
+    for(auto part:surfaces){
+      if(part.size()>maximum_vertices-count)throw std::length_error("Weight preview vertex budget exceeded");
+      count+=part.size();
+    }
+    if(!count)return false;
+    std::unique_ptr<Buffer<Vec3>> points;
+    std::unique_ptr<Buffer<float>> maxima;
+    try{
+      points=std::make_unique<Buffer<Vec3>>(api_,count);
+      maxima=std::make_unique<Buffer<float>>(api_,count);
+    }catch(const std::bad_alloc &){return false;}
+    const auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Weight painting cancelled");};
+    try{
+      size_t offset=0;
+      for(auto part:surfaces){
+        stop();
+        if(!part.empty())api_.upload(points->data+offset,part.data(),part.size_bytes());
+        offset+=part.size();
+      }
+      api_.clear_brush(maxima->data,count);
+      api_.wait();
+      stop();
+    }catch(...){api_.drain();throw;}
+    cached_points_=std::move(points);
+    cached_hits_=std::move(maxima);
+    cached_count_=count;
+    return true;
+  }
+
+  void clear_cached_hits() override {
+    if(!cached_hits_)throw std::logic_error("Weight preview has no cached hits");
+    try{
+      api_.clear_brush(cached_hits_->data,cached_count_);
+      api_.wait();
+    }catch(...){api_.drain();throw;}
+  }
+
+  size_t search_cached(size_t first,unsigned sides,std::span<Hit> hits) override {
+    if(first>cached_count_||hits.size()>cached_count_-first||!cached_points_)
+      throw std::logic_error("Invalid cached weight brush range");
+    return dispatch(cached_points_->data+first,cached_hits_->data+first,{},sides,hits);
+  }
+
   size_t search(std::span<const Vec3> points,unsigned sides,std::span<Hit> hits) override {
+    if(points.size()!=hits.size())throw std::logic_error("Invalid weight brush device positions");
+    return dispatch(points_.data,nullptr,points,sides,hits);
+  }
+
+private:
+  size_t dispatch(const Vec3 *positions,float *previous,std::span<const Vec3> upload,
+                  unsigned sides,std::span<Hit> hits) {
     const auto tests=capsules_*(sides==(Direct|Reflected)?2u:1u);
-    if(!tests||points.empty()||points.size()>batch_capacity||points.size()!=hits.size()||
-       points.size()>batch_capsules/tests||!sides||sides>(Direct|Reflected)||
+    if(!tests||hits.empty()||hits.size()>batch_capacity||
+       hits.size()>batch_capsules/tests||!sides||sides>(Direct|Reflected)||
        ((sides&Reflected)&&!mirror_))
       throw std::logic_error("Invalid weight brush device batch");
     uint32_t count=0;
     try{
-      api_.upload(points_.data,points.data(),points.size_bytes());
+      if(!upload.empty())api_.upload(points_.data,upload.data(),upload.size_bytes());
       api_.reset(count_.data);
-      api_.brush({direct_.data,reflected_.data,capsules_,sides},points_.data,points.size(),hits_.data,count_.data);
+      api_.brush({direct_.data,reflected_.data,capsules_,sides},positions,previous,hits.size(),
+                 hits_.data,count_.data);
       api_.read(&count,count_.data,sizeof(count));
-      if(count>points.size())throw std::logic_error("Weight brush device returned an invalid hit count");
+      if(count>hits.size())throw std::logic_error("Weight brush device returned an invalid hit count");
       if(count)api_.read(hits.data(),hits_.data,size_t(count)*sizeof(Hit));
     }catch(...){api_.drain();throw;}
     std::ranges::sort(hits.first(count),{},&Hit::vertex);

@@ -25,11 +25,11 @@ struct Counter {
 #endif
   }
 };
-__global__ void weight_brush_hits(weight_brush::Stroke stroke,const Vec3 *points,size_t count,
+__global__ void weight_brush_hits(weight_brush::Stroke stroke,const Vec3 *points,float *previous,size_t count,
     weight_brush::Hit *hits,uint32_t *size){
   const size_t i=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
   if(i>=count)return;
-  const auto alpha=weight_brush::strongest(stroke,points[i]);
+  const auto alpha=weight_brush::changed_falloff(stroke,points[i],previous?previous+i:nullptr);
   if(alpha!=0)hits[atomicAdd(size,1)]={uint32_t(i),alpha};
 }
 __global__ void closest_triangles(SurfaceView view,const Vec3 *points,float radius,Hit *hits,size_t count,
@@ -72,7 +72,17 @@ public:
   ~GpuApi(){(void)DOME_GPU(StreamDestroy)(stream_);}
   void *allocate(size_t bytes){
     void *pointer=nullptr;
-    checked(DOME_GPU(Malloc)(&pointer,bytes));
+    const auto status=DOME_GPU(Malloc)(&pointer,bytes);
+#if defined(__HIPCC__)
+    const bool insufficient=status==hipErrorOutOfMemory;
+#else
+    const bool insufficient=status==cudaErrorMemoryAllocation;
+#endif
+    if(insufficient){
+      (void)DOME_GPU(GetLastError)();
+      throw std::bad_alloc();
+    }
+    checked(status);
     return pointer;
   }
   void release(void *pointer) noexcept {(void)DOME_GPU(Free)(pointer);}
@@ -86,10 +96,13 @@ public:
     wait();
   }
   void reset(uint32_t *value){checked(DOME_GPU(MemsetAsync)(value,0,sizeof(*value),stream_));}
-  void brush(weight_brush::Stroke stroke,const Vec3 *points,size_t count,
+  void clear_brush(float *values,size_t count){
+    checked(DOME_GPU(MemsetAsync)(values,0,count*sizeof(float),stream_));
+  }
+  void brush(weight_brush::Stroke stroke,const Vec3 *points,float *previous,size_t count,
       weight_brush::Hit *hits,uint32_t *size){
     constexpr unsigned lanes=128;
-    weight_brush_hits<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(stroke,points,count,hits,size);
+    weight_brush_hits<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(stroke,points,previous,count,hits,size);
     checked(DOME_GPU(GetLastError)());
   }
   void launch(SurfaceView view,const Vec3 *points,float radius,Hit *hits,size_t count,

@@ -11,9 +11,14 @@ protected:
   },sycl::property_list{sycl::property::queue::in_order{}}};
 public:
   void *allocate(size_t bytes){
-    auto *pointer=sycl::malloc_device(bytes,queue_);
-    if(!pointer)throw std::bad_alloc();
-    return pointer;
+    try{
+      auto *pointer=sycl::malloc_device(bytes,queue_);
+      if(!pointer)throw std::bad_alloc();
+      return pointer;
+    }catch(const sycl::exception &error){
+      if(error.code()==sycl::make_error_code(sycl::errc::memory_allocation))throw std::bad_alloc();
+      throw;
+    }
   }
   void release(void *pointer) noexcept {try{sycl::free(pointer,queue_);}catch(...){}}
   void wait(){queue_.wait_and_throw();}
