@@ -1,0 +1,146 @@
+{
+  "date": "2026-11-28",
+  "product": "1b418bc999855fb1d9df7658e8a8288ec6af973f",
+  "preceding": "411bfb73615a03564cb9a452475676f02f0f53f4",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Retopology Apply and reapply filter editable paint channels on the selected GPU. The resident sampler consumes the three actual source barycentrics. Bounded GPU staging is used for fields that cannot stay resident in the working budget. Bake sampling and retained normal frame transport are separate operations.",
+  "oneapi_arc_release": {
+    "application_sha256": "71feeba4494b284a2b03df0ef7504a368230620e16261535f9e00161c3c2cd2c",
+    "fltk_prefix": "/opt/fltk-vr/toolkit",
+    "bitmap_runtime_prefix": "/opt/fltk-vr/bdf-runtime",
+    "ctest_passed": 52,
+    "ctest_cases": [
+      "application-missing-gpu",
+      "bake",
+      "bake-recipes",
+      "emission-raster-finite-compute",
+      "emission-raster-mapped-compute",
+      "emission-raster-mapped-missing-gpu",
+      "emission-raster-texture-set-compute",
+      "mesh-processing",
+      "retopo",
+      "retopo-cancellation-boundaries",
+      "retopo-edges",
+      "retopology-affine",
+      "retopology-affine-openxr",
+      "retopology-affine-ui-fixture",
+      "retopology-authoring",
+      "retopology-first-material-affine",
+      "retopology-first-material-plain",
+      "retopology-first-material-posed-affine",
+      "retopology-first-material-posed-plain",
+      "retopology-held-admission",
+      "retopology-history-openxr-apply",
+      "retopology-history-openxr-cancel",
+      "retopology-imported-bake-resize",
+      "retopology-imported-mtoon-mixed-hdr",
+      "retopology-imported-mtoon-mixed-ldr",
+      "retopology-imported-mtoon-painted",
+      "retopology-imported-mtoon-resize",
+      "retopology-imported-mtoon-tinted",
+      "retopology-imported-mtoon-unprepared",
+      "retopology-imported-pbr",
+      "retopology-imported-prior-bake",
+      "retopology-mixed-material",
+      "retopology-prepared-color-affine",
+      "retopology-prepared-color-normal-affine",
+      "retopology-prepared-color-normal-first",
+      "retopology-prepared-color-normal-plain",
+      "retopology-prepared-color-normal-uv-affine",
+      "retopology-prepared-color-normal-uv-plain",
+      "retopology-prepared-color-plain",
+      "retopology-prepared-detached-affine",
+      "retopology-reapply-affine",
+      "retopology-reapply-plain",
+      "retopology-save-handoff",
+      "retopology-surface-heat-affine",
+      "retopology-surface-heat-plain",
+      "retopology-worker-accepted-publication",
+      "retopology-worker-faults",
+      "retopology-worker-reporter-recovery",
+      "surface-query-oblique",
+      "texture-set-retained-retopology-affine",
+      "texture-set-retained-retopology-plain",
+      "weight-transfer-batch"
+    ],
+    "ctest_log_sha256": "fd06a31748f4e9ce0be890220221052c567ea621fbf8a9d99c62201250a218b6",
+    "oracle_resident_retopology_probes": 3900,
+    "oracle_trace_sha256": "9acb152dd8d6b80b8db7f60a1597ccefaa0afa032db490f9fe78f8afd5efc81e",
+    "bounded_layer_checks": 3,
+    "bounded_layer_trace_sha256": "30cae1cdd725cec1d58a7283b9c3fd47985ebd87ac2ed7e8ff4d40d68f4d5557",
+    "bounded_layer_scope": "A real reduced transfer budget exercises staged GPU filtering. The regular budget uses the resident sampler. The guide retains its original bytes and both outputs agree.",
+    "bit_identical_archives_to_preceding": {
+      "retopology-affine/0-posed.dsculpt": "988355c6c6dcbf4573a9b48779cd791766d62296002c210061c1d02e99b743d9",
+      "retopology-affine/0-rest.dsculpt": "426af1d247cb474bc11582f50366a6ab0f9d9210dfd35b7b44f1f500bdfa8563",
+      "retopology-affine/1-posed.dsculpt": "385c79543401aec6b68cd1c7ee4126f5cf79f5ac899d203bd9c4406e52308771",
+      "retopology-affine/1-rest.dsculpt": "83b00f0d2405f6c12997e2f2bbe151c7c71f08488f8e82c07759f2aae1a4d2b3",
+      "retopology-affine/2-posed.dsculpt": "bd3997afcfd34c9a3ce839416ee7d1b499d18cf0ffb9bf757c9c010950bfdbb6",
+      "retopology-affine/2-rest.dsculpt": "2c3cac1c7ebfd2b3015b3480ca6ddf58181eb65d54e43a96b6bd79cf5ca3ba1b",
+      "retopology-affine/3-posed.dsculpt": "c135a29975d4287f374009586823d236f809454351124698e156850ba4db7c86",
+      "retopology-affine/3-rest.dsculpt": "8d8755586829067b9445439fa9faada8a580ee51851db2e96d8cfc4006a7ea3d",
+      "retopology-affine/first-native-input.dsculpt": "98122714c96a8dc369d89f8e46deee9dedceb84c1421d6ee0f9115a80187e4b3",
+      "retopology-affine/first-native-material.dsculpt": "f6742867c7b203eca1f73c87513007d351e0f0f56de42b66656f0b657a2c7acf",
+      "retopology-affine/reflected-posed-baked.dsculpt": "0afd286277a7c987159082d5c8c0f606d4bb1ff6653896a01af833807291abfd",
+      "retopology-reapply-affine/before-bind.dsculpt": "2295e66832ff6077701b548bb8af5c2001da207b418329b0b5d07da99b160583",
+      "retopology-reapply-affine/before-reapply.dsculpt": "8ff60d00c6f8a1c00737741c79858f8a5af1f31af3e467fc10b30aeda3949639",
+      "retopology-reapply-affine/patch.dsculpt": "83d3e6d891b2307add0c04f604121140a2b095ce78c3cbb7756f77a49982ee84",
+      "retopology-reapply-affine/reapplied.dsculpt": "006202ab7a79672f9e31a6b7fe28d78486dd98b6ba52e418205713e3cbaa2e4d",
+      "retopology-reapply-affine/reapplied.glb": "95e7acb4305155a8efd2d07b88d2eea5863c879980a843b1598b4d25c3f1c900",
+      "stress-replay/first-native-input.dsculpt": "1b8c90a469c3a1f6ec6b64bbda6d1fb97ae8ff2616b3fad59d06f5e311d7baa6",
+      "stress-replay/first-native-material.dsculpt": "1fbafeb0c630be391128c7c74ecc9ce9afa816857e94489b9eb488c035e55424"
+    },
+    "1024_atlas_checks": 10,
+    "1024_atlas_log_sha256": "5d00d1de6c3319c5525c369b8166a6ac1272853cc2de7597545c7812f72cbd82",
+    "1024_atlas_fixture_seconds": 30.83,
+    "1024_atlas_timing_scope": "One isolated end-to-end run including source preparation, Bake, Apply, file I/O, rejection and Clear Bake. No paired performance claim.",
+    "wayland": {
+      "checks_passed": 10,
+      "renderer": "Zink Vulkan on Intel Arc A770",
+      "report_sha256": "6811b7e50dc8c6e104385da6fdf566dfe56a57c88bcfc0cf7947a0cd86b85bec",
+      "trace_sha256": "d2c59dd37763df1cb1dcdb81deb229664d4ac7e977ae2f543d5a8924e1eb2c89",
+      "project_sha256": "1d1d39ea9e02ad45aff01b9c4dae7ad7e8dbaa28712dc90cf023258334471738",
+      "standard_glb_sha256": "5143b31b057be81f85acc542dd94742d18ead901084d1371301f24e666dec9e2",
+      "validator_version": "2.0.0-dev.3.10",
+      "validator_errors": 0,
+      "validator_warnings": 0,
+      "validator_report_sha256": "f576e914fd5e2bc477cc141b529d42a9eba4a474dd551070b8d5f2fead7d9536"
+    },
+    "synthetic_openxr": {
+      "checks_passed": 33,
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "report_sha256": "71c3790a457ecc20e40c329175e3fa488f8970c6aeb712bfb11fd0324e40520c",
+      "trace_sha256": {
+        "accept": "a70b4483152874b8d8610326c5f240d0ee8c15bb39caf7fb136d1abe6a6abfd3",
+        "focus": "16ba5b89023035b75c1789dd20d6773def8cdef94bb493c227e0de61d9940c0e"
+      }
+    }
+  },
+  "headless_reference": {
+    "cases_passed": [
+      "retopology-affine",
+      "retopology-imported-mtoon-painted",
+      "retopology-imported-pbr"
+    ],
+    "log_sha256": "39fb7f38d96351be268b2483bc4a8717ad13c109e1911ff61c8b0daef21f36d4"
+  },
+  "sanitizers": {
+    "scope": "ASan and UBSan on native paint, the host emission raster setup and the owning affine fixture, linked to the Release oneAPI Arc kernels. Leak detection was disabled.",
+    "assertions_passed": 429,
+    "log_sha256": "db49859f13d8110a953a21ed990b59e1518698033bebb8ba6f290f3a37212314"
+  },
+  "cuda_and_rocm": {
+    "cuda": {
+      "scope": "Device and host sampling/authoring units compiled. Hardware execution unavailable.",
+      "log_sha256": "f0cac44a3081bf1fe014f0ad48a743db7139b23d0f23009902afd2fa5b12b870"
+    },
+    "rocm": {
+      "scope": "Device and host sampling/authoring units compiled. Hardware execution unavailable.",
+      "log_sha256": "adee6de32b634c220769815ae099b05b766cbf9dd4dec66d3bbb53efa56164aa"
+    }
+  },
+  "open_work": [
+    "GPU filtering of Bake maps and retained authored normal fields",
+    "First transfer of posed prepared native normal fields",
+    "Physical headset and positive AMD/NVIDIA hardware acceptance"
+  ]
+}

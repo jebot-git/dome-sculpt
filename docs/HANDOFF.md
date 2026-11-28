@@ -308,10 +308,17 @@ uploads the immutable source BVH and facing normals once per transfer.
 The device checks material membership and orientation and preserves the
 existing affine radius, tie rules and clipped-triangle barycentrics.
 Intel Arc supports the same arithmetic on hardware without native FP64.
-Layer sampling and the first transfer of posed prepared normal fields still
-require work. Physical headset acceptance and AMD and NVIDIA execution
-remain open.
 [GPU Retopology Apply evidence](validation/retopo-apply-gpu-20261128.json)
+
+Apply and reapply also sample editable paint layers on the selected GPU.
+The resident path uses the matched triangle's three independently rounded
+weights and the original grid's padding ownership. A bounded GPU batch
+handles layers that exceed the available resident memory. Both paths
+preserve coverage, hidden masks, prepared PBR color and FLOAT emission.
+The worker seals the returned pixels into editable tiles before publication.
+Bake sampling, first transfer of posed prepared normal fields, physical
+headset acceptance, and AMD and NVIDIA execution remain open.
+[GPU Retopology layer sampling evidence](validation/retopo-layer-gpu-20261128.json)
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
