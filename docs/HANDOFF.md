@@ -17,6 +17,9 @@ selected compute backend. ONEAPI is the default. CUDA and ROCm remain
 explicit build choices. Desktop and OpenXR refuse software OpenGL or missing
 compute hardware. Command-line export also requires the selected compute GPU.
 CPU numerical and sanitizer references build as opt-in headless tests.
+The `7dd412a1` policy recheck refused all five CPU configurations outside that
+test mode. Without a compute device, command-line export preserved an existing
+GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.
 The frozen pre-policy `a2646a28` Release sweep completed with all 1,438 tests
 passing. Its software application results apply to that older revision.
 

@@ -1,4 +1,17 @@
-# Current sculpt masks/symmetry —20c132d
+# Production GPU requirements
+
+ONEAPI is the default CMake backend. CUDA and ROCM are explicit alternatives.
+Desktop and OpenXR authoring require both hardware OpenGL and a working GPU for
+the selected compute backend. Command-line export requires the selected compute
+GPU. Startup refuses a missing device or software OpenGL where graphics is
+required. CPU builds require the explicit headless reference-test configuration
+documented in the [README](../README.md).
+
+The [current handoff](HANDOFF.md) tracks the latest hardware results and the
+remaining work. The evidence below preserves the source and scope of the
+earlier compute milestones.
+
+## Historical sculpt masks and symmetry validation — `20c132d`
 
 The complete ONEAPI FLTK/OpenXR application builds with the pinned DPC++7.2
 SDK and canonical FLTK282467e. Current actual Arc A770 native12/12 pass6.15s;
@@ -6,7 +19,7 @@ the full real-loader syntheticXR140/140 passes with real Arc brush compute and
 software EGL. Numeric proof includes184 independent endpoints,224 CPU-reference
 batches/445088 samples, maxerror8.9407e-08,2000007-sample chunking/concurrent
 queues and explicit missing-GPU failure retaining host inputs. Logs:
-artifacts/tests-sculpt-integrated-oneapi-{native,xr}.log. CPU remains default.
+artifacts/tests-sculpt-integrated-oneapi-{native,xr}.log.
 
 Sample now has24bytes (including protection influence); upload24 +distance-only
 readback4 transports28bytes per sample, compared with48 for full Sample return.
@@ -20,12 +33,10 @@ CUDA SDK/device execution is unavailable. Full production objective stays active
 Earlier evidence below retains its exact source/layout scope. In particular,
 40-to24byte transport described the preceding20byte Sample, not the new layout.
 
-# Compute backend selection and current evidence
+## Earlier compute backend selection and evidence
 
-CPU, ONEAPI, ROCM and CUDA are explicit CMake choices. ONEAPI configuration
-compiles and links a real SYCL queue/kernel, rather than merely testing whether
-the compiler accepts `-fsycl`. A requested GPU backend never silently selects
-the CPU implementation when the SDK or device is unavailable.
+ONEAPI configuration compiles and links a real SYCL queue and kernel. The
+selected GPU backend reports failure when its SDK or device is unavailable.
 
 ## Intel Arc execution
 
@@ -112,7 +123,7 @@ unchanged fields and cancellation down to10-micrometre voxels. The existing
 mesher linked to the frozen CPU core (tests-mesh-scale-core.log /
 tests-mesh-scale-cpu.log).
 
-## Scope still requiring work
+## Scope of the historical validation
 
 This proves the production brush path and affected native model workflows on
 the Arc. Sparse sample gathering/layer merging and most geometry, paint, bake
@@ -124,4 +135,4 @@ HIP7.1 compiles the existing kernel for explicit gfx1030, but the current host
 has no AMD GPU/ROCK device. CUDA hardware/toolchain execution is unverified.
 Compile-only HIP evidence and unavailable CUDA hardware do not complete those
 backend requirements. See artifacts/accelerator-inventory.log and
-hip-compile-inventory.log. CPU configuration remains the default.
+hip-compile-inventory.log.
