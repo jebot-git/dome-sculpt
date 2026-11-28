@@ -1,28 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#include <cstdlib>
-#include <new>
-namespace allocation {
-thread_local long remaining = -1;
-thread_local bool count = false;
-thread_local size_t calls = 0;
-} // namespace allocation
-void *operator new(size_t n) {
-  if (allocation::count)
-    ++allocation::calls;
-  if (allocation::remaining >= 0 && allocation::remaining-- == 0) {
-    allocation::remaining = 0;
-    throw std::bad_alloc();
-  }
-  if (auto p = std::malloc(n ? n : 1))
-    return p;
-  throw std::bad_alloc();
-}
-void *operator new[](size_t n) { return ::operator new(n); }
-void operator delete(void *p) noexcept { std::free(p); }
-void operator delete[](void *p) noexcept { std::free(p); }
-void operator delete(void *p, size_t) noexcept { std::free(p); }
-void operator delete[](void *p, size_t) noexcept { std::free(p); }
+#include "mirror-host-allocation-fault.hpp"
+namespace allocation=mirror_failure;
 #include "key-mirror-refinement.hpp"
+#include "dome/document.hpp"
+#include <nlohmann/json.hpp>
 #include <cmath>
 #include <iostream>
 using namespace dome;
@@ -96,9 +77,116 @@ double sampled(const MirrorSurfacePoint &p) {
     sum += z[p.triangle * 3 + k] * p.barycentric[k];
   return sum;
 }
+
+Scene native_fixture(){
+  Scene scene;
+  const auto id=scene.active().id;
+  auto mesh=*square();
+  mesh.uv_pins={1,0,0,0};
+  mesh.uv_seams={1,0,0,0,0,0};
+  auto &object=scene.active();
+  object.mesh_active=true;
+  object.painted=std::make_shared<PaintedMesh>(mesh,64);
+  Brush brush;brush.from=brush.to={-.12f,-.03f,0};brush.normal={0,0,1};brush.radius=.24f;
+  PaintSettings ink;ink.color={.12f,.6f,.35f,.8f};
+  object.painted->begin_stroke();object.painted->stamp(brush,ink);object.painted->end_stroke();
+  object.painted->add_layer("Hidden original");
+  brush.from=brush.to={.22f,.07f,0};ink.color={.8f,.15f,.1f,1};
+  object.painted->begin_stroke();object.painted->stamp(brush,ink);object.painted->end_stroke();
+  object.painted->layer_properties("Hidden original",false,.4f);
+  ShapeKeyEdit edit;edit.name="Asymmetric fold";
+  author_shapekey(scene,id,edit);
+  edit.action=ShapeKeyAction::Replace;edit.positions=mesh.positions;
+  for(auto &p:edit.positions)p.z=float(field(p.x,p.y));
+  author_shapekey(scene,id,edit);
+  auto deformation=*scene.active().deformation;deformation.morph_weights={.25f};
+  scene.set_deformation(id,std::move(deformation));
+  return scene;
+}
+
+void check_authored(const Scene &before,const Scene &after){
+  const auto &a=before.active(),&b=after.active();
+  const auto &m=b.painted->mesh();
+  const auto &keys=b.deformation->morphs->targets;
+  check(m.indices.size()>a.painted->mesh().indices.size()&&keys.size()==2&&
+        b.deformation->morph_weights==std::vector<float>({.25f,0}),
+        "Native Mirror explicitly refines the topology and carries both key weights");
+  bool interpolated=false;
+  for(size_t v=0;v<m.positions.size();++v){
+    const auto p=m.positions[v];
+    if(std::abs(keys[0].delta[v].z-field(p.x,p.y))>1e-7||std::abs(keys[1].delta[v].z-field(-p.x,p.y))>1e-7)
+      throw std::runtime_error("Authored native key disagrees with the independent continuous-field oracle");
+    interpolated|=std::abs(p.x)<.49f&&std::abs(p.y)<.49f;
+  }
+  check(interpolated,"Prior and mirrored keys preserve their physical fields at new interior vertices");
+  check(a.painted->encode()["layers"]==b.painted->encode()["layers"]&&
+        a.painted->preview(a.material)->color.rgba==b.painted->preview(b.material)->color.rgba,
+        "Every hidden and visible paint layer and the composited UV pixels survive refinement");
+  check(std::any_of(m.uv_pins.begin(),m.uv_pins.end(),[](auto pin){return pin;})&&
+        std::any_of(m.uv_seams.begin(),m.uv_seams.end(),[](auto seam){return seam;}),
+        "Explicit original UV pins and seams carry into the refined surface");
+  auto restored=after;
+  ShapeKeyEdit restore;restore.action=ShapeKeyAction::Restore;
+  author_shapekey(restored,b.id,restore);
+  check(restored.encode()==before.encode(),"Restore recovers the exact pre-refinement mesh, frame data and layers");
+}
+
+void workflow(const std::filesystem::path &out){
+  std::filesystem::create_directories(out);
+  const auto source=native_fixture();
+  auto direct=source;
+  ShapeKeyEdit edit;edit.action=ShapeKeyAction::Mirror;edit.mirror_frames=ShapeKeyMirrorFrames::RefinedSurface;
+  edit.name="Reflected fold";
+  const auto id=source.active().id;
+  auto skinned=source;
+  auto rig=*skinned.active().deformation;
+  rig.skeleton=Skeleton{{{"root",-1,{},1}}};
+  rig.skin=SkinWeights{};rig.skin->vertices.assign(4,{{0,1}});
+  skinned.set_deformation(id,std::move(rig));
+  const auto before_skin=skinned.encode();
+  check(refuses([&]{author_shapekey(skinned,id,edit);},"unskinned")&&skinned.encode()==before_skin,
+        "A skinned source is refused with its exact mesh, paint and binding intact");
+  size_t polls=0;
+  check(refuses([&]{author_shapekey(direct,id,edit,[&]{return ++polls>15;});},"cancelled")&&
+        direct.encode()==source.encode(),"Cancelled refinement publishes no part of the detached topology");
+  author_shapekey(direct,id,edit);
+  check_authored(source,direct);
+  Document document;document.replace(source);
+  document.author_shape(edit);
+  const auto file=out/"refined-mirror.dsculpt";
+  document.save_async(file).get();
+  check(document.wait_asset()&&document.wait_mesh()&&document.frame().state->error.empty(),
+        "The ordered native worker publishes its refined mesh and Save");
+  check(Scene::load(file).encode()==direct.encode()&&document.undo()&&document.copy_scene().encode()==source.encode()&&
+        document.redo()&&document.copy_scene().encode()==direct.encode(),
+        "Refined Mirror saves and reopens exactly and is one complete Undo/Redo step");
+  auto reopened=Scene::load(file);
+  ShapeKeyEdit replace;replace.action=ShapeKeyAction::Replace;replace.target=1;
+  replace.positions=reopened.active().painted->mesh().positions;
+  const auto &mirrored=reopened.active().deformation->morphs->targets[1].delta;
+  for(size_t v=0;v<replace.positions.size();++v)replace.positions[v]+=mirrored[v];
+  replace.positions[0].z+=.005f;
+  check(author_shapekey(reopened,id,replace).changed&&Scene::decode(reopened.encode()).encode()==reopened.encode(),
+        "The saved refined key remains editable and its later endpoint reopens exactly");
+  source.save(out/"source.dsculpt");
+}
 } // namespace
-int main() try {
+int main(int argc,char **argv) try {
   const auto source = square();
+  if(argc==3&&std::string_view(argv[1])=="--ui-fixture"){native_fixture().save(argv[2]);return 0;}
+  if(argc==3&&std::string_view(argv[1])=="--xr-fixture"){
+    auto scene=native_fixture();scene.active().transform.position={0,1.3f,-1.1f};scene.save(argv[2]);return 0;
+  }
+  if(argc==3&&std::string_view(argv[1])=="--authoring"){workflow(argv[2]);return 0;}
+  if(argc==4&&std::string_view(argv[1])=="--verify-ui"){
+    check_authored(Scene::load(argv[2]),Scene::load(argv[3]));return 0;
+  }
+  if(argc==2&&std::string_view(argv[1])=="--require-device"){
+    try{refine_reflected_key(source,1e-6f);}
+    catch(const std::exception &error){std::cout<<error.what()<<'\n';return 0;}
+    throw std::runtime_error("Mirror refinement accepted an unavailable GPU");
+  }
+  if(argc!=1)return 2;
   const auto positions = source->positions;
   const auto indices = source->indices;
   check(refuses([&] { reflected_key_correspondence(*source, 1e-6f); }, "triangle refinement"),
@@ -323,7 +411,32 @@ int main() try {
   check(same(result, refine_reflected_key(source, 1e-6f)),
         "All persistent allocation denials leave an exact deterministic retry and original source");
   std::cout << "ALLOCATION_PREFIXES " << calls << " POLLS " << polls << " WORK_UNITS "
-            << result.work_units << "\nPASS " << checks << " detached common-refinement checks\n";
+            << result.work_units << '\n';
+
+  auto broad=std::make_shared<Mesh>();
+  constexpr size_t squares=5000;
+  broad->positions.reserve(squares*4);
+  broad->indices.reserve(squares*6);
+  for(size_t i=0;i<squares;++i){
+    const auto start=uint32_t(broad->positions.size());
+    for(auto p:positions)broad->positions.push_back({p.x,p.y+float(i)*2,p.z});
+    for(auto v:indices)broad->indices.push_back(start+v);
+  }
+  broad->normals.assign(broad->positions.size(),{0,0,1});
+  const auto scaled=refine_reflected_key(broad,.002f);
+  bool exact=scaled.corners.size()==squares*result.corners.size();
+  for(size_t i=0;i<scaled.corners.size()&&exact;++i){
+    const auto &c=scaled.corners[i];
+    const auto &expected=result.corners[i%result.corners.size()];
+    const auto square_index=i/result.corners.size();
+    exact=c.current.triangle==square_index*2+expected.current.triangle&&
+      c.reflected.triangle==square_index*2+expected.reflected.triangle&&
+      c.current.barycentric==expected.current.barycentric&&c.reflected.barycentric==expected.reflected.barycentric&&
+      scaled.opposite[i]==square_index*result.corners.size()+result.opposite[i%result.corners.size()];
+  }
+  check(exact&&scaled.work_units<3'000'000,"10,000 triangles pass the old pair-count limit and match every ordered corner and barycentric oracle");
+  std::cout<<"INDEXED_REFINEMENT "<<broad->indices.size()/3<<" input triangles "<<scaled.corners.size()/3
+           <<" output triangles "<<scaled.work_units<<" work units\nPASS "<<checks<<" detached common-refinement checks\n";
   return 0;
 } catch (const std::exception &e) {
   allocation::remaining = -1;

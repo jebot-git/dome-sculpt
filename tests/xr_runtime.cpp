@@ -82,7 +82,7 @@ int cage_sector(){
   return -1;
 }
 std::string mirror_mode(){auto p=getenv("DOME_XR_FIXTURE_MIRROR");return p?p:"";}
-int mirror_method(){auto p=getenv("DOME_XR_FIXTURE_MIRROR_METHOD");return p?std::clamp(std::atoi(p),0,2):0;}
+int mirror_method(){auto p=getenv("DOME_XR_FIXTURE_MIRROR_METHOD");return p?std::clamp(std::atoi(p),0,3):0;}
 bool mirror_click(){return frame==8||frame==14||frame==20||frame==26||frame==32;}
 int mirror_sector(){if(frame>=12&&frame<=14)return 8;if(frame>=18&&frame<=20)return 9;if(frame>=24&&frame<=26)return 7;if(frame>=30&&frame<=32)return 3;return -1;}
 std::string corner_uv_mode(){auto mode=getenv("DOME_XR_FIXTURE_CORNER_UV");return mode?mode:"";}
@@ -1553,8 +1553,9 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   if(!mirror_mode().empty()){
     p->pose.orientation={0,0,0,1};p->pose.position=s->action?XrVector3f{right(s->hand)?0.f:-.3f,1.48f,-.5f}:XrVector3f{0,1.6f,0};
     if(s->action&&right(s->hand)&&frame>=38){
-      float x=100+420*(mirror_method()*.5f),y=240;
-      if(frame>=48){x=100+420*float(.5+.5*std::log1p(70.)/std::log1p(1e9));y=320;}
+      const bool refined=mirror_method()==3;
+      float x=100+420*(refined?.75f:mirror_method()*.5f),y=240;
+      if(frame>=48){x=100+420*(refined?.5f:float(.5+.5*std::log1p(70.)/std::log1p(1e9)));y=320;}
       if(frame>=58){x=240;y=400;}
       if(frame>=76){x=mirror_mode()=="cancel"?170:470;y=609;}
       p->pose.position={(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.43f};

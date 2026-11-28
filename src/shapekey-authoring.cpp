@@ -13,6 +13,7 @@
 #include "shapekey-normal-preparation.hpp"
 #include "shapekey-source-uv.hpp"
 #include "shapekey-attributes.hpp"
+#include "shapekey-refinement.hpp"
 #include "normal-key-derivation.hpp"
 #include "native-paint-frame-source.hpp"
 #include "key-mirror-correspondence.hpp"
@@ -122,7 +123,7 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
  }
  if(source.texture_sets&&!detail::texture_set_shape_editable(source))
   throw std::invalid_argument("Shapekeys on retained texture sets require their original material frames");
- if(edit.action==ShapeKeyAction::Mirror&&(!std::isfinite(edit.mirror_plane)||std::abs(edit.mirror_plane)>1e6||size_t(edit.mirror_frames)>2))throw std::invalid_argument("Invalid explicit Mirror plane or frame interpretation");
+ if(edit.action==ShapeKeyAction::Mirror&&(!std::isfinite(edit.mirror_plane)||std::abs(edit.mirror_plane)>1e6||size_t(edit.mirror_frames)>size_t(ShapeKeyMirrorFrames::RefinedSurface)))throw std::invalid_argument("Invalid explicit Mirror plane or frame interpretation");
  const auto &rest=source.painted->mesh();rest.validate();
  const MorphSet empty(rest);const auto &keys=source.deformation&&source.deformation->morphs?*source.deformation->morphs:empty;
  const size_t count=keys.targets.size();
@@ -135,6 +136,8 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
  const size_t slot=replace?edit.target:count;
  if(!replace && count>=128)throw std::length_error("Shapekey target budget exceeded");
  std::string name=edit.action==ShapeKeyAction::Replace?keys.targets[slot].name:key_name(keys,edit.name);
+ if(edit.action==ShapeKeyAction::Mirror&&edit.mirror_frames==ShapeKeyMirrorFrames::RefinedSurface)
+  return detail::author_refined_shapekey(scene,object,edit,std::move(name),cancelled);
  // Capturing a native32 frame is a distinct operation from its historical
  // writable UV basis. Preserve both real owners in a detached paired state.
  if(!source.texture_sets&&source.material_bindings&&source.material_bindings->native_paint_sampling&&!source.material_bindings->native_paint_frames){

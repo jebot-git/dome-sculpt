@@ -8,4 +8,7 @@ namespace dome {
 std::shared_ptr<PaintedMesh>
 polygon_paint_geometry(const PaintedMesh &, Mesh,
                        const PaintSurfaceOptions & = {});
+// Certifies the writable UV footprint and the original face for each texel.
+std::shared_ptr<PaintedMesh> refined_paint_geometry(const PaintedMesh &,Mesh,
+    std::span<const uint32_t> parent_faces,const PaintSurfaceOptions &);
 } // namespace dome

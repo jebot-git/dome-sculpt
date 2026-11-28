@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "key-mirror-refinement.hpp"
+#include "key-mirror-overlap-kernel.hpp"
+#ifdef DOME_KEY_MIRROR_REFERENCE
+#include "surface-ray-kernel.hpp"
+#endif
 #include <algorithm>
+#include <bit>
 #include <cmath>
 #include <limits>
 #include <numeric>
@@ -68,20 +73,16 @@ Polygon clip(Polygon p, const Polygon &bounds) {
   }
   return p;
 }
-struct Bounds {
-  V low, high;
-};
-Bounds bounds(const std::array<V, 3> &v) {
-  Bounds b{v[0], v[0]};
-  for (auto p : v) {
-    b.low = {std::min(b.low.x, p.x), std::min(b.low.y, p.y), std::min(b.low.z, p.z)};
-    b.high = {std::max(b.high.x, p.x), std::max(b.high.y, p.y), std::max(b.high.z, p.z)};
-  }
-  return b;
+using mirror_overlap::Box;
+Box combine(Box a,Box b) {
+  return {{std::min(a.lo.x,b.lo.x),std::min(a.lo.y,b.lo.y),std::min(a.lo.z,b.lo.z)},
+          {std::max(a.hi.x,b.hi.x),std::max(a.hi.y,b.hi.y),std::max(a.hi.z,b.hi.z)}};
 }
-bool overlaps(Bounds a, Bounds b, double t) {
-  return a.low.x <= b.high.x + t && b.low.x <= a.high.x + t && a.low.y <= b.high.y + t &&
-         b.low.y <= a.high.y + t && a.low.z <= b.high.z + t && b.low.z <= a.high.z + t;
+Box bounds(const std::array<V,3> &triangle) {
+  // These are untransformed source coordinates and originate in binary32.
+  const auto point=[](V p){return Vec3{float(p.x),float(p.y),float(p.z)};};
+  const auto a=point(triangle[0]),b=point(triangle[1]),c=point(triangle[2]);
+  return combine(combine({a,a},{b,b}),{c,c});
 }
 struct Budget {
   const KeyMirrorLimits &limits;
@@ -108,6 +109,101 @@ struct Budget {
       throw std::length_error("Mirror refinement reallocation exceeds prospective peak quota");
     charge((capacity - v.capacity()) * sizeof(T));
     v.reserve(capacity);
+  }
+};
+
+class RefinementIndex {
+  Budget &budget_;
+  std::vector<Box> boxes_;
+  std::vector<mirror_overlap::Node> nodes_;
+  std::vector<uint32_t> order_;
+#ifndef DOME_KEY_MIRROR_REFERENCE
+  std::unique_ptr<mirror_overlap::Query> device_;
+#endif
+
+  void build(uint32_t first,uint32_t count){
+    budget_.poll();
+    const auto index=nodes_.size();
+    auto bound=boxes_[order_[first]];
+    uint32_t last=0;
+    for(uint32_t i=first;i<first+count;++i){
+      budget_.poll();
+      bound=combine(bound,boxes_[order_[i]]);
+      last=std::max(last,order_[i]);
+    }
+    constexpr uint32_t leaf_size=8;
+    if(count<=leaf_size){
+      nodes_.push_back({bound,uint32_t(index+1),first,count,last});
+      return;
+    }
+    nodes_.push_back({bound,0,0,0,last});
+    const double x=double(bound.hi.x)-bound.lo.x,y=double(bound.hi.y)-bound.lo.y,z=double(bound.hi.z)-bound.lo.z;
+    const int axis=(z>std::max(x,y))?2:y>x?1:0;
+    auto center=[&](uint32_t triangle){
+      const auto box=boxes_[triangle];
+      return axis==0?double(box.lo.x)+box.hi.x:axis==1?double(box.lo.y)+box.hi.y:double(box.lo.z)+box.hi.z;
+    };
+    const auto left=count/2;
+    std::nth_element(order_.begin()+first,order_.begin()+first+left,order_.begin()+first+count,[&](uint32_t a,uint32_t b){
+      budget_.poll();
+      const auto p=center(a),q=center(b);
+      return p==q?a<b:p<q;
+    });
+    build(first,left);
+    build(first+left,count-left);
+    nodes_[index].escape=uint32_t(nodes_.size());
+  }
+
+public:
+  RefinementIndex(std::vector<Box> boxes,Budget &budget):budget_(budget),boxes_(std::move(boxes)){
+    const auto count=boxes_.size();
+    const auto nodes=2*std::bit_ceil((count+7)/8)-1;
+    budget_.charge(nodes*sizeof(mirror_overlap::Node)+count*sizeof(uint32_t));
+    nodes_.reserve(nodes);
+    order_.resize(count);
+    std::iota(order_.begin(),order_.end(),0);
+    build(0,uint32_t(count));
+#ifndef DOME_KEY_MIRROR_REFERENCE
+    using namespace mirror_overlap;
+    const auto capacity=std::min(count,batch_capacity);
+    budget_.charge(count*(sizeof(Box)+sizeof(uint32_t))+nodes_.size()*sizeof(Node)+sizeof(Status)+
+                   capacity*(sizeof(Progress)+2*visit_quantum*sizeof(Pair)));
+    budget_.poll(0);
+    device_=upload(boxes_,nodes_,order_);
+#endif
+  }
+
+  void gather(uint32_t first,uint32_t count,mirror_overlap::Metric metric,
+              std::vector<mirror_overlap::Pair> &pairs){
+    using namespace mirror_overlap;
+    pairs.clear();
+    const auto append=[&](std::span<const Pair> found){
+      budget_.grow(pairs,pairs.size()+found.size());
+      pairs.insert(pairs.end(),found.begin(),found.end());
+    };
+#ifdef DOME_KEY_MIRROR_REFERENCE
+    const View view{boxes_.data(),nodes_.data(),order_.data(),uint32_t(nodes_.size())};
+    for(uint32_t i=0;i<count;++i){
+      Progress state;
+      uint32_t visited;
+      do{
+        const auto remaining=budget_.limits.max_work-budget_.work;
+        const auto allowance=uint32_t(std::clamp(remaining,size_t(1),size_t(visit_quantum)));
+        visited=visit<surface_ray::NativePrecision>(view,first+i,metric,allowance,state,[&](Pair pair){append({&pair,1});});
+        budget_.poll(visited&~pending);
+      }while(visited&pending);
+    }
+#else
+    const auto used=device_->search(first,count,metric,uint32_t(budget_.limits.max_work-budget_.work),append,budget_.limits.cancelled);
+    budget_.poll(used);
+#endif
+    // The clipping proof uses source-index order independently of BVH layout
+    // or which device work item emitted each overlap first.
+    size_t comparisons=0;
+    std::sort(pairs.begin(),pairs.end(),[&](Pair a,Pair b){
+      if((++comparisons&1023)==0)budget_.poll(0);
+      return a.target==b.target?a.donor<b.donor:a.target<b.target;
+    });
   }
 };
 std::array<V, 3> triangle(const Mesh &m, uint32_t t, bool mirror = false, double offset = 0) {
@@ -186,16 +282,11 @@ KeyMirrorRefinement refine_reflected_key(std::shared_ptr<const Mesh> source, Key
   const size_t count = source->indices.size() / 3;
   if (!count || count > 2'000'000)
     throw std::length_error("Mirror refinement needs bounded actual source triangles");
-  // This first structural kernel uses exhaustive bounded broad-phase pairs.
-  // It chooses no nearest triangle. A production adapter needs a bounded BVH
-  // before admitting inputs whose actual pair count exceeds this work policy.
-  if (count > limits.max_work / count)
-    throw std::length_error("Mirror refinement source pair preflight exceeds bounded work");
   source->validate();
   budget.charge(2 * 8 * sizeof(MirrorRefinementCorner));
-  budget.charge(count * (sizeof(std::vector<Piece>) + sizeof(Bounds)));
+  budget.charge(count * (sizeof(std::vector<Piece>) + sizeof(Box)));
   std::vector<std::vector<Piece>> coverage(count);
-  std::vector<Bounds> boxes;
+  std::vector<Box> boxes;
   boxes.reserve(count);
   for (size_t t = 0; t < count; ++t) {
     budget.poll();
@@ -205,6 +296,10 @@ KeyMirrorRefinement refine_reflected_key(std::shared_ptr<const Mesh> source, Key
       throw std::invalid_argument("Degenerate triangle has no authentic mirror refinement");
     boxes.push_back(bounds(v));
   }
+  RefinementIndex index(std::move(boxes),budget);
+  const mirror_overlap::Metric metric{std::bit_cast<uint64_t>(2*plane.offset),tolerance};
+  std::vector<mirror_overlap::Pair> pairs;
+  size_t next_pair=0;
   KeyMirrorRefinement out;
   out.source = source;
   out.plane_offset = plane.offset;
@@ -248,6 +343,10 @@ KeyMirrorRefinement refine_reflected_key(std::shared_ptr<const Mesh> source, Key
   };
   for (uint32_t t = 0; t < count; ++t) {
     budget.poll();
+    if(t%mirror_overlap::batch_capacity==0){
+      index.gather(t,uint32_t(std::min(count-t,mirror_overlap::batch_capacity)),metric,pairs);
+      next_pair=0;
+    }
     const auto a = triangle(*source, t);
     const auto n = cross(a[1] - a[0], a[2] - a[0]);
     const double nlen = std::sqrt(dot(n, n));
@@ -262,13 +361,9 @@ KeyMirrorRefinement refine_reflected_key(std::shared_ptr<const Mesh> source, Key
     pa.count = 3;
     std::copy(ap.begin(), ap.end(), pa.p.begin());
     pa = positive(pa);
-    for (uint32_t s = t; s < count; ++s) {
+    for (;next_pair<pairs.size()&&pairs[next_pair].target==t;++next_pair) {
       budget.poll();
-      const auto reflected_box =
-          Bounds{reflected({boxes[s].high.x, boxes[s].low.y, boxes[s].low.z}, plane.offset),
-                 reflected({boxes[s].low.x, boxes[s].high.y, boxes[s].high.z}, plane.offset)};
-      if (!overlaps(boxes[t], reflected_box, tolerance))
-        continue;
+      const auto s=pairs[next_pair].donor;
       const auto b = triangle(*source, s, true, plane.offset);
       bool within_plane = true;
       for (auto p : b)

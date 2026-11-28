@@ -7,7 +7,9 @@ enum class ShapeKeyAction { Create, CaptureMix, Duplicate, Mirror, Replace, Rena
 // VertexPositions reflects only the native POSITION displacement field and
 // transports destination artist offsets through its geometric frame change.
 // It does not claim exact reflected artist directions or continuous triangles.
-enum class ShapeKeyMirrorFrames { ExactAuthored, BaseRelative, VertexPositions };
+// RefinedSurface explicitly subdivides the native REST mesh to represent the
+// reflected piecewise-linear POSITION field and captures an immediate Restore.
+enum class ShapeKeyMirrorFrames { ExactAuthored, BaseRelative, VertexPositions, RefinedSurface };
 struct ShapeKeyEdit {
   ShapeKeyAction action=ShapeKeyAction::Create;
   size_t target=0;
@@ -18,8 +20,8 @@ struct ShapeKeyEdit {
   ShapeKeyMirrorFrames mirror_frames=ShapeKeyMirrorFrames::ExactAuthored;
 };
 struct ShapeKeyResult {size_t target=0;bool changed=false;};
-// Detached worker operation. REST topology/UVs, skin, pose, paint and other keys
-// stay exact; a complete immutable pre-authoring source survives save/reopen.
+// Detached worker operation with a complete immutable Restore source. Refined
+// surface Mirror changes REST triangulation and resamples its native fields.
 ShapeKeyResult author_shapekey(Scene &,uint64_t object,const ShapeKeyEdit &,
     const std::function<bool()> &cancelled={});
 } // namespace dome

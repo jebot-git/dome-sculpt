@@ -96,6 +96,7 @@ set_property(SOURCE src/sculpt-resolution.cpp src/sparse-resample-cpu.cpp src/te
 set_source_files_properties(src/mesh-processing.cpp PROPERTIES COMPILE_OPTIONS -ffp-contract=off)
 set_source_files_properties(src/weight-edit.cpp PROPERTIES COMPILE_OPTIONS -ffp-contract=off)
 set_source_files_properties(src/key-mirror-correspondence.cpp PROPERTIES COMPILE_OPTIONS -ffp-contract=off)
+set_source_files_properties(src/key-mirror-refinement.cpp PROPERTIES COMPILE_OPTIONS -ffp-contract=off)
 
 include(GNUInstallDirs)
 find_package(Threads REQUIRED)
@@ -158,6 +159,8 @@ target_compile_options(dome-sculpt-baked-emission PRIVATE -Wall -Wextra -Wpedant
 target_link_libraries(dome-sculpt-core PRIVATE dome-sculpt-baked-emission)
 target_sources(dome-sculpt-core PRIVATE src/emission-bake-source.cpp)
 target_sources(dome-sculpt-core PRIVATE src/key-material-preview.cpp)
+target_sources(dome-sculpt-core PRIVATE src/key-mirror-refinement.cpp)
+target_sources(dome-sculpt-core PRIVATE src/shapekey-refinement.cpp)
 target_sources(dome-sculpt-core PRIVATE src/mtoon-normal-raster.cpp)
 target_sources(dome-sculpt-core PRIVATE src/scene-bake-archive.cpp)
 target_sources(dome-sculpt-core PRIVATE src/creator-vrm.cpp)
@@ -181,7 +184,8 @@ if(DOME_COMPUTE_BACKEND STREQUAL "CPU")
   set_source_files_properties(src/surface-heat-field.cpp PROPERTIES COMPILE_DEFINITIONS DOME_SURFACE_HEAT_REFERENCE=1)
   set_source_files_properties(src/rig.cpp PROPERTIES COMPILE_DEFINITIONS DOME_WEIGHT_TRANSFER_REFERENCE=1)
   set_source_files_properties(src/weight-edit.cpp PROPERTIES COMPILE_DEFINITIONS DOME_WEIGHT_BRUSH_REFERENCE=1)
-  set_source_files_properties(src/key-mirror-correspondence.cpp PROPERTIES COMPILE_DEFINITIONS DOME_KEY_MIRROR_REFERENCE=1)
+  set_source_files_properties(src/key-mirror-correspondence.cpp src/key-mirror-refinement.cpp
+    PROPERTIES COMPILE_DEFINITIONS DOME_KEY_MIRROR_REFERENCE=1)
   set_source_files_properties(src/bake.cpp src/mesh-processing.cpp PROPERTIES COMPILE_DEFINITIONS DOME_BAKE_RAY_REFERENCE=1)
 endif()
 target_sources(dome-sculpt-core PRIVATE src/polygon-authoring.cpp src/polygon-source.cpp src/polygon-color-source.cpp src/polygon-color-archive.cpp src/polygon-scene.cpp src/polygon-conversion.cpp src/document-polygon.cpp)
@@ -4013,12 +4017,20 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
 endif()
 
 if(BUILD_TESTING)
-  # Detached geometry/provenance prototype, intentionally not an authoring API.
-  add_executable(dome-sculpt-key-mirror-refinement-test tests/key-mirror-refinement.cpp src/key-mirror-refinement.cpp)
+  add_executable(dome-sculpt-key-mirror-refinement-test tests/key-mirror-refinement.cpp)
   target_include_directories(dome-sculpt-key-mirror-refinement-test PRIVATE src)
   target_link_libraries(dome-sculpt-key-mirror-refinement-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-key-mirror-refinement-test PRIVATE -Wl,--wrap=_Znwm -Wl,--wrap=_Znam)
   add_test(NAME key-mirror-refinement COMMAND dome-sculpt-key-mirror-refinement-test)
   set_tests_properties(key-mirror-refinement PROPERTIES TIMEOUT 120)
+  add_test(NAME key-mirror-refinement-authoring COMMAND dome-sculpt-key-mirror-refinement-test
+    --authoring "${CMAKE_CURRENT_BINARY_DIR}/key-mirror-refinement-authoring")
+  set_tests_properties(key-mirror-refinement-authoring PROPERTIES TIMEOUT 120)
+  if(NOT DOME_COMPUTE_BACKEND STREQUAL "CPU")
+    add_test(NAME key-mirror-refinement-missing-gpu COMMAND dome-sculpt-key-mirror-refinement-test --require-device)
+    set_tests_properties(key-mirror-refinement-missing-gpu PROPERTIES TIMEOUT 30
+      ENVIRONMENT "ONEAPI_DEVICE_SELECTOR=opencl:cpu;CUDA_VISIBLE_DEVICES=-1;HIP_VISIBLE_DEVICES=-1;ROCR_VISIBLE_DEVICES=-1")
+  endif()
 endif()
 
 if(BUILD_TESTING)
@@ -4184,7 +4196,8 @@ if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/xr-mirror.py
     $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
     $<TARGET_FILE:dome-sculpt-xr-mirror-fixture>
-    ${CMAKE_CURRENT_BINARY_DIR}/shapekey-mirror-xr)
+    ${CMAKE_CURRENT_BINARY_DIR}/shapekey-mirror-xr
+    --refinement-helper $<TARGET_FILE:dome-sculpt-key-mirror-refinement-test>)
   set_tests_properties(shapekey-mirror-openxr PROPERTIES TIMEOUT 600)
 endif()
 

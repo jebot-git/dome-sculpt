@@ -324,7 +324,7 @@ void SpatialPalette::raster(const EditorState &s) {
       else if(c.parameter==VrParameter::ProceduralDepth){char text[64];snprintf(text,sizeof(text),"Depth %.4g world mm",double(value));label=text;}
       else if(c.parameter==VrParameter::SculptMaskMode) label=value<.5f?"Add protection":value<1.5f?"Remove protection":"Smooth protection";
       else if(c.parameter==VrParameter::ShapeMirror){
-        if(row==0){const char *methods[]={"Vertex positions","Exact authored reflection","Relative artist-frame conversion"};label=methods[std::clamp(int(std::lround(value*2)),0,2)];}
+        if(row==0){const char *methods[]={"Vertex positions","Exact authored reflection","Refined surface","Relative artist-frame conversion"};label=methods[detail::mirror_method_index(value)];}
         else {char shown[96];snprintf(shown,sizeof(shown),row==1?"Plane X: %.7g local m":"Match tolerance: %.5g local m",row==1?detail::mirror_plane_metres(value):double(detail::mirror_tolerance_metres(value)));label=shown;}
       }
       else if(c.parameter==VrParameter::TextureResolution)label=std::to_string(64u<<std::clamp(int(std::lround(value)),0,5))+" x "+std::to_string(64u<<std::clamp(int(std::lround(value)),0,5))+" pixels";

@@ -3139,7 +3139,7 @@ void Document::control_event_locked(VrControlEvent event) {
   value = std::clamp(value, c.minimum, c.maximum);
   if (value == c.value[event.component])
     return;
-  if(c.parameter==VrParameter::ShapeMirror&&event.component==0)value=std::round(value*2)/2;
+  if(c.parameter==VrParameter::ShapeMirror&&event.component==0)value=detail::mirror_method_slider(value);
   c.value[event.component] = value;
   auto &o = scene_.object(control_object_);
   auto &before = control_before_->object(control_object_);

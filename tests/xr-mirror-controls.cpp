@@ -31,6 +31,7 @@ void unit(){
  VrControlState c;c.parameter=VrParameter::ShapeMirror;c.components=3;c.value={0,.5f,1.f/3,127};auto e=detail::mirror_control_request(c);check(e.target==127&&e.mirror_plane==0&&e.mirror_tolerance==.0001f&&e.mirror_frames==ShapeKeyMirrorFrames::VertexPositions,"Exact defaults and maximum native target survive normalized control encoding");
  for(double p:{-1e6,-1000.,-.07,-.0001,0.,.0001,.07,1000.,1e6}){const auto t=detail::mirror_plane_slider(p);check(std::abs(detail::mirror_plane_metres(t)-p)<=std::max(1e-9,std::abs(p)*3e-6),"Signed-log slider preserves explicit plane sign, zero and full desktop range");}
  for(int method=0;method<3;++method){c.value[0]=method*.5f;const auto want=method==0?ShapeKeyMirrorFrames::VertexPositions:method==1?ShapeKeyMirrorFrames::ExactAuthored:ShapeKeyMirrorFrames::BaseRelative;check(detail::mirror_control_request(c).mirror_frames==want,"All three explicit methods retain their authentic kernel policy");}
+ c.value[0]=detail::mirror_method_slider(.75f);check(detail::mirror_control_request(c).mirror_frames==ShapeKeyMirrorFrames::RefinedSurface,"The refined surface control selects its explicit topology-changing operation");
  c.value[3]=128;bool refused=false;try{detail::mirror_control_request(c);}catch(const std::invalid_argument&){refused=true;}check(refused,"Control payload cannot mint a target beyond the validated128 target budget");
 }
 }

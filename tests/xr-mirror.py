@@ -7,6 +7,7 @@ signal.pthread_sigmask(signal.SIG_SETMASK,[])
 parser=argparse.ArgumentParser(description=__doc__)
 for name in ('binary','runtime','helper','out'):parser.add_argument(name,type=lambda p:Path(p).resolve())
 parser.add_argument('--hardware',action='store_true',help='Require Intel Arc A770; caller selects PCI device/environment, software fallback refuses')
+parser.add_argument('--refinement-helper',type=lambda p:Path(p).resolve())
 args=parser.parse_args();binary,runtime,helper,out=args.binary,args.runtime,args.helper,args.out
 out.mkdir(parents=True,exist_ok=True);checks=[]
 def check(ok,label):
@@ -17,7 +18,13 @@ with tempfile.TemporaryDirectory(prefix='dome-mirror-xr-') as directory:
  def inspect(p):
   data=subprocess.check_output([str(helper),'--inspect',str(p)],env=env,text=True);return json.loads(next(line.removeprefix('DOME_MIRROR_JSON ') for line in data.splitlines() if line.startswith('DOME_MIRROR_JSON ')))
  original=inspect(source);(out/"source.dsculpt").write_bytes(before_bytes);(out/"source.json").write_text(json.dumps(original,indent=2)+"\n")
- for mode,method in [('accept',0),('accept',1),('accept',2),('cancel',0),('focus',0)]:
+ cases=[(mode,method,source,before_bytes,original) for mode,method in [('accept',0),('accept',1),('accept',2),('cancel',0),('focus',0)]]
+ if args.refinement_helper:
+  refined_source=root/'refined-source.dsculpt'
+  subprocess.run([str(args.refinement_helper),'--xr-fixture',str(refined_source)],env=env,check=True)
+  refined_bytes=refined_source.read_bytes();(out/'refined-source.dsculpt').write_bytes(refined_bytes)
+  cases.append(('accept',3,refined_source,refined_bytes,inspect(refined_source)))
+ for mode,method,source,before_bytes,original in cases:
   stem=mode+'-'+str(method);target=out/(stem+'.dsculpt');report=out/(stem+'.json')
   with (out/(stem+'.log')).open('w') as log:r=subprocess.run([str(binary),'--xr','--open',str(source),'--frames','126','--save',str(target)],env={**env,'DOME_XR_FIXTURE_MIRROR':mode,'DOME_XR_FIXTURE_MIRROR_METHOD':str(method),'DOME_XR_FIXTURE_REPORT':str(report)},stdout=log,stderr=subprocess.STDOUT,timeout=120)
   check(r.returncode==0,stem+': actual native XR client exits and ordered Save finishes');detail=json.loads(report.read_text());after=inspect(target)
@@ -26,7 +33,10 @@ with tempfile.TemporaryDirectory(prefix='dome-mirror-xr-') as directory:
   check(detail.get('acquires',0)>0 and detail.get('acquires')==detail.get('image_waits')==detail.get('releases') and detail.get('left_eye_nonblank',0)>0 and detail.get('right_eye_nonblank',0)>0,stem+': real stereo swapchain ownership is balanced and both eyes are nonblank')
   check(all(detail.get('mirror_images',{}).get('66',{}).get(eye,0)>1000 for eye in ['0','1']),stem+': both actual GL eyes render the settings after real controller row edits')
   check(source.read_bytes()==before_bytes,stem+': original native project bytes remain untouched')
-  if mode=='accept':
+  if mode=='accept' and method==3:
+   verification=subprocess.run([str(args.refinement_helper),'--verify-ui',str(source),str(target)],env=env)
+   check(verification.returncode==0,stem+': controller refinement preserves the continuous mirrored field, paint, UV flags and exact Restore')
+  elif mode=='accept':
    check(len(after['keys'])==3 and after['keys'][:2]==original['keys'],stem+': explicit Mirror adds one real key while keeping both original targets exact')
    delta=after['keys'][2]['delta'];check(max(abs(a-b) for a,b in zip(delta[3],[-.015,0,.04]))<1e-6 and max(abs(x) for x in delta[0])<1e-6,stem+': independent off-centre counterpart oracle verifies REST-position mirroring')
    check(after['channels']==original['channels'] and after['first_source']==original['first_source'],stem+': skin pose material paint placement and ultimately restored first source stay exact')

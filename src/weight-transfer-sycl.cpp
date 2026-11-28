@@ -3,12 +3,14 @@
 #include "weight-transfer-device-query.hpp"
 #include "surface-ray-softfloat.hpp"
 #include "key-mirror-device-query.hpp"
+#include "key-mirror-overlap-device.hpp"
 
 namespace dome::detail::retopo_surface {
 class NearestTriangles;
 }
 
 namespace dome::detail::key_mirror { class MirrorVertices; class MirrorTriangles; }
+namespace dome::detail::mirror_overlap { class ReflectedBounds; }
 
 namespace dome::detail::weight_transfer {
 namespace {
@@ -23,6 +25,23 @@ struct Counter {
 class SyclApi : public SyclSurfaceMemory {
 public:
   void reset(uint32_t *value){queue_.fill(value,uint32_t(0),1);}
+  void mirror_overlaps(mirror_overlap::View view,uint32_t first,uint32_t count,
+      mirror_overlap::Metric metric,uint32_t allowance,mirror_overlap::Progress *progress,
+      mirror_overlap::Pair *pairs,mirror_overlap::Status *status,bool initialize){
+    queue_.fill(status,mirror_overlap::Status{},1);
+    queue_.parallel_for<mirror_overlap::ReflectedBounds>(sycl::range<1>{count},[=](sycl::id<1> id){
+      const auto i=id[0];
+      if(initialize)progress[i]={};
+      using Atomic=sycl::atomic_ref<uint32_t,sycl::memory_order::relaxed,sycl::memory_scope::device,
+          sycl::access::address_space::global_space>;
+      const auto visits=mirror_overlap::visit<surface_ray::SoftPrecision>(
+          view,first+uint32_t(i),metric,allowance,progress[i],[=](mirror_overlap::Pair pair){
+            pairs[Atomic(status->hits).fetch_add(1)]=pair;
+          });
+      if(visits&mirror_overlap::pending)Atomic(status->visits).fetch_or(mirror_overlap::pending);
+      if(visits&~mirror_overlap::pending)Atomic(status->visits).fetch_add(visits&~mirror_overlap::pending);
+    });
+  }
   template<class Data,class State,class Match>
   void mirror_keys(key_mirror::View view,const Vec3 *rest,const Data *data,size_t first,
       const key_mirror::Cell *cells,key_mirror::Metric metric,uint32_t allowance,State *progress,Match *matches,
@@ -74,6 +93,13 @@ public:
 
 std::unique_ptr<Query> upload(const Surface &surface){return std::make_unique<DeviceQuery<SyclApi>>(surface);}
 } // namespace dome::detail::weight_transfer
+
+namespace dome::detail::mirror_overlap {
+std::unique_ptr<Query> upload(std::span<const Box> boxes,std::span<const Node> nodes,
+                             std::span<const uint32_t> order){
+  return std::make_unique<DeviceQuery<weight_transfer::SyclApi>>(boxes,nodes,order);
+}
+}
 
 namespace dome::detail::key_mirror {
 std::unique_ptr<Query<uint32_t>> upload(std::span<const Bin> bins,std::span<const uint32_t> order,

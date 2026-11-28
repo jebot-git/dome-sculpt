@@ -10,6 +10,7 @@
 #include "retopo-material-kernel.hpp"
 #include "surface-ray-kernel.hpp"
 #include "key-mirror-device-query.hpp"
+#include "key-mirror-overlap-device.hpp"
 
 namespace dome::detail::weight_transfer {
 namespace {
@@ -26,6 +27,24 @@ struct Counter {
 #endif
   }
 };
+struct MirrorHits {
+  mirror_overlap::Pair *pairs;
+  Counter counter;
+  __host__ __device__ void operator()(mirror_overlap::Pair pair) const {
+    pairs[counter.add(1)]=pair;
+  }
+};
+__global__ void key_reflected_bounds(mirror_overlap::View view,uint32_t first,uint32_t count,
+    mirror_overlap::Metric metric,uint32_t allowance,mirror_overlap::Progress *progress,
+    mirror_overlap::Pair *pairs,mirror_overlap::Status *status,bool initialize){
+  const uint32_t i=blockIdx.x*blockDim.x+threadIdx.x;
+  if(i>=count)return;
+  if(initialize)progress[i]={};
+  const auto visits=mirror_overlap::visit<surface_ray::NativePrecision>(
+      view,first+i,metric,allowance,progress[i],MirrorHits{pairs,{&status->hits}});
+  if(visits&mirror_overlap::pending)atomicOr(&status->visits,mirror_overlap::pending);
+  if(visits&~mirror_overlap::pending)atomicAdd(&status->visits,visits&~mirror_overlap::pending);
+}
 template<class Data,class State,class Match>
 __global__ void key_mirror_search(key_mirror::View view,const Vec3 *rest,const Data *data,size_t first,
     const key_mirror::Cell *cells,key_mirror::Metric metric,uint32_t allowance,State *progress,Match *matches,
@@ -109,6 +128,15 @@ public:
     wait();
   }
   void reset(uint32_t *value){checked(DOME_GPU(MemsetAsync)(value,0,sizeof(*value),stream_));}
+  void mirror_overlaps(mirror_overlap::View view,uint32_t first,uint32_t count,
+      mirror_overlap::Metric metric,uint32_t allowance,mirror_overlap::Progress *progress,
+      mirror_overlap::Pair *pairs,mirror_overlap::Status *status,bool initialize){
+    constexpr unsigned lanes=128;
+    checked(DOME_GPU(MemsetAsync)(status,0,sizeof(*status),stream_));
+    key_reflected_bounds<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(
+        view,first,count,metric,allowance,progress,pairs,status,initialize);
+    checked(DOME_GPU(GetLastError)());
+  }
   template<class Data,class State,class Match>
   void mirror_keys(key_mirror::View view,const Vec3 *rest,const Data *data,size_t first,
       const key_mirror::Cell *cells,key_mirror::Metric metric,uint32_t allowance,State *progress,Match *matches,
@@ -159,6 +187,13 @@ public:
 
 std::unique_ptr<Query> upload(const Surface &surface){return std::make_unique<DeviceQuery<GpuApi>>(surface);}
 } // namespace dome::detail::weight_transfer
+
+namespace dome::detail::mirror_overlap {
+std::unique_ptr<Query> upload(std::span<const Box> boxes,std::span<const Node> nodes,
+                             std::span<const uint32_t> order){
+  return std::make_unique<DeviceQuery<weight_transfer::GpuApi>>(boxes,nodes,order);
+}
+}
 
 namespace dome::detail::key_mirror {
 std::unique_ptr<Query<uint32_t>> upload(std::span<const Bin> bins,std::span<const uint32_t> order,

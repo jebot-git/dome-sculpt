@@ -20,9 +20,17 @@ inline float mirror_plane_slider(double metres) {
 inline float mirror_tolerance_metres(float slider) {
  return slider==1.f/3.f?.0001f:float(std::pow(10.,-6.+6.*double(slider)));
 }
+inline unsigned mirror_method_index(float slider) {
+ return slider<.25f?0:slider<.625f?1:slider<.875f?2:3;
+}
+inline float mirror_method_slider(float value) {
+ constexpr float positions[]={0,.5f,.75f,1};
+ return positions[mirror_method_index(value)];
+}
 inline ShapeKeyMirrorFrames mirror_control_method(float slider) {
- const ShapeKeyMirrorFrames modes[]={ShapeKeyMirrorFrames::VertexPositions,ShapeKeyMirrorFrames::ExactAuthored,ShapeKeyMirrorFrames::BaseRelative};
- return modes[std::clamp(int(std::lround(slider*2)),0,2)];
+ constexpr ShapeKeyMirrorFrames modes[]={ShapeKeyMirrorFrames::VertexPositions,
+   ShapeKeyMirrorFrames::ExactAuthored,ShapeKeyMirrorFrames::RefinedSurface,ShapeKeyMirrorFrames::BaseRelative};
+ return modes[mirror_method_index(slider)];
 }
 inline ShapeKeyEdit mirror_control_request(const VrControlState &c) {
  if(c.parameter!=VrParameter::ShapeMirror||c.components!=3)throw std::invalid_argument("Mirror controls are unavailable");

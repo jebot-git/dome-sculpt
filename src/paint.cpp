@@ -3126,7 +3126,7 @@ std::shared_ptr<PaintedMesh> adopt_key_source_geometry(const PaintedMesh &paint,
 }
 struct PolygonPaintAccess {
   static std::shared_ptr<PaintedMesh> rebuild(const PaintedMesh &source, Mesh target,
-                                              const PaintSurfaceOptions &options) {
+      const PaintSurfaceOptions &options,std::span<const uint32_t> parent_faces={}) {
     if(source.editing_)throw std::logic_error("Finish the paint stroke before rebuilding polygon geometry");
     if(source.paint_sampling_domain())throw std::logic_error("Polygon topology changes require an explicit retained paint-domain adapter");
     if(source.color_projection_)throw std::logic_error("Polygon topology changes cannot yet preserve this mesh's prepared source colors");
@@ -3134,6 +3134,19 @@ struct PolygonPaintAccess {
     if(source.revision_==UINT64_MAX)throw std::overflow_error("Paint geometry identity exhausted");
     if(options.cancelled&&options.cancelled())throw std::runtime_error("Polygon paint preparation cancelled");
     auto surface=std::make_shared<PaintedMesh::SurfaceMap>(std::move(target),source.resolution(),options);
+    if(!parent_faces.empty()){
+      const auto &before=*source.surface_;
+      if(before.diagnostics.policy!=PaintUvPolicy::Strict||options.policy!=PaintUvPolicy::Strict||
+         parent_faces.size()!=surface->mesh.indices.size()/3||before.texels.size()!=surface->texels.size())
+        throw std::invalid_argument("Mirror refinement requires its exact writable UV domain");
+      for(size_t i=0;i<before.texels.size();++i){
+        if((i&1023)==0&&options.cancelled&&options.cancelled())throw std::runtime_error("Mirror paint refinement cancelled");
+        const auto a=before.texels[i],b=surface->texels[i];
+        if(a.covered()!=b.covered()||(a.covered()&&a.face!=parent_faces[b.face])||
+           before.padding[i]!=surface->padding[i])
+          throw std::invalid_argument("Mirror refinement changes the writable texel or its source face");
+      }
+    }
     auto result=source.snapshot();
     result->surface_=std::move(surface);
     result->composite_cache_=std::make_shared<PaintedMesh::CompositeCache>();
@@ -3145,6 +3158,11 @@ struct PolygonPaintAccess {
 };
 std::shared_ptr<PaintedMesh> polygon_paint_geometry(const PaintedMesh &source,Mesh target,const PaintSurfaceOptions &options) {
   return PolygonPaintAccess::rebuild(source,std::move(target),options);
+}
+std::shared_ptr<PaintedMesh> refined_paint_geometry(const PaintedMesh &source,Mesh target,
+    std::span<const uint32_t> parent_faces,const PaintSurfaceOptions &options) {
+  if(parent_faces.empty())throw std::invalid_argument("Mirror refinement has no original face map");
+  return PolygonPaintAccess::rebuild(source,std::move(target),options,parent_faces);
 }
 void PaintNormalProjection::validate(uint32_t resolution) const {
   validate(resolution,true);
