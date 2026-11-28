@@ -8,6 +8,7 @@
 namespace dome {
 struct Image;
 struct PaintSourceTexture;
+namespace detail {class PaintOverlayPacket;}
 namespace detail::bake_material {
 enum Role { Color, Orm, Emission, Occlusion, PbrColor, TangentNormal, RoleCount };
 inline constexpr size_t batch_capacity=8192;
@@ -20,10 +21,11 @@ struct ImageInput {
 struct Parameters {
   float color[4],emission[3];
   float roughness,metallic,occlusion_strength;
-  bool composited,original;
+  bool composited,original,separate_pbr,include_overlay_emission;
 };
 struct Coordinates {
   float uv[RoleCount][2];
+  float paint_uv[2];
 };
 struct Values {
   float color[4],emission[3],roughness,metallic,occlusion;
@@ -37,6 +39,7 @@ public:
   virtual void read(std::span<const Coordinates>,std::span<Values>,const std::function<bool()> &cancelled)=0;
 };
 
-std::unique_ptr<Sampler> upload(const ImageInput (&)[RoleCount],Parameters);
+std::unique_ptr<Sampler> upload(const ImageInput (&)[RoleCount],Parameters,const PaintOverlayPacket *overlay=nullptr,
+                                const std::function<bool()> &cancelled={});
 } // namespace detail::bake_material
 } // namespace dome

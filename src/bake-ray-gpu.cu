@@ -98,6 +98,14 @@ __global__ void bake_material_samples(bake_material::View view,const bake_materi
   const size_t i=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
   if(i<count)values[i]=bake_material::evaluate(view,coordinates[i],*table);
 }
+__global__ void bake_overlay_samples(bake_material::OverlayView view,const bake_material::Coordinates *coordinates,
+                                    bake_material::Values *values,size_t count){
+  const size_t i=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+  if(i>=count)return;
+  auto value=values[i];
+  bake_material::apply_overlay(view,coordinates[i],value);
+  values[i]=value;
+}
 
 class GpuApi {
   DOME_GPU(Stream_t) stream_{};
@@ -152,6 +160,12 @@ public:
     bake_material_samples<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(view,coordinates,table,values,count);
     checked(DOME_GPU(GetLastError)());
   }
+  void composite_bake_overlay(bake_material::OverlayView view,const bake_material::Coordinates *coordinates,
+                               bake_material::Values *values,size_t count){
+    constexpr unsigned lanes=128;
+    bake_overlay_samples<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(view,coordinates,values,count);
+    checked(DOME_GPU(GetLastError)());
+  }
 
   void trace(SurfaceView surface,const Frame *frames,const Vec3 *pattern,size_t samples,float maximum,
              uint32_t *states,size_t rays,uint32_t *remaining,bool first){
@@ -185,8 +199,9 @@ std::unique_ptr<Query> upload(const Surface &surface,std::span<const Vec3> patte
 std::unique_ptr<bake_raster::Raster> bake_raster::create(std::span<const float> axis,std::span<const uint8_t> writable){
   return create_device<bake_rays::GpuApi>(axis,writable);
 }
-std::unique_ptr<bake_material::Sampler> bake_material::upload(const ImageInput (&roles)[RoleCount],Parameters parameters){
-  return std::make_unique<DeviceSampler<bake_rays::GpuApi>>(roles,parameters);
+std::unique_ptr<bake_material::Sampler> bake_material::upload(const ImageInput (&roles)[RoleCount],Parameters parameters,
+    const PaintOverlayPacket *overlay,const std::function<bool()> &cancelled){
+  return std::make_unique<DeviceSampler<bake_rays::GpuApi>>(roles,parameters,overlay,cancelled);
 }
 } // namespace dome::detail
 #undef DOME_GPU

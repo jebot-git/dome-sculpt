@@ -3,12 +3,14 @@
 #include "bake-material-device.hpp"
 #include "dome/bake.hpp"
 #include "dome/source-maps.hpp"
+#include "paint-overlay-packet.hpp"
 
 namespace dome::detail::bake_material {
 struct MaterialInput {
   Parameters parameters{};
   ImageInput images[RoleCount]{};
   const PaintSourceMaps *source=nullptr;
+  const PaintOverlayPacket *overlay=nullptr;
 
   MaterialInput(const BakeMaterial &material,bool separate_pbr,const Image *normal) {
     const auto &factor=material.material;
@@ -19,7 +21,10 @@ struct MaterialInput {
     parameters.composited=material.maps_are_composited;
     if(material.maps&&material.maps->source_only) {
       source=material.maps->source_maps.get();
+      if(material.maps->overlay&&!material.maps->overlay->empty())overlay=material.maps->overlay.get();
       parameters.original=true;
+      parameters.separate_pbr=separate_pbr;
+      parameters.include_overlay_emission=!material.resolved_emission;
       parameters.occlusion_strength=source->occlusion_strength;
       const auto set=[&](Role role,const PaintSourceTexture &texture){
         if(texture.image)images[role]={texture.image.get(),&texture};
@@ -38,13 +43,14 @@ struct MaterialInput {
     if(normal)images[TangentNormal]={normal,nullptr,material.repeat_uv};
   }
 
-  bool textured() const {
-    return std::ranges::any_of(images,[](const auto &role){return role.image!=nullptr;});
+  bool needs_sampling() const {
+    return overlay||std::ranges::any_of(images,[](const auto &role){return role.image!=nullptr;});
   }
 
   Coordinates coordinates(const Mesh &mesh,uint32_t triangle,std::array<float,3> bary,
                           std::array<float,2> paint_uv,std::array<float,2> high_uv) const {
     Coordinates result{};
+    std::copy_n(paint_uv.begin(),2,result.paint_uv);
     std::array<std::array<float,2>,8> source_uv;
     unsigned ready=0;
     for(unsigned i=0;i<RoleCount;++i){

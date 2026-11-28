@@ -5,6 +5,9 @@
 #include "bake-raster-device.hpp"
 #include "bake-ray-device.hpp"
 #include "bake-ray-query.hpp"
+#include "dome/color-preparation.hpp"
+#include "paint-overlay-sample.hpp"
+#include "source-color-fixtures.hpp"
 #endif
 #include <algorithm>
 #include <iostream>
@@ -309,6 +312,110 @@ void original_material_device_sampling(){
   }
   check(true,"GPU material values exactly preserve UV1 and UV2, affine filtering, opacity and separate occlusion");
 }
+
+void sparse_material_device_sampling(){
+  namespace device=detail::bake_material;
+  constexpr uint32_t resolution=64;
+  const auto mesh=quad(-1,1,0,.17f,.83f,.18f,.82f);
+  auto paint=std::make_shared<PaintedMesh>(mesh,resolution);
+  const auto stamp=[&](PaintSettings settings,Vec3 center,float radius){
+    paint->begin_stroke();
+    paint->stamp(Brush{center,center,{0,0,1},radius,.73f},settings);
+    check(paint->end_stroke(),"Bake fixture paints an editable sparse channel");
+  };
+  PaintSettings settings;
+  settings.color={.19f,.67f,.02f,.43f};
+  stamp(settings,{-.32f,.09f,0},.82f);
+  settings.channel=PaintChannel::Metallic;
+  stamp(settings,{-.41f,.16f,0},.41f);
+  settings.channel=PaintChannel::Mask;settings.mask=.24f;
+  stamp(settings,{-.23f,.05f,0},.53f);
+  paint->layer_properties("Masked color and metal",true,.67f);
+  paint->add_layer("Roughness and emission");
+  settings.channel=PaintChannel::Roughness;settings.roughness=.19f;
+  stamp(settings,{.07f,.15f,0},.58f);
+  settings.channel=PaintChannel::Emission;settings.emission={.19f,.71f,.01f};
+  stamp(settings,{-.15f,.11f,0},1.1f);
+  paint->layer_properties("Roughness and emission",true,.82f);
+  paint->add_layer("Hidden");
+  settings.channel=PaintChannel::Color;settings.color={1,0,1,1};
+  stamp(settings,{0,0,0},1.f);
+  paint->layer_properties("Hidden",false,1);
+
+  BakedTextures baked;
+  const auto image=[](std::array<uint8_t,4> value){
+    Image output{resolution,resolution,std::vector<uint8_t>(resolution*resolution*4)};
+    for(size_t at=0;at<output.rgba.size();at+=4)std::ranges::copy(value,output.rgba.begin()+at);
+    return output;
+  };
+  baked.maps.color=image({40,90,210,170});
+  baked.maps.metal_rough=image({190,40,230,255});
+  baked.maps.emission=image({20,40,70,255});
+  baked.coverage.resize(resolution*resolution);
+  for(size_t at=0;at<baked.coverage.size();++at)baked.coverage[at]=uint8_t(at*13+at/resolution*19);
+
+  const auto unbaked=paint->snapshot();
+  for(unsigned variant=0;variant<4;++variant){
+    paint=unbaked->snapshot();
+    if(variant==2){
+      baked.maps.emission={};
+      baked.emission_field=BakedEmissionField::generate_compact(resolution,[](size_t i){
+        const float coverage=i%7==0?0.f:1.f;
+        return BakedEmissionSample{{coverage*.61f,coverage*float(i%31)/31.f,coverage*.18f},{},coverage};
+      });
+    }
+    if(variant==3){
+      auto scene=source_color_fixture::model(true);
+      const auto &object=scene.active();
+      paint=object.painted;
+      settings.color={.17f,.67f,.93f,.71f};
+      stamp(settings,{0,0,0},.58f);
+      paint=prepare_source_colors({paint,object.appearance,object.material_bindings,
+                                   object.deformation,object.material}).paint;
+      baked.maps.pbr_color=image({170,130,20,190});
+      baked.color_interpretation=BakedColorInterpretation::ResolvedPbr;
+    }
+    if(variant)paint->install_bake(baked);
+    const auto original=paint->encode();
+    const auto overlay=detail::PaintOverlayFactory::capture(*paint);
+    BakeMaterial material;
+    material.material.color={.31f,.67f,.83f,.72f};
+    material.material.emissive={.53f,.11f,.41f};
+    material.material.roughness=.61f;material.material.metallic=.29f;
+    device::MaterialInput input(material,true,nullptr);
+    input.parameters.separate_pbr=true;
+    input.parameters.include_overlay_emission=true;
+    std::vector<device::Coordinates> coordinates;
+    for(unsigned i=0;i<889;++i){
+      const std::array uv{float(i*73%883)/713-.17f,float(i*131%887)/727-.11f};
+      coordinates.push_back(input.coordinates(mesh,0,{1,0,0},uv,{}));
+    }
+    auto sampler=device::upload(input.images,input.parameters,overlay.get());
+    std::vector<device::Values> values(coordinates.size());
+    sampler->read(coordinates,values,{});
+    const auto composite=[](float base,float coverage,float added){return base*(1-coverage)+added;};
+    for(size_t i=0;i<values.size();++i){
+      const auto [u,v]=coordinates[i].paint_uv;
+      const auto common=detail::sample_overlay_values(*overlay,u,v,false);
+      const auto pbr=detail::sample_overlay_values(*overlay,u,v,true);
+      const auto &actual=values[i];
+      bool exact=actual.roughness==composite(material.material.roughness,common[3][2],common[1][1])&&
+          actual.metallic==composite(material.material.metallic,common[3][1],common[1][2])&&
+          actual.occlusion==composite(1.f,common[1][3],common[1][0]);
+      for(unsigned c=0;c<4;++c){
+        exact&=actual.color[c]==composite(material.material.color[c],common[3][0],common[0][c]);
+        exact&=actual.pbr[c]==composite(material.material.color[c],pbr[3][0],pbr[0][c]);
+      }
+      for(unsigned c=0;c<3;++c)
+        exact&=actual.emission[c]==composite(material.material.emissive[c],common[3][3],common[2][c]);
+      if(!exact)throw std::runtime_error("Device sparse material differs from the native point oracle at variant "+
+          std::to_string(variant)+", sample "+std::to_string(i));
+    }
+    check(rejects([&]{sampler->read(coordinates,values,[]{return true;});})&&paint->encode()==original,
+          "Cancellation preserves exact native paint owners after GPU sampling");
+  }
+  check(true,"GPU sparse material matches native FLOAT filtering for masks, padding, prepared color, independent AO and emission");
+}
 #endif
 } // namespace
 int main()try {
@@ -319,6 +426,7 @@ int main()try {
   oblique_device_precision();
   resident_cage_projection();
   original_material_device_sampling();
+  sparse_material_device_sampling();
 #endif
   auto low=quad();BakeSource source;source.mesh=quad();
   BakeOptions options;options.resolution=32;options.padding=0;options.ao_samples=0;

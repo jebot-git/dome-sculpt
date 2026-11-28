@@ -37,9 +37,15 @@ protection, cancellation and both work budgets retain their native rules.
 Bake samples original material role images and precomposited maps in
 bounded GPU batches. The device preserves independent UV sets, glTF affine
 sampling, legacy wrapped and clamped texel centres, and one application of
-material factors. The worker keeps original atlas order when applying
-sparse paint, normal frames, FLOAT emission authority and publication.
+material factors. The worker keeps original atlas order through normal-frame
+evaluation, FLOAT emission authority and publication.
 [GPU Bake material evidence](validation/bake-material-gpu-20261128.json)
+
+Raw Bake material sampling now composites immutable sparse paint on the same
+device queue. It uses the original clamped FLOAT bilinear taps, padding owners,
+per-channel coverage and layer order, with distinct common/PBR color and
+independent baked AO. Explicit FLOAT radiance resolvers keep their existing
+authorship.
 
 Eligible 512–2048 current-grid RGB8 Bake materials now composite color, ORM
 and legacy emission on the selected GPU. Their ordered paint, coverage,

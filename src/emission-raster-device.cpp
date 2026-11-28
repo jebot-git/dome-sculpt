@@ -2,6 +2,7 @@
 
 #include "emission-raster-device.hpp"
 #include "paint-grid-filter-kernel.hpp"
+#include "paint-overlay-packet.hpp"
 #include "emission-paint-access.hpp"
 #include "dome/mtoon.hpp"
 #include "dome/scene.hpp"
@@ -78,9 +79,11 @@ size_t emission_raster_staging_bytes(const PaintedMesh &paint) noexcept {
 }
 
 namespace {
-emission_raster::Input describe_raster(const PaintedMesh &paint,std::span<const int32_t> padding,
+template<class Layers>
+emission_raster::Input describe_raster(Layers &&layers,const BakedTextures *baked,uint32_t resolution,
+    std::span<const int32_t> padding,
     std::array<float,3> background,float strength,bool authoring_blend,const std::function<bool()> &cancelled,
-    emission_raster::MaterialInput *material=nullptr,bool include_emission=true){
+    emission_raster::MaterialInput *material,bool include_emission,bool include_pbr){
   using namespace emission_raster;
   const auto stop=[&]{paint_compute::checkpoint(cancelled);};
   stop();
@@ -89,10 +92,10 @@ emission_raster::Input describe_raster(const PaintedMesh &paint,std::span<const 
     throw std::invalid_argument("Invalid native HDR background or legacy strength");
   Input input;
   input.padding=padding;
-  input.resolution=paint.resolution();
+  input.resolution=resolution;
   for(unsigned k=0;k<3;++k)input.background[k]=std::bit_cast<uint32_t>(background[k]);
   input.strength=std::bit_cast<uint32_t>(strength);
-  if(auto bake=include_emission?paint.baked():nullptr){
+  if(const auto *bake=include_emission?baked:nullptr){
     if(bake->emission_field){
       input.physical_bake=true;
       input.bake=bake->emission_field->storage();
@@ -106,8 +109,8 @@ emission_raster::Input describe_raster(const PaintedMesh &paint,std::span<const 
   std::unordered_map<const PaintTile *,uint32_t> material_ids;
   std::unordered_map<const PaintColorTile *,uint32_t> pbr_ids;
   uint32_t coefficient_offset=0;
-  for(const auto &layer:paint.layers()){
-    if(!layer.visible||layer.opacity<=0)continue;
+  for(const auto &layer:layers){
+    if constexpr(requires{layer.visible;})if(!layer.visible||layer.opacity<=0)continue;
     stop();
     const auto first_entry=input.entries.size();
     bool contributes=false;
@@ -128,7 +131,7 @@ emission_raster::Input describe_raster(const PaintedMesh &paint,std::span<const 
           const auto [id,added]=material_ids.try_emplace(tile,material->common.size());
           material_entry.common=id->second;
           if(added)material->common.push_back(tile);
-          if(const auto *pbr=layer.pbr_tiles.empty()?nullptr:layer.pbr_tiles[i].get()){
+          if(const auto *pbr=!include_pbr||layer.pbr_tiles.empty()?nullptr:layer.pbr_tiles[i].get()){
             const auto [color,inserted]=pbr_ids.try_emplace(pbr,material->pbr.size());
             material_entry.pbr=color->second;
             if(inserted)material->pbr.push_back(pbr);
@@ -164,6 +167,13 @@ emission_raster::Input describe_raster(const PaintedMesh &paint,std::span<const 
   }
   stop();
   return input;
+}
+
+emission_raster::Input describe_raster(const PaintedMesh &paint,std::span<const int32_t> padding,
+    std::array<float,3> background,float strength,bool authoring_blend,const std::function<bool()> &cancelled,
+    emission_raster::MaterialInput *material=nullptr,bool include_emission=true){
+  return describe_raster(paint.layers(),paint.baked().get(),paint.resolution(),padding,background,
+                        strength,authoring_blend,cancelled,material,include_emission,true);
 }
 
 void describe_source(emission_raster::Input &input,const PaintSourceTexture *source,
@@ -237,6 +247,18 @@ void plan_material_upload(const emission_raster::Input &input,emission_raster::M
   material.capacity=std::min(preferred,(remaining-source_bytes)/sample_bytes);
   if(!material.capacity)throw std::length_error("Portable source material lacks sampler batch storage");
 }
+}
+
+emission_raster::Input emission_raster::describe_bake_overlay(const PaintOverlayPacket &packet,
+    MaterialInput &material,bool separate_pbr,bool include_emission,const std::function<bool()> &cancelled){
+  const auto *bake=packet.baked().get();
+  if(bake){
+    material.bake_color=bake->maps.color.rgba;
+    material.bake_orm=bake->maps.metal_rough.rgba;
+    material.bake_coverage=bake->coverage;
+  }
+  return describe_raster(packet.layers(),bake,packet.resolution(),*packet.padding(),{},1,true,
+                         cancelled,&material,include_emission,separate_pbr);
 }
 
 std::unique_ptr<SourceMaterialRaster> create_source_material_raster(const PaintedMesh &paint,

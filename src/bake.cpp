@@ -532,7 +532,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     const auto base=sampled?Channels{{sampled->color[0],sampled->color[1],sampled->color[2],sampled->color[3]},
         {sampled->emission[0],sampled->emission[1],sampled->emission[2]},sampled->roughness,sampled->metallic,sampled->occlusion}:
         material_base(m,source.mesh,hit->triangle,hit->barycentric,paint_uv);
-    auto channels=material_overlay(m,base,paint_uv,false);
+    auto channels=sampled?base:material_overlay(m,base,paint_uv,false);
     auto high_normal=normalized(hit->normal);
     if(float_emission){
       if(retained&&retained->emission)emission[at]=*retained->emission;
@@ -547,7 +547,9 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     if(o.separate_pbr_color){
       if(resolved_source)pbr_color=sampled?std::array<float,4>{sampled->pbr[0],sampled->pbr[1],sampled->pbr[2],sampled->pbr[3]}:
           sample(m.maps->pbr_color,paint_uv,false,true);
-      else if(m.maps&&m.maps->overlay)pbr_color=material_overlay(m,base,paint_uv,true).color;
+      else if(m.maps&&m.maps->source_only&&m.maps->overlay&&!m.maps->overlay->empty())
+        pbr_color=sampled?std::array<float,4>{sampled->pbr[0],sampled->pbr[1],sampled->pbr[2],sampled->pbr[3]}:
+            material_overlay(m,base,paint_uv,true).color;
     }
     if(!source.colors.empty()){
       std::array<float,4> tint{};for(int i=0;i<3;++i)for(int c=0;c<4;++c)tint[c]+=source.colors[source.mesh.indices[hit->triangle*3+i]][c]*hit->barycentric[i];
@@ -679,7 +681,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   for(size_t i=0;i<source.materials.size();++i){
     const auto &input=material_inputs.emplace_back(source.materials[i],o.separate_pbr_color,
         !source_normals&&needs_map(i)?normal_image(source.materials[i]):nullptr);
-    device_material[i]=input.textured();
+    device_material[i]=input.needs_sampling();
     have_device_materials|=device_material[i];
   }
   const auto material_capacity=have_device_materials?std::min(pixels,shade_device::batch_capacity):0;
@@ -712,7 +714,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
         }
         if(resident_input!=material_id){
           material_sampler.reset();
-          material_sampler=shade_device::upload(input.images,input.parameters);
+          material_sampler=shade_device::upload(input.images,input.parameters,input.overlay,o.cancelled);
           resident_input=material_id;
         }
         const auto count=end-first;

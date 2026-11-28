@@ -185,6 +185,8 @@ struct Input {
   size_t mapped_capacity=0,bake_uv_capacity=0;
   bool physical_bake=false,texture_set=false,mapped_field=false;
 };
+Input describe_bake_overlay(const PaintOverlayPacket &,MaterialInput &,bool separate_pbr,bool include_emission,
+                            const std::function<bool()> &cancelled);
 std::unique_ptr<EmissionRasterDevice> upload(const Input &,const std::function<bool()> &);
 std::unique_ptr<SourceMaterialRaster> upload_material(const Input &,const MaterialInput &,
                                                         const std::function<bool()> &);

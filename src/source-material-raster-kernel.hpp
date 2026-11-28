@@ -21,7 +21,7 @@ struct MaterialView {
   const MaterialEntry *entries=nullptr;
   const paint_compute::Pixel *common=nullptr;
   const paint_compute::ColorPixel *pbr=nullptr;
-  const uint8_t *bake_color=nullptr,*bake_orm=nullptr,*bake_coverage=nullptr;
+  const uint8_t *bake_color=nullptr,*bake_orm=nullptr,*bake_coverage=nullptr,*bake_pbr=nullptr;
   paint_compute::Parameters factors;
   float shade_factor[3]{};
   float occlusion_strength=1;
@@ -43,7 +43,7 @@ struct MaterialCoefficients {
   float color[4]{},orm[3]{},coverage[3]{},ao_coverage=0;
 };
 
-DOME_MATERIAL_FN MaterialCoefficients material_texel(const DeviceInput &input,const MaterialView &view,size_t at){
+DOME_MATERIAL_FN MaterialCoefficients material_texel(const DeviceInput &input,const MaterialView &view,size_t at,bool pbr){
   using namespace paint_compute;
   MaterialCoefficients value;
   const auto owner=input.padding[at];
@@ -51,8 +51,9 @@ DOME_MATERIAL_FN MaterialCoefficients material_texel(const DeviceInput &input,co
   const auto &q=*input.quantization;
   if(view.bake_coverage){
     const float coverage=q.unit[view.bake_coverage[owner]];
+    const auto *bake_color=pbr&&view.bake_pbr?view.bake_pbr:view.bake_color;
     for(unsigned c=0;c<4;++c){
-      const auto channel=view.bake_color[4*size_t(owner)+c];
+      const auto channel=bake_color[4*size_t(owner)+c];
       value.color[c]=mul(c==3?q.unit[channel]:q.srgb[channel],coverage);
     }
     for(unsigned c=0;c<3;++c){
@@ -70,7 +71,7 @@ DOME_MATERIAL_FN MaterialCoefficients material_texel(const DeviceInput &input,co
     const float mask=material_float(input.layers[layer].opacity[pixel[13]]);
     const float color=mul(q.unit[pixel[9]],mask);
     if(color!=0){
-      const auto *rgba=entry.pbr==absent?pixel:view.pbr[size_t(entry.pbr)*tile_pixels+within].rgba;
+      const auto *rgba=pbr&&entry.pbr!=absent?view.pbr[size_t(entry.pbr)*tile_pixels+within].rgba:pixel;
       for(unsigned c=0;c<4;++c)
         value.color[c]=blend(value.color[c],c==3?q.unit[rgba[c]]:q.srgb[rgba[c]],color);
       value.coverage[0]=add(mul(value.coverage[0],sub(1,color)),color);
@@ -104,12 +105,12 @@ DOME_MATERIAL_FN MaterialCoefficients mix_material(MaterialCoefficients a,const 
   return a;
 }
 DOME_MATERIAL_FN MaterialCoefficients filter_material(const DeviceInput &input,const MaterialView &view,
-    SourceTextureAxis column,SourceTextureAxis row){
+    SourceTextureAxis column,SourceTextureAxis row,bool pbr=true){
   const auto r=input.resolution;
   const auto filter_row=[&](uint32_t y){
-    auto value=material_texel(input,view,size_t(y)*r+column.first);
+    auto value=material_texel(input,view,size_t(y)*r+column.first,pbr);
     if(column.fraction!=0&&column.first!=column.second)
-      value=mix_material(value,material_texel(input,view,size_t(y)*r+column.second),column.fraction);
+      value=mix_material(value,material_texel(input,view,size_t(y)*r+column.second,pbr),column.fraction);
     return value;
   };
   auto value=filter_row(row.first);

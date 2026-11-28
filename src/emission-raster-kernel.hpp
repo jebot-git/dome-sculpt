@@ -362,9 +362,8 @@ DOME_EMISSION_MATH uint32_t finite_lerp(uint32_t a,uint32_t b,uint32_t t){
   return b>a?(x<b?x:b):(x>b?x:b);
 }
 
-DOME_EMISSION_FN void filter_finite(const DeviceInput &input,FiniteGrid grid,uint32_t x,uint32_t y,
+DOME_EMISSION_FN void filter_finite(const DeviceInput &input,SourceTextureAxis column,SourceTextureAxis row,
     uint32_t (&value)[7]){
-  const auto column=grid.axis[x],row=grid.axis[y];
   const auto fx=paint_compute::bits(column.fraction),fy=paint_compute::bits(row.fraction);
   const unsigned rows=fy&&row.first!=row.second?2:1,columns=fx&&column.first!=column.second?2:1;
   for(unsigned j=0;j<rows;++j){
@@ -377,7 +376,10 @@ DOME_EMISSION_FN void filter_finite(const DeviceInput &input,FiniteGrid grid,uin
     }
     for(unsigned k=0;k<7;++k)value[k]=j?finite_lerp(value[k],filtered[k],fy):filtered[k];
   }
-
+}
+DOME_EMISSION_FN void filter_finite(const DeviceInput &input,FiniteGrid grid,uint32_t x,uint32_t y,
+    uint32_t (&value)[7]){
+  filter_finite(input,grid.axis[x],grid.axis[y],value);
 }
 
 DOME_EMISSION_FN void resolve_finite(const DeviceInput &input,const uint32_t (&value)[7],
