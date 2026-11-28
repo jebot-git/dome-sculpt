@@ -1,0 +1,156 @@
+{
+  "date": "2026-11-28",
+  "product": "73b9329f901eb521521ea29637724878ebc04b61",
+  "previous_product": "d84b1b29",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "operation": "Resolved source-image sampling and RGBA8 encoding during the existing native source-aware UV bake",
+  "execution": {
+    "gpu": "Intel Arc A770, Level Zero, renderD129",
+    "texture_uploads": "one per sampled role; unchanged role equivalence still reuses finished images",
+    "batch_capacity": 16384,
+    "working_set": "The source input image, active raster and padding, quantization table, and simultaneous host/device batch buffers are checked against max_working_bytes.",
+    "output": "One 32-bit RGBA word per ordinary sample; four float words for samples requiring tangent-frame conversion.",
+    "reference_probe_cases": 98304,
+    "reference_probe_result": "All six filter/wrap combinations match each independently sampled float channel and its encoded byte. Each combination reuses its sampler for a final short batch."
+  },
+  "release_ctest": {
+    "passed": [
+      "source-uv-bake",
+      "source-uv-adopt",
+      "source-extra-uv-roles",
+      "source-extra-uv-raw",
+      "source-extra-uv-atlas-openxr",
+      "source-extra-uv-raw-openxr"
+    ],
+    "failed": 0,
+    "vroid_passed_parts": {
+      "female": 19,
+      "male": 19
+    },
+    "xr_adjacent_workflows": {
+      "atlas": {
+        "status": "passed",
+        "complete": true,
+        "failed": 0,
+        "synthetic_tracking": true,
+        "checks": 21
+      },
+      "raw": {
+        "status": "passed",
+        "complete": true,
+        "failed": 0,
+        "synthetic_tracking": true,
+        "checks": 20
+      }
+    }
+  },
+  "sanitizers": {
+    "mode": "opt-in headless CPU reference with ASan and UBSan",
+    "passed": [
+      "source-uv-bake",
+      "source-uv-adopt"
+    ]
+  },
+  "device_absence": {
+    "oneapi": "No device of requested type 'info::device_type::gpu' available.",
+    "cuda": "CUDA driver version is insufficient for CUDA runtime version",
+    "rocm": "no ROCm-capable device is detected"
+  },
+  "profile": {
+    "fixture": "Four RGBA8 UV1 roles using sheared UVs. Includes repeat, mirrored repeat, clamp, and nearest and linear filtering.",
+    "columns": [
+      "base color",
+      "metallic-roughness",
+      "emission",
+      "occlusion"
+    ],
+    "protocol": "One process per revision and resolution, five complete successive bakes per process. Finite timings include raster ownership, mapped coordinates, GPU work when present, output and padding. Persistent SYCL cache disabled. The first bake includes oneAPI device initialization and compilation.",
+    "sizes": {
+      "64": {
+        "previous": {
+          "cold_ms": 2.14789,
+          "warm_ms": [
+            1.48568,
+            1.2112,
+            1.08438,
+            0.989232
+          ],
+          "warm_median_ms": 1.14779,
+          "sample_operations": 28480,
+          "image_bytes": 65536,
+          "fnv1a64": [
+            "5c6226de2098214c",
+            "22ef060333b2d119",
+            "841702470ae4fdbe",
+            "56ab60cf0e3c7635"
+          ],
+          "stable": true
+        },
+        "current": {
+          "cold_ms": 1084.47,
+          "warm_ms": [
+            8.91076,
+            9.80566,
+            10.8855,
+            5.1798
+          ],
+          "warm_median_ms": 9.35821,
+          "sample_operations": 28480,
+          "image_bytes": 65536,
+          "fnv1a64": [
+            "5c6226de2098214c",
+            "22ef060333b2d119",
+            "841702470ae4fdbe",
+            "56ab60cf0e3c7635"
+          ],
+          "stable": true
+        }
+      },
+      "1024": {
+        "previous": {
+          "cold_ms": 312.934,
+          "warm_ms": [
+            306.405,
+            298.791,
+            299.479,
+            295.55
+          ],
+          "warm_median_ms": 299.135,
+          "sample_operations": 7221504,
+          "image_bytes": 16777216,
+          "fnv1a64": [
+            "26406fa8586317b8",
+            "234247eb50ea776f",
+            "78840d587c393064",
+            "a3aa4e069b268f69"
+          ],
+          "stable": true
+        },
+        "current": {
+          "cold_ms": 1255.07,
+          "warm_ms": [
+            220.345,
+            195.221,
+            214.923,
+            209.838
+          ],
+          "warm_median_ms": 212.38049999999998,
+          "sample_operations": 7221504,
+          "image_bytes": 16777216,
+          "fnv1a64": [
+            "26406fa8586317b8",
+            "234247eb50ea776f",
+            "78840d587c393064",
+            "a3aa4e069b268f69"
+          ],
+          "stable": true
+        }
+      }
+    }
+  },
+  "open": [
+    "Animated MToon mask sampling and normal tangent-frame conversion remain worker operations.",
+    "Direct retained alternate-coordinate GLB/VRM material handling has separate coverage.",
+    "Actual AMD and NVIDIA devices and physical headset operation were outside this run."
+  ]
+}

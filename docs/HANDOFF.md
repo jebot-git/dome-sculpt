@@ -294,8 +294,28 @@ four repeat certifications of the 64-pixel atlas, median time fell from
 9.8 to 1.2 milliseconds. Both builds reject the deliberately enlarged
 512-pixel atlas at work unit 543,431. The tuned cold export fixture took
 4.9 seconds with compilation, up from 2.3 for the previous build.
-Alternate-coordinate material evaluation remains open.
+Alternate-coordinate material evaluation in direct retained export remains open.
 [Retained normal certificate evidence](validation/retained-normal-certificate-gpu-20261128.json)
+
+Source-aware UV bakes now sample resolved texture coordinates on the
+selected GPU. The worker retains source triangle and coordinate ownership,
+including UV1 and extra UV sets, source transforms, and the existing
+padding and tangent-frame rules. The GPU writes ordinary material samples
+as RGBA bytes and returns linear floats where the worker must convert
+normal frames. It uploads one image per sampled role and batches at most
+16,384 mapped coordinates within the job's working-memory budget. The
+animated MToon mask lookup and tangent conversion still run on the worker.
+
+On Intel Arc all 98,304 sampler checks reproduce the independent CPU
+samples and encoded bytes. Four UV1 output maps have matching hashes at
+64 and 1024 pixels with unchanged sampling counts. The 1024-pixel fixture
+took 299 ms before and 212 ms after in the warm median. Cold time rose from
+313 ms to 1.26 s including the first GPU dispatch. The 64-pixel fixture
+also takes longer on the GPU. Six focused Release tests pass, including
+41 synthetic OpenXR checks for adjacent alternate-UV import workflows.
+Both headless sanitizer references pass. CUDA and ROCm compile, and all
+three vendors reject a missing GPU for the sampler.
+[Source UV sampler evidence](validation/source-uv-sampler-gpu-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
