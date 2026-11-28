@@ -92,6 +92,16 @@ tiles once per field in bounded batches. Independent normal transport and
 portable reparameterization still have their own work paths.
 [Texture-set material evidence](validation/texture-set-material-gpu-20261128.json)
 
+Portable normal reprojection for retained texture sets now uses the selected
+GPU to sample the before normal image, apply the placed before and current
+frames, and encode the destination tangent-space texel. This covers both
+native Bake detail and prepared normal roles. Chart layout, exact evaluation
+for numerically sensitive samples, and the existing independent angular
+certificate retain their native C++ paths. The 0.02-radian acceptance
+threshold and the source normal owners remain part of the actual export
+decision.
+[Retained normal raster evidence](validation/retained-normal-raster-gpu-20261128.json)
+
 ## Current validation — 2026-11-27
 
 The [current handoff](HANDOFF.md) records the exact combined Release, Arc,

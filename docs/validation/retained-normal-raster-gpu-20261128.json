@@ -1,0 +1,184 @@
+{
+  "date": "2026-11-28",
+  "product_commit": "fef49484aaa3b7fcf29fdc6d361535f05c15a080",
+  "previous_published_commit": "be68831b6fe6bba3eecdf830ac856136b0f12488",
+  "domed_toolkit_commit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "device": "Intel Arc A770 / PCI 0000:03:00.0 / renderD129",
+  "scope": "GPU texel encoding of portable retained PBR normal atlases. Includes source filtering, frame transport, tangent solve and RGB8 quantization in native and prepared frames.",
+  "app": {
+    "file": "artifacts/retained-normal-raster-gpu-20261128/evidence/oneapi/dome-sculpt",
+    "sha256": "308cb7c00c946bf0c785bb982584b861e554dcb5af1998b6a2590bbe56d2b925"
+  },
+  "raster_tests": {
+    "profiles": [
+      {
+        "model": "native Bake",
+        "exact_device_texels": 8074,
+        "total_texels": 8192
+      },
+      {
+        "model": "reflected prepared PBR",
+        "exact_device_texels": 8089,
+        "total_texels": 8192
+      }
+    ],
+    "trace": {
+      "file": "artifacts/retained-normal-raster-gpu-20261128/normal-device.log",
+      "sha256": "3064e805dc469ba658553bcb1ad536e572e4b7ba50355162329080dbe101778a"
+    },
+    "max_charts": 128,
+    "max_texels": 8192,
+    "exact_guard": "Native full-precision evaluation for marked samples and independent 0.02-radian candidate certification."
+  },
+  "regressions": {
+    "passed": 11,
+    "junit": {
+      "file": "artifacts/retained-normal-raster-gpu-20261128/evidence/oneapi/retained-normal-raster-tests.xml",
+      "sha256": "9b5d78dde0edb5fc9998424170a8e6e4e235cbbaf14550b5c66039f1be3beecb"
+    }
+  },
+  "exact_case_files": {
+    "equal_files": 17,
+    "file_sha256_manifest": "3bbf19e86dc63a3a2951dfea982f1f90df202129d64d7e1b5f62903a598969a9",
+    "checks_and_timings": {
+      "native": {
+        "before": {
+          "file": "artifacts/retained-normal-raster-gpu-20261128/before-native.log",
+          "sha256": "020711a87e1448a0739632c416d17a15ac2770278171631d05f9ba41b1b91e94",
+          "elapsed_seconds": 2.2,
+          "peak_rss_kib": 199280
+        },
+        "after": {
+          "file": "artifacts/retained-normal-raster-gpu-20261128/after-native.log",
+          "sha256": "ea3f32412ef52a01700f7a1191aaa7609f65433dd14e499af789a28cde759aae",
+          "elapsed_seconds": 2.34,
+          "peak_rss_kib": 224092
+        }
+      },
+      "mikk": {
+        "before": {
+          "file": "artifacts/retained-normal-raster-gpu-20261128/before-mikk.log",
+          "sha256": "f719613de4c11260c4138cc3b8ce1074246eab3f937d0bab61a6dfaaeaeb1b4c",
+          "elapsed_seconds": 0.01,
+          "peak_rss_kib": 20452
+        },
+        "after": {
+          "file": "artifacts/retained-normal-raster-gpu-20261128/after-mikk.log",
+          "sha256": "bdf186fdd30a0bdbab3b30838f11b28c5d2c1ecb732ce40867b1f0384a35de48",
+          "elapsed_seconds": 0.01,
+          "peak_rss_kib": 20360
+        }
+      },
+      "identity": {
+        "before": {
+          "file": "artifacts/retained-normal-raster-gpu-20261128/before-identity.log",
+          "sha256": "e14d8e33f3ce1ae406a5ee2e2c25b57c48901c02a96b97f013d9470f2c13548d",
+          "elapsed_seconds": 1.42,
+          "peak_rss_kib": 200200
+        },
+        "after": {
+          "file": "artifacts/retained-normal-raster-gpu-20261128/after-identity.log",
+          "sha256": "26240f50d4ae4adef0f25313f77bd241acd464113222d7db0b91b1f41a97540a",
+          "elapsed_seconds": 1.33,
+          "peak_rss_kib": 201464
+        }
+      },
+      "affine": {
+        "before": {
+          "file": "artifacts/retained-normal-raster-gpu-20261128/before-affine.log",
+          "sha256": "70a92e762308d92d027b33df98c04a4e3d4ce81ee3eec8de3ea4b3b0454eb7d8",
+          "elapsed_seconds": 2.31,
+          "peak_rss_kib": 245700
+        },
+        "after": {
+          "file": "artifacts/retained-normal-raster-gpu-20261128/after-affine.log",
+          "sha256": "298bd113074342cd48955d57c645389b7f2e6ca22fa323c2cba36fc1a68a73d6",
+          "elapsed_seconds": 2.29,
+          "peak_rss_kib": 247064
+        }
+      }
+    },
+    "smooth_standard": {
+      "file": "artifacts/retained-normal-raster-gpu-20261128/evidence/after/native/native-normal-smooth-bake.glb",
+      "sha256": "464d8fc352a3abc33c81fe74b7d178eabc9b7a3788858a281c77f239219ec65e"
+    },
+    "smooth_editable": {
+      "file": "artifacts/retained-normal-raster-gpu-20261128/evidence/after/native/native-normal-smooth-editable.glb",
+      "sha256": "13fcf27b38407a18e96901f5be66814923cbd075548af1cfbd2fd68e1ad1a2be"
+    }
+  },
+  "nested_domed_wayland": {
+    "passed": 7,
+    "report": {
+      "file": "artifacts/retained-normal-raster-gpu-20261128/evidence/wayland/report.json",
+      "sha256": "1479f58dde45a6650ec4a86a27bfa78dbff2a7235cf3bac585efc465832f849d"
+    },
+    "log": {
+      "file": "artifacts/retained-normal-raster-gpu-20261128/wayland.log",
+      "sha256": "82f486d4effbba5a5f0ae3fed348e223e7f30af543db1a6e61e247141126eda3"
+    },
+    "compositor_log": {
+      "file": "artifacts/retained-normal-raster-gpu-20261128/evidence/wayland/compositor.log",
+      "sha256": "75eed3a8f8cd96b77b4ce51852b21466e4cd1599f6fe2f8b7b63942cf0b1aca1"
+    },
+    "package": {
+      "file": "artifacts/retained-normal-raster-gpu-20261128/evidence/wayland/standard.glb",
+      "sha256": "464d8fc352a3abc33c81fe74b7d178eabc9b7a3788858a281c77f239219ec65e"
+    }
+  },
+  "actual_loader_synthetic_openxr": {
+    "passed": 10,
+    "report": {
+      "file": "artifacts/retained-normal-raster-gpu-20261128/evidence/xr/report.json",
+      "sha256": "3b46ec4f34c68717e31664655377cf419e30e4fe031ad98496288af1fd2535f7"
+    },
+    "log": {
+      "file": "artifacts/retained-normal-raster-gpu-20261128/xr.log",
+      "sha256": "233217cc18de0f87dd23612778ae28df7d73c7e90f03fe9d12493fa4e92b1523"
+    },
+    "hardware_renderer": {
+      "file": "artifacts/retained-normal-raster-gpu-20261128/evidence/xr/accept/graphics.json",
+      "sha256": "f5e95dd9e30ec72eea9479f466264871592da5c103ee4706bf37ac1cdda2751e"
+    },
+    "package": {
+      "file": "artifacts/retained-normal-raster-gpu-20261128/evidence/xr/accept/converted.glb",
+      "sha256": "464d8fc352a3abc33c81fe74b7d178eabc9b7a3788858a281c77f239219ec65e"
+    },
+    "physical_headset": false
+  },
+  "sanitizers": {
+    "mode": "Scoped headless ASan/UBSan",
+    "native_retained": {
+      "file": "artifacts/retained-normal-raster-gpu-20261128/evidence/asan/texture-set-source-export.cpp.log",
+      "sha256": "c7ba07a258c4eda9f73a124b4191d823e18360cdabb53bd5633a886c61d1264f"
+    },
+    "encoding_foundation": {
+      "file": "artifacts/retained-normal-raster-gpu-20261128/evidence/asan/normal-bake-encoding.cpp.log",
+      "sha256": "49b009876da79f2ded9a7f43018aa5ad49b9bc8ac4d47dabe77e5353a97172ac"
+    }
+  },
+  "missing_device": {
+    "ONEAPI": {
+      "reason": "No device of requested type 'info::device_type::gpu' available.",
+      "log": {
+        "file": "artifacts/retained-normal-raster-gpu-20261128/missing-device.log",
+        "sha256": "df977c1d37da2e1f6b8b345f9f29500647b4997d32099c1cdb7ce648eeba24cc"
+      }
+    },
+    "CUDA": {
+      "reason": "CUDA driver version is insufficient for CUDA runtime version",
+      "log": {
+        "file": "artifacts/retained-normal-raster-gpu-20261128/cuda-missing.log",
+        "sha256": "a1ab36569ff3d6c1f7a8487410642446bb868809aed089df21f7c7e56bd7cc98"
+      }
+    },
+    "ROCm": {
+      "reason": "no ROCm-capable device is detected",
+      "log": {
+        "file": "artifacts/retained-normal-raster-gpu-20261128/rocm-missing.log",
+        "sha256": "9d80f3525c71a3a1e28bcf1a6e020b5fd5ba853a51541a9eceb8d30f80557f72"
+      }
+    }
+  },
+  "limits": "Chart ownership math and certification remain on the host. Timings are one cold process per fixture with several workflows per process. Positive AMD and NVIDIA device tests, physical headset checks, and GPU certification remain open."
+}

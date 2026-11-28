@@ -260,9 +260,25 @@ fixture, warm compositing fell from 288 to 146 milliseconds across three
 runs per build. Its first GPU run took 1.10 seconds including compilation.
 Nested DomeD Wayland and synthetic OpenXR both reproduce the exact retained
 Standard GLB. Scoped ASan/UBSan and CUDA, ROCm and oneAPI missing-device
-checks pass. Retained normal reprojection and source-dependent material
-proof still require separate GPU work.
+checks pass. Independent normal reprojection and source-dependent material
+proof are separate from this compositor.
 [Texture-set material evidence](validation/texture-set-material-gpu-20261128.json)
+
+Portable texture-set normal atlases now encode on the selected GPU. The
+device samples the retained normal image, transports the placed direction,
+and solves the destination tangent basis. A batch can cover up to 128
+charts or 8,192 texels while keeping the original overlap, margin and
+work-budget order. The existing full-precision path handles numerically
+sensitive samples. The independent angular certificate still evaluates
+every candidate atlas, including native or prepared source fields, atlas
+edges, shaped endpoints and active skin poses as applicable. In the direct
+Arc fixture, 16,163 of 16,384 texels encoded on the GPU and each matched
+the full-precision reference. All 11 focused regressions pass. Seventeen
+worker output files match byte for byte, and nested Wayland and synthetic
+OpenXR produce the exact smooth retained normal package. Scoped sanitizer
+and all three missing-device checks pass. GPU certification of the finished
+map and alternate-coordinate material evaluation remain open.
+[Retained normal raster evidence](validation/retained-normal-raster-gpu-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
