@@ -2539,7 +2539,9 @@ PortableRetopoImages check_portable_retopo_mtoon(const std::filesystem::path &pa
        "GLB has a selectable authored MToon variant and an independent Core PBR material");
  const auto &core=*primitive.material,&toon=*primitive.mappings[0].material;
  const auto &source_maps=patch.painted->source_maps();
- const bool core_normal=source_maps&&source_maps->normal.image;
+ const auto &bake=patch.painted->baked();
+ const bool baked_normal=bake&&!bake->maps.normal.rgba.empty();
+ const bool core_normal=(source_maps&&source_maps->normal.image)||baked_normal;
  check(bool(core.normal_texture.texture)==core_normal&&toon.normal_texture.texture&&
        core.normal_texture.texture!=toon.normal_texture.texture&&
        core.occlusion_texture.texture&&core.pbr_metallic_roughness.metallic_roughness_texture.texture,
@@ -2567,6 +2569,9 @@ PortableRetopoImages check_portable_retopo_mtoon(const std::filesystem::path &pa
         (proof.contains("maximumLinearShadeError")==(binding.roles[0].image==binding.roles[1].image))&&
         (!proof.contains("maximumLinearShadeError")||proof.at("maximumLinearShadeError").get<double>()<=.008),
         "Visible ink records its colour, emitted radiance and applicable shared shade bounds");
+  if(baked_normal)
+   check(proof.at("maximumNormalErrorRadians").get<double>()<.02&&toon.normal_texture.scale==1,
+         "GLB certifies the merged Bake normal and uses its exported unit scale");
  }
  const auto tangents=cgltf_find_accessor(&primitive,cgltf_attribute_type_tangent,0);
  const auto positions=cgltf_find_accessor(&primitive,cgltf_attribute_type_position,0);
@@ -2638,8 +2643,14 @@ void verify_mixed_retopo_sampling(const Scene &scene,const PortableRetopoImages 
  const auto base=texture(exported.mtoon_base),shade=texture(exported.mtoon_shade),emission=texture(exported.mtoon_emission);
  const auto composed_base=texture(derived.color),composed_emission=texture(derived.emission);
  const auto color_coverage=texture(derived.color_coverage),emission_coverage=texture(derived.emission_coverage);
- float max_base=0,max_shade=0,max_emission=0;
- size_t painted_samples=0;
+ const bool baked_normal=!patch.painted->source_maps()&&patch.painted->baked()&&
+     !patch.painted->baked()->maps.normal.rgba.empty();
+ if(baked_normal)
+  check(!derived.baked_normal.rgba.empty()&&!derived.baked_coverage.rgba.empty(),
+        "The native renderer exposes the actual covered normal Bake");
+ const auto normal=texture(exported.mtoon_normal);
+ float max_base=0,max_shade=0,max_emission=0,max_normal=0;
+ size_t painted_samples=0,partial_normals=0;
  const auto &mesh=patch.painted->mesh();
  const auto uv_visible=[&](float u,float v){
   const auto edge=[&](const auto &a,const auto &b){return (b[0]-a[0])*(v-a[1])-(b[1]-a[1])*(u-a[0]);};
@@ -2665,6 +2676,30 @@ void verify_mixed_retopo_sampling(const Scene &scene,const PortableRetopoImages 
   const auto contributions=hdr?detail::sample_overlay_values(*packet,u,v,false):detail::PaintOverlayValues{};
   if(cover>.01f)++painted_samples;
   const auto actual_base=srgb(base),actual_shade=srgb(shade),actual_emission=srgb(emission);
+  if(baked_normal){
+   const auto direction=[](const auto &rgb){return Vec3{2*rgb[0]-1,2*rgb[1]-1,2*rgb[2]-1};};
+   auto source=direction(linear(binding.roles[size_t(MToonSlot::Normal)]));
+   source.x*=params.normal_scale;
+   source.y*=params.normal_scale;
+   const int r=derived.baked_normal.width;
+   const float px=u*r-.5f,py=v*r-.5f;
+   const int ix=int(std::floor(px)),iy=int(std::floor(py));
+   const float dx=px-ix,dy=py-iy;
+   Vec3 detail{};
+   float covered=0;
+   for(int y=0;y<2;++y)for(int x=0;x<2;++x){
+    const size_t at=(std::clamp(iy+y,0,r-1)*r+std::clamp(ix+x,0,r-1))*4;
+    const float weight=(x?dx:1-dx)*(y?dy:1-dy)*derived.baked_coverage.rgba[at]/255.f;
+    const auto *rgb=derived.baked_normal.rgba.data()+at;
+    detail+=direction(std::array{rgb[0]/255.f,rgb[1]/255.f,rgb[2]/255.f})*weight;
+    covered+=weight;
+   }
+   if(covered>.001f&&covered<.999f)++partial_normals;
+   const auto expected=normalized(normalized(source)*(1-covered)+normalized(detail)*covered);
+   const auto actual=normalized(direction(linear(normal)));
+   const auto angle=std::acos(std::clamp(dot(expected,actual),-1.f,1.f));
+   max_normal=std::max(max_normal,angle);
+  }
   for(size_t k=0;k<3;++k){
    const float typed_base=params.base_color[k]*typed[k],generic=patch.material.color[k]*pbr[k];
    const float expected_base=cover>0?std::max(0.f,composed[k]+(typed_base-generic)*(1-cover)):typed_base;
@@ -2684,6 +2719,10 @@ void verify_mixed_retopo_sampling(const Scene &scene,const PortableRetopoImages 
  std::cout<<"MIXED_MTOON painted="<<painted_samples<<" base_error="<<max_base<<" shade_error="<<max_shade
           <<" emission_error="<<max_emission<<" base_size="<<exported.mtoon_base.width<<" emission_size="
           <<exported.mtoon_emission.width<<" strength="<<params.emission_strength<<'\n';
+ if(baked_normal){
+  check(partial_normals>100&&max_normal<.02f,"Independent fractional UV reads agree with the covered MToon normal mix");
+  std::cout<<"RETOPO_BAKE_MTOON partial="<<partial_normals<<" maximum_angle="<<max_normal<<'\n';
+ }
 }
 
 void standalone_retopo_mtoon(const Scene &guide) {
@@ -2713,16 +2752,17 @@ void standalone_retopo_mtoon(const Scene &guide) {
  ready(doc);
  const auto accepted=doc.copy_scene();
  const auto &patch=accepted.active();
+ const bool baked=bool(guide.active().painted->baked());
  check(patch.retopology&&patch.retopology->source==guide.active().id&&patch.material_bindings->has_mtoon&&
-       !patch.painted->source_maps()&&!patch.painted->baked()&&patch.painted->has_paint_data()&&
+       !patch.painted->source_maps()&&bool(patch.painted->baked())==baked&&patch.painted->has_paint_data()&&
        patch.painted->layers().size()==2&&!patch.painted->layers().back().visible,
        "The accepted standalone patch owns visible and hidden paint without a Core texture atlas");
  doc.export_asset("standalone-standard.glb",AssetExportFormat::Glb).get();
  doc.export_asset("standalone-editable.glb",AssetExportFormat::EditableGlb256).get();
  for (const auto *name:{"standalone-standard.glb","standalone-editable.glb"}) {
   const auto exported=check_portable_retopo_mtoon(name,patch,true);
-  check(exported.mtoon_normal.rgba==patch.material_bindings->roles[size_t(MToonSlot::Normal)].image->rgba,
-        "The standalone paint export preserves the typed normal map byte for byte");
+  check((exported.mtoon_normal.rgba==patch.material_bindings->roles[size_t(MToonSlot::Normal)].image->rgba)!=baked,
+        "The portable normal only changes when it incorporates the covered Bake");
   verify_mixed_retopo_sampling(accepted,exported,true);
  }
  check(doc.copy_scene().encode()==accepted.encode()&&Scene::load("standalone-editable.glb").encode()==accepted.encode()&&

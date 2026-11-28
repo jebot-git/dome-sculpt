@@ -157,16 +157,20 @@ bool portable_mtoon_bake_frame(const Mesh &mesh,const TextureSetView &field,
     std::abs(product(0,1))>tolerance||std::abs(product(0,2))>tolerance||std::abs(product(1,2))>tolerance)
   return false;
  constexpr float error=1e-5f;
- size_t processed=0;
- for(auto face:field.domain->triangles()){
-  if((processed++&1023)==0)stop(limits);
+ const auto faces=field.domain?field.domain->triangles().size():mesh.indices.size()/3;
+ for(size_t i=0;i<faces;++i){
+  if((i&1023)==0)stop(limits);
+  const auto face=field.domain?field.domain->triangles()[i]:i;
   const size_t first=size_t(face)*3;
   const auto a=mesh.indices[first],b=mesh.indices[first+1],c=mesh.indices[first+2];
   const auto n=mesh.normals[a];
   const auto &t=tangents[first];
   const Vec3 axis{t[0],t[1],t[2]};
+  const auto matches_axis=[&](const Tangent &corner){
+   return corner[3]==t[3]&&length(Vec3{corner[0],corner[1],corner[2]}-axis)<=error;
+  };
   if(length(mesh.normals[b]-n)>error||length(mesh.normals[c]-n)>error||
-     tangents[first+1]!=t||tangents[first+2]!=t||std::abs(length(n)-1)>error||
+     !matches_axis(tangents[first+1])||!matches_axis(tangents[first+2])||std::abs(length(n)-1)>error||
      std::abs(length(axis)-1)>error||std::abs(dot(n,axis))>error)return false;
   // An original UV-derivative map and the exported Mikk frame must use
   // the same axes. Check the actual triangle derivatives and handedness.
@@ -382,7 +386,8 @@ double mtoon_normal_cell_error(const std::array<const MToonNormalTap *,4> &taps)
 }
 
 std::shared_ptr<const Image> compose_mtoon_baked_normal(const TextureSetView &field,
-    const TextureMaps &maps,const MToonMaterial &effective,double &bound,const TextureSetLimits &limits){
+    const TextureMaps &maps,const MToonMaterial &effective,double &bound,const TextureSetLimits &limits,
+    std::span<const uint8_t> sampled={}){
  const auto &normal=maps.baked_normal,&coverage=maps.baked_coverage;
  const auto r=field.painted->resolution();
  normal.validate();coverage.validate();
@@ -413,6 +418,15 @@ std::shared_ptr<const Image> compose_mtoon_baked_normal(const TextureSetView &fi
  constexpr double limit=.02;
  auto output=std::make_shared<Image>(normal);
  std::vector<MToonNormalTap> previous(r),row(r);
+ const auto sampled_cell=[&](uint32_t x,uint32_t y){
+  if(sampled.empty())return true;
+  const size_t stride=size_t(r)+2;
+  const size_t at=(size_t(y)+1)*stride+x+1;
+  // The last cell on each axis also bounds the constant clamp interval
+  // beyond its right or bottom edge.
+  return sampled[at]||(x+1==r&&sampled[at+1])||(y+1==r&&sampled[at+stride])||
+      (x+1==r&&y+1==r&&sampled[at+stride+1]);
+ };
  for(size_t y=0;y<r;++y){
   stop(limits);
   for(size_t x=0;x<r;++x){
@@ -433,7 +447,9 @@ std::shared_ptr<const Image> compose_mtoon_baked_normal(const TextureSetView &fi
    }
    const size_t left=x?x-1:x;
    const auto &above=y?previous:row;
-   bound=std::max(bound,mtoon_normal_cell_error({&above[left],&above[x],&row[left],&tap}));
+   if(!sampled_cell(x,y))continue;
+   const std::array<const MToonNormalTap*,4> taps{&above[left],&above[x],&row[left],&tap};
+   bound=std::max(bound,mtoon_normal_cell_error(taps));
    if(bound>limit)return {};
   }
   previous.swap(row);
@@ -789,18 +805,20 @@ using NativeTileEntry=std::pair<const PaintTile *,size_t>;
 bool legacy_grid(TextureSetGridMode mode) {
  return mode==TextureSetGridMode::NativeLdr||mode==TextureSetGridMode::RetainedLdr;
 }
+bool raw_bake_normal(TextureSetGridMode mode,const BakedTextures *bake) {
+ return (mode==TextureSetGridMode::NativeLdr||mode==TextureSetGridMode::NativeMToonHdr)&&
+     bake&&!bake->maps.normal.rgba.empty();
+}
 
 paint_compute::Input material_grid_input(const PaintedMesh &paint,const Material &material,
     const SparseExportGrid &grid,const TextureSetLimits &limits,TextureSetGridMode mode){
  using namespace paint_compute;
  static_assert(sizeof(PaintPixel)==sizeof(Pixel)&&sizeof(PaintTile)==Input::tile_bytes);
- const bool typed=mode==TextureSetGridMode::NativeMToonHdr;
  const bool legacy=legacy_grid(mode);
  const auto &bake=paint.baked();
- const bool normal=(mode==TextureSetGridMode::NativeHdr||typed)&&bake&&!bake->maps.normal.rgba.empty();
  Input input;
  input.native_channels=Color|Orm|(legacy?Emission:0u);
- input.raw_bake_normal=typed;
+ input.raw_bake_normal=raw_bake_normal(mode,bake.get());
  input.native_padding=grid.padding;
  auto &p=input.parameters;
  p.resolution=grid.resolution;
@@ -814,7 +832,7 @@ paint_compute::Input material_grid_input(const PaintedMesh &paint,const Material
   input.bake.color=bake->maps.color.rgba;
   input.bake.orm=bake->maps.metal_rough.rgba;
   if(legacy)input.bake.emission=bake->maps.emission.rgba;
-  if(normal)input.bake.normal=bake->maps.normal.rgba;
+  if(input.raw_bake_normal||mode==TextureSetGridMode::NativeHdr)input.bake.normal=bake->maps.normal.rgba;
  }
  const auto slots=size_t(p.tiles)*paint.layers().size();
  input.layers.reserve(paint.layers().size());
@@ -864,7 +882,7 @@ std::shared_ptr<TextureMaps> composite_device_grid(const PaintedMesh &paint,cons
  maps->color={r,r,std::move(result.planes[0])};
  maps->metal_rough={r,r,std::move(result.planes[1])};
  if(legacy)maps->emission={r,r,std::move(result.planes[2])};
- if(!input.bake.normal.empty()&&!typed)maps->normal={r,r,std::move(result.normals)};
+ if(!input.bake.normal.empty()&&!input.raw_bake_normal)maps->normal={r,r,std::move(result.normals)};
  const auto coverage_image=[&](bool full){
   if(!full)return Image{1,1,{0,0,0,255}};
   Image image{r,r,std::vector<uint8_t>(count*4)};
@@ -873,7 +891,7 @@ std::shared_ptr<TextureMaps> composite_device_grid(const PaintedMesh &paint,cons
  };
  if(legacy||typed)maps->color_coverage=coverage_image(typed||covered[0]);
  if(legacy)maps->emission_coverage=coverage_image(covered[1]);
- if(typed){
+ if(input.raw_bake_normal){
   maps->baked_base=bake;
   maps->baked_normal={r,r,std::move(result.normals)};
   maps->baked_coverage=coverage_image(true);
@@ -884,7 +902,7 @@ std::shared_ptr<TextureMaps> composite_device_grid(const PaintedMesh &paint,cons
   maps->transparent|=bool(color.transparency&common_transparency);
   if(typed||covered[0])maps->color_coverage.rgba[at*4]=color.coverage;
   if(legacy&&covered[1])maps->emission_coverage.rgba[at*4]=result.emission_coverage[at];
-  if(typed)maps->baked_coverage.rgba[at*4]=result.bake_coverage[at];
+  if(input.raw_bake_normal)maps->baked_coverage.rgba[at*4]=result.bake_coverage[at];
  }
  stop(limits);
  return maps;
@@ -897,7 +915,8 @@ void charge_native_grid(const PaintedMesh &paint,const SparseExportGrid &grid,si
  const bool normal=mode==TextureSetGridMode::NativeHdr&&baked&&!baked->maps.normal.rgba.empty();
  const bool typed=mode==TextureSetGridMode::NativeMToonHdr;
  const bool legacy_emission=legacy_grid(mode);
- charge(work,count,legacy_emission||typed?7:normal?4:3,limits.maximum_work);
+ const bool raw=raw_bake_normal(mode,baked.get());
+ charge(work,count,legacy_emission?7+2*raw:typed?7:normal?4:3,limits.maximum_work);
  for(size_t at=0;at<count;++at){
   if((at&4095)==0)stop(limits);
   const auto owner=grid.padding[at];
@@ -987,7 +1006,7 @@ size_t native_material_grid_bytes(const PaintedMesh &paint,TextureSetGridMode mo
  const auto &baked=paint.baked();
  const bool normal=mode==TextureSetGridMode::NativeHdr&&baked&&!baked->maps.normal.rgba.empty();
  const auto channels=mode==TextureSetGridMode::NativeMToonHdr?20:
-     legacy_grid(mode)?20:normal?12:8;
+     legacy_grid(mode)?20+8*raw_bake_normal(mode,baked.get()):normal?12:8;
  return sizeof(TextureMaps)+size_t(r)*r*channels+size_t(r/PaintTile::size)*(r/PaintTile::size)*sizeof(uint16_t);
 }
 
@@ -996,7 +1015,7 @@ size_t native_material_grid_scratch_bytes(const PaintedMesh &paint,TextureSetGri
  using namespace paint_compute;
  const auto r=paint.resolution();
  const auto slots=size_t(r/PaintTile::size)*(r/PaintTile::size)*paint.layers().size();
- const auto per_pixel=sizeof(ColorInfo)+(legacy_grid(mode)||mode==TextureSetGridMode::NativeMToonHdr);
+ const auto per_pixel=sizeof(ColorInfo)+legacy_grid(mode)+raw_bake_normal(mode,paint.baked().get());
  return sizeof(Input)+paint.layers().size()*sizeof(Layer)+size_t(r)*r*per_pixel+
      slots*(sizeof(NativeTileEntry)+sizeof(uint32_t)+sizeof(std::span<const std::byte>))+
      std::min(slots,Input::native_upload_tiles)*Input::tile_bytes;
@@ -1034,6 +1053,7 @@ std::shared_ptr<TextureMaps> compile_native_material_grid(const PaintedMesh &pai
  const auto count=grid.padding.size();
  const bool normal=mode==TextureSetGridMode::NativeHdr&&baked&&!baked->maps.normal.rgba.empty();
  const bool legacy_emission=legacy_grid(mode);
+ const bool raw=raw_bake_normal(mode,baked.get());
  const auto covered=legacy_emission?legacy_coverage(paint,work,limits):std::array<bool,2>{};
  if(compute_backend()!="CPU")return composite_device_grid(paint,material,grid,limits,mode,covered);
  auto maps=std::make_shared<TextureMaps>();
@@ -1043,9 +1063,10 @@ std::shared_ptr<TextureMaps> compile_native_material_grid(const PaintedMesh &pai
   image->rgba.resize(count*4);
  }
  if(normal)maps->normal={grid.resolution,grid.resolution,std::vector<uint8_t>(count*4)};
- if(typed){
+ if(typed)maps->color_coverage={grid.resolution,grid.resolution,std::vector<uint8_t>(count*4)};
+ if(raw){
   maps->baked_base=baked;
-  for(auto *image:{&maps->color_coverage,&maps->baked_normal,&maps->baked_coverage})
+  for(auto *image:{&maps->baked_normal,&maps->baked_coverage})
    *image={grid.resolution,grid.resolution,std::vector<uint8_t>(count*4)};
  }
  if(legacy_emission){
@@ -1095,7 +1116,7 @@ std::shared_ptr<TextureMaps> compile_native_material_grid(const PaintedMesh &pai
      const auto *baked_emission=baked->maps.emission.rgba.data()+offset;
      for(size_t i=0;i<3;++i)emission[i]=bake_mix(emission[i],linear_byte[baked_emission[i]]);
     }
-    if(typed)std::copy_n(baked->maps.normal.rgba.data()+offset,4,maps->baked_normal.rgba.data()+at*4);
+    if(raw)std::copy_n(baked->maps.normal.rgba.data()+offset,4,maps->baked_normal.rgba.data()+at*4);
     if(normal){
      const auto *detail=baked->maps.normal.rgba.data()+offset;
      Vec3 direction{unit(detail[0])*2-1,unit(detail[1])*2-1,unit(detail[2])*2-1};
@@ -1137,6 +1158,8 @@ std::shared_ptr<TextureMaps> compile_native_material_grid(const PaintedMesh &pai
   if(typed){
    maps->color_coverage.rgba[at*4]=byte(color_coverage);
    maps->color_coverage.rgba[at*4+3]=255;
+  }
+  if(raw){
    maps->baked_coverage.rgba[at*4]=byte(baked_coverage);
    maps->baked_coverage.rgba[at*4+3]=255;
   }
@@ -2043,6 +2066,7 @@ std::optional<PortableMToonSetPaint> compile_retopo_mtoon_paint(const TextureSet
  const bool shade=color&&mtoon_shared_shade(binding);
  const bool render_hdr=EmissionExportAccess::requires_preview(paint,field.material,&binding);
  const auto &core=paint.source_maps();
+ const bool normal=paint.baked()&&!paint.baked()->maps.normal.rgba.empty();
  std::optional<PaintEmissionSampler> coefficients;
  if(emission&&render_hdr){
   coefficients.emplace(paint,remaining.cancelled);
@@ -2088,6 +2112,30 @@ std::optional<PortableMToonSetPaint> compile_retopo_mtoon_paint(const TextureSet
     (emission&&effective.parameters.emission_strength!=0&&
      !compose(MToonSlot::Emission,out.emission,coefficients?&*coefficients:nullptr))){
   return {};
+ }
+ if(normal){
+  size_t normal_bytes=0,normal_work=0;
+  const size_t pixels=size_t(r)*r;
+  charge(normal_bytes,pixels,4,budget.maximum_bytes);
+  charge(normal_bytes,r,2*sizeof(MToonNormalTap),budget.maximum_bytes);
+  charge(normal_bytes,size_t(r+2)*(r+2),1,budget.maximum_bytes);
+  charge(normal_bytes,r+2,sizeof(double),budget.maximum_bytes);
+  charge(normal_work,pixels,64,budget.maximum_work);
+  if(const auto &image=binding.roles[size_t(MToonSlot::Normal)].image)
+   charge(normal_work,image->rgba.size(),1,budget.maximum_work);
+  budget.maximum_work-=normal_work;
+  remaining.maximum_work=budget.maximum_work;
+  std::vector<uint8_t> sampled;
+  const auto &mesh=paint.mesh();
+  if(std::ranges::all_of(mesh.uv,[](const auto &uv){return uv[0]>=0&&uv[0]<=1&&uv[1]>=0&&uv[1]<=1;})){
+   const auto knots=mtoon_filter_knots({r});
+   sampled=retopo_sampled_cells(mesh,knots,knots,budget);
+   out.retopo_uv_domain=true;
+  }
+  remaining.maximum_work=budget.maximum_work;
+  out.normal=compose_mtoon_baked_normal(field,*maps,effective,out.normal_error_radians,budget,sampled);
+  if(!out.normal)return {};
+  budget.maximum_bytes-=pixels*4;
  }
  remaining.maximum_bytes=budget.maximum_bytes+bytes;
  return out;
@@ -2146,11 +2194,12 @@ std::shared_ptr<const RetopoMToonExport> RetopoMToonExport::capture(const Sculpt
  if(!object.retopology||object.texture_sets||!object.mesh_active||object.deformation||
     !native_texture_set_mtoon(paint.get(),object.appearance.get(),binding.get())||
     binding->material.version()!=MToonVersion::V1||paint->in_stroke()||
-    paint->baked()||paint->has_physical_emission()||binding->physical_emission)
+    paint->has_physical_emission()||binding->physical_emission)
   return {};
  const auto &params=binding->material.parameters;
  if(params.rotation_speed!=0||params.scroll!=std::array<float,2>{})return {};
  const auto &core=paint->source_maps();
+ if(paint->baked()&&(core||EmissionExportAccess::requires_preview(*paint,object.material,binding.get())))return {};
  if(!core&&paint->has_paint_data()&&!native_hdr_grid(*paint))return {};
  const auto &normal=binding->material.textures[size_t(MToonSlot::Normal)];
  // Both materials read the same explicit tangent attribute in a portable
@@ -2195,8 +2244,17 @@ std::optional<TextureSetExport> compile_retopo_mtoon_export(const ObjectSurface 
  charge(bytes,mesh.positions.size(),2*sizeof(Vec3)+sizeof(std::array<float,2>),limits.maximum_bytes);
  owner.authenticate(object,limits);
  mesh.validate();
- const auto frames=portable_mtoon_derivative_frames(mesh,field,object.world_matrix(),limits);
- if(!frames||frames->normal_coordinates)return {};
+ const auto &bake=field.painted->baked();
+ const bool baked_normal=bake&&!bake->maps.normal.rgba.empty();
+ std::vector<Tangent> canonical;
+ std::optional<PortableMToonFrames> derivative;
+ if(baked_normal){
+  canonical=tangent_corners(mesh,limits.cancelled);
+  if(!portable_mtoon_bake_frame(mesh,field,canonical,object.world_matrix(),limits))return {};
+ }else{
+  derivative=portable_mtoon_derivative_frames(mesh,field,object.world_matrix(),limits);
+  if(!derivative||derivative->normal_coordinates)return {};
+ }
 
  TextureSetExport out;
  out.working_bound=bytes;
@@ -2205,11 +2263,11 @@ std::optional<TextureSetExport> compile_retopo_mtoon_export(const ObjectSurface 
  emitted=Mesh{};
  emitted.indices.reserve(count);
  std::map<std::pair<uint32_t,std::array<uint32_t,4>>,uint32_t> indices;
- for(size_t face=0;face<frames->triangles.size();++face){
+ for(size_t face=0;face<count/3;++face){
   if((face&1023)==0)stop(limits);
   for(size_t c=0;c<3;++c){
    const auto vertex=mesh.indices[face*3+c];
-   const auto &tangent=frames->triangles[face][c].tangent;
+   const auto &tangent=baked_normal?canonical[face*3+c]:derivative->triangles[face][c].tangent;
    const auto [entry,fresh]=indices.emplace(std::pair{vertex,std::bit_cast<std::array<uint32_t,4>>(tangent)},
                                             uint32_t(emitted.positions.size()));
    if(fresh){
@@ -2226,7 +2284,8 @@ std::optional<TextureSetExport> compile_retopo_mtoon_export(const ObjectSurface 
  material.count=count;
  material.material=field.material;
  material.tangent_attribute=true;
- material.portable_mtoon_derivative_frame=true;
+ material.portable_mtoon_bake_frame=baked_normal;
+ material.portable_mtoon_derivative_frame=!baked_normal;
  out.fields.push_back(std::move(material));
  return out;
 }

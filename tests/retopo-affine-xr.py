@@ -90,7 +90,7 @@ for mode in ('accept','focus','unconfirmed'):
           metadata(replacement['layers'])==metadata(guide_paint['layers']),
           mode+' keeps the writable layers on the new native patch')
     base = guide_paint.get('baked')
-    if base:
+    if base and base.get('float_emission'):
         check(bool(replacement['layers'][0]['physical_emission_tiles']) and bool(replacement['layers'][1]['tiles']),
               mode+' preserves FLOAT paint and its hidden mask')
         baked = replacement.get('baked', {})
@@ -106,7 +106,7 @@ for mode in ('accept','focus','unconfirmed'):
     else:
         bindings = scene_payload(after)['source_materials']['bindings']
         old_binding, new_binding = [bindings[obj['material_bindings']] for obj in objects]
-        check(old_binding['material'] and new_binding['material'] and replacement.get('baked') is None and
+        check(old_binding['material'] and new_binding['material'] and bool(replacement.get('baked'))==bool(base) and
               all(old['image'] != new['image'] and new['image'] is not None and new['wrap'] == [33071,33071]
                   for old,new in zip(old_binding['roles'][:4],new_binding['roles'][:4])),
               mode+' captures the original MToon color, shade, normal and emission as independent patch maps')
@@ -114,6 +114,12 @@ for mode in ('accept','focus','unconfirmed'):
         if painted:
             check(all(layer['tiles'] for layer in replacement['layers']),
                   mode+' keeps the visible and hidden paint on the standalone MToon patch')
+        if base:
+            baked=replacement['baked']
+            coverage=baked['coverage']['bytes']
+            check(baked['normal']['bytes'] and baked['emission']['bytes'] and
+                  any(0<value<255 for value in coverage) and max(coverage)>128,
+                  mode+' retains partially covered native normal and emission Bake maps')
         if mode=='accept':
             glb=out/'mtoon-portable.glb'
             subprocess.run([str(binary),'--export-project',str(out/'accept.dsculpt'),str(glb)],
@@ -134,6 +140,11 @@ for mode in ('accept','focus','unconfirmed'):
                       all(bounds[key]<=.008 for key in ('maximumLinearColorError','maximumLinearShadeError',
                                                       'maximumLinearEmissionError')),
                       'Standard GLB certifies color, shared shade and emission from the visible paint layers')
+                if base:
+                    core=exported['materials'][primitive['material']]
+                    check(0<bounds['maximumNormalErrorRadians']<.02 and
+                          core['normalTexture']['index']!=material['normalTexture']['index'],
+                          'Standard GLB certifies the independent covered MToon normal Bake')
     patch=objects[1]['retopology'];topology=json.loads(patch['topology'])
     positions=sorted(v[1] for v in topology['vertices'])
     want=sorted([[-.2,-.2,0],[.2,-.2,0],[0,.2,0]])

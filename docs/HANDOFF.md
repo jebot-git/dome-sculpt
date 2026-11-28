@@ -357,10 +357,19 @@ factors, including at 64 texels, when the patch has no Core source atlas.
 The export worker resolves the typed base, shared shade and emission over
 that composite and certifies their filtering across the emitted UV triangles.
 The variant carries its original typed normal map and the Editable package
-restores the original visible and hidden layers. This export path still needs
-separate support for physical emission, retained Bakes and materials outside
-the existing static tangent and sampler proof.
+restores the original visible and hidden layers.
 [Painted standalone MToon export evidence](validation/retopo-painted-standalone-20261128.json)
+
+The standalone MToon 1 variant can now carry a retained RGB8 Bake as well.
+The GPU compositor reads the raw covered normal alongside the paint and
+emission maps. The export worker verifies that the patch's Mikk tangents
+agree with the material's derivative frame, then resolves and certifies a
+separate normal map for the MToon variant. Both GLB formats retain the
+independent Core PBR normal and Editable GLB restores the native Bake and
+all layers. This path covers certified static frames. Physical emission,
+separate Core source atlases with retained Bakes and more general tangent
+frames still need their export adapters.
+[Retained MToon Bake export evidence](validation/retopo-baked-mtoon-20261128.json)
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing

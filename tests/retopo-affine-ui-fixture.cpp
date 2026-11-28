@@ -10,7 +10,8 @@
 using namespace dome;
 int main(int argc,char **argv)try {
   const bool prepared=argc==3 && std::string_view(argv[2])=="prepared";
-  const bool painted_mtoon=argc==3 && std::string_view(argv[2])=="painted-mtoon";
+  const bool baked_mtoon=argc==3 && std::string_view(argv[2])=="baked-mtoon";
+  const bool painted_mtoon=baked_mtoon || (argc==3 && std::string_view(argv[2])=="painted-mtoon");
   const bool mtoon=painted_mtoon || (argc==3 && std::string_view(argv[2])=="mtoon");
   if(argc!=2 && !prepared && !mtoon)return 2;
   Mesh m;m.positions={{-.6f,-.6f,0},{.6f,-.6f,0},{.6f,.6f,0},{-.6f,.6f,0}};
@@ -56,6 +57,26 @@ int main(int argc,char **argv)try {
       o.painted->begin_stroke();o.painted->stamp(b,p);
       if(!o.painted->end_stroke())throw std::runtime_error("Hidden MToon stroke made no change");
       o.painted->layer_properties("Hidden ink",false,.74f);
+    }
+    if(baked_mtoon){
+      const auto filled=[](std::array<uint8_t,4> pixel){
+        Image image{64,64,std::vector<uint8_t>(64*64*4)};
+        for(size_t at=0;at<image.rgba.size();at+=4)
+          std::copy(pixel.begin(),pixel.end(),image.rgba.begin()+at);
+        return image;
+      };
+      BakedTextures bake;
+      bake.maps.color=filled({56,75,79,255});
+      bake.maps.metal_rough=filled({170,146,87,255});
+      bake.maps.emission=filled({47,23,13,255});
+      bake.maps.normal=filled({140,119,254,255});
+      bake.coverage.resize(64*64);
+      for(size_t i=0;i<bake.coverage.size();++i){
+        const auto x=int(i%64),y=int(i/64);
+        bake.coverage[i]=uint8_t(std::clamp((x-19)*16,0,255));
+        bake.maps.normal.rgba[i*4]=uint8_t(132+y/4);
+      }
+      o.painted->install_bake(std::move(bake));
     }
     o.material_bindings=std::move(binding);
   }else{

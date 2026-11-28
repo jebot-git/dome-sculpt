@@ -944,7 +944,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     output["name"]=field.name;
     output["pbrMetallicRoughness"]["metallicFactor"]=current.metallic;
     output["pbrMetallicRoughness"]["roughnessFactor"]=current.roughness;
-    if(paint&&(!variant||paint->color||paint->emission)){
+    if(paint&&(!variant||paint->color||paint->emission||paint->normal)){
       if(!variant){
         auto &pbr=output["pbrMetallicRoughness"];
         const auto orm=texture(float_preview?float_preview->metal_rough:compiled.textures->metal_rough,paint_sampler);
