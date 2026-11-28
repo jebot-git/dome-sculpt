@@ -1,0 +1,120 @@
+{
+  "date": "2026-11-28",
+  "product": "59a891152d7aeacf98c58db7b4b35d57c99ad843",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Standard GLB for a static prepared imported MToon1 Bake with a shared glTF base role and separate shade sampling.",
+  "baseline": "The preceding release refused the same actual baked native scene and preserved a pre-existing GLB.",
+  "fixture": {
+    "size": 64,
+    "base_normal_and_emission_share_writable_uv": true,
+    "original_shade_uv": 0,
+    "typed_emission_gain": 2.25,
+    "donor_absolute_linear_emission": [
+      0.27,
+      0.14,
+      0.09
+    ],
+    "distinct_core_pbr_and_typed_normals_on_misses": true,
+    "exact_native_save_and_history": true,
+    "exact_native_archive_reopen_and_reexport": true,
+    "native_sha256": "d36d0ed5be26a6f17b54db68e39029a00107ee5f2174aebef515b2e74e45b5c5",
+    "maximum_portable_pixel_difference_bytes": 1
+  },
+  "arc": {
+    "device": "Intel Arc A770 with oneAPI Level Zero and hardware EGL",
+    "checks": 668,
+    "bake_export_kernels": [
+      "launch_mapped_field",
+      "launch_material_sources",
+      "launch_material"
+    ]
+  },
+  "release_ctest": [
+    "baked-emission-native",
+    "emission-raster-finite-compute",
+    "source-material-raster-compute",
+    "emission-raster-mapped-compute",
+    "emission-raster-mapped-missing-gpu",
+    "emission-raster-texture-set-compute",
+    "baked-emission-workflow",
+    "baked-emission-source",
+    "baked-emission-uv1-worker",
+    "emission-export",
+    "emission-export-worker",
+    "source-paint-export",
+    "source-paint-bake",
+    "source-paint-authoring",
+    "source-paint-physical-authoring",
+    "surface-program-switch",
+    "mtoon-render",
+    "mtoon-texture-sets",
+    "mtoon-painted-texture-sets",
+    "mtoon-resized-texture-set",
+    "mtoon-baked-texture-sets",
+    "vrm1-source-export",
+    "raw-hdr-authoring",
+    "xr-editable-export",
+    "source-role-missing-uv1"
+  ],
+  "regression_before_scope_fix": "The first candidate changed existing texture-set FLOAT Bake pixels. The correction scopes exact LDR donor sampling to standalone imported meshes.",
+  "other_gpu_profiles": {
+    "cuda": "affected host code compiled",
+    "rocm": "affected host code compiled"
+  },
+  "asan_ubsan": {
+    "mode": "opt-in headless reference",
+    "checks": 668,
+    "export_matches_arc": true
+  },
+  "gpu_only": {
+    "cpu_ui_configuration_rejected": true,
+    "missing_gpu_kept_previous_cli_output": true
+  },
+  "native_wayland": {
+    "checks": 7,
+    "artifact_sha256": "930e295138979556aadc7505cec4397f62c781c538812cc5c849c5c1bf64a5a7"
+  },
+  "openxr": {
+    "checks": 10,
+    "synthetic_tracking": true,
+    "artifact_sha256": "930e295138979556aadc7505cec4397f62c781c538812cc5c849c5c1bf64a5a7",
+    "native_sha256": "d36d0ed5be26a6f17b54db68e39029a00107ee5f2174aebef515b2e74e45b5c5",
+    "focus_loss_cancelled_export": true
+  },
+  "khronos": {
+    "prepared-mtoon-baked.glb": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 215132,
+      "sha256": "930e295138979556aadc7505cec4397f62c781c538812cc5c849c5c1bf64a5a7",
+      "errors": 0,
+      "warnings": 0
+    },
+    "prepared-mtoon-baked-portable.glb": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 214136,
+      "sha256": "0f49f0655a3f14f5b1fe7f7a3bb43780fcd9900d9a3e2105abca3290d8736ead",
+      "errors": 0,
+      "warnings": 0
+    }
+  },
+  "official_mtoon_schema_validated": 2,
+  "prior_glbs_byte_identical": {
+    "prepared-mtoon-hdr.glb": "55b80b4d2158b808a0db172236e4bbe6b938aea88cbf8790402abedf892e6062",
+    "prepared-mtoon-hdr-uv0.glb": "5821ff66098c95168efba401eada214444e2fdfa25ffe234113f6319a75abc88",
+    "baked-source-hdr.glb": "7a8d9dd3f41218ef527fe2fed9346a0607ca554d28ea1b10b2e328f939c95729",
+    "baked-generated-tangents-hdr.glb": "40b51a7c7cfe9259bd9f0c6ad8c66cfa95b9090b7661495dca255255d2ae4f70",
+    "baked-native-tangents-hdr.glb": "5c8f728a32c527c18eec64ad30f8aab5664e1dae3ae7158ea75c89696e826273",
+    "baked-mask-visible.glb": "7829e58d94294a184e1d04ef606a6511b10c12dd8c50bb343648c114401e61cf",
+    "baked-mask-hidden.glb": "b83e6cd6a27af1a137093069194dcf0a009b09e6618fd57efa66f5b9d442c218",
+    "baked-mask-mixed.glb": "679d0e26b8bcd883e9d3b3b34038fba217614469e96874d9130bdcea5b88d882",
+    "varying-source-hdr.glb": "497b70223ba5aeb39e6556950e824b471cc39714ff83de0966c42081cfaf9cc6",
+    "single-surface-hdr.glb": "54fe8dccaaf6fc0ba69ace992aade6199eaea18b60dc5aa19d6bd6a444527971",
+    "mixed-source.glb": "ff769fff8afebfb62309e67abf0bc5efc1843dc13151d909bb2d981ebe9c84fa",
+    "mixed-source-hidden.glb": "484678692c4aad88173eb79876d79241c09895fa3faf1a52c04020612a689f5d",
+    "uniform-mask-cross.glb": "98e526883365742fef5b60880641cb918d3f4b761424f88089ab9c3a948b1b9a"
+  },
+  "open": [
+    "Shared-shade compilation, separately projected donor normal planes, animated UVs and legacy VRM0.",
+    "Physical headset and positive CUDA and ROCm hardware qualification."
+  ]
+}

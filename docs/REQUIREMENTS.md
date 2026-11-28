@@ -177,9 +177,17 @@ Static imported MToon 1.0 with a prepared atlas now exports physical and
 relative emission paint to Standard GLB. The selected GPU resolves the
 original UV0 or UV1 emission role with the existing source sampler. The GLB
 retains the typed shading and normal roles and displays the compiled atlas
-after a portable re-import. Full typed Bake, painted color, and animated
+after a portable re-import. General portable painted color and animated
 emission transport remain open.
 [Prepared MToon emission evidence](validation/prepared-mtoon-hdr-20261128.json)
+
+Static prepared MToon1 HDR Bake supports a shared glTF base color role and
+independent shade. It emits the baked color, authored normal, ORM and
+emission atlas in Standard GLB, with exact native Save, Undo/Redo and
+recovery. The projection resolver preserves both original normal roles on
+misses. Shared-shade compilation, separately projected normal planes,
+broader deformation and physical headset workflows remain open.
+[Prepared MToon1 Bake evidence](validation/prepared-mtoon-bake-20261128.json)
 
 ## Current validation — 2026-11-27
 

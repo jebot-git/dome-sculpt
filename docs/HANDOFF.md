@@ -547,9 +547,22 @@ and material-relative emission paint in Standard GLB. The GPU resolves
 the original transformed UV0 or UV1 image with ordered FLOAT paint and the
 original strength. The emitted material keeps its shade, rim, normal and
 morph data. The OpenGL viewport displays the portable file using the
-emission atlas on UV2. Prepared MToon color and normal Bake, animated
-emission and the legacy VRM0 shared-UV adapter remain open.
+emission atlas on UV2. Animated emission and the legacy VRM0 shared-UV
+adapter remain open.
 [Prepared MToon emission evidence](validation/prepared-mtoon-hdr-20261128.json)
+
+Static prepared MToon1 projection Bake now preserves imported normal frames,
+the writable Bake and exact FLOAT donor emission through native Save and
+Standard GLB. An ordinary donor keeps its absolute radiance when the receiving
+material has its own gain. On projection misses the native scene preserves
+the distinct Core PBR and authored MToon normals. The outbound atlas encodes
+the authored MToon normal and retains independent shade and rim sampling.
+The portable re-import matches the authored Arc A770 viewport within one
+output byte. All 25 focused Arc Release tests pass. Native DomeD Wayland,
+synthetic OpenXR and the release CLI export the same GLB byte for byte.
+Shared shade, separately projected donor normal planes and physical headset
+acceptance remain open.
+[Prepared MToon1 Bake evidence](validation/prepared-mtoon-bake-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
