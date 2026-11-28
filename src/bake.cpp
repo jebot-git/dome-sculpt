@@ -4,6 +4,7 @@
 #include "bake-ray-query.hpp"
 #include "bake-paint-coordinates.hpp"
 #include "emission-bake-source.hpp"
+#include "normal-bake-encoding.hpp"
 #include "source-uv-sampler.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake.hpp"
@@ -325,7 +326,8 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     std::span<const detail::RetainedSourceBakeField> source_fields = {},
     detail::SourceBakePlacement source_placement = {},
     std::span<const Tangent> target_metric_corners = {},
-    bool corresponding_topology = false,bool dual_normal = true,bool absolute_emission = false) {
+    bool corresponding_topology = false,bool dual_normal = true,bool absolute_emission = false,
+    std::optional<float> canonical_pair_error = {}) {
   if(o.progress)o.progress(0);
   cancel(o); validate(low,source,o,source_fields,source_normals);
   if(corresponding_topology&&(!o.cage_positions.empty()||!o.source_triangles.empty()||
@@ -363,7 +365,8 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   constexpr size_t retained_limit=128*1024*1024;
   size_t emission_budget=0;
   if(float_emission){
-    const uint64_t other=uint64_t(o.resolution)*o.resolution*(13+(o.separate_pbr_color?4:0)+(o.encode_target_normal&&dual_normal?4:0));
+    const uint64_t other=uint64_t(o.resolution)*o.resolution*(13+(o.separate_pbr_color?4:0)+
+        ((o.encode_target_normal&&dual_normal)||canonical_pair_error?4:0));
     if(other>=retained_limit)
       throw std::length_error("FLOAT Bake retained channels exceed unchanged paint budget");
     emission_budget=retained_limit-size_t(other);
@@ -460,7 +463,8 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     }
     pending.clear();
   };
-  if(o.encode_target_normal&&dual_normal)result.maps.mtoon_normal={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
+  if((o.encode_target_normal&&dual_normal)||canonical_pair_error)
+    result.maps.mtoon_normal={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
   if (!o.writable.empty()) for (size_t i=0;i<pixels;++i) if (!o.writable[i]) result.coverage[i]=4;
   for (auto *image:{&result.maps.color,&result.maps.metal_rough,&result.maps.emission,&result.normal,&result.ambient_occlusion})
     if(image!=&result.maps.emission||!float_emission)*image={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
@@ -626,9 +630,25 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       auto desired=source_normals?source_normals(hit->triangle,hit->barycentric):std::array<Vec3,2>{high_normal,high_normal};
       if(source_normals)for(auto &direction:desired){if(!finite(direction)||length(direction)<1e-10f)throw std::invalid_argument("Source normal resolver returned a singular direction");direction=normalized(direction);}
       high_normal=desired[0];Vec3 mapped;
-      if((!o.encode_target_normal||!dual_normal)&&source_normals&&length(desired[0]-desired[1])>1e-6f)
+      if(!canonical_pair_error&&(!o.encode_target_normal||!dual_normal)&&source_normals&&length(desired[0]-desired[1])>1e-6f)
         throw std::invalid_argument("Source PBR/MToon normals differ; enable genuine target normal preparation to retain both roles");
-      if(o.encode_target_normal){
+      if(canonical_pair_error){
+        std::array<detail::NormalBakeVertex,3> columns;
+        for(size_t k=0;k<3;++k){
+          const auto corner=triangle*3+k,vertex=size_t(low.indices[corner]);
+          const auto &t=o.low_tangents.empty()?low_frames[corner]:o.low_tangents[vertex];
+          columns[k]=detail::normal_bake_vertex(low.normals[vertex],{t[0],t[1],t[2]},t[3],
+              detail::NormalVertexBitangent::RawCross);
+        }
+        const auto basis=detail::normal_bake_basis(columns,{bary[0],bary[1],bary[2]},detail::NormalFragmentBasis::RawColumns);
+        const std::array outputs{&result.normal,&result.maps.mtoon_normal};
+        for(size_t role=0;role<outputs.size();++role){
+          const auto encoded=detail::encode_normal_bake(basis,desired[role]);
+          if(!encoded||encoded->quantized_angle_radians>*canonical_pair_error)
+            throw std::invalid_argument("Projected normal exceeds the writable Mikk basis conditioning or quantization limit");
+          std::copy_n(encoded->rgba.begin(),4,outputs[role]->rgba.data()+at*4);
+        }
+      }else if(o.encode_target_normal){
         const auto pbr=o.encode_target_normal(uint32_t(triangle),bary,desired[0]);
         if(pbr[0][3]!=255)throw std::invalid_argument("Explicit target normal encoder returned malformed normal data alpha");
         std::copy_n(pbr[0].begin(),4,result.normal.rgba.data()+at*4);
@@ -653,7 +673,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       if(!float_emission)result.maps.emission.rgba[at*4+3]=255;
       result.maps.metal_rough.rgba[at*4]=byte(ao); result.maps.metal_rough.rgba[at*4+1]=byte(channels.roughness);
       result.maps.metal_rough.rgba[at*4+2]=byte(channels.metallic); result.maps.metal_rough.rgba[at*4+3]=255;
-      if(!o.encode_target_normal){result.normal.rgba[at*4]=byte(mapped.x*.5f+.5f);result.normal.rgba[at*4+1]=byte(mapped.y*.5f+.5f);
+      if(!o.encode_target_normal&&!canonical_pair_error){result.normal.rgba[at*4]=byte(mapped.x*.5f+.5f);result.normal.rgba[at*4+1]=byte(mapped.y*.5f+.5f);
         result.normal.rgba[at*4+2]=byte(mapped.z*.5f+.5f);result.normal.rgba[at*4+3]=255;}
       for (int c=0;c<3;++c) result.ambient_occlusion.rgba[at*4+c]=byte(ao);
       result.ambient_occlusion.rgba[at*4+3]=255;
@@ -685,9 +705,10 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
 BakeResult detail::bake_mesh_source_normals(const Mesh &low,const BakeSource &source,const BakeOptions &options,
  const SourceBakeNormalResolver &normal,std::span<const uint32_t> target_triangles,
  std::span<const RetainedSourceBakeField> source_fields,SourceBakePlacement source_placement,
- std::span<const Tangent> target_metric_corners,bool corresponding_topology,bool absolute_emission){
+ std::span<const Tangent> target_metric_corners,bool corresponding_topology,bool absolute_emission,
+ std::optional<float> canonical_pair_error){
  return bake_mesh_impl(low,source,options,normal,target_triangles,source_fields,source_placement,
-                       target_metric_corners,corresponding_topology,true,absolute_emission);
+                       target_metric_corners,corresponding_topology,true,absolute_emission,canonical_pair_error);
 }
 BakeResult detail::bake_mesh_native_attributes(const Mesh &low,const BakeSource &source,const BakeOptions &options,
  const SourceBakeNormalResolver &normal,std::span<const RetainedSourceBakeField> source_fields,

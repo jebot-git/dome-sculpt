@@ -29,11 +29,12 @@ class PaintOverlayPacket {
  // Distinct Source8 proof: exact current geometry paired with the immutable
  // baked owner by SourcePaintAccess, never a native32 or raw UV0 permission.
  std::shared_ptr<const Mesh> source_baked_geometry_;
- std::shared_ptr<const Image> source_baked_normal_,source_baked_coverage_;
+ std::shared_ptr<const Image> source_baked_normal_,source_baked_mtoon_normal_,source_baked_coverage_;
  PaintOverlayPacket()=default;
 public:
  bool requires_bake_source_frames() const noexcept {return paired_bake_source_;}
  const std::shared_ptr<const Image>&source_baked_normal()const noexcept{return contribution_owner_?contribution_owner_->source_baked_normal():source_baked_normal_;}
+ const std::shared_ptr<const Image>&source_baked_mtoon_normal()const noexcept{return contribution_owner_?contribution_owner_->source_baked_mtoon_normal():source_baked_mtoon_normal_;}
  const std::shared_ptr<const Image>&source_baked_coverage()const noexcept{return contribution_owner_?contribution_owner_->source_baked_coverage():source_baked_coverage_;}
  const std::shared_ptr<const Mesh>&source_baked_geometry()const noexcept{return contribution_owner_?contribution_owner_->source_baked_geometry():source_baked_geometry_;}
  const std::shared_ptr<const Mesh>&native_geometry()const noexcept{return contribution_owner_?contribution_owner_->native_geometry():native_geometry_;}
@@ -59,12 +60,14 @@ inline bool source_baked_preview_metadata(const TextureMaps &maps){
     maps.source_maps!=p->source_maps()||!root->original_uv0()||
     root->original_uv0()->size()!=root->source_baked_geometry()->positions.size()||
     (bool(p->source_baked_normal())!=!p->baked()->maps.normal.rgba.empty())||
+    (bool(p->source_baked_mtoon_normal())!=!p->baked()->maps.mtoon_normal.rgba.empty())||
     bool(p->source_baked_normal())!=bool(p->source_baked_coverage()))
    throw std::invalid_argument("Source8 preview differs from its actual immutable source/baked/carrier owners");
  if(p->source_baked_normal()){
-   p->source_baked_normal()->validate();p->source_baked_coverage()->validate();
-   for(const auto &i:{p->source_baked_normal(),p->source_baked_coverage()})
+   for(const auto &i:{p->source_baked_normal(),p->source_baked_mtoon_normal(),p->source_baked_coverage()})if(i){
+     i->validate();
      if(i->width!=p->resolution()||i->height!=p->resolution())throw std::invalid_argument("Source8 normal carrier changed its current atlas domain");
+   }
  }
  return true;
 }

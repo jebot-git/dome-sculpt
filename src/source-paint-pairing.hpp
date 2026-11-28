@@ -24,6 +24,11 @@ inline void source_paint_pairing(const PaintedMesh *paint,const SourceMaterialBi
   const auto normal=paint?paint->normal_projection():nullptr;
   const auto color_recipe=binding?binding->color_preparation:nullptr;
   const auto normal_recipe=binding?binding->normal_preparation:nullptr;
+  if(paint&&paint->baked()&&paint->baked()->normal_interpretation==BakedNormalInterpretation::CanonicalMikk&&
+     !paint->baked()->maps.mtoon_normal.rgba.empty()&&
+     (!paint->source_sampling_prepared()||!paint->valid_source_sampling_attachment()||!appearance||
+      !binding||!binding->has_mtoon||!binding->normal_frames||!binding->normal_frames->pbr||!binding->normal_frames->mtoon))
+    throw std::invalid_argument("Paired Mikk normals lost their actual original-source and material frames");
   if(paint&&paint->baked()&&paint->baked()->normal_interpretation==BakedNormalInterpretation::NativeAttributes&&
      (!binding||!binding->native_paint_sampling||!binding->native_paint_frames||!binding->normal_frames||
       !binding->normal_frames->pbr||binding->normal_frames->pbr->tangents.empty()||appearance))

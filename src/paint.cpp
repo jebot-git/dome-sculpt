@@ -981,8 +981,12 @@ struct SourcePaintAccess {
       Footprint result;result.geometry=positions+normals+uv+indices;result.pixels=size*size;
       if(p.contains("baked")){
         const auto &b=p.at("baked");const auto v=detail::baked_legacy_version(b,capability);
-        if(v>1||b.contains("normal_authority")||b.contains("normal_field"))throw std::invalid_argument("Source Bake requires current canonical normal/color data");
-        for(const auto *key:{"color","orm","emission","normal","coverage","pbr_color"})if(b.contains(key)){
+        const bool paired=v==3&&b.value("normal_interpretation",nlohmann::json{})=="paired-mikk-v1"&&
+            b.contains("mtoon_normal")&&b.at("mtoon_normal").is_binary()&&b.at("mtoon_normal").get_binary().size()==size*size*4;
+        if((v>1&&!paired)||b.contains("normal_authority")||b.contains("normal_field")||
+           (paired&&(b.contains("pbr_color")||b.contains("color_interpretation"))))
+          throw std::invalid_argument("Source Bake requires current canonical normal/color data");
+        for(const auto *key:{"color","orm","emission","normal","coverage","pbr_color","mtoon_normal"})if(b.contains(key)){
           const auto &data=b.at(key);if(!data.is_binary()||data.get_binary().size()>size*size*4)throw std::invalid_argument("Source Bake buffer exceeds its actual atlas");
           result.tiles+=data.get_binary().size();
         }
@@ -1367,7 +1371,8 @@ std::shared_ptr<const TextureMaps> detail::PaintOverlayFactory::capture_source_b
       }
   }
   const auto r=paint.resolution();const size_t pixels=size_t(r)*r;
-  const size_t extra=paint.baked_->maps.normal.rgba.empty()?0:pixels*8;
+  const bool paired=!paint.baked_->maps.mtoon_normal.rgba.empty();
+  const size_t extra=paint.baked_->maps.normal.rgba.empty()?0:pixels*(paired?12:8);
   if(extra>128*1024*1024||paint.storage_bytes()>128*1024*1024-extra)
     throw std::length_error("Source8 preview normal carriers exceed existing paint storage budget");
   auto result=std::make_shared<TextureMaps>();result->source_maps=paint.source_maps_;result->source_only=true;
@@ -1375,14 +1380,17 @@ std::shared_ptr<const TextureMaps> detail::PaintOverlayFactory::capture_source_b
   result->baked_base=paint.baked_;
   if(extra){
     auto normal=std::make_shared<Image>(blank_image(r,true)),coverage=std::make_shared<Image>(blank_image(r));
+    auto mtoon=paired?std::make_shared<Image>(blank_image(r,true)):nullptr;
     for(size_t at=0;at<pixels;++at){
       if((at&1023)==0)paint_compute::checkpoint(cancelled);
       coverage->rgba[at*4+3]=255;
       const auto owner=paint.surface_->padding[at];if(owner<0)continue;const size_t source=size_t(owner);
       std::copy_n(paint.baked_->maps.normal.rgba.data()+source*4,4,normal->rgba.data()+at*4);
+      if(mtoon)std::copy_n(paint.baked_->maps.mtoon_normal.rgba.data()+source*4,4,mtoon->rgba.data()+at*4);
       coverage->rgba[at*4]=paint.baked_->coverage[source];
     }
     packet->source_baked_normal_=std::move(normal);packet->source_baked_coverage_=std::move(coverage);packet->storage_bytes_+=extra;
+    packet->source_baked_mtoon_normal_=std::move(mtoon);
   }
   result->overlay=std::move(packet);
   if(const auto &image=paint.source_maps_->color.image)for(size_t at=3;at<image->rgba.size();at+=4)if(image->rgba[at]!=255){result->transparent=true;break;}
@@ -3145,7 +3153,8 @@ std::shared_ptr<PaintedMesh> SourceNormalPreparationAccess::adopt_canonical(cons
     std::shared_ptr<const PaintNormalProjection> projection,const std::function<bool()> &cancelled){
   auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Canonical normal adoption cancelled");};stop();
   if(source.in_stroke()||source.normal_projection_||!source.baked_||
-      source.baked_->normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||source.baked_->maps.normal.rgba.empty()||!projection)
+      source.baked_->normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||source.baked_->maps.normal.rgba.empty()||
+      !source.baked_->maps.mtoon_normal.rgba.empty()||!projection)
     throw std::invalid_argument("Canonical normal adoption requires its genuine completed historical input");
   projection->validate(source.resolution());
   source.baked_->validate(source.resolution());
@@ -3166,7 +3175,8 @@ std::shared_ptr<PaintedMesh> SourceNormalPreparationAccess::adopt_baked_field(co
     std::shared_ptr<const detail::BakedNormalField> field,const std::function<bool()> &cancelled){
   if(cancelled&&cancelled())throw std::runtime_error("Baked normal adoption cancelled");
   if(!field||source.in_stroke()||source.normal_projection_||!source.baked_||
-      source.baked_->normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||source.baked_->maps.normal.rgba.empty())
+      source.baked_->normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||source.baked_->maps.normal.rgba.empty()||
+      !source.baked_->maps.mtoon_normal.rgba.empty())
     throw std::invalid_argument("Baked field adoption requires its actual completed canonical before-state");
   field->validate();
   if(field->origin()->before_paint()->mesh_owner()!=source.mesh_owner()||field->resolution()!=source.resolution())
@@ -3385,7 +3395,7 @@ void BakedTextures::validate(uint32_t resolution,bool independent_normal_grid) c
   if(size_t(color_interpretation)>1 || (color_interpretation==BakedColorInterpretation::ResolvedPbr)!=!maps.pbr_color.rgba.empty())
     throw std::invalid_argument("Baked PBR color interpretation is incomplete");
   if(size_t(normal_interpretation)>2||maps.normal_projection||
-     (normal_interpretation!=BakedNormalInterpretation::PreparedAttributes&&!maps.mtoon_normal.rgba.empty())||
+     (!maps.mtoon_normal.rgba.empty()&&(maps.normal.rgba.empty()||normal_interpretation==BakedNormalInterpretation::NativeAttributes))||
      (normal_interpretation==BakedNormalInterpretation::NativeAttributes&&
       (maps.normal.rgba.empty()||color_interpretation!=BakedColorInterpretation::VertexComponent))||
      (normal_interpretation==BakedNormalInterpretation::PreparedAttributes&&maps.normal.rgba.empty()!=maps.mtoon_normal.rgba.empty()))
@@ -4440,6 +4450,11 @@ void SourcePaintAccess::merge_bake(PaintedMesh &paint,BakedTextures incoming,Bak
       (incoming.normal_field!=paint.baked_->normal_field&&incoming.normal_field->prior()!=paint.baked_->normal_field)))
     throw std::invalid_argument("Independent normal rebake must retain its actual previous field");
   const bool retained=paint.normal_projection_&&paint.normal_projection_->version==2;
+  const bool canonical_pair=incoming.normal_interpretation==BakedNormalInterpretation::CanonicalMikk&&
+      !incoming.maps.mtoon_normal.rgba.empty();
+  if(canonical_pair&&(!paint.source_sampling_prepared()||paint.normal_projection_||paint.color_projection_||
+      incoming.color_interpretation!=BakedColorInterpretation::VertexComponent))
+    throw std::invalid_argument("Paired Mikk normals require their writable original-source atlas");
   const bool preserve_normal=normal_write==BakedNormalWrite::PreserveRetained;
   if(preserve_normal&&(!retained||!incoming.maps.normal.rgba.empty()||!incoming.maps.mtoon_normal.rgba.empty()))
     throw std::invalid_argument("Color-only normal preservation requires an explicit retained field and no incoming normal payload");
@@ -4465,6 +4480,8 @@ void SourcePaintAccess::merge_bake(PaintedMesh &paint,BakedTextures incoming,Bak
       throw std::invalid_argument("Different normal interpretations require explicit source-retaining conversion");
     auto merged = *paint.baked_;
     merged.normal_field=incoming.normal_field;
+    if(canonical_pair&&merged.maps.mtoon_normal.rgba.empty())
+      merged.maps.mtoon_normal=merged.maps.normal.rgba.empty()?blank_image(paint.resolution(),true):merged.maps.normal;
     if(merged.emission_field||incoming.emission_field){
       // Independent FLOAT coverage, including values far below one R8 step.
       // Other channels continue their original common-coverage merge below.
@@ -4501,10 +4518,13 @@ void SourcePaintAccess::merge_bake(PaintedMesh &paint,BakedTextures incoming,Bak
         next[c] = (next[c] * a + prior[c] * b * (1 - a)) / coverage;
       }
       baked_pixel(merged, i, next,!preserve_normal);
-      if(incoming.normal_interpretation==BakedNormalInterpretation::PreparedAttributes&&!incoming.maps.mtoon_normal.rgba.empty())
-        for(size_t c=0;c<3;++c){const auto at=i*4+c;const float x=unit(incoming.maps.mtoon_normal.rgba[at])*2-1,y=unit(merged.maps.mtoon_normal.rgba[at])*2-1;
+      if(!merged.maps.mtoon_normal.rgba.empty()&&!incoming.maps.normal.rgba.empty()){
+        const auto &toon=incoming.maps.mtoon_normal.rgba.empty()?incoming.maps.normal:incoming.maps.mtoon_normal;
+        for(size_t c=0;c<3;++c){const auto at=i*4+c;const float x=unit(toon.rgba[at])*2-1,y=unit(merged.maps.mtoon_normal.rgba[at])*2-1;
           merged.maps.mtoon_normal.rgba[at]=byte(((x*a+y*b*(1-a))/coverage)*.5f+.5f);
         }
+        if(canonical_pair)merged.maps.mtoon_normal.rgba[i*4+3]=255;
+      }
       merged.coverage[i] = byte(coverage);
     }
     incoming = std::move(merged);
@@ -5645,6 +5665,10 @@ nlohmann::json PaintedMesh::encode_impl(PaintImageArchive *archive,NormalSamplin
       }else if(baked_->normal_interpretation==BakedNormalInterpretation::PreparedAttributes){
         field["version"]=3;field["normal_interpretation"]="prepared-attributes-v1";
         field["mtoon_normal"]=nlohmann::json::binary(baked_->maps.mtoon_normal.rgba);
+      }else if(!baked_->maps.mtoon_normal.rgba.empty()){
+        if(!source_sampling_prepared())throw std::invalid_argument("Paired Mikk normals lost their original-source atlas");
+        field["version"]=3;field["normal_interpretation"]="paired-mikk-v1";
+        field["mtoon_normal"]=nlohmann::json::binary(baked_->maps.mtoon_normal.rgba);
       }
       if(baked_->normal_authority){
         if(!domains||!normal_projection_||normal_projection_->version!=2)
@@ -6082,6 +6106,11 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode_impl(const nlohmann::json &inpu
       if(baked_version==3||retained){
         const auto &kind=v.at("normal_interpretation");
         if(!retained&&kind=="native-attributes-v1")baked.normal_interpretation=BakedNormalInterpretation::NativeAttributes;
+        else if(!retained&&kind=="paired-mikk-v1"){
+          if(!independent||input.at("version")!=8||baked.color_interpretation!=BakedColorInterpretation::VertexComponent||
+             !v.at("mtoon_normal").is_binary()||v.at("mtoon_normal").get_binary().empty())
+            throw std::invalid_argument("Paired Mikk normals require their actual source Bake envelope and role image");
+        }
         else {
           if(!kind.is_string()||kind.get_ref<const std::string&>()!=(retained?"retained-field-metadata-v1":"prepared-attributes-v1"))
             throw std::runtime_error("Unknown baked normal interpretation");

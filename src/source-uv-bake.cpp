@@ -346,6 +346,9 @@ bool same_normal_detail(const NormalDetailAuthority *expected,const BakedTexture
 } // namespace detail
 SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOptions&requested){
  validate(i,requested);auto limits=requested;
+ if(const auto &bake=i.paint->baked();bake&&bake->normal_interpretation==BakedNormalInterpretation::CanonicalMikk&&
+    !bake->maps.mtoon_normal.rgba.empty())
+  throw std::invalid_argument("UV transfer requires a frame adapter for both projected normal planes");
  if(i.paint->source_sampling_prepared()){
   const auto &mesh=i.target;size_t fixed=sizeof(SourceUvBakeResult)+(mesh.positions.size()+mesh.normals.size())*sizeof(Vec3)+mesh.uv.size()*sizeof(std::array<float,2>)+mesh.indices.size()*sizeof(uint32_t)+mesh.uv_pins.size()+mesh.uv_seams.size()+i.source_vertices.size()*sizeof(uint32_t);
   if(i.appearance)fixed+=i.source_vertices.size()*sizeof(uint32_t);

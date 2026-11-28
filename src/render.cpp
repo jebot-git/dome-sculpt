@@ -583,7 +583,9 @@ struct SurfaceRenderer::TextureState {
         if(maps&&detail::source_baked_preview_metadata(*maps)&&maps->overlay->source_baked_normal()){
           if(mesh.tangents.size()!=mesh.mesh.positions.size())throw std::invalid_argument("Source8 normals require actual worker-generated current Mikk corners");
           PaintSourceTexture view;view.wrap_s=view.wrap_t=GL_CLAMP_TO_EDGE;view.min_filter=view.mag_filter=GL_LINEAR;
-          slot(13,maps->overlay->source_baked_normal(),view,false);slot(15,maps->overlay->source_baked_coverage(),view,false);toon.baked_normal=true;
+          const auto &mtoon=maps->overlay->source_baked_mtoon_normal();
+          slot(13,mtoon?mtoon:maps->overlay->source_baked_normal(),view,false);
+          slot(15,maps->overlay->source_baked_coverage(),view,false);toon.baked_normal=true;
         }
         if(needs_uv1&&maps&&maps->overlay){
           const auto &logical=maps->overlay->original_uv1();

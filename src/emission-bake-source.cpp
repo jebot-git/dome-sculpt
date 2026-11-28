@@ -149,15 +149,16 @@ struct ImportedBakedNormal {
   }
 
   Vec3 with_detail(const Source &source,Vec3 original,uint32_t triangle,
-                   std::array<float,3> bary,bool back=false) const {
+                   std::array<float,3> bary,bool mtoon=false,bool back=false) const {
     if(columns.empty())return original;
     const auto &event=*source.packet->baked();
+    const auto &image=mtoon&&!event.maps.mtoon_normal.rgba.empty()?event.maps.mtoon_normal:event.maps.normal;
     const auto uv=source.coordinates(triangle,bary,0,false);
     const auto taps=paint_bilinear_taps(source.packet->resolution(),uv,*source.packet->padding(),true);
     Vec3 premultiplied{};
     float amount=0;
     for(const auto &tap:taps){
-      const auto *p=event.maps.normal.rgba.data()+size_t(tap.texel)*4;
+      const auto *p=image.rgba.data()+size_t(tap.texel)*4;
       const float alpha=float(tap.weight)*event.coverage[tap.texel]/255.f;
       amount+=alpha;
       premultiplied+=Vec3{p[0]*(2.f/255)-1,p[1]*(2.f/255)-1,p[2]*(2.f/255)-1}*alpha;
@@ -660,7 +661,7 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
         result[role]=normalized(basis.t*ts.x+basis.b*ts.y+basis.n*ts.z);
       }
     }
-    if(source8)result[1]=source8->with_detail(coordinates,result[1],triangle,bary,
+    if(source8)result[1]=source8->with_detail(coordinates,result[1],triangle,bary,true,
         mtoon_back&&typed->version()==MToonVersion::V1);
     else if(!typed)result[1]=result[0];
     return result;

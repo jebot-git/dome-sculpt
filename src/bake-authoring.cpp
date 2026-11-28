@@ -636,11 +636,16 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   };
   if(retained_recipient&&!split_recipient)encode_retained(options);
   if(separate_normal_pass&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
+  const bool paired_canonical=!recipient&&!prepared_normals&&target.appearance&&
+      target.material_bindings&&target.material_bindings->has_mtoon&&target.painted->source_sampling_prepared()&&
+      ((source_normals&&source.material_bindings&&source.material_bindings->has_mtoon)||
+       (old_bake&&!old_bake->maps.mtoon_normal.rgba.empty()));
   auto result = native_attributes?detail::bake_mesh_native_attributes(low_mesh,high,options,
       source_normals,source_fields,source_placement,target_metric_corners,settings.corresponding_topology):
       detail::bake_mesh_source_normals(low_mesh,high,options,source_normals,
       target_triangles,source_fields,source_placement,target_metric_corners,
-      settings.corresponding_topology,absolute_emission);
+      settings.corresponding_topology,absolute_emission,
+      paired_canonical?std::optional(settings.normal_error):std::nullopt);
   std::optional<BakeResult> retained_normal_write;
   if(split_recipient){
     auto normal_options=options;

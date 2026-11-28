@@ -937,6 +937,66 @@ void prepared_mtoon_bake(const std::filesystem::path &out,const Scene &initial,
  const auto error=delta(reference,draw(renderer,document.frame().surface));
  std::cout<<"MTOON_BAKE_STANDARD "<<stem<<" max="<<error<<'\n';
  check(error<=7,"Portable MToon1 reproduces the actual projected Bake");
+ if(!shared){
+  auto pair_scene=baked_scene.snapshot();
+  const auto typed_donor=pair_scene.duplicate(recipient);
+  pair_scene.object(typed_donor).visible=false;
+  pair_scene.select(recipient);
+  const auto donor_normals=detail::source_bake_normals(pair_scene.object(typed_donor),{});
+  document.replace(pair_scene.snapshot());
+  settings.corresponding_topology=true;
+  document.bake_from_object(typed_donor,settings);
+  const auto paired_path=out/"prepared-mtoon-paired-bake.dsculpt";
+  auto paired_save=document.save_async(paired_path);
+  check(document.wait_asset(std::chrono::seconds(90)),"Paired Bake reaches the asset worker fence");
+  if(!document.frame().state->error.empty())throw std::runtime_error(document.frame().state->error);
+  paired_save.get();
+  settled(document);
+  const auto paired_scene=document.copy_scene();
+  const auto &paired_object=paired_scene.object(recipient);
+  const auto &paired=*paired_object.painted->baked();
+  check(!paired.maps.mtoon_normal.rgba.empty()&&Scene::load(paired_path).encode()==paired_scene.encode(),
+        "Bake saves independently projected MToon and PBR normal planes");
+  const auto paired_normals=detail::source_bake_normals(paired_object,{});
+  size_t separated=0;
+  float maximum=0;
+  for(size_t i=0;i<padding.size();++i){
+   if(padding[i]!=int32_t(i)||!paired.coverage[i])continue;
+   const auto [face,bary]=detail::EmissionExportAccess::writable_sample(*subject.painted,i);
+   const auto a=paired_normals(face,bary),b=donor_normals(face,bary);
+   separated+=length(a[0]-a[1])>.025f;
+   for(size_t role=0;role<2;++role)maximum=std::max(maximum,length(a[role]-b[role]));
+  }
+  std::cout<<"MTOON_PAIRED_BAKE separated="<<separated<<" error="<<maximum<<'\n';
+  check(separated>10&&maximum<.01f,"The two projected planes keep their corresponding donor directions at the same texels");
+  const auto paired_glb=out/"prepared-mtoon-paired-bake.glb";
+  const auto preview=draw(renderer,document.frame().surface);
+  document.export_asset(paired_glb).get();
+  PreviewGlb portable_pair(paired_glb);
+  auto paired_restored=extract_native_emission(portable_pair.bytes);
+  check(paired_restored&&paired_restored->encode()==paired_scene.encode(),"GLB native recovery retains both projected normal planes");
+  document.replace(open_portable_mtoon(portable_pair,out/"prepared-mtoon-paired-bake-portable.glb",initial,options));
+  document.authored_shading();
+  settled(document);
+  check(delta(preview,draw(renderer,document.frame().surface))<=7,"Portable GLB displays the projected MToon plane");
+  document.replace(paired_scene.snapshot());
+  settings.corresponding_topology=false;
+  document.bake_from_object(donor_id,settings);
+  check(document.wait_asset(std::chrono::seconds(90))&&document.frame().state->error.empty(),
+        "A partial single-normal donor can rebake the paired normal target");
+  const auto rebaked_scene=document.copy_scene();
+  const auto &rebaked=*rebaked_scene.object(recipient).painted->baked();
+  size_t kept=0;
+  for(size_t i=0;i<padding.size();++i){
+   if(padding[i]!=int32_t(i)||event->coverage[i]||!paired.coverage[i])continue;
+   const auto at=4*i;
+   if(std::equal(paired.maps.normal.rgba.data()+at,paired.maps.normal.rgba.data()+at+4,rebaked.maps.normal.rgba.data()+at)&&
+      std::equal(paired.maps.mtoon_normal.rgba.data()+at,paired.maps.mtoon_normal.rgba.data()+at+4,rebaked.maps.mtoon_normal.rgba.data()+at))++kept;
+  }
+  check(kept>10,"Missed rebake texels retain both previous normal planes byte for byte");
+  check(document.undo()&&document.copy_scene().encode()==paired_scene.encode(),"Undo restores the exact previous pair");
+  check(document.redo()&&document.copy_scene().encode()==rebaked_scene.encode(),"Redo restores the exact paired partial rebake");
+ }
  if(shared){
   auto changed=file;
   changed.json["materials"][entry.at("material").get<size_t>()]["extensions"]["VRMC_materials_mtoon"]
