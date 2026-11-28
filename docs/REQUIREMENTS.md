@@ -59,9 +59,13 @@ Native and typed HDR Bake sources use GPU radiance resolution. The GPU
 filters the original image and sparse legacy and absolute coefficients in
 their independent coordinate domains, then preserves the native FLOAT
 rounding and overflow rules. Explicit physical backgrounds and sources without
-images use the same path. Retained polygon and caller-provided source resolvers
-still run on the worker.
+images use the same path. Caller-provided source resolvers run on the worker.
 [GPU HDR Bake evidence](validation/bake-radiance-gpu-20261128.json)
+
+Retained polygon Bake also filters FLOAT emission and authored normal texture
+samples on the GPU. The prepared and native normal roles use their own retained
+coordinates. Normal-frame transport and logical triangle validation stay with
+the existing field owner.
 
 Eligible 512–2048 current-grid RGB8 Bake materials now composite color, ORM
 and legacy emission on the selected GPU. Their ordered paint, coverage,

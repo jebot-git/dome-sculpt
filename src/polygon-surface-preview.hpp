@@ -31,6 +31,7 @@ public:
      std::span<const uint32_t> triangles,
      const std::function<bool()> &cancelled={})const;
  Vec3 sample_native_bake(size_t,std::array<double,3>,const AffineTransform &)const;
+ Vec3 transport_baked_normal(size_t,std::array<double,3>,const AffineTransform &,std::array<float,4>)const;
  // Explicit image-space lookup used by export at raster centers and gutters.
  // The barycentrics still address the genuine triangle frame.
  Vec3 sample_baked_normal(size_t,std::array<double,3>,const AffineTransform &,

@@ -24,7 +24,7 @@
 #include "texture-set-field-source.hpp"
 #include "polygon-surface-paint.hpp"
 #include "polygon-surface-preview.hpp"
-#include "paint-overlay-sample.hpp"
+#include "paint-overlay-packet.hpp"
 #include "emission-authority.hpp"
 #include "emission-paint-access.hpp"
 #include "affine-surface.hpp"
@@ -60,8 +60,10 @@ struct RetainedBakePose {
 // Reuse the sealed before/current streams once the hit belongs to its field.
 // Replaying the complete polygon graph per texel would dominate projection.
 Vec3 retained_source_normal(const detail::PolygonSurfacePreview &preview, size_t triangle,
-    std::array<double,3> bary, std::optional<std::array<float,2>> normal_uv,
+    std::array<double,3> bary, const std::array<float,4> &sample,
     const std::optional<detail::AffineInteractionFrame> &placement) {
+ if(preview.native_bake())return preview.transport_baked_normal(triangle,bary,
+      placement?placement->world():AffineTransform{},sample);
  const auto &normals=preview.normals();
  const auto &frame=preview.geometric_frames().at(triangle);
  const auto normal_direction=[&](Vec3 n) {
@@ -82,15 +84,12 @@ Vec3 retained_source_normal(const detail::PolygonSurfacePreview &preview, size_t
  };
  const auto before=geometry(0),current=geometry(2);
  const auto first=triangle*3;
- if(preview.native_bake())return preview.sample_native_bake(triangle,bary,
-      placement?placement->world():AffineTransform{});
  if(preview.model()==detail::PolygonSurfaceNormalModel::NativeNOnly) {
   Vec3 normal;
   for(size_t k=0;k<3;++k)
    normal+=normal_direction(normals.at(first+k))*float(bary[k]);
   return detail::transport_polygon_direction(normal,before,current);
  }
- if(!normal_uv)throw std::invalid_argument("Retained Bake source lost its normal coordinates");
  std::array<detail::NormalBakeVertex,3> vertices;
  for(size_t k=0;k<3;++k) {
   auto t=preview.tangents().at(first+k);
@@ -103,11 +102,7 @@ Vec3 retained_source_normal(const detail::PolygonSurfacePreview &preview, size_t
       detail::NormalVertexBitangent::UnitCross);
  }
  const auto basis=detail::normal_bake_basis(vertices,bary,detail::NormalFragmentBasis::UnitColumns);
- PaintSourceTexture texture;
- texture.image=preview.baked()->normal_field->pbr();
- texture.wrap_s=texture.wrap_t=33071;texture.min_filter=texture.mag_filter=9729;
- const auto value=sample_source_texture(texture,(*normal_uv)[0],(*normal_uv)[1],false);
- Vec3 decoded{value[0]*2-1,value[1]*2-1,value[2]*2-1};
+ Vec3 decoded{sample[0]*2-1,sample[1]*2-1,sample[2]*2-1};
  if(std::max({std::abs(decoded.x),std::abs(decoded.y),std::abs(decoded.z)})<=1e-20f)decoded={0,0,1};
  return detail::transport_polygon_normal({basis,vertices.front().w,1},decoded,before,current);
 }
@@ -154,22 +149,31 @@ std::vector<detail::RetainedSourceBakeField> capture_texture_set_bake_source(
     material.maps=detail::PolygonSurfacePaintCodec::preview(*paint,field.material_bindings,
         field.material,cancelled,preview);
     const auto packet=material.maps->overlay;
-    resolved.physical_emission=detail::overlay_uses_float_emission(*packet)||
-        detail::hdr_emission(field.material.emissive)||detail::physical_emission(*field.material_bindings);
-    const auto background=field.material_bindings->physical_emission.value_or(field.material.emissive);
-    resolved.sample=[owner=field.source,preview,limits,normal_to_target,placement,background,
-        emission=resolved.physical_emission?packet:nullptr](uint32_t triangle,std::array<float,3> weights) {
+    if(detail::overlay_uses_float_emission(*packet)||detail::hdr_emission(field.material.emissive)||
+       detail::physical_emission(*field.material_bindings))
+      resolved.emission_background=field.material_bindings->physical_emission.value_or(field.material.emissive);
+    const bool native_normal=bool(preview->native_bake());
+    const bool prepared_normal=preview->model()!=detail::PolygonSurfaceNormalModel::NativeNOnly;
+    if(native_normal||prepared_normal){
+      auto &normal=resolved.normal_image;
+      normal.image=native_normal?preview->native_bake():preview->baked()->normal_field->pbr();
+      normal.wrap_s=normal.wrap_t=33071;
+      normal.min_filter=normal.mag_filter=9729;
+    }
+    resolved.sample=[owner=field.source,limits,native_normal,prepared_normal](uint32_t triangle,std::array<float,3> weights) {
       const std::array<double,3> bary{weights[0],weights[1],weights[2]};
       const auto point=owner->sample(triangle,bary,limits);
-      const auto local=retained_source_normal(*preview,triangle,bary,point.normal_uv,placement);
+      if(prepared_normal&&!point.normal_uv)
+        throw std::invalid_argument("Retained Bake source lost its normal coordinates");
+      return detail::RetainedSourceBakeHit{point.paint_uv,native_normal?point.paint_uv:
+          point.normal_uv.value_or(std::array<float,2>{})};
+    };
+    resolved.transport_normal=[preview,normal_to_target,placement](uint32_t triangle,std::array<float,3> weights,
+                                                                std::array<float,4> sample) {
+      const std::array<double,3> bary{weights[0],weights[1],weights[2]};
+      const auto local=retained_source_normal(*preview,triangle,bary,sample,placement);
       const auto normal=ob::rotate(normal_to_target.orientation,{local.x,local.y,local.z});
-      detail::RetainedSourceBakeHit result{point.paint_uv,{normal.x,normal.y,normal.z},{}};
-      if(emission) {
-        const auto values=detail::sample_overlay_values(*emission,point.paint_uv[0],point.paint_uv[1],false);
-        result.emission=BakedEmissionSample{{values[2][0],values[2][1],values[2][2]},
-            {values[4][0],values[4][1],values[4][2]},values[3][3]}.resolve(background,1);
-      }
-      return result;
+      return Vec3{normal.x,normal.y,normal.z};
     };
   };
   capture(primary);

@@ -219,11 +219,17 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o,
         throw std::invalid_argument("GPU emission Bake requires a complete immutable source");
       batch.source.validate(8);
     }
-    if(!m.resolved_emission&&(!owns_field||!retained[field].physical_emission)&&
+    if(!m.resolved_emission&&(!owns_field||!retained[field].emission_background)&&
        (detail::hdr_emission(m.material.emissive)||(!owns_field&&m.maps&&m.maps->overlay&&m.maps->overlay->native_geometry())))
       throw std::invalid_argument("Physical emission Bake requires its actual float sampling/output adapter");
     if(owns_field!=bool(m.maps&&m.maps->polygon_surface))
       throw std::invalid_argument("Retained polygon Bake maps require their actual source-field resolver");
+    if(owns_field){
+      const auto &owner=retained[field];
+      if(!owner.transport_normal||(owner.emission_background&&!m.maps->overlay))
+        throw std::invalid_argument("Retained polygon Bake lacks its captured normal or emission owner");
+      owner.normal_image.validate();
+    }
     if (!std::isfinite(m.normal_strength)||m.normal_strength<0||m.normal_strength>4) throw std::invalid_argument("Invalid normal-map strength");
     const bool paired=m.maps&&m.maps->overlay&&m.maps->overlay->requires_bake_source_frames();
     if((source_normals.requires_source_pairing()||paired)&&
@@ -375,7 +381,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     }
   }
   const bool float_emission=absolute_emission||std::any_of(source.materials.begin(),source.materials.end(),[](const auto &m){return bool(m.resolved_emission);})||
-      std::any_of(source_fields.begin(),source_fields.end(),[](const auto &field){return field.physical_emission;});
+      std::ranges::any_of(source_fields,[](const auto &field){return field.emission_background.has_value();});
   constexpr size_t retained_limit=128*1024*1024;
   size_t emission_budget=0;
   if(float_emission){
@@ -426,11 +432,12 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
 #ifndef DOME_BAKE_RAY_REFERENCE
   using RadianceDevice=detail::EmissionRasterDevice;
   struct EmissionHit {
-    uint32_t material,triangle,texel;
-    std::array<float,3> bary;
+    uint32_t material,texel;
+    RadianceDevice::BakeRadianceSample sample;
   };
   const bool gpu_emission=std::ranges::any_of(source.materials,
-      [](const auto &m){return bool(m.emission_batch);});
+      [](const auto &m){return bool(m.emission_batch);})||
+      std::ranges::any_of(source_fields,[](const auto &field){return field.emission_background.has_value();});
   const size_t emission_capacity=gpu_emission?std::min(RadianceDevice::mapped_batch,pixels):0;
   std::vector<EmissionHit> pending;
   pending.reserve(emission_capacity);
@@ -446,20 +453,25 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       std::ranges::sort(pending,{},&EmissionHit::material);
     for(size_t first=0;first<pending.size();){
       const uint32_t slot=pending[first].material;
-      const auto &batch=*source.materials[slot].emission_batch;
+      const auto &material=source.materials[slot];
       size_t end=first;
       while(end<pending.size()&&pending[end].material==slot){
         if((end&1023)==0)cancel(o);
-        const auto &hit=pending[end];
-        emission_samples[end-first]=batch.sample(hit.triangle,hit.bary);
+        emission_samples[end-first]=pending[end].sample;
         ++end;
       }
       if(slot!=resident_material){
         // Hold one emission image and its sparse field at a time across
         // material sets. Neighboring batches can reuse those device owners.
         resident_radiance.reset();
-        resident_radiance=detail::create_bake_radiance_device(batch.overlay.get(),
-            batch.source.image?&batch.source:nullptr,batch.background,batch.legacy_strength,emission_capacity,o.cancelled);
+        if(!source_fields.empty()&&source_fields[slot].emission_background){
+          resident_radiance=detail::create_bake_radiance_device(material.maps->overlay.get(),nullptr,
+              *source_fields[slot].emission_background,1,emission_capacity,o.cancelled);
+        }else{
+          const auto &batch=*material.emission_batch;
+          resident_radiance=detail::create_bake_radiance_device(batch.overlay.get(),
+              batch.source.image?&batch.source:nullptr,batch.background,batch.legacy_strength,emission_capacity,o.cancelled);
+        }
         resident_material=slot;
       }
       const size_t count=end-first;
@@ -470,6 +482,10 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       first=end;
     }
     pending.clear();
+  };
+  const auto queue_emission=[&](uint32_t material,size_t at,RadianceDevice::BakeRadianceSample sample){
+    pending.push_back({material,uint32_t(at),sample});
+    if(pending.size()==emission_capacity)flush_emission();
   };
 #endif
   if((o.encode_target_normal&&dual_normal)||canonical_pair_error)
@@ -532,12 +548,17 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     auto channels=sampled?base:material_overlay(m,base,paint_uv,false);
     auto high_normal=normalized(hit->normal);
     if(float_emission){
-      if(retained&&retained->emission)emission[at]=*retained->emission;
-#ifndef DOME_BAKE_RAY_REFERENCE
-      else if(m.emission_batch){
-        pending.push_back({material_id,hit->triangle,uint32_t(at),hit->barycentric});
-        if(pending.size()==emission_capacity)flush_emission();
+      if(retained&&source_fields[material_id].emission_background){
+#ifdef DOME_BAKE_RAY_REFERENCE
+        const auto values=detail::sample_overlay_values(*m.maps->overlay,retained->paint_uv[0],retained->paint_uv[1],false);
+        emission[at]=BakedEmissionSample{{values[2][0],values[2][1],values[2][2]},
+            {values[4][0],values[4][1],values[4][2]},values[3][3]}.resolve(*source_fields[material_id].emission_background,1);
+#else
+        queue_emission(material_id,at,{{retained->paint_uv[0],retained->paint_uv[1]}, {}});
+#endif
       }
+#ifndef DOME_BAKE_RAY_REFERENCE
+      else if(m.emission_batch)queue_emission(material_id,at,m.emission_batch->sample(hit->triangle,hit->barycentric));
 #endif
       else if(m.resolved_emission)emission[at]=m.resolved_emission(hit->triangle,hit->barycentric);
       else emission[at]=channels.emission;
@@ -555,7 +576,15 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       std::array<float,4> tint{};for(int i=0;i<3;++i)for(int c=0;c<4;++c)tint[c]+=source.colors[source.mesh.indices[hit->triangle*3+i]][c]*hit->barycentric[i];
       for(int c=0;c<4;++c){if(!o.separate_pbr_color)channels.color[c]*=tint[c];else if(!resolved_source)pbr_color[c]*=tint[c];}
     }
-    if(retained)high_normal=retained->normal;
+    if(retained){
+      const auto &field=source_fields[material_id];
+      std::array<float,4> encoded{};
+      if(field.normal_image.image){
+        if(sampled)std::copy_n(sampled->normal,4,encoded.begin());
+        else encoded=sample_source_texture(field.normal_image,retained->normal_uv[0],retained->normal_uv[1],false);
+      }
+      high_normal=field.transport_normal(hit->triangle,hit->barycentric,encoded);
+    }
     else if(!source_normals){
     if (normal_image(m)&&m.normal_strength>0) {
       TangentFrame tangent;
@@ -676,8 +705,9 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   for(size_t i=0;i<source.materials.size();++i){
     const bool sample_normals=!source_normals&&!retained_field(i);
     const auto &material=source.materials[i];
+    const PaintSourceTexture *retained_image=retained_field(i)?&source_fields[i].normal_image:nullptr;
     const auto &input=material_inputs.emplace_back(material,o.separate_pbr_color,
-        sample_normals&&needs_map(i)?normal_image(material):nullptr,sample_normals);
+        sample_normals&&needs_map(i)?normal_image(material):nullptr,sample_normals,retained_image);
     device_material[i]=input.needs_sampling();
     have_device_materials|=device_material[i];
   }
@@ -707,7 +737,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
           if((i&255)==0)cancel(o);
           const auto &point=material_points[material_order[i]];
           material_coordinates[i-first]=input.coordinates(source.mesh,point.hit.triangle,point.hit.barycentric,
-                                                         point.paint_uv,point.high_uv);
+              point.paint_uv,point.high_uv,point.retained?point.retained->normal_uv:std::array<float,2>{});
         }
         if(resident_input!=material_id){
           material_sampler.reset();

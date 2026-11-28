@@ -18,8 +18,10 @@ struct MaterialInput {
   ImageInput images[RoleCount]{};
   const PaintSourceMaps *source=nullptr;
   const PaintOverlayPacket *overlay=nullptr;
+  const PaintSourceTexture *retained_normal=nullptr;
 
-  MaterialInput(const BakeMaterial &material,bool separate_pbr,const Image *normal,bool sample_normals=false) {
+  MaterialInput(const BakeMaterial &material,bool separate_pbr,const Image *normal,bool sample_normals=false,
+                const PaintSourceTexture *retained=nullptr):retained_normal(retained) {
     const auto &factor=material.material;
     std::copy_n(factor.color.begin(),4,parameters.color);
     std::copy_n(factor.emissive.begin(),3,parameters.emission);
@@ -47,7 +49,8 @@ struct MaterialInput {
       if(!material.emission_batch)images[Emission]={&maps.emission,nullptr,material.repeat_uv};
       if(separate_pbr&&!maps.pbr_color.rgba.empty())images[PbrColor]={&maps.pbr_color};
     }
-    if(normal)images[TangentNormal]={normal,nullptr,material.repeat_uv};
+    if(retained_normal)images[TangentNormal]={retained_normal->image.get(),retained_normal};
+    else if(normal)images[TangentNormal]={normal,nullptr,material.repeat_uv};
     else if(sample_normals&&source&&source->normal.image&&source->normal_scale>0&&material.normal_strength>0)
       images[TangentNormal]={source->normal.image.get(),&source->normal};
     parameters.include_baked_normal=sample_normals&&covered_normal_image(material);
@@ -58,7 +61,8 @@ struct MaterialInput {
   }
 
   Coordinates coordinates(const Mesh &mesh,uint32_t triangle,std::array<float,3> bary,
-                          std::array<float,2> paint_uv,std::array<float,2> high_uv) const {
+                          std::array<float,2> paint_uv,std::array<float,2> high_uv,
+                          std::array<float,2> normal_uv={}) const {
     Coordinates result{};
     std::copy_n(paint_uv.begin(),2,result.paint_uv);
     if(parameters.include_baked_normal)std::copy_n(high_uv.begin(),2,result.high_uv);
@@ -67,7 +71,8 @@ struct MaterialInput {
     for(unsigned i=0;i<RoleCount;++i){
       if(!images[i].image)continue;
       auto uv=i==TangentNormal?high_uv:paint_uv;
-      if(const auto *original=images[i].original){
+      if(i==TangentNormal&&retained_normal)uv=normal_uv;
+      else if(const auto *original=images[i].original){
         const unsigned set=original->texcoord;
         if(!(ready&(1u<<set))){
           source_uv[set]=source_texture_uv(mesh,*source,int(set),triangle,bary);

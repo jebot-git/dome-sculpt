@@ -125,7 +125,10 @@ Vec3 PolygonSurfacePreview::sample_baked_normal(size_t triangle,std::array<doubl
  texture.image=image;
  texture.wrap_s=texture.wrap_t=33071;
  texture.min_filter=texture.mag_filter=9729;
- const auto e=sample_source_texture(texture,uv[0],uv[1],false);
+ return transport_baked_normal(triangle,b,world,sample_source_texture(texture,uv[0],uv[1],false));
+}
+Vec3 PolygonSurfacePreview::transport_baked_normal(size_t triangle,std::array<double,3> b,
+    const AffineTransform &world,std::array<float,4> e)const{
  const auto [before,current]=triangle_frames(triangle,world);
  const auto basis=before_role_basis(triangle,b,world);
  const Vec3 detail{e[0]*2-1,e[1]*2-1,e[2]*2-1};

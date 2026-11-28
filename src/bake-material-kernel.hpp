@@ -73,7 +73,7 @@ DOME_BAKE_MATERIAL_INLINE Values evaluate(const View &view,const Coordinates &co
       for(unsigned c=0;c<4;++c)result.pbr[c]=rgba[c];
       break;
     case TangentNormal:
-      for(unsigned c=0;c<3;++c)result.normal[c]=rgba[c];
+      for(unsigned c=0;c<4;++c)result.normal[c]=rgba[c];
       break;
     }
   }

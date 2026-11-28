@@ -29,7 +29,7 @@ struct Coordinates {
 };
 struct Values {
   float color[4],emission[3],roughness,metallic,occlusion;
-  float pbr[4],normal[3];
+  float pbr[4],normal[4];
   float baked_normal[4];
   uint32_t invalid;
 };

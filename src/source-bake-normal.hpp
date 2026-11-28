@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "dome/bake.hpp"
+#include "dome/source-maps.hpp"
 #include <span>
 namespace dome::detail {
 class AffineInteractionFrame;
@@ -45,12 +46,13 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &,CanvasTransfor
  const SourceBakeNormalOptions & = {});
 struct RetainedSourceBakeHit {
  std::array<float,2> paint_uv;
- Vec3 normal;
- std::optional<std::array<float,3>> emission;
+ std::array<float,2> normal_uv;
 };
 struct RetainedSourceBakeField {
  std::function<RetainedSourceBakeHit(uint32_t,std::array<float,3>)> sample;
- bool physical_emission=false;
+ std::function<Vec3(uint32_t,std::array<float,3>,std::array<float,4>)> transport_normal;
+ PaintSourceTexture normal_image;
+ std::optional<std::array<float,3>> emission_background;
 };
 struct SourceBakePlacement {
  // Transformed native Mikk corners, in original logical triangle order.

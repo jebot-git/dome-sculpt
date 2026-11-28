@@ -157,13 +157,20 @@ HDR Bake resolves captured native and typed emission sources on the selected
 GPU. The same batch samples the original image, filters sparse legacy and
 absolute FLOAT paint through the retained padding, and resolves the final
 radiance using the original ordered binary64 arithmetic. The path also
-covers constant sources and explicit physical backgrounds. The worker still
-owns retained polygon field resolvers and ordered native publication. The
+covers constant sources and explicit physical backgrounds. The worker owns
+ordered native publication. The
 five-layer 1024² HDR fixture produced a byte-identical project. Its median
 warm Arc Bake fell from 0.92 to 0.55 seconds. Its first Bake rose from 11.73
 to 14.48 seconds. Synthetic OpenXR tracking exercised the public HDR Bake,
 Save, Undo and Redo workflow on the ordinary app.
 [GPU HDR Bake evidence](validation/bake-radiance-gpu-20261128.json)
+
+Retained polygon Bake uses the same GPU radiance resolver with the original
+paint UV coordinates for each material field. It also samples prepared PBR
+normal maps in their independent UV domain and authored native normal maps in
+the retained paint domain, including the alpha coverage used by native
+detail. The worker validates logical triangle ownership and applies the
+retained normal frames for skin, morph and affine placement.
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing

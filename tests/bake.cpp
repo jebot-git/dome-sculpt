@@ -309,7 +309,7 @@ void original_material_device_sampling(){
     const auto normal=sample_surface_texture(mesh,*maps,maps->normal,0,weights[i],false);
     const auto &actual=values[i];
     bool exact=actual.roughness==orm[1]*material.material.roughness&&actual.metallic==orm[2]*material.material.metallic&&
-        actual.occlusion==1-maps->occlusion_strength*(1-ao[0]);
+        actual.occlusion==1-maps->occlusion_strength*(1-ao[0])&&actual.normal[3]==normal[3];
     for(unsigned c=0;c<4;++c)exact&=actual.color[c]==color[c]*material.material.color[c];
     for(unsigned c=0;c<3;++c){
       exact&=actual.emission[c]==emission[c]*material.material.emissive[c];
