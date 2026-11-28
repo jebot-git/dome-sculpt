@@ -1,0 +1,178 @@
+{
+  "date": "2026-11-28",
+  "product": "a52cb90ff906ea3e08ee784e43718687ba3cd9e8",
+  "preceding_product": "c206b5ba7d03695d6f1e7f2625959df94a094765",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Surface Heat device-side PCG coefficients and bounded convergence polling.",
+  "oneapi_arc": {
+    "application_sha256": "2b3e39c31a9f4907dd832942439e598afec6a96bebb5d012c1251d1b16a62990",
+    "focused": {
+      "passed": 33,
+      "junit_sha256": "3d38ace41092ffa9cb597e32001fcc0bcc03ae8b38bc691809ba75254bf0aedf"
+    },
+    "additional_retopology_and_affine": {
+      "passed": 4,
+      "junit_sha256": "d4f091ba24f3a059e774f4f208c5dc5b5cf3d51ac6c41b812f97c82555690245"
+    },
+    "gpu_hidden_refusal": "FAIL No device of requested type 'info::device_type::gpu' available.",
+    "one_step_solution_stops_in_first_batch": true,
+    "cancel_between_device_batches_leaves_destination_exact": true
+  },
+  "open_grid_fixture_trace": {
+    "baseline": {
+      "memory_copies": 629,
+      "kernel_launches": 3486,
+      "eight_byte_copies": 615,
+      "field_check": "PASS manufactured open-grid field after Cancel and retry, rows=3315 error=1.82077e-14 replay=7.54288e-16 iterations=200",
+      "sha256": "83fef3b7d1a09e48a4ca03f4da2964c277209a817b1184434cd52b4373ad141a"
+    },
+    "batched": {
+      "memory_copies": 58,
+      "eight_byte_copies": 44,
+      "kernel_launches": 3472,
+      "field_check": "PASS manufactured open-grid field after Cancel and retry, rows=3315 error=1.82077e-14 replay=7.54288e-16 iterations=200",
+      "sha256": "ea229302ef792c5f758ca3b2db0efb48182dfbe749d9970bdfb5c79137096c3f"
+    }
+  },
+  "alternating_single_process_arc_trials": {
+    "input_sha256": "05e9e52533e60a27089ee46b232dea93f38b2e43ca094745ef7422d7393bb07d",
+    "bound_sha256": "76dc328851bcffb9f5a70aba5f65187715fe2890ca31bba1c214259c46d11064",
+    "cases": {
+      "grid": {
+        "baseline": {
+          "seconds": [
+            0.8653258540434763,
+            0.36418136092834175,
+            0.3641158230602741
+          ],
+          "median_seconds": 0.36418136092834175
+        },
+        "batched": {
+          "seconds": [
+            1.1657630790723488,
+            0.3141910609556362,
+            0.3142107219900936
+          ],
+          "median_seconds": 0.3142107219900936
+        }
+      },
+      "native-male": {
+        "baseline": {
+          "seconds": [
+            10.733509968034923,
+            10.282473455998115,
+            10.282050463953055
+          ],
+          "median_seconds": 10.282473455998115
+        },
+        "batched": {
+          "seconds": [
+            10.883152096997947,
+            9.832001538947225,
+            9.781671238946728
+          ],
+          "median_seconds": 9.832001538947225
+        }
+      }
+    },
+    "report_sha256": "60a5ae6b3c1a96349fb013389f3378abc019cdea1335cc398e67936332e7c2b5"
+  },
+  "parallel_focused_cohort_seconds": {
+    "preceding": 160.0,
+    "batched": 168.0
+  },
+  "archives_matching_preceding_product_byte_for_byte": [
+    {
+      "project": "surface-heat/male-owning/bound.dsculpt",
+      "sha256": "00b1d46aa7937b0a4a69555c855f3d0be188c55c643a756df48834523ac27847"
+    },
+    {
+      "project": "surface-heat/male-public/accepted.dsculpt",
+      "sha256": "00b1d46aa7937b0a4a69555c855f3d0be188c55c643a756df48834523ac27847"
+    },
+    {
+      "project": "surface-heat/female-mixed-targets/mixed-xr.dsculpt",
+      "sha256": "520a05a8d698b86d252fff411d842d09282ac8249db0b38e21eab82427b6a2c2"
+    },
+    {
+      "project": "surface-heat/male-mixed-targets/mixed-xr.dsculpt",
+      "sha256": "6926e4c3ffc4dbb7605d374a83b0c9012029d5f330737676b5e6d402e52e198c"
+    },
+    {
+      "project": "surface-heat/native-male-owning/bound.dsculpt",
+      "sha256": "76dc328851bcffb9f5a70aba5f65187715fe2890ca31bba1c214259c46d11064"
+    },
+    {
+      "project": "surface-heat/native-male-public/accepted.dsculpt",
+      "sha256": "76dc328851bcffb9f5a70aba5f65187715fe2890ca31bba1c214259c46d11064"
+    },
+    {
+      "project": "surface-heat/male-mixed-targets/bound.dsculpt",
+      "sha256": "97a48c703f975d3661163a8f874eb1f8a8ce462ee4b8a69dfdfb88d0be3dbcd1"
+    },
+    {
+      "project": "surface-heat/native-female-owning/bound.dsculpt",
+      "sha256": "a05aba3142dca30bd9844e0dc651247867a8cceced58897119c322aa025c9f26"
+    },
+    {
+      "project": "surface-heat/native-female-public/accepted.dsculpt",
+      "sha256": "a05aba3142dca30bd9844e0dc651247867a8cceced58897119c322aa025c9f26"
+    },
+    {
+      "project": "surface-heat/female-owning/bound.dsculpt",
+      "sha256": "a1b6071045c898a446f549cee7cc0bcef86d5b8d665a2687a11927b76a7fd895"
+    },
+    {
+      "project": "surface-heat/female-public/accepted.dsculpt",
+      "sha256": "a1b6071045c898a446f549cee7cc0bcef86d5b8d665a2687a11927b76a7fd895"
+    },
+    {
+      "project": "surface-heat/female-mixed-targets/bound.dsculpt",
+      "sha256": "cb633926eb4403a4a74ee452396e0bea2f4eb7e450d6ca3628bce819a4d25d70"
+    }
+  ],
+  "nested_wayland": {
+    "checks": 7,
+    "report_sha256": "d14b42d0e5f697741951a9002c67282a4e21b9275227227091262e8c36ca6f0d",
+    "device_iteration_start_traced": true,
+    "dma_buf_render_node": "/dev/dri/renderD129"
+  },
+  "synthetic_openxr": {
+    "female": {
+      "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_submissions": 89,
+      "report_sha256": "c20bb890e78396d2cff757b27c1b5369e06276b27f08ee01888f5a085497c066"
+    },
+    "male": {
+      "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_submissions": 89,
+      "report_sha256": "c20bb890e78396d2cff757b27c1b5369e06276b27f08ee01888f5a085497c066"
+    }
+  },
+  "headless_reference": {
+    "focused": {
+      "passed": 2,
+      "junit_sha256": "c85368365848ec5897e708ed170a3a1bf5af971c5f9836487ea2323c899e58d1"
+    },
+    "device_layout_with_checked_host_buffers_asan_ubsan": [
+      "PASS manufactured open-grid field after Cancel and retry, rows=3315 error=1.82077e-14 replay=7.54288e-16 iterations=200",
+      "PASS exact single-step field stops at its first converged iteration"
+    ]
+  },
+  "cuda_and_rocm": {
+    "cuda": {
+      "kernel_object_sha256": "a1b0122ecc63b83fb503c4141fd62aa23afb5b53fa8e2d20e0203d797635302e",
+      "missing_device_refusal": "CUDA driver version is insufficient for CUDA runtime version"
+    },
+    "rocm": {
+      "kernel_object_sha256": "53546c0998315d5c2830f30bcf4c258ed740acfb6eb6b9ecb90263c6e5eadcc5",
+      "missing_device_refusal": "no ROCm-capable device is detected"
+    }
+  },
+  "limits": [
+    "Trace counts include each full open-grid executable run, including Cancel and retry. The batched executable also runs the new one-step check.",
+    "Isolated Arc benchmark times overlap across three trials. In the parallel CTest cohort the total time did not decrease.",
+    "The original true residual, probability range, and partition checks still apply. Device-side convergence uses the same binary64 operations.",
+    "CUDA and ROCm kernel builds and missing-device tests do not qualify positive hardware runs. Physical XR, production-size assemblies and a complete current Release sweep remain open."
+  ]
+}
