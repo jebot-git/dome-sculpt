@@ -7,6 +7,7 @@
 #include "dome/emission-native.hpp"
 #include "dome/import-authoring.hpp"
 #include "dome/material-bindings.hpp"
+#include "dome/tangents.hpp"
 #include "import-authoring-fixtures.hpp"
 #include "source-color-consumer.hpp"
 #include "prepared-normal-consumer.hpp"
@@ -682,21 +683,36 @@ void single_surface_emission(const std::filesystem::path &out,const Scene &initi
  doc.export_asset(mapped_retry).get();
  check(file_bytes(mapped_retry)==mapped_bytes,"Reopening mapped HDR reproduces every byte of the GLB");
 }
+enum class BakeFrame { AuthoredTangents, ImportedNormals, NativeNormals };
+
 void baked_surface_emission(const std::filesystem::path &out,const Scene &initial,
     const ImportAuthoringOptions &options,SurfaceRenderer &native,Fbo &fbo,
-    prepared_normal_consumer::Renderer &consumer) {
+    prepared_normal_consumer::Renderer &consumer,BakeFrame frame) {
+ const bool authored_tangents=frame==BakeFrame::AuthoredTangents;
+ const bool native_frame=frame==BakeFrame::NativeNormals;
  auto fixture=source(1,false,"BLEND",0.f);
  fixture.j["meshes"][0]["primitives"][0]["attributes"].erase("COLOR_0");
  auto &m=fixture.j["materials"][0];
+ if(!authored_tangents){
+  auto &primitive=fixture.j["meshes"][0]["primitives"][0];
+  primitive["attributes"].erase("TANGENT");
+  primitive["targets"][0].erase("TANGENT");
+  m.erase("normalTexture");
+ }
  m["emissiveTexture"]={{"index",0},{"texCoord",1}};
  m["emissiveFactor"]={.02f,.23f,.14f};
  m["pbrMetallicRoughness"]["metallicRoughnessTexture"]={{"index",0},{"texCoord",1}};
  fixture.j["samplers"][0]["magFilter"]=9729;
  fixture.j["samplers"][0]["minFilter"]=9729;
- const auto input=out/"baked-source-hdr-input.glb";
+ const std::string stem=authored_tangents?"baked-source-hdr":native_frame?"baked-native-tangents-hdr":"baked-generated-tangents-hdr";
+ const auto input=out/(stem+"-input.glb");
  fixture.save(input);
  auto scene=prepare_authoring_import(initial,input,options).scene;
  const auto id=scene.active().id;
+ if(native_frame){
+  scene.active().appearance.reset();
+  scene.active().material_bindings.reset();
+ }
  for(const auto &object:scene.objects())if(object.id!=id)scene.object(object.id).visible=false;
  const auto donor_id=scene.duplicate(id);
  auto &donor=scene.object(donor_id);
@@ -718,6 +734,9 @@ void baked_surface_emission(const std::filesystem::path &out,const Scene &initia
  bake.padding=2;
  bake_object(scene,donor_id,bake);
  auto &recipient=scene.active();
+ if(native_frame)check(!recipient.appearance&&!recipient.material_bindings,"Native prepared atlas has no source frame before export");
+ else if(!authored_tangents)check(recipient.material_bindings->normal_frames->pbr->tangents.empty(),
+                                 "Imported source has retained normal attributes and no tangent stream before export");
  const auto baked=recipient.painted->baked();
  check(baked&&baked->emission_field&&!baked->maps.normal.rgba.empty()&&recipient.bake_recipe&&
        std::find(baked->coverage.begin(),baked->coverage.end(),0)!=baked->coverage.end()&&
@@ -738,7 +757,7 @@ void baked_surface_emission(const std::filesystem::path &out,const Scene &initia
  doc.shading(false);
  settled(doc);
  const auto reference=draw(native,doc.frame().surface);
- const auto path=out/"baked-source-hdr.glb",saved=out/"baked-source-hdr.dsculpt";
+ const auto path=out/(stem+".glb"),saved=out/(stem+".dsculpt");
  auto export_job=doc.export_asset(path);
  auto save_job=doc.save_async(saved);
  export_job.get();
@@ -746,27 +765,43 @@ void baked_surface_emission(const std::filesystem::path &out,const Scene &initia
  color_consumer::Model glb(path);
  const auto &primitive=glb.data->meshes[0].primitives[0];
  const auto &material=*primitive.material;
- check(material.normal_texture.texcoord==2&&material.normal_texture.scale==1&&
-       material.occlusion_texture.texcoord==2&&material.pbr_metallic_roughness.base_color_texture.texcoord==2&&
-       material.pbr_metallic_roughness.metallic_roughness_texture.texcoord==2&&material.emissive_texture.texcoord==2&&
+ const auto atlas=native_frame?1:2;
+ check(material.normal_texture.texcoord==atlas&&material.normal_texture.scale==1&&
+       material.occlusion_texture.texcoord==atlas&&material.pbr_metallic_roughness.base_color_texture.texcoord==atlas&&
+       material.pbr_metallic_roughness.metallic_roughness_texture.texcoord==atlas&&material.emissive_texture.texcoord==atlas&&
        material.has_emissive_strength&&primitive.targets_count==1,
        "Standard GLB carries all baked PBR channels on the writable atlas and keeps original morphs");
+ if(!authored_tangents){
+  const auto &rest=recipient.painted->mesh();
+  const auto expected=tangent_corners(rest);
+  const auto *tangents=prepared_normal_consumer::attr(primitive.attributes,primitive.attributes_count,cgltf_attribute_type_tangent);
+  const auto &target=primitive.targets[0];
+  const auto *delta_tangents=prepared_normal_consumer::attr(target.attributes,target.attributes_count,cgltf_attribute_type_tangent);
+  check(tangents&&delta_tangents&&primitive.indices->count==expected.size(),
+        "Export emits real atlas tangents and a tangent morph on the original corner domain");
+  for(size_t corner=0;corner<expected.size();++corner){
+   const auto vertex=cgltf_accessor_read_index(primitive.indices,corner);
+   std::array<float,4> actual{};
+   check(cgltf_accessor_read_float(tangents,vertex,actual.data(),4)&&actual==expected[corner],
+         "Emitted tangent matches Mikk on the actual writable atlas corner");
+  }
+ }
  fbo.bind();
  consumer.render(glb.data);
  const auto error=delta(reference,read());
- std::cout<<"BAKED_SOURCE_STANDARD max="<<error<<'\n';
+ std::cout<<"BAKED_SOURCE_STANDARD "<<stem<<" max="<<error<<'\n';
  check(error<=8,"Independent GLB renderer reproduces the finite source Bake preview");
  const auto encoded=file_bytes(path);
  const auto length=size_t(encoded[12])|(size_t(encoded[13])<<8)|(size_t(encoded[14])<<16)|(size_t(encoded[15])<<24);
  const auto json=nlohmann::json::parse(encoded.begin()+20,encoded.begin()+20+length);
  const auto &field=json.at("extras").at("domeSculptEmission").at("images").at(0);
- check(field.at("object")==id&&field.at("fallback").at("version")==2&&field.at("domain").at("texCoord")==2,
+ check(field.at("object")==id&&field.at("fallback").at("version")==2&&field.at("domain").at("texCoord")==atlas,
        "The emitted EXR record keeps the resolved FLOAT variant and exact native atlas owner");
  auto restored=extract_native_emission(encoded);
  check(restored&&restored->encode()==exact&&Scene::load(saved).encode()==exact&&doc.copy_scene().encode()==exact,
        "Prepared-source Bake, original source, touch-up and recipe round-trip exactly through Standard GLB");
  doc.replace(std::move(*restored));
- const auto retry=out/"baked-source-hdr-retry.glb";
+ const auto retry=out/(stem+"-retry.glb");
  doc.export_asset(retry).get();
  check(file_bytes(retry)==encoded,"Prepared baked HDR export is byte-identical after native recovery");
 }
@@ -813,6 +848,7 @@ int main(int argc,char **argv)try{
  spatial_paint(out,initial,options,native,fbo,separate_roles);
  mixed_emission(out,fbo,separate_roles);
  single_surface_emission(out,initial,options,native,fbo,separate_roles);
- baked_surface_emission(out,initial,options,native,fbo,separate_roles);
+ for(const auto frame:{BakeFrame::AuthoredTangents,BakeFrame::ImportedNormals,BakeFrame::NativeNormals})
+  baked_surface_emission(out,initial,options,native,fbo,separate_roles,frame);
  std::cout<<"PASS "<<checks<<" source-aware original standard export checks maxerror="<<maximum<<'\n';return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

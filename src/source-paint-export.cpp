@@ -7,6 +7,7 @@
 #include "emission-paint-access.hpp"
 #include "emission-raster-device.hpp"
 #include "normal-bake-encoding.hpp"
+#include "normal-bake-frames.hpp"
 #include "paint-overlay-sample.hpp"
 #include "source-extra-uv-authority.hpp"
 #include "source-paint-pairing.hpp"
@@ -292,20 +293,49 @@ AtlasAlpha atlas_alpha(const PaintedMesh &paint,const PaintOverlayPacket &packet
 struct PaintAtlas {
   std::shared_ptr<Image> color,orm,emission;
   bool transparent=false;
-  std::shared_ptr<Image> normal;
+  std::shared_ptr<Image> normal{};
   bool includes_occlusion=false;
 };
 
-std::shared_ptr<Image> baked_normal_atlas(const SculptObject &owner,std::span<const int32_t> padding,ProofWork &work) {
+void prepare_baked_export_frame(const SculptObject &owner,ObjectSurface &out,
+    const std::function<bool()> &cancelled) {
+  if(owner.painted->baked()->maps.normal.rgba.empty())return;
+  const auto binding=owner.material_bindings;
+  const auto frames=binding?binding->normal_frames:nullptr;
+  if(frames&&frames->pbr&&!frames->pbr->tangents.empty())return;
+  if(!frames&&owner.appearance)
+    throw std::invalid_argument("Prepared HDR Bake lost its original normal attribute owner");
+  // Generate only the outbound frame, before remapping the surface UVs.
+  // The existing emitter splits its actual per-corner tangents and key deltas.
+  NormalBakeFrameOptions options;
+  options.cancelled=cancelled;
+  auto candidate=normal_bake_frame_candidate(owner.painted->mesh(),owner.deformation.get(),binding.get(),options);
+  auto staged=binding?std::make_shared<SourceMaterialBindings>(*binding):std::make_shared<SourceMaterialBindings>();
+  staged->has_mtoon=false;
+  staged->normal_frame=SourceMaterialNormalFrame::OriginalAttributes;
+  staged->normal_frames=std::move(candidate.frames);
+  if(!frames){
+    auto origin=std::make_shared<SourceUvOrigin>();
+    origin->paint=owner.painted;
+    origin->deformation=owner.deformation;
+    staged->uv_origin=std::move(origin);
+  }
+  staged->validate();
+  out.material_bindings=std::move(staged);
+}
+
+std::shared_ptr<Image> baked_normal_atlas(const SculptObject &owner,const ObjectSurface &out,
+    std::span<const int32_t> padding,ProofWork &work) {
   const auto &paint=*owner.painted;
   if(paint.baked()->maps.normal.rgba.empty())return {};
-  const auto frames=owner.material_bindings?owner.material_bindings->normal_frames:nullptr;
+  const auto frames=out.material_bindings?out.material_bindings->normal_frames:nullptr;
   if(!frames||!frames->pbr||frames->pbr->tangents.empty())
     throw std::invalid_argument("Prepared HDR Bake normals require the source's emitted tangent frame");
   // Encode the finite baked normal into the same frame glTF emits. The source
   // normal may use a different UV derivative and the native Bake may use Mikk
   // on the writable atlas. Neither input vector can be copied verbatim.
   auto rest=owner;
+  if(!rest.material_bindings||!rest.material_bindings->normal_frames)rest.material_bindings=out.material_bindings;
   if(rest.deformation){
     auto deformation=std::make_shared<DeformationState>(*rest.deformation);
     deformation->morph_weights.clear();
@@ -341,8 +371,8 @@ std::shared_ptr<Image> baked_normal_atlas(const SculptObject &owner,std::span<co
   return normal;
 }
 
-PaintAtlas compile_baked_hdr_atlas(const SculptObject &owner,const PaintOverlayPacket &packet,Material &material,
-    const std::function<bool()> &cancelled) {
+PaintAtlas compile_baked_hdr_atlas(const SculptObject &owner,const ObjectSurface &out,
+    const PaintOverlayPacket &packet,Material &material,const std::function<bool()> &cancelled) {
   const auto &paint=*owner.painted;
   const auto &maps=*paint.source_maps();
   const auto padding=EmissionExportAccess::writable_padding(paint);
@@ -356,7 +386,7 @@ PaintAtlas compile_baked_hdr_atlas(const SculptObject &owner,const PaintOverlayP
     alpha=atlas_alpha(paint,packet,original,true,work);
   }
   const auto image=[&]{return std::make_shared<Image>(Image{r,r,std::vector<uint8_t>(padding.size()*4)});};
-  PaintAtlas atlas{image(),image(),{},alpha.transparent,baked_normal_atlas(owner,padding,work),true};
+  PaintAtlas atlas{image(),image(),{},alpha.transparent,baked_normal_atlas(owner,out,padding,work),true};
   const auto store=[&](size_t at,const paint_compute::Output &pixel){
     auto *rgba=atlas.color->rgba.data()+at*4;
     std::copy_n(pixel.color,4,rgba);
@@ -710,7 +740,7 @@ void compile_source_surface(const PaintedMesh &paint,ObjectSurface &out,
   auto source=std::make_shared<PaintSourceMaps>(original);
   auto material=out.material;
   PaintAtlas atlas;
-  if(baked_owner)atlas=compile_baked_hdr_atlas(*baked_owner,*marker->overlay,material,cancelled);
+  if(baked_owner)atlas=compile_baked_hdr_atlas(*baked_owner,out,*marker->overlay,material,cancelled);
   else if(!marker->overlay->empty())
     atlas=compile_source_paint(paint,out,*marker->overlay,*source,material,cancelled,
                                mode!=SourcePaintExport::Factors);
@@ -751,6 +781,7 @@ void source_baked_hdr_export(const SculptObject &owner,ObjectSurface &out,
      out.material.emissive!=std::array<float,3>{})
     throw std::invalid_argument("Prepared HDR Bake requires its actual non-emission material view");
   out.textures=std::move(marker);
+  prepare_baked_export_frame(owner,out,cancelled);
   compile_source_surface(*paint,out,cancelled,SourcePaintExport::StandardHdr,&owner);
 }
 } // namespace dome::detail

@@ -123,10 +123,10 @@ struct Source {
     return resolve(triangle,bary,{value[0],value[1],value[2]});
   }
 };
-bool imported_baked_pbr(const SculptObject &object) noexcept {
+bool framed_source_bake(const SculptObject &object) noexcept {
   const auto &paint=object.painted;
   const auto &binding=object.material_bindings;
-  if(!object.mesh_active||!object.appearance||!paint||!binding||!binding->normal_frames||binding->has_mtoon||
+  if(!object.mesh_active||!paint||!binding||!binding->normal_frames||binding->has_mtoon||
      object.material.toon||binding->canonical_attributes||paint->paint_sampling_domain()||
      !paint->source_sampling_prepared()||!paint->source_maps()||!paint->valid_source_sampling_attachment()||
      paint->color_projection()||paint->normal_projection())return false;
@@ -194,7 +194,7 @@ const char *source_normal_domain_error(const SculptObject &object,bool prepared,
      (binding->native_paint_frames&&!binding->native_paint_sampling)||
      bool(binding->normal_preparation)!=bool(object.painted->normal_projection())||
      (!canonical&&!writable&&object.painted->color_projection())||
-     (event&&((!prepared&&!imported_baked_pbr(object)&&!event->maps.normal.rgba.empty()&&
+     (event&&((!prepared&&!framed_source_bake(object)&&!event->maps.normal.rgba.empty()&&
        event->normal_interpretation!=BakedNormalInterpretation::NativeAttributes)||(field&&!canonical)||
       (!prepared&&event->normal_authority))))
     return "Artist source normal capture requires its unchanged original frame and separate current-normal adapter";
@@ -466,7 +466,7 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
   const auto retained=prepared?object.painted->normal_projection()->sampling_domain:nullptr;
   const auto canonical_uv=canonical?binding->canonical_uv:nullptr;
   const auto &mesh=object.painted->mesh();const auto &set=*binding->normal_frames;
-  const bool imported_baked=imported_baked_pbr(object)&&!event->maps.normal.rgba.empty();
+  const bool framed_bake=framed_source_bake(object)&&!event->maps.normal.rgba.empty();
   const uint64_t corners=mesh.indices.size();
   // Charge both posed role arrays, immutable evaluated corner columns and
   // layout scratch before allocating, including retained morph/frame payload.
@@ -476,7 +476,7 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
       corners*(3*sizeof(uint32_t)+2*(sizeof(Vec3)+sizeof(std::array<float,4>)+sizeof(NormalBakeVertex)))+
       (retained?retained->storage_bytes():0)+(canonical_uv?canonical_uv->storage_bytes():0)+
       (field?field->retained_bytes():0)+writable_bytes+
-      (imported_baked?mesh.positions.size()*64+corners*(sizeof(Tangent)*5+sizeof(NormalBakeVertex)+sizeof(uint32_t)):0);
+      (framed_bake?mesh.positions.size()*64+corners*(sizeof(Tangent)*5+sizeof(NormalBakeVertex)+sizeof(uint32_t)):0);
   const uint64_t work=std::max(capture_bytes,(prepared||canonical||domain)?normal_replay_bytes(*binding,stop):0);
   if(!options.max_working_bytes||options.max_working_bytes>512*1024*1024||work>options.max_working_bytes)
     throw std::length_error("Artist source normal capture exceeds prospective working budget");
@@ -516,7 +516,7 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
     current_normals=SourceNormalPreparationAccess::resolved(*object.painted,options.cancelled);
     current_normals->validate(object.painted->resolution());
   }
-  auto paired_maps=(canonical||domain||imported_baked)?paired_bake_maps(object,options.cancelled):nullptr;
+  auto paired_maps=(canonical||domain||framed_bake)?paired_bake_maps(object,options.cancelled):nullptr;
   PaintSourceTexture native_normal;
   if(native_attributes){
     if(!domain||!binding->native_paint_frames||set.pbr->tangents.empty())
@@ -543,9 +543,9 @@ SourceBakeNormalResolver source_bake_normals(const SculptObject &object,CanvasTr
     throw std::invalid_argument("Artist normal texture requires its genuine declared tangent attribute role");
   NormalFrameLayout layout;layout.vertices=mesh.indices;layout.corners.resize(size_t(corners));std::iota(layout.corners.begin(),layout.corners.end(),0u);
   const auto posed=normal_frame_preview(set,layout,object.deformation.get(),options.cancelled,
-      (typed?3u:1u)|(imported_baked&&set.canonical?4u:0u));
+      (typed?3u:1u)|(framed_bake&&set.canonical?4u:0u));
   std::optional<ImportedBakedNormal> source8;
-  if(imported_baked) {
+  if(framed_bake) {
     auto geometry=object.deformation?std::make_shared<const Mesh>(object.deformation->preview(mesh)):coordinates.mesh;
     const auto placement=affine_similarity(relative)*(options.placement?options.placement->world():AffineTransform{});
     source8.emplace(ImportedBakedNormal{std::move(geometry),placement,{}});
@@ -663,15 +663,15 @@ std::shared_ptr<const TextureMaps> raw_bake_source(const SculptObject &object,
   const auto typed=binding&&binding->has_mtoon?std::optional<MToonMaterial>(binding->material):
       (object.appearance?retained_mtoon(object.appearance.get()):std::optional<MToonMaterial>{});
   require_original_emission_uv1(object,typed);
-  const bool imported_baked=imported_baked_pbr(object)&&!object.painted->baked()->maps.normal.rgba.empty();
-  if(imported_baked||(binding&&binding->canonical_attributes)||(object.painted&&(object.painted->paint_sampling_domain()||
+  const bool framed_bake=framed_source_bake(object)&&!object.painted->baked()->maps.normal.rgba.empty();
+  if(framed_bake||(binding&&binding->canonical_attributes)||(object.painted&&(object.painted->paint_sampling_domain()||
       (object.painted->baked()&&object.painted->baked()->normal_field)))){
     const auto maps=captured_normals?captured_normals->paired_maps():
         source_bake_normals(object,{},SourceBakeNormalOptions{256*1024*1024,cancelled}).paired_maps();
     if(!maps)throw std::invalid_argument("Bake source requires its paired material capture");
-    if(imported_baked&&(!maps->overlay||maps->baked_base!=object.painted->baked()||
+    if(framed_bake&&(!maps->overlay||maps->baked_base!=object.painted->baked()||
        maps->source_maps!=object.painted->source_maps()||maps->overlay->source_baked_geometry()!=object.painted->mesh_owner()))
-      throw std::invalid_argument("Imported Bake requires its own material, geometry and normal capture");
+      throw std::invalid_argument("Prepared source Bake requires its own material, geometry and normal capture");
     return maps;
   }
   const auto has_frames=[&]{
@@ -732,7 +732,7 @@ std::shared_ptr<const TextureMaps> source_baked_preview(const SculptObject &obje
   if(!object.mesh_active||!object.painted||!object.painted->source_sampling_prepared()||!object.painted->baked())return {};
   // Same authenticated original/current role and rest-frame contract as Bake.
   // This deliberately retains typed/prepared/changed-pose refusals.
-  if(imported_baked_pbr(object))
+  if(framed_source_bake(object))
     normal_frame_current_authority(*object.material_bindings,object.painted->mesh(),object.deformation.get(),cancelled);
   else (void)raw_bake_source(object,cancelled);
   return PaintOverlayFactory::capture_source_baked(*object.painted,cancelled);
