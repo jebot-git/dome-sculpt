@@ -11,6 +11,7 @@
 #include "paint-sampling-access.hpp"
 #include "native-paint-model.hpp"
 #include "canonical-paint-native.hpp"
+#include "source4-baked.hpp"
 #include <new>
 #include "document-transaction.hpp"
 namespace dome {
@@ -327,7 +328,9 @@ void Document::process_uv_transfer(FileJob &job) {
     (job.uv_keep_paint&&!source.painted->paint_sampling_domain()&&!canonical_paint);
   std::shared_ptr<PaintedMesh> painted;
   auto binding=source.material_bindings;
-  if(!changed&&binding&&binding->canonical_attributes){
+  const bool source_bake=source.painted->source_sampling_prepared()&&source.painted->baked()&&
+      source.appearance&&binding&&binding->normal_frames&&!own_corners&&!source.texture_sets;
+  if(!changed&&((binding&&binding->canonical_attributes)||source_bake)){
     // Finishing an untouched workspace is a genuine no-op. It must not enter
     // an atlas transfer that lacks this separate normal-role interpretation.
     painted=source.painted;deformation=source.deformation;appearance=source.appearance;
@@ -355,6 +358,26 @@ void Document::process_uv_transfer(FileJob &job) {
     auto composed=std::make_shared<SourceMaterialBindings>(*source.material_bindings);composed->color_preparation=std::move(retained.colors);
     auto normal_preparation=std::make_shared<SourceNormalPreparation>(*composed->normal_preparation);normal_preparation->projection=normal->projection;normal_preparation->sampling_domain=normal;normal_preparation->uv_reprojection.reset();composed->normal_preparation=std::move(normal_preparation);
     binding=std::move(composed);deformation=detail::normal_frame_remap_deformation(source.deformation,old,target,*map,cancelled);appearance=source.appearance;
+  }else if(source_bake){
+    detail::normal_frame_current_authority(*binding,old,source.deformation.get(),cancelled);
+    SourcePaintOptions options;options.cancelled=cancelled;
+    painted=detail::transfer_source_bake_uv(*source.painted,target,*map,binding->normal_frames->canonical.get(),options);
+    deformation=detail::normal_frame_remap_deformation(source.deformation,old,target,*map,cancelled);
+    auto remapped=std::make_shared<CreatorAppearance>(*source.appearance);
+    remapped->source_vertices.clear();remapped->source_vertices.reserve(map->size());
+    for(auto vertex:*map){
+      if(cancelled())throw std::runtime_error("UV transfer cancelled");
+      remapped->source_vertices.push_back(source.appearance->source_vertices.at(vertex));
+    }
+    appearance=std::move(remapped);
+    if(uv_modified&&binding->normal_frames->canonical){
+      auto frames=std::make_shared<NormalFrameSet>(*binding->normal_frames);
+      frames->canonical.reset();
+      auto refreshed=std::make_shared<SourceMaterialBindings>(*binding);
+      refreshed->normal_frames=std::move(frames);
+      binding=std::move(refreshed);
+    }
+    detail::normal_frame_current_authority(*binding,target,deformation.get(),cancelled);
   }else if(source_aware){
     SourceUvBakeInput input;input.paint=source.painted;input.appearance=source.appearance;
     input.current_material=source.material_bindings;input.current_deformation=source.deformation;

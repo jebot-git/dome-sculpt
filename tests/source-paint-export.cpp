@@ -14,6 +14,7 @@
 #include "paint-overlay-sample.hpp"
 #include "emission-paint-access.hpp"
 #include "source-bake-normal.hpp"
+#include "texture-set-resample.hpp"
 namespace {
 import_fixture::Fixture source(int kind,bool flat,const char *alpha,float weight){
  import_fixture::Fixture f;while(f.bin.size()%4)f.bin.push_back(0);
@@ -815,6 +816,99 @@ void prepared_mtoon_emission(const std::filesystem::path &out,const Scene &initi
  check(error<=7,"Re-imported portable MToon1 matches the native physical paint preview");
 }
 
+void paired_bake_uv(const std::filesystem::path &out,const Scene &initial,Scene scene,
+    const ImportAuthoringOptions &options,SurfaceRenderer &renderer) {
+ auto &selected=scene.active();
+ selected.painted=selected.painted->snapshot();
+ selected.painted->add_layer("UV test physical light");
+ PaintSettings lamp;
+ lamp.channel=PaintChannel::Emission;
+ lamp.front_only=false;
+ lamp.emission_units=PaintEmissionUnits::Physical;
+ lamp.emission={.48f,.4f,.19f};
+ paint_uniform(*selected.painted,lamp,.24f);
+ selected.painted->layer_properties("UV test physical light",true,.63f);
+ const auto original=scene.encode();
+ const auto id=selected.id;
+ const auto &before=*selected.painted;
+ const auto source_normals=detail::source_bake_normals(selected,{});
+ Document doc;
+ doc.replace(scene.snapshot());
+ doc.authored_shading();
+ settled(doc);
+ const auto draft=[&]{
+  doc.begin_uv();
+  check(doc.wait_uv(),"The paired Bake opens its native UV workspace");
+  doc.edit_uv(UvAction::Scale,.82f);
+  doc.edit_uv(UvAction::Rotate,1.57079632679f);
+  check(doc.wait_uv()&&doc.frame().state->uv->valid,"The writable UV draft has a valid scaled and rotated atlas");
+ };
+ draft();
+ doc.end_uv(false);
+ check(doc.wait_uv()&&doc.copy_scene().encode()==original,"Cancel keeps the original paired maps and physical paint exact");
+ draft();
+ doc.end_uv(true);
+ const auto native=out/"prepared-mtoon-uv-bake.dsculpt";
+ auto ordered=doc.save_async(native);
+ check(doc.wait_asset(std::chrono::seconds(90)),"UV Apply reaches the detached transfer fence");
+ if(!doc.frame().state->error.empty())throw std::runtime_error(doc.frame().state->error);
+ ordered.get();
+ settled(doc);
+ const auto transferred=doc.copy_scene();
+ const auto &object=transferred.object(id);
+ const auto &paint=*object.painted;
+ check(paint.mesh().uv!=before.mesh().uv&&paint.valid_source_sampling_attachment()&&
+       paint.source_sampling_original()->mesh_owner()==before.source_sampling_original()->mesh_owner()&&
+       paint.baked()->emission_field&&!paint.baked()->maps.mtoon_normal.rgba.empty()&&
+       Scene::load(native).encode()==transferred.encode(),
+       "UV Apply preserves source sampling, both normal maps and FLOAT Bake through an immediately ordered Save");
+ check(paint.layers().size()==before.layers().size()&&paint.layers().back().id==before.layers().back().id&&
+       paint.layers().back().opacity==.63f&&
+       std::ranges::any_of(paint.layers().back().emission_tiles,[](const auto &tile){return bool(tile);}),
+       "The authored FLOAT layer keeps its identity, opacity and editable field");
+ const auto target_normals=detail::source_bake_normals(object,{});
+ const auto &old_grid=before.mesh();
+ const auto old_padding=detail::EmissionExportAccess::writable_padding(before);
+ const auto new_padding=detail::EmissionExportAccess::writable_padding(paint);
+ size_t distinct=0,close=0,count=0;
+ float energy_error=0;
+ for(size_t i=0;i<new_padding.size();++i){
+  if(new_padding[i]!=int32_t(i))continue;
+  const auto [face,bary]=detail::EmissionExportAccess::writable_sample(paint,i);
+  const auto a=source_normals(face,bary),b=target_normals(face,bary);
+  distinct+=length(a[0]-a[1])>.025f&&length(b[0]-b[1])>.025f;
+  ++count;
+  close+=std::max(length(a[0]-b[0]),length(a[1]-b[1]))<.025f;
+  std::array<float,2> q{};
+  for(size_t k=0;k<3;++k)for(size_t axis=0;axis<2;++axis)q[axis]+=old_grid.uv[old_grid.indices[face*3+k]][axis]*bary[k];
+  const auto actual=paint.baked()->emission_field->texel(i);
+  for(size_t k=0;k<3;++k){
+   float expected=0;
+   for(const auto tap:detail::paint_bilinear_taps(before.resolution(),q,old_padding,true))
+    expected+=float(tap.weight)*before.baked()->emission_field->texel(tap.texel).absolute[k];
+   energy_error=std::max(energy_error,std::abs(actual.absolute[k]-expected));
+  }
+ }
+ std::cout<<"MTOON_UV normals="<<close<<"/"<<count<<" distinct="<<distinct<<" float_error="<<energy_error<<'\n';
+ check(count>500&&close*10>count*9&&distinct>70&&energy_error<1e-5f,
+       "Rotated UVs transport each original shading direction and exact filtered FLOAT energy");
+ check(doc.undo()&&doc.copy_scene().encode()==original,"UV Undo restores the exact paired source atlas");
+ check(doc.redo()&&doc.copy_scene().encode()==transferred.encode(),"UV Redo restores the exact transferred atlas");
+ settled(doc);
+ const auto reference=draw(renderer,doc.frame().surface);
+ const auto output=out/"prepared-mtoon-uv-bake.glb";
+ doc.export_asset(output).get();
+ PreviewGlb file(output);
+ const auto restored=extract_native_emission(file.bytes);
+ check(restored&&restored->encode()==transferred.encode(),"The edited UV layout and paired fields recover from Standard GLB");
+ doc.replace(open_portable_mtoon(file,out/"prepared-mtoon-uv-bake-portable.glb",initial,options));
+ doc.authored_shading();
+ settled(doc);
+ const auto error=delta(reference,draw(renderer,doc.frame().surface));
+ std::cout<<"MTOON_UV_STANDARD max="<<error<<'\n';
+ check(error<=7,"The editable UV change survives portable MToon1 export");
+}
+
 void prepared_mtoon_bake(const std::filesystem::path &out,const Scene &initial,
     const ImportAuthoringOptions &options,SurfaceRenderer &renderer,bool shared) {
  auto fixture=prepared_mtoon_fixture(1,0);
@@ -996,6 +1090,7 @@ void prepared_mtoon_bake(const std::filesystem::path &out,const Scene &initial,
   check(kept>10,"Missed rebake texels retain both previous normal planes byte for byte");
   check(document.undo()&&document.copy_scene().encode()==paired_scene.encode(),"Undo restores the exact previous pair");
   check(document.redo()&&document.copy_scene().encode()==rebaked_scene.encode(),"Redo restores the exact paired partial rebake");
+  paired_bake_uv(out,initial,rebaked_scene.snapshot(),options,renderer);
  }
  if(shared){
   auto changed=file;

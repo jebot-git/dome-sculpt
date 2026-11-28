@@ -836,6 +836,8 @@ std::shared_ptr<const std::vector<std::array<float,2>>> PaintedMesh::source_samp
   return source_sampling_prepared()?surface_->original_sampling->authored_uv1:nullptr;
 }
 struct SourcePaintAccess {
+  static std::shared_ptr<PaintedMesh> transfer_bake_uv(const PaintedMesh &,Mesh,
+      std::span<const uint32_t>,const NormalFrames *,const SourcePaintOptions &);
   using Coordinates=std::vector<std::array<float,2>>;
   static void merge_bake(PaintedMesh &,BakedTextures,BakedNormalWrite,const std::function<bool()> &cancelled={});
   static std::shared_ptr<PaintedMesh> install(const PaintedMesh &,BakedTextures,const SourcePaintOptions &);
@@ -4579,6 +4581,232 @@ std::shared_ptr<PaintedMesh> SourcePaintAccess::install(const PaintedMesh &curre
 }
 std::shared_ptr<PaintedMesh> detail::install_source_bake(const PaintedMesh &current,BakedTextures incoming,
     const SourcePaintOptions &options){return SourcePaintAccess::install(current,std::move(incoming),options);}
+
+std::shared_ptr<PaintedMesh> SourcePaintAccess::transfer_bake_uv(const PaintedMesh &source,Mesh target,
+    std::span<const uint32_t> vertices,const NormalFrames *old_canonical,const SourcePaintOptions &options) {
+  const auto stop=[&]{paint_compute::checkpoint(options.cancelled);};
+  stop();
+  if(source.in_stroke()||!source.source_sampling_prepared()||!source.valid_source_sampling_attachment()||
+      source.color_projection_||source.normal_projection_||source.paint_sampling_domain()||!source.baked_||
+      source.revision_==UINT64_MAX)
+    throw std::invalid_argument("UV transfer requires the current writable source Bake");
+  const auto &bake=*source.baked_;
+  const auto r=source.resolution();
+  bake.validate(r);
+  if(bake.normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||bake.normal_authority||bake.normal_field||
+      bake.color_interpretation!=BakedColorInterpretation::VertexComponent)
+    throw std::invalid_argument("UV transfer requires its canonical source Bake channels");
+  const auto &old=source.mesh();
+  if(vertices.size()!=target.positions.size()||target.uv.size()!=target.positions.size()||
+      target.indices.size()!=old.indices.size())
+    throw std::invalid_argument("UV transfer lost the ordered source corner correspondence");
+  target.validate();
+  const auto original=source.source_sampling_original();
+  const auto original_vertices=source.source_sampling_vertices();
+  const auto authored=source.source_sampling_authored_uv1();
+  uint64_t remaining=options.max_working_bytes;
+  const auto reserve=[&](uint64_t bytes){
+    if(bytes>remaining)throw std::length_error("UV transfer exceeds its working memory budget");
+    remaining-=bytes;
+  };
+  reserve(working_bytes(source));
+  reserve(vertices.size()*sizeof(uint32_t));
+  std::vector<uint32_t> remap;
+  remap.reserve(vertices.size());
+  for(size_t v=0;v<vertices.size();++v){
+    if((v&1023)==0)stop();
+    if(vertices[v]>=original_vertices.size())throw std::invalid_argument("UV transfer vertex is outside its writable source");
+    remap.push_back(original_vertices[vertices[v]]);
+  }
+  bool same_uv=true;
+  for(size_t c=0;c<old.indices.size();++c){
+    if((c&1023)==0)stop();
+    const auto next=target.indices[c];
+    if(vertices[next]!=old.indices[c])throw std::invalid_argument("UV transfer changed the source corner order");
+    same_uv&=target.uv[next]==old.uv[old.indices[c]];
+  }
+  auto layout_options=options;
+  layout_options.max_working_bytes=size_t(remaining);
+  auto result=prepare(original,std::move(target),remap,layout_options,authored);
+  const auto &mesh=result->mesh();
+  const auto &surface=*result->surface_;
+  if(surface.diagnostics.additional_candidates||!surface.diagnostics.unpaintable_uv_faces.empty())
+    throw std::invalid_argument("UV transfer requires a strict writable atlas");
+  reserve(working_bytes(*result));
+  reserve(sizeof(PaintedMesh::SurfaceMap::OriginalSampling)+remap.size()*sizeof(uint32_t));
+  uint64_t work=options.max_work;
+  const auto visit=[&](uint64_t cost){
+    if(cost>work)throw std::length_error("UV transfer exceeds its sample budget");
+    work-=cost;
+  };
+  result->active_=source.active_;
+  result->next_=source.next_;
+  if(same_uv){
+    result->layers_=source.layers_;
+    result->baked_=source.baked_;
+  }else{
+    const auto taps_at=[&](const auto &texel){
+      std::array<float,2> uv{};
+      const std::array weights{texel.bary[0],texel.bary[1],1-texel.bary[0]-texel.bary[1]};
+      for(size_t k=0;k<3;++k){
+        const auto q=old.uv[old.indices[size_t(texel.face)*3+k]];
+        for(size_t axis=0;axis<2;++axis)uv[axis]+=q[axis]*weights[k];
+      }
+      return detail::paint_bilinear_taps(r,uv,source.surface_->padding,true);
+    };
+    BakedTextures converted;
+    const std::array old_normals{&bake.maps.normal,&bake.maps.mtoon_normal};
+    const std::array new_normals{&converted.maps.normal,&converted.maps.mtoon_normal};
+    const auto pixels=surface.texels.size();
+    reserve(pixels*(9+4*(!bake.emission_field)+4*(!old_normals[0]->rgba.empty())+4*(!old_normals[1]->rgba.empty())));
+    converted.coverage.resize(pixels);
+    converted.maps.color=blank_image(r);
+    converted.maps.metal_rough=blank_image(r);
+    if(!bake.emission_field)converted.maps.emission=blank_image(r);
+    std::vector<detail::NormalBakeVertex> old_columns,new_columns;
+    if(!old_normals[0]->rgba.empty()){
+      reserve(mesh.indices.size()*(2*sizeof(detail::NormalBakeVertex)+4*sizeof(Tangent)));
+      const auto columns=[&](const Mesh &m,const NormalFrames *frame){
+        const auto generated=frame?std::vector<Tangent>{}:tangent_corners(m,options.cancelled);
+        std::vector<detail::NormalBakeVertex> result;
+        result.reserve(m.indices.size());
+        for(size_t c=0;c<m.indices.size();++c){
+          if((c&1023)==0)stop();
+          const auto &t=frame?frame->tangents.at(c):generated.at(c);
+          const auto n=frame?frame->normals.at(c):m.normals[m.indices[c]];
+          result.push_back(detail::normal_bake_vertex(n,{t[0],t[1],t[2]},t[3],detail::NormalVertexBitangent::RawCross));
+        }
+        return result;
+      };
+      old_columns=columns(old,old_canonical);
+      new_columns=columns(mesh,nullptr);
+      for(size_t role=0;role<old_normals.size();++role)
+        if(!old_normals[role]->rgba.empty())*new_normals[role]=blank_image(r,true);
+    }
+    if(bake.emission_field){
+      constexpr size_t storage=128*1024*1024;
+      const auto used=result->storage_bytes()+converted.storage_bytes();
+      if(used>=storage)throw std::length_error("UV transfer leaves no room for FLOAT emission");
+      const auto bytes=std::min(remaining,uint64_t(storage-used));
+      converted.emission_field=BakedEmissionField::generate_compact(r,[&](size_t at){
+        visit(8);
+        BakedEmissionSample filtered;
+        const auto &texel=surface.texels[at];
+        if(texel.covered())for(const auto tap:taps_at(texel))if(tap.weight!=0){
+          const auto sample=bake.emission_field->texel(tap.texel);
+          filtered.coverage+=float(tap.weight)*sample.coverage;
+          for(size_t k=0;k<3;++k){
+            filtered.legacy[k]+=float(tap.weight)*sample.legacy[k];
+            filtered.absolute[k]+=float(tap.weight)*sample.absolute[k];
+          }
+        }
+        filtered.coverage=std::min(1.f,filtered.coverage);
+        for(size_t k=0;k<3;++k){
+          filtered.legacy[k]=std::min(filtered.legacy[k],filtered.coverage);
+          filtered.absolute[k]=std::min(filtered.absolute[k],filtered.coverage*maximum_native_emission);
+        }
+        return filtered;
+      },{size_t(bytes),options.cancelled});
+      reserve(converted.emission_field->storage_bytes());
+    }
+    for(size_t at=0;at<pixels;++at){
+      if((at&1023)==0)stop();
+      const auto &texel=surface.texels[at];
+      if(!texel.covered())continue;
+      visit(16);
+      const auto taps=taps_at(texel);
+      BakedPixel value{};
+      std::array<Vec3,2> directions{};
+      float coverage=0;
+      for(const auto tap:taps){
+        const auto alpha=float(tap.weight)*unit(bake.coverage[tap.texel]);
+        if(alpha==0)continue;
+        const auto sample=baked_pixel(bake,tap.texel);
+        for(size_t k=0;k<10;++k)value[k]+=sample[k]*alpha;
+        for(size_t role=0;role<directions.size();++role)
+          directions[role]+=unpack_baked_normal(*old_normals[role],tap.texel)*alpha;
+        coverage+=alpha;
+      }
+      converted.coverage[at]=byte(coverage);
+      if(!converted.coverage[at])continue;
+      for(auto &component:value)component/=coverage;
+      baked_pixel(converted,at,value,false);
+      if(old_columns.empty())continue;
+      const size_t c=size_t(texel.face)*3;
+      const std::array<double,3> bary{texel.bary[0],texel.bary[1],1.-texel.bary[0]-texel.bary[1]};
+      const auto basis=[&](const auto &columns){return detail::normal_bake_basis({columns[c],columns[c+1],columns[c+2]},
+          bary,detail::NormalFragmentBasis::RawColumns);};
+      const auto before=basis(old_columns),after=basis(new_columns);
+      for(size_t role=0;role<directions.size();++role)if(!new_normals[role]->rgba.empty()){
+        visit(8);
+        const auto q=directions[role]/coverage;
+        const auto desired=before.t*q.x+before.b*q.y+before.n*q.z;
+        const auto encoded=detail::encode_normal_bake(after,length(desired)>1e-8f?desired:before.n);
+        if(!encoded||encoded->quantized_angle_radians>.02)
+          throw std::invalid_argument("UV transfer exceeds the baked normal frame error limit");
+        std::copy(encoded->rgba.begin(),encoded->rgba.end(),new_normals[role]->rgba.begin()+at*4);
+      }
+    }
+    result->layers_.clear();
+    result->layers_.reserve(source.layers_.size());
+    const auto tile_count=surface.tiles.size();
+    constexpr uint32_t side=PaintTile::size;
+    for(const auto &layer:source.layers_){
+      auto &destination=result->layers_.emplace_back(PaintLayer{layer.id,layer.name,layer.visible,layer.opacity,
+          std::vector<std::shared_ptr<const PaintTile>>(tile_count),{}, {}});
+      if(std::ranges::none_of(layer.tiles,[](const auto &tile){return bool(tile);}))continue;
+      const bool physical=!layer.emission_tiles.empty();
+      if(physical)destination.emission_tiles.resize(tile_count);
+      for(size_t tile=0;tile<tile_count;++tile){
+        stop();
+        std::shared_ptr<PaintTile> common;
+        PaintEmissionTile::Pixels floats{};
+        bool has_float=false;
+        const size_t top=tile/surface.columns*side,left=tile%surface.columns*side;
+        for(size_t n=0;n<side*side;++n){
+          const auto &texel=surface.texels[(top+n/side)*r+left+n%side];
+          if(!texel.covered())continue;
+          visit(16);
+          auto sample=detail::filter_paint_layer(layer,r,taps_at(texel));
+          if(physical){
+            sample.common.data[12]=byte(sample.emission.coverage);
+            for(size_t k=0;k<3;++k)sample.common.data[k+6]=byte(linear_to_srgb(sample.emission.legacy[k]));
+            floats[n]=sample.emission;
+            has_float|=sample.emission!=PaintEmissionValue{};
+          }
+          if(sample.common==PaintPixel{}&&sample.emission==PaintEmissionValue{})continue;
+          if(!common){reserve(sizeof(PaintTile));common=std::make_shared<PaintTile>();}
+          common->pixels[n]=sample.common;
+        }
+        destination.tiles[tile]=std::move(common);
+        if(has_float){
+          const auto largest=PaintEmissionTile::maximum_storage_bytes();
+          reserve(largest);
+          const auto field=PaintEmissionTile::pack(floats);
+          remaining+=largest-field->storage_bytes();
+          destination.emission_tiles[tile]=field;
+        }
+      }
+    }
+    merge_bake(*result,std::move(converted),BakedNormalWrite::Replace,options.cancelled);
+  }
+  result->allocated_tiles_=0;
+  for(const auto &layer:result->layers_)result->allocated_tiles_+=tile_count(layer);
+  auto proof=std::make_shared<PaintedMesh::SurfaceMap::OriginalSampling>(*surface.original_sampling);
+  proof->baked=result->baked_;
+  std::const_pointer_cast<PaintedMesh::SurfaceMap>(result->surface_)->original_sampling=std::move(proof);
+  result->revision_=source.revision_+1;
+  if(!result->valid_source_sampling_attachment()||result->storage_bytes()>128*1024*1024||
+      working_bytes(*result)>options.max_working_bytes)
+    throw std::length_error("UV transfer exceeds its persistable paint/atlas budget");
+  stop();
+  return result;
+}
+
+std::shared_ptr<PaintedMesh> detail::transfer_source_bake_uv(const PaintedMesh &source,Mesh target,
+    std::span<const uint32_t> vertices,const NormalFrames *old_canonical,const SourcePaintOptions &options){
+  return SourcePaintAccess::transfer_bake_uv(source,std::move(target),vertices,old_canonical,options);
+}
 void SourcePaintAccess::clear(PaintedMesh &current){
   if(current.editing_||!current.valid_source_sampling_attachment())throw std::logic_error("Source Bake clear requires its exact finished current owner");
   const auto working=working_bytes(current);
