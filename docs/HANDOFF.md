@@ -106,6 +106,10 @@ trials, compared with 3.769 seconds for complete replays. All intermediate
 skin weights match exactly. The longest incremental update in those
 trials is 21.344 ms. These timings cover stroke evaluation and scene
 assembly. End-to-end headset latency still requires qualification.
+All 19 selected Arc regressions and the scoped ASan/UBSan runs pass.
+Nested DomeD Wayland and synthetic OpenXR keep their preceding saves
+byte for byte. CUDA and ROCm compile and reject unavailable devices.
+[Incremental weight preview evidence](validation/weight-preview-prefix-20261128.json)
 
 Ambient occlusion in Bake now traces the biased hemisphere on the selected
 GPU against the existing immutable source BVH. The device returns one
