@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/weight-edit.hpp"
 #include "dome/humanoid-creator.hpp"
+#include "weight-brush-kernel.hpp"
 #include <iostream>
 #include <limits>
 using namespace dome;
@@ -23,7 +24,72 @@ float weight(const VertexWeights &values, uint32_t joint) {
   for (auto influence : values) if (influence.joint == joint) return influence.weight;
   return 0;
 }
+float reference_capsule(Vec3 p,const WeightBrush &brush) {
+  const auto direction=brush.to-brush.from;
+  const float squared=dot(direction,direction);
+  const float t=squared>1e-20f?std::clamp(dot(p-brush.from,direction)/squared,0.f,1.f):0;
+  const float u=std::clamp(1-length(p-(brush.from+direction*t))/brush.radius,0.f,1.f);
+  return u*u*(3-2*u)*brush.strength*brush.pressure;
+}
+void check_brush_batches() {
+  namespace field=detail::weight_brush;
+  std::vector<WeightBrush> direct(257),mirrored;
+  std::vector<Vec3> points(16391);
+  for(size_t i=0;i<direct.size();++i){
+    auto &brush=direct[i];
+    brush.from={float(int(i%31)-15)*.217f,float(i%13)*.116f,float(i%5)*.105f};
+    brush.to=brush.from+Vec3{.27f,float(int(i%7)-3)*.017f,-.135f};
+    brush.radius=.014f+float(i%19)*.015f;
+    brush.pressure=float(i%11)/10;
+    brush.strength=float(i%7)/6;
+    auto &reflection=mirrored.emplace_back(brush);
+    reflection.from.x=-brush.from.x;
+    reflection.to.x=-brush.to.x;
+    points[i]=brush.from;
+  }
+  direct[2].radius=mirrored[2].radius=std::numeric_limits<float>::denorm_min();
+  for(size_t i=direct.size();i<points.size();++i)
+    points[i]={float(int(i%269)-134)*.027f,float(i%109)*.017f,float(int(i%41)-7)*.013f};
+  auto pack=[](const auto &brushes){
+    std::vector<field::Capsule> result;
+    for(const auto &b:brushes)result.push_back(field::capsule(b.from,b.to,b.radius,b.strength,b.pressure));
+    return result;
+  };
+  const auto a=pack(direct),b=pack(mirrored);
+  auto query=field::upload(a,b);
+  size_t samples=0,hits=0;
+  for(const unsigned sides:{unsigned(field::Direct),unsigned(field::Reflected),field::Direct|field::Reflected}){
+    const size_t batch=field::batch_capsules/(direct.size()*(sides==(field::Direct|field::Reflected)?2:1));
+    std::vector<field::Hit> output(batch);
+    for(size_t first=0;first<points.size();first+=batch){
+      const auto count=std::min(batch,points.size()-first);
+      const auto touched=query->search(std::span(points).subspan(first,count),sides,std::span(output).first(count));
+      size_t matched=0;
+      for(size_t i=0;i<count;++i){
+        const auto p=points[first+i];
+        float d=0,m=0;
+        for(size_t j=0;j<direct.size();++j){
+          if(sides&field::Direct)d=std::max(d,reference_capsule(p,direct[j]));
+          if(sides&field::Reflected)m=std::max(m,reference_capsule(p,mirrored[j]));
+        }
+        const float expected=d>=m?d:-m;
+        if(expected!=0){
+          if(matched>=touched||output[matched].vertex!=i||output[matched].alpha!=expected)
+            throw std::runtime_error("Compacted weight hit differs from the original capsule oracle at "+
+                std::to_string(first+i)+" expected "+std::to_string(expected));
+          ++matched;
+        }
+      }
+      if(matched!=touched)throw std::runtime_error("Compacted weight hits contain unexpected vertices");
+      samples+=count;
+      hits+=touched;
+    }
+  }
+  std::cout<<"WEIGHT_BRUSH samples="<<samples<<" compact_hits="<<hits<<'\n';
+  require(hits>1000&&hits<samples,"Batched direct, reflected and combined strengths match the original capsule oracle exactly");
+}
 int main() try {
+  check_brush_batches();
   auto mesh=plane(); SkinWeights skin; skin.vertices.assign(4,{{0,1}});
   auto original=skin.vertices; auto topology=morph_topology_id(mesh);
   std::array surfaces{WeightPaintSurface{7,&mesh,&skin,{}}};
@@ -37,6 +103,12 @@ int main() try {
           "Swept capsule edits only geometric hits and retains exact object/topology identity");
   require(skin.vertices==original && morph_topology_id(mesh)==topology,
           "Detached stroke leaves input rest mesh/skin untouched");
+  WeightEditOptions exact_budget;exact_budget.maximum_work=22;
+  require(edit_weights(surfaces,3,brush,exact_budget).changed==2,
+          "A batched stroke fits the same exact work budget as the original capsule loop");
+  --exact_budget.maximum_work;
+  rejects([&]{edit_weights(surfaces,3,brush,exact_budget);},
+          "One work unit below the complete stroke preserves the input skin");
   brush.pressure=0;require(edit_weights(surfaces,3,brush).changed==0,
                           "Zero pressure has no effect");brush.pressure=1;
   auto preview=mesh.positions;for(auto&p:preview)p.x+=10;

@@ -2,19 +2,24 @@
 #pragma once
 #include "weight-transfer-kernel.hpp"
 #include "retopo-surface-kernel.hpp"
+#include "weight-brush-kernel.hpp"
+#include <algorithm>
 #include <stdexcept>
 
 namespace dome::detail::weight_transfer {
+template<class Api,class T>
+struct DeviceBuffer {
+  Api &api;
+  T *data;
+  DeviceBuffer(Api &context,size_t size):api(context),data(size?static_cast<T*>(api.allocate(size*sizeof(T))):nullptr){}
+  ~DeviceBuffer(){if(data)api.release(data);}
+  DeviceBuffer(const DeviceBuffer &)=delete;
+};
+
 template<class Api>
 class DeviceSurface {
 protected:
-  template<class T> struct Buffer {
-    Api &api;
-    T *data;
-    Buffer(Api &context,size_t size):api(context),data(static_cast<T*>(api.allocate(size*sizeof(T)))){}
-    ~Buffer(){api.release(data);}
-    Buffer(const Buffer &)=delete;
-  };
+  template<class T> using Buffer=DeviceBuffer<Api,T>;
   Api api_;
   Buffer<Node> nodes_;
   Buffer<uint32_t> order_,indices_;
@@ -64,6 +69,50 @@ public:
   }
 };
 } // namespace dome::detail::weight_transfer
+
+namespace dome::detail::weight_brush {
+template<class Api>
+class DeviceQuery final:public Query {
+  template<class T>using Buffer=weight_transfer::DeviceBuffer<Api,T>;
+  Api api_;
+  Buffer<Capsule> direct_,reflected_;
+  Buffer<Vec3> points_{api_,batch_capacity};
+  Buffer<Hit> hits_{api_,batch_capacity};
+  Buffer<uint32_t> count_{api_,1};
+  uint32_t capsules_;
+
+public:
+  DeviceQuery(std::span<const Capsule> direct,std::span<const Capsule> reflected):
+      direct_(api_,direct.size()),reflected_(api_,reflected.size()),capsules_(uint32_t(direct.size())) {
+    if(direct.empty()||direct.size()>4096||(!reflected.empty()&&reflected.size()!=direct.size()))
+      throw std::logic_error("Invalid weight brush device stroke");
+    try{
+      api_.upload(direct_.data,direct.data(),direct.size_bytes());
+      if(reflected_.data)api_.upload(reflected_.data,reflected.data(),reflected.size_bytes());
+      api_.wait();
+    }catch(...){api_.drain();throw;}
+  }
+
+  size_t search(std::span<const Vec3> points,unsigned sides,std::span<Hit> hits) override {
+    const auto tests=capsules_*(sides==(Direct|Reflected)?2u:1u);
+    if(points.empty()||points.size()>batch_capacity||points.size()!=hits.size()||
+       points.size()>batch_capsules/tests||!sides||sides>(Direct|Reflected)||
+       ((sides&Reflected)&&!reflected_.data))
+      throw std::logic_error("Invalid weight brush device batch");
+    uint32_t count=0;
+    try{
+      api_.upload(points_.data,points.data(),points.size_bytes());
+      api_.reset(count_.data);
+      api_.brush({direct_.data,reflected_.data,capsules_,sides},points_.data,points.size(),hits_.data,count_.data);
+      api_.read(&count,count_.data,sizeof(count));
+      if(count>points.size())throw std::logic_error("Weight brush device returned an invalid hit count");
+      if(count)api_.read(hits.data(),hits_.data,size_t(count)*sizeof(Hit));
+    }catch(...){api_.drain();throw;}
+    std::ranges::sort(hits.first(count),{},&Hit::vertex);
+    return count;
+  }
+};
+}
 
 namespace dome::detail::retopo_surface {
 template<class Api>

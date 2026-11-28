@@ -20,6 +20,16 @@ struct Counter {
 class SyclApi : public SyclSurfaceMemory {
 public:
   void reset(uint32_t *value){queue_.fill(value,uint32_t(0),1);}
+  void brush(weight_brush::Stroke stroke,const Vec3 *points,size_t count,
+      weight_brush::Hit *hits,uint32_t *size){
+    queue_.parallel_for(sycl::range<1>{count},[=](sycl::id<1> id){
+      const auto alpha=weight_brush::strongest(stroke,points[id[0]]);
+      if(alpha!=0){
+        Counter used{size};
+        hits[used.add(1)]={uint32_t(id[0]),alpha};
+      }
+    });
+  }
   void launch(SurfaceView view,const Vec3 *points,float radius,Hit *hits,size_t count,
               uint32_t *visits,uint32_t work,bool all_queries_fit){
     queue_.parallel_for(sycl::range<1>{count},[=](sycl::id<1> id){
@@ -43,6 +53,12 @@ public:
 
 std::unique_ptr<Query> upload(const Surface &surface){return std::make_unique<DeviceQuery<SyclApi>>(surface);}
 } // namespace dome::detail::weight_transfer
+
+namespace dome::detail::weight_brush {
+std::unique_ptr<Query> upload(std::span<const Capsule> direct,std::span<const Capsule> reflected){
+  return std::make_unique<DeviceQuery<weight_transfer::SyclApi>>(direct,reflected);
+}
+}
 
 namespace dome::detail::retopo_surface {
 std::unique_ptr<Query> upload(const weight_transfer::Surface &surface){

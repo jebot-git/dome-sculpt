@@ -1,6 +1,31 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/weight-edit.hpp"
+#include "weight-brush-kernel.hpp"
 #include <set>
+#ifdef DOME_WEIGHT_BRUSH_REFERENCE
+namespace dome::detail::weight_brush {
+namespace {
+class ReferenceQuery final:public Query {
+  const std::vector<Capsule> direct_,reflected_;
+public:
+  ReferenceQuery(std::span<const Capsule> direct,std::span<const Capsule> reflected):
+      direct_(direct.begin(),direct.end()),reflected_(reflected.begin(),reflected.end()) {}
+  size_t search(std::span<const Vec3> points,unsigned sides,std::span<Hit> hits) override {
+    const Stroke stroke{direct_.data(),reflected_.data(),uint32_t(direct_.size()),sides};
+    size_t count=0;
+    for(size_t i=0;i<points.size();++i)
+      if(const auto alpha=strongest(stroke,points[i]);alpha!=0)
+        hits[count++]={uint32_t(i),alpha};
+    return count;
+  }
+};
+}
+std::unique_ptr<Query> upload(std::span<const Capsule> direct,std::span<const Capsule> reflected){
+  return std::make_unique<ReferenceQuery>(direct,reflected);
+}
+}
+#endif
+
 namespace dome {
 namespace {
 bool bounded(Vec3 p) {
@@ -12,13 +37,9 @@ float influence(const VertexWeights &weights, uint32_t joint) {
     if (i.joint == joint) return i.weight;
   return 0;
 }
-float capsule(Vec3 p, const WeightBrush &brush) {
-  const Vec3 from = brush.from, to = brush.to;
-  auto direction = to - from;
-  float norm = dot(direction, direction);
-  float t = norm > 1e-20f ? std::clamp(dot(p - from, direction) / norm, 0.f, 1.f) : 0;
-  float u = std::clamp(1 - length(p - (from + direction * t)) / brush.radius, 0.f, 1.f);
-  return u * u * (3 - 2 * u) * brush.strength * brush.pressure;
+namespace field=detail::weight_brush;
+field::Capsule capsule(const WeightBrush &brush,Vec3 from,Vec3 to){
+  return field::capsule(from,to,brush.radius,brush.strength,brush.pressure);
 }
 } // namespace
 WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
@@ -62,7 +83,9 @@ WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
       if (s.joints[i] >= bones || s.joints[s.joints[i]] != i)
         throw std::invalid_argument("Weight symmetry joint map is not involutive");
   }
-  std::vector<WeightBrush> reflected_stroke;
+  std::vector<field::Capsule> direct_stroke,reflected_stroke;
+  direct_stroke.reserve(brushes.size());
+  for(const auto &sample:brushes)direct_stroke.push_back(capsule(sample,sample.from,sample.to));
   if (options.symmetry) {
     const auto &symmetry = *options.symmetry;
     std::optional<AffineTransform> reflection;
@@ -79,11 +102,9 @@ WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
       if (!bounded(result)) throw std::invalid_argument("Reflected weight brush leaves the coordinate bounds");
       return result;
     };
-    reflected_stroke.assign(brushes.begin(), brushes.end());
-    for (auto &sample : reflected_stroke) {
-      sample.from = point(sample.from);
-      sample.to = point(sample.to);
-    }
+    reflected_stroke.reserve(brushes.size());
+    for(const auto &sample:brushes)
+      reflected_stroke.push_back(capsule(sample,point(sample.from),point(sample.to)));
   }
   const auto mirror_joint = options.symmetry ? options.symmetry->joints[brush.joint] : brush.joint;
   const WeightSurfaceJoints ordinary{bones, brush.joint, mirror_joint, options.locks};
@@ -123,6 +144,10 @@ WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
     for (auto p : positions)
       if (!bounded(p)) throw std::invalid_argument("Weight position outside finite coordinate bounds");
   }
+  const size_t tests_per_vertex=brushes.size()*(options.symmetry?2:1);
+  const size_t batch=std::min(field::batch_capacity,field::batch_capsules/tests_per_vertex);
+  std::unique_ptr<field::Query> query;
+  std::vector<field::Hit> hits;
   WeightEditResult result;
   for (const auto &surface : surfaces) {
     const auto &mesh = *surface.rest;
@@ -144,56 +169,54 @@ WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
         row.erase(std::unique(row.begin(), row.end()), row.end());
       }
     }
-    for (size_t vertex = 0; vertex < mesh.positions.size(); ++vertex) {
-      step();
-      Vec3 p = surface.positions.empty() ? mesh.positions[vertex] : surface.positions[vertex];
-      float direct = 0, mirror = 0;
-      for (size_t sample = 0; sample < brushes.size(); ++sample) {
-        step(options.symmetry ? 2 : 1);
-        if (joints.direct) direct = std::max(direct, capsule(p, brushes[sample]));
-        if (joints.mirrored && options.symmetry) mirror = std::max(mirror, capsule(p, reflected_stroke[sample]));
+    const auto positions=surface.positions.empty()?std::span<const Vec3>(mesh.positions):surface.positions;
+    const unsigned sides=(joints.direct?field::Direct:0u)|
+                         (joints.mirrored&&options.symmetry?field::Reflected:0u);
+    for(size_t first=0;first<positions.size();first+=batch){
+      const auto count=std::min(batch,positions.size()-first);
+      step(count*(1+tests_per_vertex));
+      if(!sides)continue;
+      if(!query){
+        query=field::upload(direct_stroke,reflected_stroke);
+        hits.resize(std::min(batch,vertices));
       }
-      if (direct == 0 && mirror == 0) continue;
-      ++edited.affected;
-      bool constrained = false;
-      auto assign = [&](uint32_t joint, float alpha) {
-        if (alpha == 0) return;
-        step(original.vertices[vertex].size());
-        const auto &before = original.vertices[vertex];
-        float old = influence(before, joint), target = old;
+      const auto affected=query->search(positions.subspan(first,count),sides,std::span(hits).first(count));
+      step(0);
+      edited.affected+=affected;
+      for(const auto &hit:std::span(hits).first(affected)){
+        const auto vertex=first+hit.vertex;
+        const auto joint=hit.alpha>0?*joints.direct:*joints.mirrored;
+        const float alpha=std::abs(hit.alpha);
+        const auto &before=original.vertices[vertex];
+        step(before.size());
+        const float old=influence(before,joint);
+        float target=old;
         switch (brush.mode) {
-        case WeightBrushMode::Add: target = std::min(1.f, old + alpha * brush.value); break;
-        case WeightBrushMode::Subtract: target = std::max(0.f, old - alpha * brush.value); break;
-        case WeightBrushMode::Replace: target = old + alpha * (brush.value - old); break;
+        case WeightBrushMode::Add: target=std::min(1.f,old+alpha*brush.value); break;
+        case WeightBrushMode::Subtract: target=std::max(0.f,old-alpha*brush.value); break;
+        case WeightBrushMode::Replace: target=old+alpha*(brush.value-old); break;
         case WeightBrushMode::Smooth: {
-          if (neighbors[vertex].empty()) return;
-          double sum = 0;
-          for (auto adjacent : neighbors[vertex]) {
+          if(neighbors[vertex].empty())continue;
+          double sum=0;
+          for(auto adjacent:neighbors[vertex]){
             step(original.vertices[adjacent].size());
-            sum += influence(original.vertices[adjacent], joint);
+            sum+=influence(original.vertices[adjacent],joint);
           }
-          target = old + alpha * (float(sum / neighbors[vertex].size()) - old);
+          target=old+alpha*(float(sum/neighbors[vertex].size())-old);
           break;
         }
         }
-        if (std::abs(target - old) < 1e-7f) return;
+        if(std::abs(target-old)<1e-7f)continue;
         try {
-          edited.weights.vertices[vertex] = paint_weight(
-              edited.weights.vertices[vertex], joint, target, joints.bones,
-              joints.locks, options.limits);
+          edited.weights.vertices[vertex]=paint_weight(before,joint,target,joints.bones,joints.locks,options.limits);
         } catch (const std::logic_error &error) {
-          constrained = true;
-          if (result.diagnostics.size() < 8)
-            result.diagnostics.push_back("Object " + std::to_string(surface.object) +
-                " vertex " + std::to_string(vertex) + ": " + error.what());
+          ++edited.constrained;
+          if(result.diagnostics.size()<8)
+            result.diagnostics.push_back("Object "+std::to_string(surface.object)+
+                " vertex "+std::to_string(vertex)+": "+error.what());
         }
-      };
-      // Central overlap uses the stronger side. The nonzero side always has
-      // an authenticated slot in this particular skin.
-      if (direct >= mirror) assign(*joints.direct, direct);
-      else assign(*joints.mirrored, mirror);
-      if (constrained) ++edited.constrained;
-      if (edited.weights.vertices[vertex] != original.vertices[vertex]) ++edited.changed;
+        if(edited.weights.vertices[vertex]!=before)++edited.changed;
+      }
     }
     edited.weights.validate(mesh.positions.size(), joints.bones);
     result.affected += edited.affected; result.changed += edited.changed;

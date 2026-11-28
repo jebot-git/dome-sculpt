@@ -76,6 +76,17 @@ compatible joint rejects the complete operation. Recipient-side locks,
 native Restore, and Undo keep their existing semantics.
 [Joint correspondence evidence](validation/skin-joint-transfer-20261128.json)
 
+Weight painting now evaluates direct and reflected pressure capsules on the
+selected GPU for the posed vertices of every linked part. Each edit uploads
+its capsule list once and submits bounded vertex batches. The device returns
+only affected vertex indices and their strongest falloff, with direct-side
+priority on ties. The worker applies the existing locks, smooth-neighbor
+reads, normalization and diagnostics in original vertex order. The work
+budget still counts every vertex and logical capsule test. The numerical
+corpus matches the previous scalar evaluator exactly across 49,173 queries.
+Native Wayland and synthetic OpenXR saves match the preceding affine
+weight-painting captures byte for byte.
+
 Ambient occlusion in Bake now traces the biased hemisphere on the selected
 GPU against the existing immutable source BVH. The device returns one
 blocked-ray count per projected texel. Long traversals resume on the device

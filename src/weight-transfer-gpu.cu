@@ -25,6 +25,13 @@ struct Counter {
 #endif
   }
 };
+__global__ void weight_brush_hits(weight_brush::Stroke stroke,const Vec3 *points,size_t count,
+    weight_brush::Hit *hits,uint32_t *size){
+  const size_t i=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+  if(i>=count)return;
+  const auto alpha=weight_brush::strongest(stroke,points[i]);
+  if(alpha!=0)hits[atomicAdd(size,1)]={uint32_t(i),alpha};
+}
 __global__ void closest_triangles(SurfaceView view,const Vec3 *points,float radius,Hit *hits,size_t count,
                                   uint32_t *visits,uint32_t work,bool all_queries_fit){
   const size_t id=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
@@ -79,6 +86,12 @@ public:
     wait();
   }
   void reset(uint32_t *value){checked(DOME_GPU(MemsetAsync)(value,0,sizeof(*value),stream_));}
+  void brush(weight_brush::Stroke stroke,const Vec3 *points,size_t count,
+      weight_brush::Hit *hits,uint32_t *size){
+    constexpr unsigned lanes=128;
+    weight_brush_hits<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(stroke,points,count,hits,size);
+    checked(DOME_GPU(GetLastError)());
+  }
   void launch(SurfaceView view,const Vec3 *points,float radius,Hit *hits,size_t count,
               uint32_t *visits,uint32_t work,bool all_queries_fit){
     constexpr unsigned lanes=128;
@@ -111,6 +124,12 @@ public:
 
 std::unique_ptr<Query> upload(const Surface &surface){return std::make_unique<DeviceQuery<GpuApi>>(surface);}
 } // namespace dome::detail::weight_transfer
+
+namespace dome::detail::weight_brush {
+std::unique_ptr<Query> upload(std::span<const Capsule> direct,std::span<const Capsule> reflected){
+  return std::make_unique<DeviceQuery<weight_transfer::GpuApi>>(direct,reflected);
+}
+}
 
 namespace dome::detail::retopo_surface {
 std::unique_ptr<Query> upload(const weight_transfer::Surface &surface){
