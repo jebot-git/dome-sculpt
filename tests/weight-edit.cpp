@@ -158,9 +158,48 @@ void check_resident_preview(){
           hits[1].vertex==1&&hits[1].alpha==.6f,
           "Clearing the falloff lets edited prefixes replay against the same resident geometry");
 }
+void check_linked_resident_ranges(){
+  auto mesh=plane();
+  const auto part_size=detail::weight_brush::batch_capacity/2+4;
+  mesh.positions.resize(part_size,{8,8,8});
+  mesh.positions.back()=mesh.positions.front();
+  mesh.normals.resize(part_size,{0,0,1});
+  mesh.uv.clear();
+  SkinWeights skin;
+  skin.vertices.assign(mesh.positions.size(),{{0,1}});
+  const std::array surfaces{
+    WeightPaintSurface{7,&mesh,&skin,{},WeightSurfaceJoints{3,1,2,{}}},
+    WeightPaintSurface{3,&mesh,&skin,{},WeightSurfaceJoints{3,{},{},{}}},
+    WeightPaintSurface{9,&mesh,&skin,{},WeightSurfaceJoints{3,{},1,{}}},
+    WeightPaintSurface{1,&mesh,&skin,{},WeightSurfaceJoints{3,2,{},{}}},
+    WeightPaintSurface{5,&mesh,&skin,{},WeightSurfaceJoints{3,2,1,{}}}};
+  WeightEditOptions options;
+  options.symmetry=WeightBrushSymmetry{0,{0,2,1}};
+  WeightBrush left;
+  left.from=left.to={-1,0,0};
+  left.joint=1;left.strength=.5f;
+  auto right=left;
+  right.from=right.to={1,0,0};
+  const std::array stroke{left,right};
+  detail::WeightFalloffPreview cache;
+  const auto prefix=detail::preview_weights(surfaces,3,std::span(stroke).first(1),options,cache,{});
+  require(cache.resident&&cache.ranges.size()==3&&cache.ranges[0].count==part_size&&
+          cache.ranges[1].count==part_size&&cache.ranges[2].count==2*part_size&&prefix.surfaces[1].affected==0,
+          "Resident linked ranges group only eligible vertices by direct and reflected brush sides");
+  const auto combined=detail::preview_weights(surfaces,3,stroke,options,cache,{});
+  const auto replay=edit_weights(surfaces,3,stroke,options);
+  bool matches=combined.affected==replay.affected&&combined.changed==replay.changed&&
+      combined.diagnostics==replay.diagnostics;
+  for(size_t i=0;i<surfaces.size();++i)
+    matches&=combined.surfaces[i].object==surfaces[i].object&&
+        combined.surfaces[i].weights.vertices==replay.surfaces[i].weights.vertices;
+  require(matches&&weight(combined.surfaces[4].weights.vertices.back(),2)==.5f,
+          "Batches spanning linked parts preserve original ordering, per-part slots and hits beyond the batch boundary");
+}
 int main() try {
   check_brush_batches();
   check_resident_preview();
+  check_linked_resident_ranges();
   check_incremental_preview();
   auto mesh=plane(); SkinWeights skin; skin.vertices.assign(4,{{0,1}});
   auto original=skin.vertices; auto topology=morph_topology_id(mesh);

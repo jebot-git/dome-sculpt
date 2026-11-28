@@ -130,6 +130,15 @@ pass. Nested DomeD Wayland and synthetic OpenXR reproduce their saved
 projects byte for byte. CUDA and ROCm compile and reject missing devices.
 [Resident weight-preview evidence](validation/weight-preview-resident-20261128.json)
 
+Resident weight previews now batch linked parts by their available direct
+and reflected joints. The worker maps compact results back to the original
+part and vertex order. One range can cross multiple linked meshes and the
+existing dispatch size limit. The 19-part VRoid fixture now submits one
+brush dispatch per preview. Over 96 prefixes, Arc traces record 96
+dispatches and 190 readback calls. The per-part path recorded 1,824
+dispatches and 1,967 readback calls. The final project matches the full
+replay on both the grouped route and the staged GPU allocation fallback.
+
 Ambient occlusion in Bake now traces the biased hemisphere on the selected
 GPU against the existing immutable source BVH. The device returns one
 blocked-ray count per projected texel. Long traversals resume on the device

@@ -19,8 +19,14 @@ private:
 
 // This cache belongs to one prepared, immutable surface list and tool setup.
 struct WeightFalloffPreview {
+  struct Range {
+    size_t first,count;
+    unsigned sides;
+  };
   std::vector<WeightBrush> prefix;
-  std::vector<std::vector<float>> maxima;
+  std::vector<size_t> offsets;
+  std::vector<Range> ranges;
+  std::vector<float> maxima;
   std::unique_ptr<weight_brush::Query> query;
   bool resident=false;
 };
