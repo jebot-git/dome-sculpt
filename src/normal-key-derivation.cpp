@@ -38,12 +38,32 @@ std::vector<uint32_t> anchor_map(const SourceKeyDerivation &node){
   }return domain.origin_vertices();
 }
 KeyMirrorPlane mirror_plane(const DerivedKeyTarget &t){return {t.mirror_conversion?t.mirror_conversion->plane:0};}
+class ReplayMirror {
+  const Mesh &basis_;
+  const std::function<bool()> &cancelled_;
+  std::optional<KeyMirrorCorrespondence> match_;
+  double plane_=0;
+public:
+  ReplayMirror(const Mesh &basis,const std::function<bool()> &cancelled):basis_(basis),cancelled_(cancelled) {}
+  const KeyMirrorCorrespondence *get(const DerivedKeyTarget &target) {
+    if(!target.mirror_tolerance)return nullptr;
+    const auto plane=mirror_plane(target);
+    if(!match_||match_->tolerance!=*target.mirror_tolerance||plane_!=plane.offset){
+      match_.reset();
+      KeyMirrorLimits limits;
+      limits.cancelled=cancelled_;
+      match_=reflected_key_correspondence(basis_,plane,*target.mirror_tolerance,limits);
+      plane_=plane.offset;
+    }
+    return &*match_;
+  }
+};
 std::vector<Vec3> seed_positions(const SourceKeyDerivation &node,const DerivedKeyTarget &target,
-    const std::function<bool()> &cancelled){
+    const KeyMirrorCorrespondence *mirror,const std::function<bool()> &cancelled){
   const auto &before=*node.before_material();const auto &basis=frame_position_basis(before);
   if(!target.reference)return std::vector<Vec3>(basis.positions.size());
-  if(*target.reference){auto values=prior_positions(before,*target.reference);if(!target.mirror_tolerance)return values;
-    KeyMirrorLimits limits;limits.cancelled=cancelled;const auto mirror=reflected_key_correspondence(*node.position_domain()->basis(),mirror_plane(target),*target.mirror_tolerance,limits);const auto map=anchor_map(node);std::vector<Vec3> output;output.reserve(map.size());for(size_t v=0;v<map.size();++v){if((v&1023)==0)stop(cancelled);const auto p=values.at(map.at(mirror.vertices.at(v)));output.push_back({-p.x,p.y,p.z});}return output;}
+  if(*target.reference){auto values=prior_positions(before,*target.reference);if(!mirror)return values;
+    const auto map=anchor_map(node);std::vector<Vec3> output;output.reserve(map.size());for(size_t v=0;v<map.size();++v){if((v&1023)==0)stop(cancelled);const auto p=values.at(map.at(mirror->vertices.at(v)));output.push_back({-p.x,p.y,p.z});}return output;}
   // Match the actual native CaptureMix accumulation order, including float
   // addition to REST. A sum of deltas followed by one addition is different.
   auto endpoint=basis.positions;
@@ -58,11 +78,12 @@ std::vector<Vec3> seed_positions(const SourceKeyDerivation &node,const DerivedKe
 }
 std::vector<std::array<float,2>> role_coordinates(const SourceKeyDerivation &,uint32_t,const std::function<bool()> &);
 NormalFrameTarget seed_attributes(const SourceKeyDerivation &node,const DerivedKeyTarget &target,
-    const NormalFrames &artist,uint32_t coordinate,const std::function<bool()> &cancelled){
+    const NormalFrames &artist,uint32_t coordinate,const KeyMirrorCorrespondence *mirror,
+    const std::function<bool()> &cancelled){
   NormalFrameTarget result;result.id=target.id;if(!target.reference)return result;
-  if(*target.reference){result=attributes(artist,*target.reference);result.id=target.id;if(!target.mirror_tolerance)return result;
-    KeyMirrorLimits limits;limits.cancelled=cancelled;const auto &basis=*node.position_domain()->basis();const auto mirror=reflected_key_correspondence(basis,mirror_plane(target),*target.mirror_tolerance,limits);std::vector<std::array<float,2>> uv;if(!artist.tangents.empty()){const auto vertices=role_coordinates(node,coordinate,cancelled);uv.reserve(basis.indices.size());for(auto v:basis.indices)uv.push_back(vertices.at(v));}if(target.mirror_conversion&&target.mirror_conversion->frames==ShapeKeyMirrorFrames::BaseRelative)return relative_mirror_attributes(basis,artist,attributes(artist,*target.reference),target.id,mirror,uv,limits).target;const auto signs=reflected_key_role_signs(artist,uv,mirror,limits);const auto source=result;
-    for(size_t c=0;c<mirror.corners.size();++c){if((c&1023)==0)stop(cancelled);if(!result.normals.empty()){const auto v=source.normals.at(mirror.corners[c]);result.normals[c]={-v.x,v.y,v.z};}if(!result.tangents.empty()){const auto v=source.tangents.at(mirror.corners[c]);result.tangents[c]=Vec3{-v.x,v.y,v.z}*float(signs[c]);}}return result;}
+  if(*target.reference){result=attributes(artist,*target.reference);result.id=target.id;if(!mirror)return result;
+    KeyMirrorLimits limits;limits.cancelled=cancelled;const auto &basis=*node.position_domain()->basis();std::vector<std::array<float,2>> uv;if(!artist.tangents.empty()){const auto vertices=role_coordinates(node,coordinate,cancelled);uv.reserve(basis.indices.size());for(auto v:basis.indices)uv.push_back(vertices.at(v));}if(target.mirror_conversion&&target.mirror_conversion->frames==ShapeKeyMirrorFrames::BaseRelative)return relative_mirror_attributes(basis,artist,attributes(artist,*target.reference),target.id,*mirror,uv,limits).target;const auto signs=reflected_key_role_signs(artist,uv,*mirror,limits);const auto source=result;
+    for(size_t c=0;c<mirror->corners.size();++c){if((c&1023)==0)stop(cancelled);if(!result.normals.empty()){const auto v=source.normals.at(mirror->corners[c]);result.normals[c]={-v.x,v.y,v.z};}if(!result.tangents.empty()){const auto v=source.tangents.at(mirror->corners[c]);result.tangents[c]=Vec3{-v.x,v.y,v.z}*float(signs[c]);}}return result;}
   const auto &frames=*node.before_material()->normal_frames;const auto &weights=node.before_deformation()->morph_weights;
   for(size_t t=0;t<frames.current_targets.size();++t){const float w=weights.empty()?0:weights.at(t);if(!w)continue;const auto &key=attributes(artist,frames.current_targets[t]);
     auto add=[&](auto &out,const auto &values){if(values.empty())return;if(out.empty())out.resize(values.size());for(size_t c=0;c<values.size();++c){if((c&1023)==0)stop(cancelled);out[c]+=values[c]*w;}};
@@ -126,12 +147,13 @@ size_t future_frame_payload(const SculptObject &source,const std::shared_ptr<con
   };
   role(before.normal_frames->pbr,current.pbr,ShapeFrameRole::Pbr);role(before.normal_frames->mtoon,current.mtoon,ShapeFrameRole::MToon);role(before.normal_frames->canonical,current.canonical,ShapeFrameRole::Canonical);return bytes;
 }
-size_t replay_frame_bytes(const SourceKeyDerivation &node,const std::function<bool()> &cancelled){
+size_t replay_frame_bytes(const SourceKeyDerivation &node,ReplayMirror &mirrors,
+    const std::function<bool()> &cancelled){
   const auto &domain=*node.position_domain();const auto &before=*node.before_material();const auto &basis=*domain.basis();const auto &targets=node.targets();
   constexpr size_t cap=128*1024*1024;size_t planned=domain.storage_bytes();auto add=[&](size_t n){if(n>cap-planned)throw std::length_error("Independent key attribute preflight exceeds native frame quota");planned+=n;};
   if(basis.positions.size()>cap/sizeof(Vec3)||targets.size()>(cap/sizeof(Vec3))/basis.positions.size())throw std::length_error("Independent key POSITION payload exceeds native frame quota");add(targets.size()*basis.positions.size()*sizeof(Vec3));
   std::vector<uint8_t> equal(targets.size(),1);
-  for(size_t i=0;i<targets.size();++i){const auto&t=targets[i];std::optional<KeyMirrorCorrespondence> mirror;if(t.mirror_tolerance){KeyMirrorLimits limits;limits.cancelled=cancelled;mirror=reflected_key_correspondence(basis,mirror_plane(t),*t.mirror_tolerance,limits);}const auto &endpoint=node.positions(t.id);for(size_t v=0;v<endpoint.size();++v){if((v&1023)==0)stop(cancelled);if(!same(endpoint[v],seed_position_at(node,t,v,mirror?&*mirror:nullptr))){equal[i]=0;break;}}}
+  for(size_t i=0;i<targets.size();++i){const auto&t=targets[i];const auto *mirror=mirrors.get(t);const auto &endpoint=node.positions(t.id);for(size_t v=0;v<endpoint.size();++v){if((v&1023)==0)stop(cancelled);if(!same(endpoint[v],seed_position_at(node,t,v,mirror))){equal[i]=0;break;}}}
   std::set<std::pair<const NormalFrames*,uint32_t>> seen;
   auto role=[&](const std::shared_ptr<const NormalFrames>&artist,ShapeFrameRole kind){
     stop(cancelled);if(!artist)return;const auto coordinate=shapekey_frame_coordinate(before,*artist,kind);if(!seen.insert({artist.get(),coordinate}).second)return;
@@ -155,14 +177,15 @@ const std::vector<Vec3> &SourceKeyDerivation::positions(uint64_t id) const {if(!
 std::shared_ptr<const NormalFrameSet> SourceKeyDerivation::replay(
     const std::function<bool()> &cancelled,MorphNormalBasis normal_basis) const {
   stop(cancelled);const auto &before=*material_->normal_frames;const auto &basis=*domain_->basis();const auto map=anchor_map(*this);const size_t count=targets_.size();key_budget(deformation_.get(),basis.positions.size(),count);
-  replay_frame_bytes(*this,cancelled);
+  ReplayMirror mirrors(basis,cancelled);
+  replay_frame_bytes(*this,mirrors,cancelled);
   auto out=std::make_shared<NormalFrameSet>(before);out->position_domain=domain_;out->targets.clear();out->current_targets=current_targets_;out->next_target=next_target_;
   for(const auto &t:targets_){stop(cancelled);FrameTargetIdentity record;record.id=t.id;if(t.reference&&*t.reference==t.id)record=identity(before,*t.reference);record.id=t.id;record.positions=positions(t.id);out->targets.push_back(std::move(record));}
   struct Copy {const NormalFrames*source;uint32_t coordinate;std::shared_ptr<const NormalFrames> frame;};std::vector<Copy> copies;
   auto role=[&](const std::shared_ptr<const NormalFrames> &artist,ShapeFrameRole kind)->std::shared_ptr<const NormalFrames>{
     if(!artist)return {};const auto coordinate=shapekey_frame_coordinate(*material_,*artist,kind);for(const auto &copy:copies)if(copy.source==artist.get()&&copy.coordinate==coordinate)return copy.frame;
     auto frame=std::make_shared<NormalFrames>(*artist);frame->origin_vertex_count=uint32_t(basis.positions.size());frame->origin_vertices=basis.indices;frame->targets.clear();auto mesh=basis;if(!artist->tangents.empty())mesh.uv=role_coordinates(*this,coordinate,cancelled);
-    for(const auto &t:targets_){stop(cancelled);const auto &endpoint=positions(t.id);std::vector<Vec3> previous(mesh.positions.size());auto seed=seed_attributes(*this,t,*artist,coordinate,cancelled);const NormalFrameTarget *old_key=t.reference?&seed:nullptr;if(t.reference){auto old_position=seed_positions(*this,t,cancelled);for(size_t v=0;v<map.size();++v)previous[v]=old_position.at(t.mirror_tolerance?v:map[v]);}
+    for(const auto &t:targets_){stop(cancelled);const auto &endpoint=positions(t.id);const auto *mirror=mirrors.get(t);std::vector<Vec3> previous(mesh.positions.size());auto seed=seed_attributes(*this,t,*artist,coordinate,mirror,cancelled);const NormalFrameTarget *old_key=t.reference?&seed:nullptr;if(t.reference){auto old_position=seed_positions(*this,t,mirror,cancelled);for(size_t v=0;v<map.size();++v)previous[v]=old_position.at(mirror?v:map[v]);}
       NormalFrameTarget target;if(vectors(previous,endpoint)){if(old_key)target=*old_key;target.id=t.id;}
       else {auto old_positions=mesh.positions,new_positions=mesh.positions;for(size_t v=0;v<map.size();++v){old_positions[v]+=previous[v];new_positions[v]+=endpoint[v];}target=author_key_attributes(mesh,*artist,old_key,old_positions,new_positions,t.id,cancelled,normal_basis);}
       frame->targets.push_back(std::move(target));

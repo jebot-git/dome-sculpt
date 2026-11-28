@@ -8,7 +8,7 @@ namespace dome::detail::retopo_surface {
 class NearestTriangles;
 }
 
-namespace dome::detail::key_mirror { class MirrorVertices; }
+namespace dome::detail::key_mirror { class MirrorVertices; class MirrorTriangles; }
 
 namespace dome::detail::weight_transfer {
 namespace {
@@ -23,14 +23,16 @@ struct Counter {
 class SyclApi : public SyclSurfaceMemory {
 public:
   void reset(uint32_t *value){queue_.fill(value,uint32_t(0),1);}
-  void mirror_vertices(key_mirror::View view,size_t first,const key_mirror::Cell *cells,
-      key_mirror::Metric metric,uint32_t allowance,key_mirror::Progress *progress,uint32_t *donors,
+  template<class Data,class State,class Match>
+  void mirror_keys(key_mirror::View view,const Vec3 *rest,const Data *data,size_t first,
+      const key_mirror::Cell *cells,key_mirror::Metric metric,uint32_t allowance,State *progress,Match *matches,
       size_t count,uint32_t *status,bool initialize){
-    queue_.parallel_for<key_mirror::MirrorVertices>(sycl::range<1>{count},[=](sycl::id<1> index){
+    using Kernel=std::conditional_t<std::is_same_v<Match,uint32_t>,key_mirror::MirrorVertices,key_mirror::MirrorTriangles>;
+    queue_.parallel_for<Kernel>(sycl::range<1>{count},[=](sycl::id<1> index){
       const auto i=index[0];
       if(initialize)progress[i]={};
       const auto visited=key_mirror::visit<surface_ray::SoftPrecision>(
-          view,view.rest[first+i],cells[i],metric,allowance,progress[i],donors[i]);
+          view,rest,data,first+i,cells[i],metric,allowance,progress[i],matches[i]);
       using Atomic=sycl::atomic_ref<uint32_t,sycl::memory_order::relaxed,sycl::memory_scope::device,
           sycl::access::address_space::global_space>;
       if(visited&key_mirror::pending)Atomic(*status).fetch_or(key_mirror::pending);
@@ -74,9 +76,13 @@ std::unique_ptr<Query> upload(const Surface &surface){return std::make_unique<De
 } // namespace dome::detail::weight_transfer
 
 namespace dome::detail::key_mirror {
-std::unique_ptr<Query> upload(std::span<const Bin> bins,std::span<const uint32_t> order,
-                             std::span<const Vec3> rest,std::span<const Vec3> delta){
-  return std::make_unique<DeviceQuery<weight_transfer::SyclApi>>(bins,order,rest,delta);
+std::unique_ptr<Query<uint32_t>> upload(std::span<const Bin> bins,std::span<const uint32_t> order,
+                                       std::span<const Vec3> rest,std::span<const Vec3> delta){
+  return std::make_unique<VertexQuery<weight_transfer::SyclApi>>(bins,order,rest,delta,std::min(rest.size(),batch_capacity));
+}
+std::unique_ptr<Query<TriangleMatch>> upload_triangles(std::span<const Bin> bins,std::span<const uint32_t> order,
+    std::span<const Vec3> rest,std::span<const uint32_t> indices,size_t capacity){
+  return std::make_unique<TriangleQuery<weight_transfer::SyclApi>>(bins,order,rest,indices,capacity);
 }
 }
 

@@ -1,9 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#include <cstdlib>
-#include <new>
-namespace mirror_failure {thread_local long remaining=-1;thread_local bool count=false;thread_local size_t calls=0;}
-void *operator new(size_t n){if(mirror_failure::count)++mirror_failure::calls;if(mirror_failure::remaining>=0&&mirror_failure::remaining--==0){mirror_failure::remaining=0;throw std::bad_alloc();}if(auto p=std::malloc(n?n:1))return p;throw std::bad_alloc();}
-void *operator new[](size_t n){return ::operator new(n);}void operator delete(void*p)noexcept{std::free(p);}void operator delete[](void*p)noexcept{std::free(p);}void operator delete(void*p,size_t)noexcept{std::free(p);}void operator delete[](void*p,size_t)noexcept{std::free(p);}
+#include "mirror-host-allocation-fault.hpp"
 #define main mirror_positive_suite
 #include "independent-seam-key-mirror.cpp"
 #undef main

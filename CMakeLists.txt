@@ -3943,7 +3943,13 @@ if(BUILD_TESTING)
   add_executable(dome-sculpt-key-mirror-correspondence-test tests/key-mirror-correspondence.cpp)
   target_include_directories(dome-sculpt-key-mirror-correspondence-test PRIVATE src)
   target_link_libraries(dome-sculpt-key-mirror-correspondence-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-key-mirror-correspondence-test PRIVATE -Wl,--wrap=_Znwm -Wl,--wrap=_Znam)
   add_test(NAME key-mirror-correspondence COMMAND dome-sculpt-key-mirror-correspondence-test)
+  if(NOT DOME_COMPUTE_BACKEND STREQUAL "CPU")
+    add_test(NAME key-mirror-correspondence-missing-gpu COMMAND dome-sculpt-key-mirror-correspondence-test --require-device)
+    set_tests_properties(key-mirror-correspondence-missing-gpu PROPERTIES TIMEOUT 30
+      ENVIRONMENT "ONEAPI_DEVICE_SELECTOR=opencl:cpu;CUDA_VISIBLE_DEVICES=-1;HIP_VISIBLE_DEVICES=-1;ROCR_VISIBLE_DEVICES=-1")
+  endif()
   add_executable(dome-sculpt-independent-seam-key-mirror-test tests/independent-seam-key-mirror.cpp)
   target_include_directories(dome-sculpt-independent-seam-key-mirror-test PRIVATE src)
   target_link_libraries(dome-sculpt-independent-seam-key-mirror-test PRIVATE dome-sculpt-core)
@@ -3953,7 +3959,9 @@ if(BUILD_TESTING)
   add_executable(dome-sculpt-independent-seam-key-mirror-faults-test tests/independent-seam-key-mirror-faults.cpp)
   target_include_directories(dome-sculpt-independent-seam-key-mirror-faults-test PRIVATE src)
   target_link_libraries(dome-sculpt-independent-seam-key-mirror-faults-test PRIVATE dome-sculpt-core)
-  target_link_options(dome-sculpt-independent-seam-key-mirror-faults-test PRIVATE "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE")
+  target_link_options(dome-sculpt-independent-seam-key-mirror-faults-test PRIVATE
+    -Wl,--wrap=_Znwm -Wl,--wrap=_Znam
+    "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE")
 endif()
 
 if(BUILD_TESTING)
@@ -4046,7 +4054,9 @@ if(BUILD_TESTING)
   add_executable(dome-sculpt-key-mirror-relative-faults-test tests/key-mirror-relative-faults.cpp)
   target_include_directories(dome-sculpt-key-mirror-relative-faults-test PRIVATE src tests)
   target_link_libraries(dome-sculpt-key-mirror-relative-faults-test PRIVATE dome-sculpt-core)
-  target_link_options(dome-sculpt-key-mirror-relative-faults-test PRIVATE "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE")
+  target_link_options(dome-sculpt-key-mirror-relative-faults-test PRIVATE
+    -Wl,--wrap=_Znwm -Wl,--wrap=_Znam
+    "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE")
 endif()
 
 if(BUILD_TESTING)

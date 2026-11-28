@@ -2,13 +2,17 @@
 #include "key-mirror-correspondence.hpp"
 #include "corner-key-expansion.hpp"
 #include <iostream>
-#include <cstdlib>
-#include <new>
-namespace fault {thread_local long remaining=-1;thread_local bool count=false;thread_local size_t calls=0;}
-void *operator new(size_t n){if(fault::count)++fault::calls;if(fault::remaining>=0&&fault::remaining--==0){fault::remaining=0;throw std::bad_alloc();}if(auto p=std::malloc(n?n:1))return p;throw std::bad_alloc();}void *operator new[](size_t n){return ::operator new(n);}void operator delete(void*p)noexcept{std::free(p);}void operator delete[](void*p)noexcept{std::free(p);}void operator delete(void*p,size_t)noexcept{std::free(p);}void operator delete[](void*p,size_t)noexcept{std::free(p);}
+#include "mirror-host-allocation-fault.hpp"
+namespace fault=mirror_failure;
 using namespace dome;namespace {size_t checks=0;void check(bool b,const char*m){if(!b)throw std::runtime_error(m);++checks;std::cout<<"PASS "<<m<<std::endl;}bool rejects(auto call,std::string_view message){try{call();return false;}catch(const std::exception&e){std::cout<<"REFUSAL "<<e.what()<<std::endl;return std::string_view(e.what()).find(message)!=std::string_view::npos;}}bool same(Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}}
-int main()try{
+int main(int argc,char **argv)try{
  Mesh original;original.positions={{0,0,0},{-.5f,-.5f,0},{.5f,-.5f,0},{.5f,.5f,0},{-.5f,.5f,0}};original.normals.assign(5,{0,0,1});for(auto p:original.positions)original.uv.push_back({p.x+.5f,p.y+.5f});original.indices={0,1,2,0,2,3,0,3,4,0,4,1};Mesh current;for(auto v:original.indices){current.positions.push_back(original.positions[v]);current.normals.push_back(original.normals[v]);const auto uv=original.uv[v];const auto x=uv[0]-.5f,y=uv[1]-.5f;current.uv.push_back({.5f+.7f*(std::cos(.23f)*x-std::sin(.23f)*y),.5f+.7f*(std::sin(.23f)*x+std::cos(.23f)*y)});current.indices.push_back(uint32_t(current.indices.size()));}const auto expanded=detail::expand_corner_key_basis(current,original);
+ if(argc==2&&std::string_view(argv[1])=="--require-device"){
+  try{detail::reflected_key_correspondence(current,.0001f);}
+  catch(const std::exception &error){std::cout<<error.what()<<'\n';return 0;}
+  throw std::runtime_error("Exact authored Mirror accepted an unavailable GPU");
+ }
+ if(argc!=1)return 2;
  auto map=detail::reflected_key_correspondence(current,.0001f);check(map.corners.size()==12&&map.vertices.size()==12&&map.maximum_rest_error==0,"Actual five-source/twelve-current symmetric fan has a unique exact reflected corner/vertex bijection");check(map.vertices[3]==9&&map.vertices[9]==3&&map.vertices[0]==0&&map.vertices[6]==6,"Independent copies of the same original center follow distinct real reflected triangles");
  std::vector<Vec3> values(12);values[0].z=.013f;values[3].z=-.017f;values[6].z=.021f;values[9].z=-.029f;std::vector<Vec3> mirrored;for(auto source:map.vertices){const auto p=values[source];mirrored.push_back({-p.x,p.y,p.z});}check(mirrored[0].z==.013f&&mirrored[3].z==-.029f&&mirrored[6].z==.021f&&mirrored[9].z==-.017f,"Opposite-seam field reflection preserves every independent endpoint instead of contracting to source5");
  NormalFrames frame;frame.origin_vertex_count=12;frame.origin_vertices=current.indices;frame.normals.assign(12,{0,0,1});frame.tangents.assign(12,{1,0,0,1});std::vector<std::array<float,2>> role_uv;for(auto v:expanded.origin_vertices)role_uv.push_back(original.uv[v]);auto signs=detail::reflected_key_role_signs(frame,role_uv,map);check(std::all_of(signs.begin(),signs.end(),[](auto s){return s==-1;}),"Actual original-role U reflection proves exact base N/T parity and immutable handedness");
@@ -21,5 +25,30 @@ int main()try{
  auto huge=current;for(auto &p:huge.positions)p=p*1e20f;check(rejects([&]{detail::reflected_key_correspondence(huge,.0001f);},"spatial indexing"),"Finite extreme geometry refuses before signed spatial-cell conversion");
  detail::KeyMirrorLimits work;work.max_work=1;check(rejects([&]{detail::reflected_key_correspondence(current,.0001f,work);},"bounded work"),"Mirror candidate search cannot exceed its declared work quota");
  detail::KeyMirrorLimits limits;limits.max_bytes=1;check(rejects([&]{detail::reflected_key_correspondence(current,.0001f,limits);},"preflight"),"Mirror scratch dimensions are bounded before detached allocation");limits={};size_t polls=0;limits.cancelled=[&]{++polls;return false;};detail::reflected_key_correspondence(current,.0001f,limits);for(auto cut:{size_t(1),polls/2,polls}){size_t at=0;limits.cancelled=[&]{return ++at>=cut;};check(rejects([&]{detail::reflected_key_correspondence(current,.0001f,limits);},"cancelled"),"Early/middle/late detached mirror cancellation refuses before a result");}
+
+ const auto edge=detail::reflected_key_correspondence(current,{.0625},.125f);
+ check(edge.corners==map.corners&&edge.maximum_rest_error==.125,"Inclusive binary64 radius returns the exact maximum rest error");
+ check(rejects([&]{detail::reflected_key_correspondence(current,{std::nextafter(.0625,1.)},.125f);},"triangle refinement"),"A plane one binary64 increment outside the radius refuses");
+
+ // Each triangle has an independent self-reflected seam and the same centroid.
+ Mesh dense;
+ constexpr uint32_t faces=96;
+ for(uint32_t face=0;face<faces;++face){
+  const float x=1+face*.03125f,y=1+face*.0625f;
+  dense.positions.insert(dense.positions.end(),{{-x,y,0},{x,y,0},{0,-2*y,0}});
+  dense.indices.insert(dense.indices.end(),{3*face,3*face+1,3*face+2});
+ }
+ dense.normals.assign(dense.positions.size(),{0,0,1});
+ detail::KeyMirrorLimits exact;
+ exact.max_work=1+35*faces+9*faces*faces;
+ const auto dense_map=detail::reflected_key_correspondence(dense,.0001f,exact);
+ bool ordered=dense_map.maximum_rest_error==0;
+ for(uint32_t t=0;t<faces;++t){
+  const auto base=3*t;
+  ordered&=dense_map.corners[base]==base+1&&dense_map.corners[base+1]==base&&dense_map.corners[base+2]==base+2;
+ }
+ check(ordered&&dense_map.corners==dense_map.vertices,"Unique wound corner matches survive continuation within a dense centroid bin");
+ --exact.max_work;
+ check(rejects([&]{detail::reflected_key_correspondence(dense,.0001f,exact);},"bounded work"),"The exact work limit charges all nine candidate corner checks, including rejected rotations");
  fault::calls=0;fault::count=true;auto positive=detail::reflected_key_correspondence(current,.0001f);fault::count=false;const auto count=fault::calls;for(size_t cut=0;cut<count;++cut){fault::remaining=long(cut);bool failed=false;try{detail::reflected_key_correspondence(current,.0001f);}catch(const std::bad_alloc&){failed=true;}catch(...){fault::remaining=-1;throw;}fault::remaining=-1;if(!failed)throw std::runtime_error("Mirror allocation prefix unexpectedly completed");}std::cout<<"MIRROR_ALLOCATION_PREFIXES "<<count<<std::endl;check(count>0&&detail::reflected_key_correspondence(current,.0001f).corners==positive.corners,"All measured persistent mirror allocation denials unwind and exact retry succeeds");std::cout<<"PASS "<<checks<<" detached mirror correspondence checks"<<std::endl;return 0;
 }catch(const std::exception&e){fault::remaining=-1;fault::count=false;std::cerr<<"FAIL "<<e.what()<<std::endl;return 1;}

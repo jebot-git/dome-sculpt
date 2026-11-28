@@ -26,14 +26,15 @@ struct Counter {
 #endif
   }
 };
-__global__ void key_mirror_vertices(key_mirror::View view,size_t first,const key_mirror::Cell *cells,
-    key_mirror::Metric metric,uint32_t allowance,key_mirror::Progress *progress,uint32_t *donors,
+template<class Data,class State,class Match>
+__global__ void key_mirror_search(key_mirror::View view,const Vec3 *rest,const Data *data,size_t first,
+    const key_mirror::Cell *cells,key_mirror::Metric metric,uint32_t allowance,State *progress,Match *matches,
     size_t count,uint32_t *status,bool initialize){
   const size_t i=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
   if(i>=count)return;
   if(initialize)progress[i]={};
   const auto visited=key_mirror::visit<surface_ray::NativePrecision>(
-      view,view.rest[first+i],cells[i],metric,allowance,progress[i],donors[i]);
+      view,rest,data,first+i,cells[i],metric,allowance,progress[i],matches[i]);
   if(visited&key_mirror::pending)atomicOr(status,key_mirror::pending);
   if(visited&~key_mirror::pending)atomicAdd(status,visited&~key_mirror::pending);
 }
@@ -108,12 +109,13 @@ public:
     wait();
   }
   void reset(uint32_t *value){checked(DOME_GPU(MemsetAsync)(value,0,sizeof(*value),stream_));}
-  void mirror_vertices(key_mirror::View view,size_t first,const key_mirror::Cell *cells,
-      key_mirror::Metric metric,uint32_t allowance,key_mirror::Progress *progress,uint32_t *donors,
+  template<class Data,class State,class Match>
+  void mirror_keys(key_mirror::View view,const Vec3 *rest,const Data *data,size_t first,
+      const key_mirror::Cell *cells,key_mirror::Metric metric,uint32_t allowance,State *progress,Match *matches,
       size_t count,uint32_t *status,bool initialize){
     constexpr unsigned lanes=128;
-    key_mirror_vertices<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(
-        view,first,cells,metric,allowance,progress,donors,count,status,initialize);
+    key_mirror_search<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(
+        view,rest,data,first,cells,metric,allowance,progress,matches,count,status,initialize);
     checked(DOME_GPU(GetLastError)());
   }
   void clear_brush(float *values,size_t count){
@@ -159,9 +161,13 @@ std::unique_ptr<Query> upload(const Surface &surface){return std::make_unique<De
 } // namespace dome::detail::weight_transfer
 
 namespace dome::detail::key_mirror {
-std::unique_ptr<Query> upload(std::span<const Bin> bins,std::span<const uint32_t> order,
-                             std::span<const Vec3> rest,std::span<const Vec3> delta){
-  return std::make_unique<DeviceQuery<weight_transfer::GpuApi>>(bins,order,rest,delta);
+std::unique_ptr<Query<uint32_t>> upload(std::span<const Bin> bins,std::span<const uint32_t> order,
+                                       std::span<const Vec3> rest,std::span<const Vec3> delta){
+  return std::make_unique<VertexQuery<weight_transfer::GpuApi>>(bins,order,rest,delta,std::min(rest.size(),batch_capacity));
+}
+std::unique_ptr<Query<TriangleMatch>> upload_triangles(std::span<const Bin> bins,std::span<const uint32_t> order,
+    std::span<const Vec3> rest,std::span<const uint32_t> indices,size_t capacity){
+  return std::make_unique<TriangleQuery<weight_transfer::GpuApi>>(bins,order,rest,indices,capacity);
 }
 }
 
