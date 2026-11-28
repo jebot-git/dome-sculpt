@@ -376,8 +376,9 @@ void compare_uv_layers(){
   using Device=detail::EmissionRasterDevice;
   const std::array triangles{Device::BakeUvTriangle{{{1,0},{0,1},{0,0}}},
                              Device::BakeUvTriangle{{{0,1},{1,0},{1,1}}}};
-  const auto resident_compare=[&]{
-    auto resident=detail::create_resident_uv_layer(layer,extent,{triangles,padding},capacity,detail::uv_paint_tables(),{});
+  const auto resident_compare=[&](bool independent=false,bool retain_unowned=false){
+    auto resident=detail::create_resident_uv_layer(layer,extent,{triangles,padding,independent,retain_unowned},
+                                                   capacity,detail::uv_paint_tables(),{});
     std::vector<Device::BakeUvPoint> points(capacity);
     std::vector<detail::FilteredPaintTexel> expected(capacity);
     std::vector<paint_grid::Pixel> actual(capacity);
@@ -390,12 +391,14 @@ void compare_uv_layers(){
         if(at%11==0)continue;
         const auto face=uint32_t(at%2);
         const float a=at%43?float(at%97)/97:1,b=(1-a)*float(at%41)/41;
-        points[i]={face,{a,b}};
-        const float weights[]{a,b,1-a-b};
+        const float c=independent?float(1.-double(a)-double(b)):1-a-b;
+        points[i]={face,{a,b,c}};
+        const float weights[]{a,b,c};
         std::array<float,2> uv{};
         for(unsigned corner=0;corner<3;++corner)for(unsigned axis=0;axis<2;++axis)
           uv[axis]+=triangles[face].uv[corner][axis]*weights[corner];
-        expected[i]=detail::filter_paint_layer(layer,extent,detail::paint_bilinear_taps(extent,uv,padding,true));
+        expected[i]=detail::filter_paint_layer(layer,extent,
+            detail::paint_bilinear_taps(extent,uv,padding,!retain_unowned));
       }
       resident->read_uv_layer(std::span(points).first(count),std::span(actual).first(count),{});
       for(size_t i=0;i<count;++i){
@@ -425,6 +428,10 @@ void compare_uv_layers(){
   compare();
   layer.tiles[9]=PaintTile::shared_default();
   resident_compare();
+  resident_compare(true,false);
+  resident_compare(true,true);
+  std::cout<<"PASS resident GPU retopology keeps the independently rounded third weight and both padding policies "
+           <<2*probes<<" texels\n";
   bool cancelled=false;
   try{gpu.read(layer,extent,1,footprint,[]{return true;});}
   catch(const std::runtime_error &){cancelled=true;}

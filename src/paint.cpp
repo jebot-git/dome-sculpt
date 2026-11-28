@@ -3614,7 +3614,7 @@ class RetopoTexelMatches {
 public:
   RetopoTexelMatches(const Raster &surface, detail::RetopoTransfer &transfer,
                      const TextureSetFaceDomain *domain=nullptr)
-      : surface_(surface), transfer_(transfer), domain_(domain) {}
+      : surface_(surface), transfer_(transfer), domain_(domain), scratch_(transfer.scratch()) {}
 
   const detail::RetopoMatch *at(size_t index) {
     if(index>=end_) load(index);
@@ -3622,15 +3622,19 @@ public:
     return hit?&hit:nullptr;
   }
 
+  void reserve_staging() {
+    if(points_.capacity())return;
+    const auto capacity=std::min(detail::retopo_surface::transfer_capacity,surface_.texels.size());
+    scratch_.reserve(capacity*(sizeof(detail::RetopoPatchPoint)+sizeof(detail::RetopoMatch)+sizeof(uint32_t)));
+    transfer_.reserve_query_staging(domain_);
+    points_.reserve(capacity);
+    hits_.reserve(capacity);
+    slots_.reserve(capacity);
+  }
+
 private:
   void load(size_t index) {
-    if(points_.capacity()==0) {
-      const auto capacity=std::min(detail::retopo_surface::transfer_capacity,surface_.texels.size());
-      transfer_.reserve(capacity,sizeof(detail::RetopoPatchPoint)+sizeof(detail::RetopoMatch)+sizeof(uint32_t));
-      points_.reserve(capacity);
-      hits_.reserve(capacity);
-      slots_.reserve(capacity);
-    }
+    reserve_staging();
     start_=index;
     end_=start_+std::min(detail::retopo_surface::transfer_capacity,surface_.texels.size()-start_);
     slots_.resize(end_-start_);
@@ -3650,6 +3654,7 @@ private:
   const Raster &surface_;
   detail::RetopoTransfer &transfer_;
   const TextureSetFaceDomain *domain_;
+  detail::RetopoTransferBudget::Scratch scratch_;
   size_t start_=0,end_=0;
   std::vector<detail::RetopoPatchPoint> points_;
   std::vector<detail::RetopoMatch> hits_;
@@ -3756,6 +3761,7 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &sour
   replacement.layers_.clear();
   replacement.layers_.reserve(from.layers_.size());
 
+  using UvDevice=EmissionRasterDevice;
   struct WritableLayer {
     size_t slot;
     std::vector<std::shared_ptr<PaintTile>> common;
@@ -3864,129 +3870,216 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &sour
     transfer.reserve(1, sizeof(Tile));
     tile = std::make_shared<Tile>();
   };
-  size_t hits = 0;
-  RetopoTexelMatches matches(surface,transfer,old_domain.get());
-  bool emission_sealing_reserved = false;
-  for (size_t at = 0; at < texels; ++at) {
-    if ((at & 1023) == 0) paint_compute::checkpoint(transfer.cancelled());
-    const auto &texel = surface.texels[at];
-    if (!texel.covered()) continue;
-    const auto &w = texel.bary;
-    const auto hit = matches.at(at);
-    if (!hit) {
-      if (imported) throw std::invalid_argument("A retopology texel falls outside the original imported material surface");
-      continue;
+  struct LayerSample {
+    size_t target;
+    std::array<PaintBilinearTap,4> taps;
+    std::array<float,4> tint;
+  };
+  size_t hits=0;
+  bool emission_sealing_reserved=false;
+  {
+    auto scratch=transfer.scratch();
+    RetopoTexelMatches matches(surface,transfer,old_domain.get());
+    auto capacity=std::min(retopo_surface::transfer_capacity,texels);
+    const bool gpu=compute_backend()!="CPU";
+    std::vector<LayerSample> samples;
+    std::vector<UvDevice::BakeUvPoint> points;
+    std::vector<paint_grid::Pixel> resident_results;
+    std::vector<std::unique_ptr<UvDevice>> resident(writable.size());
+    std::unique_ptr<PaintLayerUvFilter> mapped;
+    bool needs_taps=bool(bake);
+    if(!writable.empty()){
+      matches.reserve_staging();
+      if(gpu){
+        // Always leave room for bounded staging even if the source layers
+        // are too large to upload together. Correspondence batches keep
+        // their original size independently of the paint staging capacity.
+        while(capacity>1&&capacity*sizeof(LayerSample)+PaintLayerUvFilter::staging_bytes(capacity)>
+                          transfer.remaining_bytes())
+          capacity/=2;
+      }
+      scratch.reserve(capacity*sizeof(LayerSample));
+      samples.reserve(capacity);
+      if(gpu) {
+        const auto &mesh=from.mesh();
+        const auto faces=mesh.indices.size()/3;
+        std::vector<UvDevice::BakeUvTriangle> triangles;
+        size_t per_tile=0;
+        for(const auto &layer:writable){
+          per_tile+=sizeof(PaintTile)+(resolved_color?sizeof(PaintColorTile):0);
+          if(!from.layers_[layer.slot].emission_tiles.empty())
+            per_tile+=sizeof(PaintEmissionTile::Pixels)+sizeof(PaintEmissionTile);
+        }
+        const auto touched=std::ranges::count_if(surface.tiles,[](const auto &tile){
+          return std::isfinite(tile.lo.x);
+        });
+        const size_t output_bytes=std::min(paint_limit+size_t(touched)*sizeof(PaintEmissionTile),
+                                          size_t(touched)*per_tile);
+        const auto staged_bytes=PaintLayerUvFilter::staging_bytes(capacity);
+        const auto available=transfer.remaining_bytes();
+        auto resident_budget=available-std::min(available,output_bytes+staged_bytes);
+        for(size_t i=0;i<writable.size();++i){
+          paint_compute::checkpoint(transfer.cancelled());
+          const auto &old_layer=from.layers_[writable[i].slot];
+          const auto bytes=resident_uv_layer_bytes(old_layer,from.resolution(),faces,capacity);
+          if(bytes>resident_budget){
+            needs_taps=true;
+            continue;
+          }
+          scratch.reserve(bytes);
+          resident_budget-=bytes;
+          if(triangles.empty()){
+            triangles.resize(faces);
+            for(size_t face=0;face<faces;++face){
+              if((face&1023)==0)paint_compute::checkpoint(transfer.cancelled());
+              for(size_t corner=0;corner<3;++corner){
+                const auto index=3*face+corner;
+                const auto uv=writable_coordinates.empty()?mesh.uv[mesh.indices[index]]:writable_coordinates[index];
+                std::copy(uv.begin(),uv.end(),triangles[face].uv[corner]);
+              }
+            }
+            points.reserve(capacity);
+            resident_results.reserve(capacity);
+          }
+          resident[i]=create_resident_uv_layer(old_layer,from.resolution(),
+              {triangles,from.surface_->padding,true,!imported},capacity,uv_paint_tables(),transfer.cancelled());
+        }
+        if(std::ranges::any_of(resident,[](const auto &device){return !device;})){
+          scratch.reserve(staged_bytes);
+          mapped=std::make_unique<PaintLayerUvFilter>(capacity);
+        }
+      }else needs_taps=true;
     }
-    ++hits;
-    if (writable.empty() && !bake && !retained_preview && !raw) continue;
-    const auto tint = raw ? raw->tint(*hit) : std::array<float,4>{1,1,1,1};
-    std::array<float, 2> uv{};
-    for (size_t corner = 0; corner < 3; ++corner) {
-      const auto index = size_t(hit->triangle) * 3 + corner;
-      const auto value = writable_coordinates.empty()?from.mesh().uv[from.mesh().indices[index]]:
-                                                      writable_coordinates[index];
-      for (size_t axis = 0; axis < 2; ++axis)
-        uv[axis] += value[axis] * hit->barycentric[corner];
-    }
-    const auto taps = paint_bilinear_taps(from.resolution(), uv, from.surface_->padding,bool(imported));
-    transfer.work((resolved_color ? 48 : 32) + 128 * writable.size());
-    if (raw) {
-      transfer.work(bake?256:144);
-      auto values=raw->sample(*hit);
-      if (bake) resolve_imported_bake(values,*bake,taps);
-      for (size_t k=0; k<4; ++k) values[k]*=tint[k];
-      const auto direction=raw->normal(hit->triangle,hit->barycentric)[0];
-      const auto frame=basis(target_columns,texel.face,{w[0],w[1],1-w[0]-w[1]});
-      const auto normal=retained_retopology_detail(frame,direction,255,true);
-      baked_pixel(*baked,at,values,false);
-      std::copy(normal.begin(),normal.end(),baked->maps.normal.rgba.begin()+4*at);
-      baked->coverage[at]=255;
-      if (!float_bake.empty()) float_bake[at]={{},{values[7],values[8],values[9]},1};
-    } else if (bake) {
-      BakedPixel values{};
-      std::array<float,4> pbr{};
-      float coverage = 0;
-      for (const auto &tap : taps) {
-        const auto weight = float(tap.weight);
-        const auto alpha = weight * unit(bake->coverage[tap.texel]);
-        if (alpha > 0) {
-          const auto sample = baked_pixel(*bake, tap.texel);
-          for (size_t i = 0; i < values.size(); ++i) values[i] += sample[i] * alpha;
+
+    const auto transfer_texel=[&](size_t at){
+      if ((at & 1023) == 0) paint_compute::checkpoint(transfer.cancelled());
+      const auto &texel = surface.texels[at];
+      if (!texel.covered()) return;
+      const auto &w = texel.bary;
+      const auto hit = matches.at(at);
+      if (!hit) {
+        if (imported) throw std::invalid_argument("A retopology texel falls outside the original imported material surface");
+        return;
+      }
+      ++hits;
+      if (writable.empty() && !bake && !retained_preview && !raw) return;
+      const auto tint = raw ? raw->tint(*hit) : std::array<float,4>{1,1,1,1};
+      std::array<PaintBilinearTap,4> taps{};
+      if(needs_taps){
+        std::array<float,2> uv{};
+        for(size_t corner=0;corner<3;++corner){
+          const auto index=size_t(hit->triangle)*3+corner;
+          const auto value=writable_coordinates.empty()?from.mesh().uv[from.mesh().indices[index]]:
+                                                       writable_coordinates[index];
+          for(size_t axis=0;axis<2;++axis)
+            uv[axis]+=value[axis]*hit->barycentric[corner];
+        }
+        taps=paint_bilinear_taps(from.resolution(),uv,from.surface_->padding,bool(imported));
+      }
+      if(!writable.empty())samples.push_back({at,taps,tint});
+      if(points.capacity()){
+        const auto &b=hit->barycentric;
+        points.push_back({hit->triangle,{b[0],b[1],b[2]}});
+      }
+      transfer.work((resolved_color ? 48 : 32) + 128 * writable.size());
+      if (raw) {
+        transfer.work(bake?256:144);
+        auto values=raw->sample(*hit);
+        if (bake) resolve_imported_bake(values,*bake,taps);
+        for (size_t k=0; k<4; ++k) values[k]*=tint[k];
+        const auto direction=raw->normal(hit->triangle,hit->barycentric)[0];
+        const auto frame=basis(target_columns,texel.face,{w[0],w[1],1-w[0]-w[1]});
+        const auto normal=retained_retopology_detail(frame,direction,255,true);
+        baked_pixel(*baked,at,values,false);
+        std::copy(normal.begin(),normal.end(),baked->maps.normal.rgba.begin()+4*at);
+        baked->coverage[at]=255;
+        if (!float_bake.empty()) float_bake[at]={{},{values[7],values[8],values[9]},1};
+      } else if (bake) {
+        BakedPixel values{};
+        std::array<float,4> pbr{};
+        float coverage = 0;
+        for (const auto &tap : taps) {
+          const auto weight = float(tap.weight);
+          const auto alpha = weight * unit(bake->coverage[tap.texel]);
+          if (alpha > 0) {
+            const auto sample = baked_pixel(*bake, tap.texel);
+            for (size_t i = 0; i < values.size(); ++i) values[i] += sample[i] * alpha;
+            if (resolved_color)
+              for (size_t k = 0; k < pbr.size(); ++k) {
+                const auto color = unit(bake->maps.pbr_color.rgba[tap.texel * 4 + k]);
+                pbr[k] += (k < 3 ? srgb_to_linear(color) : color) * alpha;
+              }
+            coverage += alpha;
+          }
+          if (!float_bake.empty() && weight > 0) {
+            const auto sample = bake->emission_field->texel(tap.texel);
+            auto &dest = float_bake[at];
+            for (size_t i = 0; i < 3; ++i) {
+              dest.legacy[i] += sample.legacy[i] * weight;
+              dest.absolute[i] += sample.absolute[i] * weight;
+            }
+            dest.coverage += sample.coverage * weight;
+          }
+        }
+        if (!float_bake.empty()) {
+          auto &sample = float_bake[at];
+          sample.coverage = std::clamp(sample.coverage, 0.f, 1.f);
+          for (size_t k = 0; k < 3; ++k) {
+            sample.legacy[k] = std::min(sample.legacy[k], sample.coverage);
+            sample.absolute[k] = std::min(sample.absolute[k], sample.coverage * maximum_native_emission);
+          }
+        }
+        if (coverage > 0) {
+          for (auto &value : values) value /= coverage;
+          std::optional<NormalBakeEncoding> posed_normal;
+          if (!source_tangents.empty()) {
+            const Vec3 old_normal{values[10],values[11],values[12]};
+            if (transfer.posed_source()) {
+              // The viewport places the posed tangent and normal columns
+              // separately before interpolation, including under shear.
+              transfer.work(48);
+              const auto old_frame = basis(source_columns,hit->triangle,hit->barycentric);
+              const auto new_frame = basis(target_columns,texel.face,{w[0],w[1],1-w[0]-w[1]});
+              const auto world = TangentFrame{old_frame.t,old_frame.b,old_frame.n}.to_world(old_normal);
+              posed_normal = encode_normal_bake(new_frame,world);
+              if (!posed_normal || posed_normal->quantized_angle_radians > .02)
+                throw std::invalid_argument("Retopology exceeds the posed Bake normal error limit");
+            } else {
+              const auto old_frame = tangent_frame(source_geometry, source_tangents, hit->triangle, hit->barycentric);
+              const auto new_frame = tangent_frame(replacement.mesh(), target_tangents, texel.face,
+                  {w[0],w[1],1-w[0]-w[1]});
+              const auto direction = old_frame.to_world(old_normal);
+              const auto changed = transfer.placement_change().normal({direction.x,direction.y,direction.z});
+              const auto new_normal = new_frame.to_tangent({float(changed[0]),float(changed[1]),float(changed[2])});
+              values[10] = new_normal.x; values[11] = new_normal.y; values[12] = new_normal.z;
+            }
+          }
+          baked->coverage[at] = byte(coverage);
+          baked_pixel(*baked, at, values,!posed_normal);
+          if (posed_normal)
+            std::copy(posed_normal->rgba.begin(),posed_normal->rgba.end(),baked->maps.normal.rgba.begin()+4*at);
           if (resolved_color)
             for (size_t k = 0; k < pbr.size(); ++k) {
-              const auto color = unit(bake->maps.pbr_color.rgba[tap.texel * 4 + k]);
-              pbr[k] += (k < 3 ? srgb_to_linear(color) : color) * alpha;
+              const auto value = pbr[k] / coverage;
+              baked->maps.pbr_color.rgba[at * 4 + k] = byte(k < 3 ? linear_to_srgb(value) : value);
             }
-          coverage += alpha;
-        }
-        if (!float_bake.empty() && weight > 0) {
-          const auto sample = bake->emission_field->texel(tap.texel);
-          auto &dest = float_bake[at];
-          for (size_t i = 0; i < 3; ++i) {
-            dest.legacy[i] += sample.legacy[i] * weight;
-            dest.absolute[i] += sample.absolute[i] * weight;
-          }
-          dest.coverage += sample.coverage * weight;
         }
       }
-      if (!float_bake.empty()) {
-        auto &sample = float_bake[at];
-        sample.coverage = std::clamp(sample.coverage, 0.f, 1.f);
-        for (size_t k = 0; k < 3; ++k) {
-          sample.legacy[k] = std::min(sample.legacy[k], sample.coverage);
-          sample.absolute[k] = std::min(sample.absolute[k], sample.coverage * maximum_native_emission);
-        }
+      if (retained_preview) {
+        transfer.work(128);
+        const auto &b = hit->barycentric;
+        const auto desired = retained_retopology_normal(*retained_preview,hit->triangle,{b[0],b[1],b[2]},transfer.previous_metric());
+        const auto frame = basis(target_columns,texel.face,{w[0],w[1],1-w[0]-w[1]});
+        const auto detail = retained_retopology_detail(frame,desired,baked?baked->coverage[at]:0,bool(baked));
+        if (baked) std::copy(detail.begin(),detail.end(),baked->maps.normal.rgba.begin()+4*at);
       }
-      if (coverage > 0) {
-        for (auto &value : values) value /= coverage;
-        std::optional<NormalBakeEncoding> posed_normal;
-        if (!source_tangents.empty()) {
-          const Vec3 old_normal{values[10],values[11],values[12]};
-          if (transfer.posed_source()) {
-            // The viewport places the posed tangent and normal columns
-            // separately before interpolation, including under shear.
-            transfer.work(48);
-            const auto old_frame = basis(source_columns,hit->triangle,hit->barycentric);
-            const auto new_frame = basis(target_columns,texel.face,{w[0],w[1],1-w[0]-w[1]});
-            const auto world = TangentFrame{old_frame.t,old_frame.b,old_frame.n}.to_world(old_normal);
-            posed_normal = encode_normal_bake(new_frame,world);
-            if (!posed_normal || posed_normal->quantized_angle_radians > .02)
-              throw std::invalid_argument("Retopology exceeds the posed Bake normal error limit");
-          } else {
-            const auto old_frame = tangent_frame(source_geometry, source_tangents, hit->triangle, hit->barycentric);
-            const auto new_frame = tangent_frame(replacement.mesh(), target_tangents, texel.face,
-                {w[0],w[1],1-w[0]-w[1]});
-            const auto direction = old_frame.to_world(old_normal);
-            const auto changed = transfer.placement_change().normal({direction.x,direction.y,direction.z});
-            const auto new_normal = new_frame.to_tangent({float(changed[0]),float(changed[1]),float(changed[2])});
-            values[10] = new_normal.x; values[11] = new_normal.y; values[12] = new_normal.z;
-          }
-        }
-        baked->coverage[at] = byte(coverage);
-        baked_pixel(*baked, at, values,!posed_normal);
-        if (posed_normal)
-          std::copy(posed_normal->rgba.begin(),posed_normal->rgba.end(),baked->maps.normal.rgba.begin()+4*at);
-        if (resolved_color)
-          for (size_t k = 0; k < pbr.size(); ++k) {
-            const auto value = pbr[k] / coverage;
-            baked->maps.pbr_color.rgba[at * 4 + k] = byte(k < 3 ? linear_to_srgb(value) : value);
-          }
-      }
-    }
-    if (retained_preview) {
-      transfer.work(128);
-      const auto &b = hit->barycentric;
-      const auto desired = retained_retopology_normal(*retained_preview,hit->triangle,{b[0],b[1],b[2]},transfer.previous_metric());
-      const auto frame = basis(target_columns,texel.face,{w[0],w[1],1-w[0]-w[1]});
-      const auto detail = retained_retopology_detail(frame,desired,baked?baked->coverage[at]:0,bool(baked));
-      if (baked) std::copy(detail.begin(),detail.end(),baked->maps.normal.rgba.begin()+4*at);
-    }
-    const auto x = at % resolution, y = at / resolution;
-    const auto tile = y / 32 * surface.columns + x / 32;
-    const auto pixel = y % 32 * 32 + x % 32;
-    for (auto &layer : writable) {
-      const auto &old_layer = from.layers_[layer.slot];
-      auto sample = filter_paint_layer(old_layer, from.resolution(), taps);
+    };
+
+    const auto write_layer=[&](WritableLayer &layer,FilteredPaintTexel sample,const LayerSample &target){
+      const auto &old_layer=from.layers_[layer.slot];
+      const auto &tint=target.tint;
+      const auto x=target.target%resolution,y=target.target/resolution;
+      const auto tile=y/32*surface.columns+x/32,pixel=y%32*32+x%32;
       if (raw && sample.common.data[9])
         for (size_t k=0; k<4; ++k) {
           const float color=unit(sample.common.data[k]);
@@ -4000,7 +4093,7 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &sour
         for (size_t k = 0; k < 3; ++k)
           sample.common.data[6 + k] = byte(linear_to_srgb(sample.emission.legacy[k]));
       }
-      if (sample.common == PaintPixel{} && !emission && !sample.pbr_present) continue;
+      if (sample.common == PaintPixel{} && !emission && !sample.pbr_present) return;
       auto &dest = replacement.layers_[layer.slot];
       auto &common = layer.common[tile];
       allocate_tile(common);
@@ -4026,6 +4119,36 @@ void detail::TextureSetPaintAccess::reproject_retopology(const PaintedMesh &sour
         allocate_tile(pbr);
         dest.pbr_tiles[tile] = pbr;
         pbr->pixels[pixel] = sample.pbr;
+      }
+    };
+
+    for(size_t first=0;first<texels;first+=capacity){
+      paint_compute::checkpoint(transfer.cancelled());
+      samples.clear();
+      points.clear();
+      const auto end=first+std::min(capacity,texels-first);
+      for(size_t at=first;at<end;++at)transfer_texel(at);
+      if(samples.empty())continue;
+      for(size_t slot=0;slot<writable.size();++slot){
+        auto &layer=writable[slot];
+        const auto &old_layer=from.layers_[layer.slot];
+        const auto &device=resident[slot];
+        std::span<const FilteredPaintTexel> staged;
+        if(device){
+          resident_results.resize(samples.size());
+          device->read_uv_layer(points,resident_results,transfer.cancelled());
+        }else if(mapped){
+          staged=mapped->read(old_layer,from.resolution(),samples.size(),[&](size_t i,auto &taps){
+            taps=samples[i].taps;
+            return true;
+          },transfer.cancelled());
+        }
+        for(size_t i=0;i<samples.size();++i){
+          if((i&255)==0)paint_compute::checkpoint(transfer.cancelled());
+          const auto sample=device?decode_uv_paint_pixel(resident_results[i]):mapped?staged[i]:
+                            filter_paint_layer(old_layer,from.resolution(),samples[i].taps);
+          write_layer(layer,sample,samples[i]);
+        }
       }
     }
   }

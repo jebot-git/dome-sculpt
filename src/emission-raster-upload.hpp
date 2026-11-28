@@ -28,7 +28,9 @@ private:
       upload_bake(input);
       bake_uv_triangles_=input.bake_uv_source.triangles.size();
       if(bake_uv_triangles_){
-        bake_uv_geometry_={upload(input.bake_uv_source.triangles),upload(input.bake_uv_source.padding),input.resolution};
+        const auto &source=input.bake_uv_source;
+        bake_uv_geometry_={upload(source.triangles),upload(source.padding),input.resolution,
+                           source.independent_barycentric,source.retain_unowned_texels};
         bake_uv_points_=allocate<BakeUvPoint>(bake_uv_capacity_);
       }else bake_uv_samples_=allocate<BakeUvSample>(bake_uv_capacity_);
       if(input.uv_layer){
@@ -190,7 +192,7 @@ public:
        (!emission.empty()&&(!view_.bake.physical||emission.size()!=samples.size())))
       throw std::invalid_argument("Invalid GPU Bake UV maps batch");
     if(bake_uv_faces_)for(const auto &sample:samples){
-      if(sample.face>=bake_uv_faces_||!valid_bake_uv_bary(sample.bary))
+      if(sample.face>=bake_uv_faces_||!valid_bake_uv_bary(sample.bary,1.-double(sample.bary[0])-sample.bary[1]))
         throw std::invalid_argument("Invalid GPU Bake UV tangent sample");
     }
     upload_bake_uv_taps(samples,cancelled);
@@ -227,15 +229,16 @@ public:
     for(size_t i=0;i<points.size();++i){
       if((i&1023)==0)paint_compute::checkpoint(cancelled);
       const auto &point=points[i];
-      if(point.face!=UINT32_MAX&&(point.face>=bake_uv_triangles_||!valid_bake_uv_bary(point.bary)))
+      const double third=bake_uv_geometry_.independent_barycentric?double(point.bary[2]):
+                         1.-double(point.bary[0])-point.bary[1];
+      if(point.face!=UINT32_MAX&&(point.face>=bake_uv_triangles_||!valid_bake_uv_bary(point.bary,third)))
         throw std::invalid_argument("Invalid GPU UV correspondence point");
     }
     device_.upload(bake_uv_points_,points.data(),points.size_bytes());
   }
-  static bool valid_bake_uv_bary(const float (&bary)[2]){
-    const auto first=double(bary[0]),second=double(bary[1]),third=1.-first-second;
+  static bool valid_bake_uv_bary(const float *bary,double third){
     const auto valid=[](double value){return value>=-.00001&&value<=1.00001;};
-    return valid(first)&&valid(second)&&valid(third);
+    return valid(bary[0])&&valid(bary[1])&&valid(third);
   }
   void upload_bake_uv_taps(std::span<const BakeUvSample> samples,const std::function<bool()> &cancelled) {
     if(!bake_uv_samples_||samples.empty()||samples.size()>bake_uv_capacity_)

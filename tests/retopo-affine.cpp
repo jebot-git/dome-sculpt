@@ -3,6 +3,9 @@
 #include "dome/bake-recipe.hpp"
 #include "dome/document.hpp"
 #include "dome/source-placement.hpp"
+#include "../src/retopo-transfer.hpp"
+#include "../src/texture-set-paint-access.hpp"
+#include "../src/texture-set-resample.hpp"
 #include <algorithm>
 #include <nlohmann/json.hpp>
 #include <filesystem>
@@ -220,6 +223,50 @@ void first_native_material(const std::filesystem::path &out,uint32_t resolution=
   check(empty.active().painted->resolution()==64&&cursor->active_layer()==3,
       "An otherwise empty native layer stack preserves its monotonic ID cursor");
 }
+void bounded_layer_sampling() {
+  Mesh mesh;
+  mesh.positions={{-1,-1,0},{1,-1,0},{1,1,0},{-1,1,0}};
+  mesh.normals.assign(4,{0,0,1});
+  mesh.indices={0,1,2,0,2,3};
+  mesh.uv={{0,0},{1,0},{1,1},{0,1}};
+  PaintedMesh guide(mesh,64);
+  Brush brush;
+  brush.radius=.49f;
+  brush.normal={0,0,1};
+  PaintSettings settings;
+  settings.color={.15f,.7f,.2f,1};
+  guide.begin_stroke();
+  guide.stamp(brush,settings);
+  settings.channel=PaintChannel::Emission;
+  settings.emission_units=PaintEmissionUnits::Physical;
+  settings.emission={2,.1f,.05f};
+  guide.stamp(brush,settings);
+  check(guide.end_stroke(),"Bounded retopology guide has editable pigment and FLOAT emission");
+  guide.add_layer("Hidden mask");
+  settings.channel=PaintChannel::Mask;
+  settings.mask=0;
+  guide.begin_stroke();
+  guide.stamp(brush,settings);
+  check(guide.end_stroke(),"Bounded retopology guide has an independent mask");
+  guide.layer_properties("Hidden mask",false,.25f);
+  const auto original=guide.encode();
+  const std::function<bool()> cancelled;
+  const auto apply=[&](size_t working_bytes) {
+    detail::RetopoTransferBudget budget(cancelled);
+    if(working_bytes<budget.remaining_bytes())budget.reserve(budget.remaining_bytes()-working_bytes,1);
+    detail::RetopoTransfer transfer(mesh,AffineTransform{},AffineTransform{},budget,{},true);
+    PaintedMesh patch(mesh,64);
+    detail::TextureSetPaintAccess::reproject_retopology(guide,patch,transfer);
+    return patch.encode();
+  };
+  const auto staging=detail::PaintLayerUvFilter::staging_bytes(64*64);
+  // Keep enough memory to stage and seal a complete batch while excluding
+  // additional resident source fields. The regular call can retain both.
+  const auto staged=apply(staging+1280*1024);
+  check(staged==apply(SIZE_MAX)&&guide.encode()==original,
+        "Bounded and resident layer sampling publish the same editable paint bytes");
+}
+
 void topology_transform() {
   RetopoMesh t;std::array<TopologyID,4> v;
   const Vec3 p[4]{{-.2f,-.2f,0},{.2f,-.2f,0},{.2f,.2f,0},{-.2f,.2f,0}};
@@ -242,6 +289,11 @@ void topology_transform() {
 }
 }
 int main(int argc,char **argv)try {
+  if(argc==2&&std::string_view(argv[1])=="--layer-budget-only"){
+    bounded_layer_sampling();
+    std::cout<<"PASS "<<checks<<" bounded retopology layer checks\n";
+    return 0;
+  }
   if(argc==3&&std::string_view(argv[1])=="--first-native-1024"){
     const std::filesystem::path out=argv[2];std::filesystem::create_directories(out);
     first_native_material(out,1024);
@@ -249,6 +301,7 @@ int main(int argc,char **argv)try {
   }
   if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
   topology_transform();
+  bounded_layer_sampling();
   first_native_material(out);
   const Matrix matrices[]{
     {0,1,0,0,-1,0,0,0,0,0,1,0,.15,-.1,.2,1},

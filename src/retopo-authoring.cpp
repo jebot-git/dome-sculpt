@@ -134,20 +134,21 @@ void detail::RetopoTransferBudget::reserve(size_t count, size_t stride) {
   bytes_left_ -= count * stride;
 }
 
-void detail::RetopoTransfer::prepare_batch(size_t size) {
-  if(queries_.capacity()||!size)return;
-  const auto capacity=retopo_surface::transfer_capacity;
-  reserve(capacity,sizeof(RetopoMatchPoint)+sizeof(retopo_surface::TransferPoint)+sizeof(retopo_surface::TransferHit));
-  queries_.reserve(capacity);
+void detail::RetopoTransfer::reserve_query_staging(const TextureSetFaceDomain *domain) {
+  if(!queries_.capacity()){
+    const auto capacity=retopo_surface::transfer_capacity;
+    reserve(capacity,sizeof(RetopoMatchPoint)+sizeof(retopo_surface::TransferPoint)+sizeof(retopo_surface::TransferHit));
+    queries_.reserve(capacity);
+  }
+  if(domain&&!membership_reserved_){
+    reserve(world_normals_.size(),sizeof(uint8_t));
+    membership_reserved_=true;
+  }
 }
 
 void detail::RetopoTransfer::submit(std::span<RetopoMatch> hits,const TextureSetFaceDomain *domain){
   if(queries_.empty())return;
   if(!projection_)projection_=std::make_unique<RetopoSurface>(*old_surface_);
-  if(domain&&!membership_reserved_){
-    reserve(world_normals_.size(),sizeof(uint8_t));
-    membership_reserved_=true;
-  }
   const auto members=domain?std::optional(domain->triangles()):std::nullopt;
   work(projection_->match(queries_,hits,previous_metric_,world_normals_,members,
                           uint32_t(remaining_work()),cancelled()));
@@ -157,7 +158,7 @@ void detail::RetopoTransfer::match(std::span<const RetopoMatchPoint> points,std:
     throw std::logic_error("Invalid Retopology transfer batch");
   work(points.size());
   queries_.clear();
-  prepare_batch(points.size());
+  if(!points.empty())reserve_query_staging();
   for(const auto &point:points)
     queries_.push_back({skin_affine_point(replacement_metric_,point.position),
                         normal_direction(replacement_metric_,point.normal),false});
@@ -191,7 +192,7 @@ void detail::RetopoTransfer::match_patch(std::span<const RetopoPatchPoint> point
     throw std::logic_error("Invalid Retopology patch batch");
   work(points.size());
   queries_.clear();
-  prepare_batch(points.size());
+  if(!points.empty())reserve_query_staging(domain);
   for(const auto &point:points){
     // On the first patch, an interior texel must agree with the material
     // picked at the centre. Looking only in that slot hides crossed seams.

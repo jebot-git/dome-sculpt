@@ -12,6 +12,20 @@ public:
   explicit RetopoTransferBudget(const std::function<bool()> &cancelled) : cancelled_(cancelled) {}
   void work(size_t amount = 1);
   void reserve(size_t count, size_t stride);
+  class Scratch {
+  public:
+    explicit Scratch(RetopoTransferBudget &budget) : budget_(budget) {}
+    Scratch(const Scratch &)=delete;
+    Scratch &operator=(const Scratch &)=delete;
+    ~Scratch(){budget_.bytes_left_+=held_;}
+    void reserve(size_t bytes){
+      budget_.reserve(1,bytes);
+      held_+=bytes;
+    }
+  private:
+    RetopoTransferBudget &budget_;
+    size_t held_=0;
+  };
   const auto &cancelled() const { return cancelled_; }
   size_t remaining_work() const { return work_left_; }
   size_t remaining_bytes() const { return bytes_left_; }
@@ -40,6 +54,7 @@ public:
                  const DeformationState *source_pose = nullptr);
   RetopoTransfer(const RetopoTransfer &) = delete;
   RetopoTransfer &operator=(const RetopoTransfer &) = delete;
+  void reserve_query_staging(const TextureSetFaceDomain *domain=nullptr);
   void match(std::span<const RetopoMatchPoint>,std::span<RetopoMatch>);
   void match_patch(std::span<const RetopoPatchPoint>,std::span<RetopoMatch>,
                    const TextureSetFaceDomain *source_domain=nullptr);
@@ -51,6 +66,7 @@ public:
   const Mesh &source_geometry() const { return old_surface_->mesh(); }
   void work(size_t amount = 1) { budget_.work(amount); }
   void reserve(size_t count, size_t stride) { budget_.reserve(count, stride); }
+  RetopoTransferBudget::Scratch scratch() {return RetopoTransferBudget::Scratch(budget_);}
   const auto &cancelled() const { return budget_.cancelled(); }
   const auto &placement_change() const { return placement_change_; }
   const auto &previous_metric() const { return previous_metric_; }
@@ -67,7 +83,6 @@ private:
   std::vector<Vec3> world_normals_;
   std::unique_ptr<RetopoSurface> projection_;
   std::vector<RetopoMatchPoint> queries_;
-  void prepare_batch(size_t);
   void submit(std::span<RetopoMatch>,const TextureSetFaceDomain *);
 };
 

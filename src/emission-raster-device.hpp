@@ -43,11 +43,13 @@ public:
     uint32_t face=0;
     float bary[2]{};
   };
-  struct BakeUvPoint { uint32_t face=UINT32_MAX; float bary[2]{}; };
+  struct BakeUvPoint { uint32_t face=UINT32_MAX; float bary[3]{}; };
   struct BakeUvTriangle { float uv[3][2]{}; };
   struct BakeUvSource {
     std::span<const BakeUvTriangle> triangles;
     std::span<const int32_t> padding;
+    bool independent_barycentric=false;
+    bool retain_unowned_texels=false;
   };
   struct BakeUvFrame { NormalBakeVertex before[3],after[3]; };
   struct BakeUvMapsPixel {
@@ -141,6 +143,8 @@ struct BakeUvGeometry {
   const EmissionRasterDevice::BakeUvTriangle *triangles=nullptr;
   const int32_t *padding=nullptr;
   uint32_t resolution=0;
+  bool independent_barycentric=false;
+  bool retain_unowned_texels=false;
 };
 struct BakeUvRequests {
   BakeUvGeometry geometry;

@@ -63,7 +63,7 @@ DOME_EMISSION_FN paint_grid::MappedTaps bake_uv_taps(const BakeUvGeometry &geome
   paint_grid::MappedTaps result;
   if(point.face==UINT32_MAX)return result;
   result.covered=true;
-  const float weights[]{point.bary[0],point.bary[1],
+  const float weights[]{point.bary[0],point.bary[1],geometry.independent_barycentric?point.bary[2]:
       paint_compute::sub(paint_compute::sub(1,point.bary[0]),point.bary[1])};
   const auto &triangle=geometry.triangles[point.face];
   const auto extent=paint_grid::integer(int32_t(geometry.resolution));
@@ -87,10 +87,10 @@ DOME_EMISSION_FN paint_grid::MappedTaps bake_uv_taps(const BakeUvGeometry &geome
   for(unsigned tap=0;tap<4;++tap){
     const auto texel=size_t(addresses[1][tap>>1])*geometry.resolution+addresses[0][tap&1];
     const auto owner=geometry.padding[texel];
-    if(owner<0)continue;
+    if(owner<0&&!geometry.retain_unowned_texels)continue;
     const auto x=tap&1?fractions[0]:sum64(one64,fractions[0]^sign64);
     const auto y=tap&2?fractions[1]:sum64(one64,fractions[1]^sign64);
-    result.texels[tap]=uint32_t(owner);
+    result.texels[tap]=owner>=0?uint32_t(owner):uint32_t(texel);
     result.weights[tap]=product64(x,y);
   }
   return result;
