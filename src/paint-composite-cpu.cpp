@@ -5,7 +5,7 @@
 #include "paint-grid-filter.hpp"
 #include "portable-normal-raster.hpp"
 #include "source-uv-sampler-kernel.hpp"
-#include "mixed-normal-raster-kernel.hpp"
+#include "mtoon-normal-raster-kernel.hpp"
 #include "dome/source-maps.hpp"
 #include <cstring>
 namespace dome::detail {
@@ -71,13 +71,12 @@ std::unique_ptr<SourceUvSampler> upload_source_uv_sampler(
   return std::make_unique<ReferenceSourceUvSampler>(source, srgb, format, capacity, transform);
 }
 }
-namespace dome::detail::mixed_normal {
+namespace dome::detail::mtoon_normal_raster {
 float raster(const Input &in,std::span<uint8_t> rgba,const std::function<bool()> &cancelled){
  paint_compute::checkpoint(cancelled);
  validate(in,rgba);
- const View source{view(in.original,in.original.rgba.data()),view(in.detail,in.detail.rgba.data()),
-                   in.coverage.rgba.data(),in.visible.empty()?nullptr:in.visible.data(),
-                   in.width,in.height,in.scale};
+ const auto source=view(in,in.original?in.original->rgba.data():nullptr,in.detail.rgba.data(),
+                       in.coverage.rgba.data(),in.visible.empty()?nullptr:in.visible.data());
  const auto &q=paint_compute::quantization();
  std::vector<Tap> taps(capacity(in));
  return visit_stripes(in,rgba,cancelled,[&](Stripe batch,std::span<uint8_t> output){

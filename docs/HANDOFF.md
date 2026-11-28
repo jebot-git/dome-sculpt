@@ -429,6 +429,17 @@ compile the device path. Physical XR and positive vendor hardware tests
 remain open.
 [Resident MToon normal raster evidence](validation/retopo-gpu-normal-20261128.json)
 
+Aligned native MToon Bake normals now use the same device raster and
+workgroup reduction in standalone retopology and regular texture-set
+exports. The native-size branch preserves the raw tangent-space blend,
+fully covered RGB, and original Bake alpha. Untextured and constant
+backgrounds need no authored normal image upload. The same cell admission
+preserves clamped edges and the mesh UV domain where applicable. The
+export worker budgets each resident input and the bounded scratch before
+dispatching. The 64² and 512² Arc texture-set cases include varying
+normals, full coverage, and HDR. Reimported Standard GLB matches the
+viewport within one RGB value with identical cutout alpha.
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.

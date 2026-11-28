@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include <sycl/sycl.hpp>
-#include "mixed-normal-raster-kernel.hpp"
+#include "mtoon-normal-raster-kernel.hpp"
 #include "paint-composite-backend.hpp"
 
-namespace dome::detail::mixed_normal {
+namespace dome::detail::mtoon_normal_raster {
 namespace {
 struct Release {
  sycl::queue *queue;
@@ -28,7 +28,7 @@ float raster(const Input &in,std::span<uint8_t> rgba,const std::function<bool()>
   for(auto error:errors)std::rethrow_exception(error);
  },sycl::property_list{sycl::property::queue::in_order{}}};
  const auto limit=capacity(in),groups=(limit+group_size-1)/group_size;
- const auto original=allocate<uint8_t>(queue,in.original.rgba.size());
+ const auto original=allocate<uint8_t>(queue,original_bytes(in));
  const auto detail=allocate<uint8_t>(queue,in.detail.rgba.size());
  const auto coverage=allocate<uint8_t>(queue,in.coverage.rgba.size());
  const auto visible=allocate<uint8_t>(queue,in.visible.size());
@@ -37,15 +37,14 @@ float raster(const Input &in,std::span<uint8_t> rgba,const std::function<bool()>
  const auto pixels=allocate<uint8_t>(queue,4*limit);
  const auto bounds=allocate<float>(queue,groups);
  std::vector<float> bound(groups);
- const View source{view(in.original,original.get()),view(in.detail,detail.get()),
-                   coverage.get(),visible.get(),in.width,in.height,in.scale};
+ const auto source=view(in,original.get(),detail.get(),coverage.get(),visible.get());
  const auto *quantization=table.get();
  auto *tap=taps.get();
  auto *pixel=pixels.get();
  auto *result=bounds.get();
  try {
   const auto &q=paint_compute::quantization();
-  queue.memcpy(original.get(),in.original.rgba.data(),in.original.rgba.size());
+  if(original)queue.memcpy(original.get(),in.original->rgba.data(),in.original->rgba.size());
   queue.memcpy(detail.get(),in.detail.rgba.data(),in.detail.rgba.size());
   queue.memcpy(coverage.get(),in.coverage.rgba.data(),in.coverage.rgba.size());
   if(visible)queue.memcpy(visible.get(),in.visible.data(),in.visible.size_bytes());

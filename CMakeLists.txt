@@ -73,7 +73,7 @@ elseif(DOME_COMPUTE_BACKEND STREQUAL "ONEAPI")
     src/emission-raster-texture-set-sycl.cpp
     src/emission-raster-texture-set-source-sycl.cpp src/portable-normal-raster-sycl.cpp
     src/portable-normal-certificate-sycl.cpp src/source-uv-sampler-sycl.cpp
-    src/mixed-normal-raster-sycl.cpp)
+    src/mtoon-normal-raster-sycl.cpp)
 else()
   message(FATAL_ERROR "Unknown DOME_COMPUTE_BACKEND=${DOME_COMPUTE_BACKEND}")
 endif()
@@ -146,7 +146,7 @@ target_include_directories(dome-sculpt-baked-emission PUBLIC include)
 target_compile_options(dome-sculpt-baked-emission PRIVATE -Wall -Wextra -Wpedantic)
 target_link_libraries(dome-sculpt-core PRIVATE dome-sculpt-baked-emission)
 target_sources(dome-sculpt-core PRIVATE src/emission-bake-source.cpp)
-target_sources(dome-sculpt-core PRIVATE src/mixed-normal-raster.cpp)
+target_sources(dome-sculpt-core PRIVATE src/mtoon-normal-raster.cpp)
 target_sources(dome-sculpt-core PRIVATE src/scene-bake-archive.cpp)
 target_sources(dome-sculpt-core PRIVATE src/creator-vrm.cpp)
 target_include_directories(dome-sculpt-core PUBLIC include third_party/openbrush)

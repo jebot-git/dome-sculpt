@@ -18,7 +18,7 @@
 #include "source-frame-skin.hpp"
 #include "affine-interaction.hpp"
 #include "normal-bake-encoding.hpp"
-#include "mixed-normal-raster.hpp"
+#include "mtoon-normal-raster.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/brush.hpp"
 #include "dome/material-visibility.hpp"
@@ -137,15 +137,6 @@ struct MToonShadeTap {
  std::array<double,3> correction{};
  MToonSourceTap sampling;
 };
-
-struct MToonNormalTap {
- Vec3 original, baked;
- float coverage=0, quantization=0;
-};
-
-Vec3 normal_rgb(const uint8_t *p){
- return {2.f*p[0]/255.f-1,2.f*p[1]/255.f-1,2.f*p[2]/255.f-1};
-}
 
 bool portable_mtoon_bake_frame(const Mesh &mesh,const TextureSetView &field,
     std::span<const Tangent> tangents,const AffineTransform &world,const TextureSetLimits &limits){
@@ -341,52 +332,6 @@ std::optional<PortableMToonFrames> portable_mtoon_derivative_frames(const Mesh &
  return result;
 }
 
-// A cell's filtered vectors are convex combinations of its four taps.
-// Project them onto one unit tap to bound length from below and use the
-// longest tap as the upper bound. Keep a separate bound on positive Z.
-struct NormalCone {
- Vec3 reference{};
- float low=1,high=0,min_z=1;
- void add(Vec3 v){
-  const float norm=length(v);
-  if(high==0&&norm>0)reference=v/norm;
-  low=std::min(low,dot(reference,v));
-  high=std::max(high,norm);
-  min_z=std::min(min_z,v.z);
- }
- float normalization_error() const { return std::max(1-low,high-1); }
-};
-
-double mtoon_normal_cell_error(const std::array<const MToonNormalTap *,4> &taps){
- constexpr double frame_and_sampling_slack=1e-4;
- float min_coverage=1,max_coverage=0,quantization=0;
- for(const auto *tap:taps){
-  min_coverage=std::min(min_coverage,tap->coverage);
-  max_coverage=std::max(max_coverage,tap->coverage);
-  quantization=std::max(quantization,tap->quantization);
- }
- // With full coverage both texture reads normalize the same filtered RGB.
- if(min_coverage==1)return frame_and_sampling_slack;
- NormalCone original,baked;
- Vec3 maximum=taps[0]->original,minimum=maximum;
- for(const auto *tap:taps){
-  original.add(tap->original);
-  if(tap->coverage>0)baked.add(tap->baked);
-  const auto v=tap->original;
-  maximum={std::max(maximum.x,v.x),std::max(maximum.y,v.y),std::max(maximum.z,v.z)};
-  minimum={std::min(minimum.x,v.x),std::min(minimum.y,v.y),std::min(minimum.z,v.z)};
- }
- // The original part has an additional product of filtered direction and
- // uncovered fraction. Bound its covariance componentwise, then take its norm.
- const double covariance=.25*(max_coverage-min_coverage)*length(maximum-minimum);
- const double normal_length_low=baked.high==0?original.min_z/original.high:
-     std::min(original.min_z/original.high,baked.min_z/baked.high);
- // Leave room for frame and floating-point normalization differences.
- const double delta=quantization+covariance+(1-min_coverage)*original.normalization_error()+
-     max_coverage*baked.normalization_error()+frame_and_sampling_slack;
- return normal_length_low>delta?std::asin(delta/normal_length_low):std::acos(-1.);
-}
-
 bool retopo_sampled_cell(std::span<const uint8_t> sampled,uint32_t r,uint32_t x,uint32_t y) {
  if(sampled.empty())return true;
  const size_t stride=size_t(r)+2;
@@ -427,37 +372,14 @@ std::shared_ptr<const Image> compose_mtoon_baked_normal(const TextureSetView &fi
    if(coverage.rgba[at]!=255)return {};
   }
  }
- constexpr double limit=.02;
- auto output=std::make_shared<Image>(normal);
- std::vector<MToonNormalTap> previous(r),row(r);
- for(size_t y=0;y<r;++y){
-  stop(limits);
-  for(size_t x=0;x<r;++x){
-   const auto i=(y*r+x)*4;
-   auto &tap=row[x];
-   tap={original,normal_rgb(normal.rgba.data()+i),coverage.rgba[i]/255.f,0};
-   if(aligned){
-    tap.original=normal_rgb(aligned->rgba.data()+i);
-    tap.original.x*=effective.parameters.normal_scale;
-    tap.original.y*=effective.parameters.normal_scale;
-   }
-   if((tap.coverage<1&&tap.original.z<=0)||(tap.coverage>0&&tap.baked.z<=0))return {};
-   if(tap.coverage<1){
-    const auto value=tap.original*(1-tap.coverage)+tap.baked*tap.coverage;
-    const std::array channels{value.x,value.y,value.z};
-    for(size_t k=0;k<3;++k)output->rgba[i+k]=uint8_t(std::lround(std::clamp(channels[k]*.5f+.5f,0.f,1.f)*255));
-    tap.quantization=length(normal_rgb(output->rgba.data()+i)-value);
-   }
-   const size_t left=x?x-1:x;
-   const auto &above=y?previous:row;
-   if(!retopo_sampled_cell(sampled,r,x,y))continue;
-   const std::array<const MToonNormalTap*,4> taps{&above[left],&above[x],&row[left],&tap};
-   bound=std::max(bound,mtoon_normal_cell_error(taps));
-   if(bound>limit)return {};
-  }
-  previous.swap(row);
- }
- return output;
+ const mtoon_normal_raster::Input input{aligned,normal,coverage,r,r,effective.parameters.normal_scale,
+     sampled,mtoon_normal_raster::Grid::Native,original};
+ size_t bytes=0;
+ charge(bytes,normal.rgba.size(),1,limits.maximum_bytes);
+ charge(bytes,1,mtoon_normal_raster::device_bytes(input),limits.maximum_bytes);
+ auto output=std::make_shared<Image>(Image{r,r,std::vector<uint8_t>(normal.rgba.size())});
+ bound=std::asin(double(mtoon_normal_raster::raster(input,output->rgba,limits.cancelled)));
+ return bound<=.02?output:nullptr;
 }
 
 std::shared_ptr<const Image> compose_shared_mtoon_shade(
@@ -1488,7 +1410,6 @@ void charge_mtoon_paint(const TextureSetView &field,size_t &bytes,size_t &work,
  }
  if(field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty()){
   charge(bytes,pixels,4,limits.maximum_bytes);
-  charge(bytes,resolution,2*sizeof(MToonNormalTap),limits.maximum_bytes);
   charge(work,pixels,42,limits.maximum_work);
   if(const auto &image=field.material_bindings->roles[size_t(MToonSlot::Normal)].image)
    charge(work,size_t(image->width)*image->height,1,limits.maximum_work);
@@ -1502,6 +1423,16 @@ void charge_mtoon_paint(const TextureSetView &field,size_t &bytes,size_t &work,
     if(!float_emission)charge(work,pixels,18,limits.maximum_work);
    }
   }
+}
+
+size_t mtoon_normal_workspace(const TextureSetView &field){
+ const auto &bake=field.painted->baked();
+ if(!bake||bake->maps.normal.rgba.empty())return 0;
+ const auto resolution=field.painted->resolution();
+ const auto &binding=*field.material_bindings;
+ const auto slot=size_t(MToonSlot::Normal);
+ const bool aligned=aligned_mtoon_source(binding.roles[slot],binding.material.textures[slot],resolution);
+ return mtoon_normal_raster::native_device_bytes(resolution,aligned);
 }
 
 struct ExportBound { size_t bytes, work; bool independent_mtoon, scaled_mtoon_alpha; };
@@ -1539,6 +1470,7 @@ ExportBound export_bound(const ObjectSurface&input,const TextureSetLimits&limits
   const bool sparse_retained=retained_material_grid(field);
   if(mtoon&&!editable_pbr&&field.painted->has_paint_data()){
    charge_mtoon_paint(field,bytes,work,limits,typed_hdr);
+   scratch=std::max(scratch,mtoon_normal_workspace(field));
    const auto &binding=*field.material_bindings;
    const auto &p=binding.material.parameters;
    if(binding.material.version()==MToonVersion::V1&&!field.source&&!field.appearance&&
@@ -2006,11 +1938,11 @@ std::shared_ptr<const Image> compile_mixed_retopo_normal(const TextureSetView &f
   charge(sampling_bytes,size_t(width)+height+2,sizeof(double),remaining.maximum_bytes);
   sampled=retopo_sampled_cells(mesh,retopo_lattice_knots(width),retopo_lattice_knots(height),remaining);
  }
- const mixed_normal::Input input{*role.image,maps.baked_normal,maps.baked_coverage,
+ const mtoon_normal_raster::Input input{role.image.get(),maps.baked_normal,maps.baked_coverage,
      width,height,effective.parameters.normal_scale,sampled};
- charge(bytes,1,mixed_normal::device_bytes(input),remaining.maximum_bytes);
+ charge(bytes,1,mtoon_normal_raster::device_bytes(input),remaining.maximum_bytes);
  auto image=std::make_shared<Image>(Image{width,height,std::vector<uint8_t>(count*4)});
- const auto bound=std::asin(double(mixed_normal::raster(input,image->rgba,remaining.cancelled)));
+ const auto bound=std::asin(double(mtoon_normal_raster::raster(input,image->rgba,remaining.cancelled)));
  if(bound>.02)return {};
  proof.normal_texture_offset={.5f/width,.5f/height};
  proof.normal_error_radians=bound;
@@ -2363,27 +2295,29 @@ std::optional<PortableMToonSetPaint> compile_retopo_mtoon_paint(const TextureSet
   return {};
  }
  if(normal){
-  size_t normal_bytes=0,normal_work=0;
+  size_t normal_work=0;
   const size_t pixels=size_t(r)*r;
-  charge(normal_bytes,pixels,4,budget.maximum_bytes);
-  charge(normal_bytes,r,2*sizeof(MToonNormalTap),budget.maximum_bytes);
-  charge(normal_bytes,size_t(r+2)*(r+2),1,budget.maximum_bytes);
-  charge(normal_bytes,r+2,sizeof(double),budget.maximum_bytes);
   charge(normal_work,pixels,64,budget.maximum_work);
   if(const auto &image=binding.roles[size_t(MToonSlot::Normal)].image)
    charge(normal_work,image->rgba.size(),1,budget.maximum_work);
   budget.maximum_work-=normal_work;
-  remaining.maximum_work=budget.maximum_work;
   const auto &mesh=paint.mesh();
   {
+   auto normal_limits=budget;
    std::vector<uint8_t> sampled;
    if(retopo_has_unit_uv(mesh)){
+    size_t bytes=0;
+    charge(bytes,size_t(r+2)*(r+2),1,budget.maximum_bytes);
+    auto mask_bytes=bytes;
+    charge(bytes,r+2,sizeof(double),budget.maximum_bytes);
     const auto knots=mtoon_filter_knots({r});
-    sampled=retopo_sampled_cells(mesh,knots,knots,budget);
+    sampled=retopo_sampled_cells(mesh,knots,knots,normal_limits);
+    normal_limits.maximum_bytes-=mask_bytes;
     out.retopo_uv_domain=true;
    }
+   budget.maximum_work=normal_limits.maximum_work;
    remaining.maximum_work=budget.maximum_work;
-   out.normal=compose_mtoon_baked_normal(field,*maps,effective,out.normal_error_radians,budget,sampled);
+   out.normal=compose_mtoon_baked_normal(field,*maps,effective,out.normal_error_radians,normal_limits,sampled);
   }
   if(out.normal)budget.maximum_bytes-=pixels*4;
   else {
@@ -2412,8 +2346,9 @@ std::optional<MToonFloatPreview> compile_editable_mtoon_float_preview(
   charge(bytes,1,native_material_grid_bytes(*field.painted,TextureSetGridMode::NativeMToonHdr),budget.maximum_bytes);
   const auto resolution=field.painted->resolution();
   charge(bytes,size_t(resolution)*resolution,4,budget.maximum_bytes);
-  const auto scratch=std::max(emission_device_scratch(*field.painted,true),
-      native_material_grid_scratch_bytes(*field.painted,TextureSetGridMode::NativeMToonHdr));
+  const auto scratch=std::max({emission_device_scratch(*field.painted,true),
+      native_material_grid_scratch_bytes(*field.painted,TextureSetGridMode::NativeMToonHdr),
+      mtoon_normal_workspace(field)});
   if(scratch>budget.maximum_bytes-bytes)
    throw ExportBudgetExceeded("Typed FLOAT material device staging exceeds working budget");
 
