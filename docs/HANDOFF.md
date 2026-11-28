@@ -194,8 +194,22 @@ first compilation. The 2048² Standard GLB matches byte for byte across the
 previous build, the current file worker, nested DomeD Wayland and synthetic
 OpenXR. Across three fresh process pairs, the median complete export took
 13.95 seconds on the new path and 10.84 seconds on the preceding revision.
-Typed MToon source sampling and finite Editable resampling remain open.
+Finite Editable resampling remains open.
 [FLOAT emission raster evidence](validation/float-emission-raster-gpu-20261128.json)
+
+Typed native HDR export and replay now sample the original MToon emission
+image on the selected GPU. VRM 1.0 rounds the authored role transform to
+FLOAT before applying the retained image sampler. The device preserves
+that boundary and handles repeat and mirrored repeat beyond the integer
+coordinate range. Axis-aligned transforms precompute rounded row and column
+terms and reuse the original GPU sampler. VRM 0.0 uses its existing admitted
+shared UV rule. The rotated oneAPI program still takes several seconds to
+compile on its first use. Twelve focused Arc Release tests pass. The native
+VRM suite passes 163 checks, with all 26 generated projects and exports
+matching the preceding revision. The trace records the rotated device
+kernel on the actual VRM output. Finite Editable resampling and source-aware
+animated and alternate-UV authoring remain open.
+[Typed emission raster evidence](validation/typed-emission-raster-gpu-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with

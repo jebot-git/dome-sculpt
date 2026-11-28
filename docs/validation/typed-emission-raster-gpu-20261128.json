@@ -1,0 +1,188 @@
+{
+  "date": "2026-11-28",
+  "product_commit": "47b11269a0998c6b91296fcbd060e59c60adcae8",
+  "previous_published_commit": "2d2808c8cfaf76e4e08ffc897ece9497b5e59884",
+  "domed_toolkit_commit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "device": "Intel Arc A770 / PCI 0000:03:00.0 / renderD129",
+  "scope": "Native HDR emission export and replay of admitted static VRM 0.0 and VRM 1.0 UV0 roles. Finite Editable resampling, animated and alternate-coordinate preparation remain open.",
+  "app": {
+    "file": "artifacts/typed-emission-axis-gpu-20261128/evidence/oneapi/dome-sculpt",
+    "sha256": "846cfeeaf0047b3e5d46d00a5158c3e806454324520493ecad8ba9bfa92850e1"
+  },
+  "release": {
+    "junit": {
+      "file": "artifacts/typed-emission-axis-gpu-20261128/evidence/oneapi/typed-emission-raster-gpu.xml",
+      "sha256": "1bed26252bb797f893444bd433e16eeaa7510aeaf41904d3d1519665d35db1d9"
+    },
+    "passed": 12,
+    "tests": [
+      "baked-emission-native",
+      "emission-raster-compute",
+      "baked-emission-workflow",
+      "baked-emission-source",
+      "baked-emission-uv1-worker",
+      "baked-emission-gpu",
+      "emission-exr-owned",
+      "paint-composite-compute",
+      "paint-composite-native",
+      "native-paint32-emission",
+      "native-paint32-emission-mixed",
+      "native-paint32-emission-contracts"
+    ]
+  },
+  "exact_raster": {
+    "log": {
+      "file": "artifacts/typed-emission-axis-gpu-20261128/shared-arithmetic.log",
+      "sha256": "0c55791a1f53386c44554652824554b18067c32ad8cb5aa2c48871a862b6d481"
+    },
+    "binary32_values_per_pixel": 10,
+    "profiles": [
+      {
+        "fixture": 4,
+        "typed_model": 0,
+        "pixels": 262144,
+        "device_ms": 440,
+        "host_ms": 9
+      },
+      {
+        "fixture": 0,
+        "typed_model": 0,
+        "pixels": 262144,
+        "device_ms": 6999,
+        "host_ms": 20
+      },
+      {
+        "fixture": 1,
+        "typed_model": 0,
+        "pixels": 262144,
+        "device_ms": 25,
+        "host_ms": 27
+      },
+      {
+        "fixture": 2,
+        "typed_model": 0,
+        "pixels": 262144,
+        "device_ms": 26,
+        "host_ms": 22
+      },
+      {
+        "fixture": 3,
+        "typed_model": 0,
+        "pixels": 262144,
+        "device_ms": 18,
+        "host_ms": 23
+      },
+      {
+        "fixture": 0,
+        "typed_model": 1,
+        "pixels": 262144,
+        "device_ms": 39,
+        "host_ms": 52
+      },
+      {
+        "fixture": 3,
+        "typed_model": 2,
+        "pixels": 262144,
+        "device_ms": 6140,
+        "host_ms": 55
+      },
+      {
+        "fixture": 2,
+        "typed_model": 3,
+        "pixels": 262144,
+        "device_ms": 21,
+        "host_ms": 64
+      },
+      {
+        "fixture": 1,
+        "typed_model": 4,
+        "pixels": 262144,
+        "device_ms": 8,
+        "host_ms": 60
+      }
+    ],
+    "typed_modes": [
+      "plain",
+      "VRM0",
+      "rotated VRM1",
+      "wide axis-aligned VRM1",
+      "zero strength VRM1"
+    ],
+    "scope": "The first rotated device measurement includes first-use kernel compilation. All modes use the published host evaluation as an oracle."
+  },
+  "actual_vrm_exports": {
+    "checks": 163,
+    "identical_projects_and_exports": 26,
+    "digests": {
+      "accessory-avatar-baseline.vrm": "dd308f80504de8b404e8d24a527b4dd3ae88292acc47e20742bd555fd6a4c846",
+      "accessory-source.vrm": "755ce4030b3783a35a4d6af6042da0acdaa7324878424e9e5565fd5a8bb9c5a6",
+      "independent-v1-before.vrm": "bb25b63f1876b21e05d51db5503136ac66bbe6a7e514b9fb85bed6746963baf4",
+      "independent-v1-physical.vrm": "93efb9f86068549711068aa6c30b628ec697f288f58fd278d429a2e6331b075a",
+      "independent-v1-second.vrm": "93efb9f86068549711068aa6c30b628ec697f288f58fd278d429a2e6331b075a",
+      "independent-v1-source.vrm": "fbd7275c23649cc26dfb296f859eca9fcb5f89a66a35fb49be79c4524417e7b7",
+      "independent-v1.dsculpt": "ac7ee154a6e0fedd7dacb0d9061ab21f64c5aaa01ace0b08beee5d87272ac14b",
+      "native-accessory-editable-second.vrm": "8e9c57dcf43ae8a4a15ef782ce75d27156003ae46a1703e42105d9d18230d71f",
+      "native-accessory-editable.vrm": "8e9c57dcf43ae8a4a15ef782ce75d27156003ae46a1703e42105d9d18230d71f",
+      "native-accessory-second.vrm": "d7cc28bf5a0c9920f9d48a0650d20d54f84f90304048dbcbfdf4ab690e2befcf",
+      "native-accessory.dsculpt": "b9355f1038729e3a75195e437637ca401dbb401e3741e49978724dd4eb31bed3",
+      "native-accessory.vrm": "d7cc28bf5a0c9920f9d48a0650d20d54f84f90304048dbcbfdf4ab690e2befcf",
+      "strength-five-source.vrm": "f08c826eb6f8d450064e49eea7e4499da6c81069f56816a371d4c6b35ecca643",
+      "strength-five.vrm": "77db3aa19b4889c63c42b8605098a618508473056fb324201de62eb8f5c5ba84",
+      "strength-rotated-source.vrm": "1f751060b901041bd085ad5f320d650f2fe3a7956d18d41574ed49cbba9bbf60",
+      "strength-rotated.vrm": "cd72b90654b7b8120a753be82093ac07c69c02ef87dcda08b5de2b0f0d5a3227",
+      "strength-zero-source.vrm": "19d86b9b1d504b79956a0d5115bfca5715d874f55091accba301217b6ff3721d",
+      "strength-zero.vrm": "fe76ce7dd9ab5b69d1e9609c0306996d689352c92156b609a42c9ee518931f5c",
+      "vroid-beta-female-before.vrm": "bf8089ada02fd99da34f387d21e5a451e52a359e2fdd1dc4505acf0680e36b9a",
+      "vroid-beta-female-physical.vrm": "0b0ad57b795ca9a445dbeba1df34123194315cf11dd4f7eed309e2330f9729a5",
+      "vroid-beta-female-second.vrm": "0b0ad57b795ca9a445dbeba1df34123194315cf11dd4f7eed309e2330f9729a5",
+      "vroid-beta-female.dsculpt": "4dc0b7fedde8b9759b4cb3ba456fc23986bfe650384018246e239afb782fbd22",
+      "vroid-beta-male-before.vrm": "5d1049314cf6ea3e8c1b0b8d637dd4de6012e72895b3dcbe2d394c34d3248e41",
+      "vroid-beta-male-physical.vrm": "8d7a5200f36c49b0c658cf9c70d94db222831d285901c014848fba1f616d63ff",
+      "vroid-beta-male-second.vrm": "8d7a5200f36c49b0c658cf9c70d94db222831d285901c014848fba1f616d63ff",
+      "vroid-beta-male.dsculpt": "0a57948f349c622c23391ac6abd7fa497b30e27e344bf0268cc33d1828cb5356"
+    },
+    "manifest": {
+      "file": "artifacts/typed-emission-axis-gpu-20261128/compare-vrm.log",
+      "sha256": "4621e837c0468d665b1e5e5857e1c75244cdf303c220a7c1e5cbabbbf04b2445"
+    },
+    "baseline_log": {
+      "file": "artifacts/typed-emission-axis-gpu-20261128/vrm-before.log",
+      "sha256": "d03f4077b25c9a8240eebd412fb04de0cac1addaf760efe53ac4f5cf07098edb"
+    },
+    "device_trace": {
+      "file": "artifacts/typed-emission-axis-gpu-20261128/vrm-after.log",
+      "sha256": "2020de7f2c0eb9ad2f260f4a287a1805c9876c31fb0d441c1b04cafe52798101"
+    },
+    "typed_gpu_dispatches": 1
+  },
+  "standard_glb_regression": {
+    "file": "artifacts/typed-emission-axis-gpu-20261128/evidence/wrapped-source.glb",
+    "sha256": "d1f3cd4c7a79bd89f348569b85aabcb5cd2428e6671926fee1aa1b1ed02355d6"
+  },
+  "headless_sanitizer": {
+    "emission-raster-compute.cpp.log": {
+      "file": "artifacts/typed-emission-axis-gpu-20261128/evidence/asan/emission-raster-compute.cpp.log",
+      "sha256": "723f8d71194391ec59861e0ff7468a008239b2de70a92914c363bb688f5266c0"
+    },
+    "baked-emission-workflow.cpp.log": {
+      "file": "artifacts/typed-emission-axis-gpu-20261128/evidence/asan/baked-emission-workflow.cpp.log",
+      "sha256": "536147bd07f4599ce084da08c68ff6a90df3f2f2bffc3968db5dbe39fc3606c3"
+    }
+  },
+  "sanitizer_scope": "Changed host import/export and compute-planning objects rebuilt against the preceding opt-in headless ASan/UBSan reference archive.",
+  "missing_device": {
+    "oneapi": {
+      "file": "artifacts/typed-emission-axis-gpu-20261128/missing-device.log",
+      "sha256": "df977c1d37da2e1f6b8b345f9f29500647b4997d32099c1cdb7ce648eeba24cc"
+    },
+    "cuda": {
+      "file": "artifacts/typed-emission-axis-gpu-20261128/cuda-missing.log",
+      "sha256": "6cd248435a37fa43f0eeffdd6b8694bbfe2ddec208378916cecc0749e4738af8"
+    },
+    "rocm": {
+      "file": "artifacts/typed-emission-axis-gpu-20261128/rocm-missing.log",
+      "sha256": "51a521e7fa769a661c4fd20f2e9491b7260510f02f5b17217c55e5a8b46b7314"
+    }
+  },
+  "vendor_scope": "CUDA and ROCm compile and refuse missing devices. Positive AMD and NVIDIA hardware execution remains open."
+}

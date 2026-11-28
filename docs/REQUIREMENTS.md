@@ -53,9 +53,18 @@ scanlines on the selected GPU for eligible writable rasters. The device reads
 legacy Bake bytes and dense or compact FLOAT Bake, applies masked layers in
 order and resolves the original UV0 background. Legacy and physical Bake
 retain their binary32 and binary64 rounding rules. The host reads bounded
-chunks for OpenEXR and portable GLB encoding. Typed MToon source sampling and
-finite authoring resampling still need GPU adapters.
+chunks for OpenEXR and portable GLB encoding. Finite authoring resampling
+still needs a GPU adapter.
 [FLOAT emission raster evidence](validation/float-emission-raster-gpu-20261128.json)
+
+The same native HDR package path samples eligible authored MToon UV0
+emission textures on the selected GPU. It preserves VRM 0.0 shared UV
+rules and the FLOAT boundary between the VRM 1.0 emission role transform
+and the retained image sampler. Original sampler wrapping, nearest and
+bilinear filtering, and material-relative versus absolute energy remain
+independent. Animated and alternate-coordinate roles still require their
+own export preparation.
+[Typed emission raster evidence](validation/typed-emission-raster-gpu-20261128.json)
 
 ## Current validation — 2026-11-27
 
