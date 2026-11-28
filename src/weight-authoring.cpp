@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/weight-authoring.hpp"
+#include "weight-preview.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "affine-surface.hpp"
 #include "source-rigid-pose.hpp"
@@ -74,32 +75,45 @@ std::vector<uint64_t> weight_objects(const Scene &scene, uint64_t object, bool l
   }
   return result;
 }
-WeightEditResult paint_scene_weights(Scene &scene, uint64_t object,
-                                    std::span<const WeightBrush> brushes,
-                                    const WeightToolSettings &settings,
-                                    const std::function<bool()> &cancelled) {
+namespace {
+struct PreparedWeightStroke {
+  size_t bones;
+  uint32_t joint;
+  WeightToolSettings settings;
+  WeightEditOptions options;
+  std::vector<std::vector<Vec3>> positions;
+  std::vector<std::vector<uint8_t>> locks;
+  std::vector<WeightPaintSurface> surfaces;
+
+  PreparedWeightStroke(const Scene &scene,uint64_t object,uint32_t selected,
+      const WeightToolSettings &configured,const std::function<bool()> &cancelled);
+  std::pair<Scene,WeightEditResult> paint(const Scene &,std::span<const WeightBrush>,
+      detail::WeightFalloffPreview *,const std::function<bool()> &) const;
+};
+
+PreparedWeightStroke::PreparedWeightStroke(const Scene &scene,uint64_t object,uint32_t selected,
+    const WeightToolSettings &configured,const std::function<bool()> &cancelled)
+    :joint(selected),settings(configured) {
   auto ids = weight_objects(scene, object, settings.linked);
   const auto &active = scene.object(object);
   const auto &source = *active.deformation;
-  settings.validate(source.skeleton->bones.size());
-  if (brushes.empty() || brushes.front().joint >= source.skeleton->bones.size())
-    throw std::invalid_argument("Weight gesture needs an eligible source joint and a sample");
+  bones=source.skeleton->bones.size();
+  settings.validate(bones);
+  if(joint>=bones)throw std::invalid_argument("Weight gesture needs an eligible source joint");
   const bool affine = scene.has_affine_placement(object);
   const auto inverse = affine ? CanvasTransform{} : ob::inverse(scene.world_transform(object));
   const auto brush_from_world = affine_similarity(inverse);
-  WeightEditOptions options; options.locks = settings.locks; options.limits = settings.limits;
+  options.locks=settings.locks;
+  options.limits=settings.limits;
   if (settings.symmetry) {
     if (!source.humanoid) throw std::invalid_argument("Weight symmetry requires explicit humanoid joint mapping");
     options.symmetry = WeightBrushSymmetry{settings.symmetry_plane, source.humanoid->mirror(*source.skeleton),
                                           affine ? std::optional{scene.world_matrix(object)} : std::nullopt};
   }
-  const auto joint = brushes.front().joint;
   const auto mirror = options.symmetry ? options.symmetry->joints[joint] : joint;
-  std::vector<std::vector<Vec3>> positions;
   positions.reserve(ids.size());
-  std::vector<std::vector<uint8_t>> locks;
   locks.reserve(ids.size());
-  std::vector<WeightPaintSurface> surfaces;
+  surfaces.reserve(ids.size());
   size_t vertices = 0;
   for (auto id : ids) {
     if (cancelled && cancelled()) throw std::runtime_error("Weight gesture cancelled");
@@ -141,12 +155,20 @@ WeightEditResult paint_scene_weights(Scene &scene, uint64_t object,
     surfaces.push_back({id, &rest, &*part.deformation->skin, positions.back(),
                         WeightSurfaceJoints{bones, direct, reflected, mapped_locks}});
   }
+}
+
+std::pair<Scene,WeightEditResult> PreparedWeightStroke::paint(const Scene &scene,
+    std::span<const WeightBrush> brushes,detail::WeightFalloffPreview *preview,
+    const std::function<bool()> &cancelled) const {
+  if(brushes.empty()||brushes.front().joint!=joint)
+    throw std::invalid_argument("Weight gesture needs its original joint and a sample");
   std::vector<WeightBrush> stroke(brushes.begin(), brushes.end());
   for (auto &sample : stroke) {
     sample.mode = settings.mode; sample.value = settings.value;
     sample.strength *= settings.strength;
   }
-  auto result = edit_weights(surfaces, source.skeleton->bones.size(), stroke, options, cancelled);
+  auto result=preview?detail::preview_weights(surfaces,bones,stroke,options,*preview,cancelled):
+      edit_weights(surfaces,bones,stroke,options,cancelled);
   Scene next = scene;
   for (const auto &edited : result.surfaces) {
     if (!edited.changed) continue;
@@ -159,7 +181,40 @@ WeightEditResult paint_scene_weights(Scene &scene, uint64_t object,
   }
   next.validate(false);
   if (cancelled && cancelled()) throw std::runtime_error("Weight gesture cancelled");
-  scene = std::move(next);
+  return {std::move(next),std::move(result)};
+}
+} // namespace
+
+WeightEditResult paint_scene_weights(Scene &scene,uint64_t object,std::span<const WeightBrush> brushes,
+    const WeightToolSettings &settings,const std::function<bool()> &cancelled) {
+  if(brushes.empty())throw std::invalid_argument("Weight gesture needs an eligible source joint and a sample");
+  PreparedWeightStroke prepared(scene,object,brushes.front().joint,settings,cancelled);
+  auto [next,result]=prepared.paint(scene,brushes,nullptr,cancelled);
+  scene=std::move(next);
   return result;
+}
+
+struct detail::WeightScenePreview::State {
+  const Scene base;
+  PreparedWeightStroke prepared;
+  WeightFalloffPreview falloff;
+  State(const Scene &source,uint64_t object,uint32_t joint,const WeightToolSettings &settings,
+      const std::function<bool()> &cancelled)
+      :base(source.snapshot()),prepared(base,object,joint,settings,cancelled) {}
+};
+
+detail::WeightScenePreview::WeightScenePreview(const Scene &scene,uint64_t object,uint32_t joint,
+    const WeightToolSettings &settings,const std::function<bool()> &cancelled)
+    :state_(std::make_unique<State>(scene,object,joint,settings,cancelled)) {}
+detail::WeightScenePreview::~WeightScenePreview()=default;
+
+Scene detail::WeightScenePreview::paint(std::span<const WeightBrush> brushes,
+    const std::function<bool()> &cancelled) {
+  try{
+    return state_->prepared.paint(state_->base,brushes,&state_->falloff,cancelled).first;
+  }catch(...){
+    state_->falloff={};
+    throw;
+  }
 }
 } // namespace dome

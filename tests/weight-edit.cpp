@@ -2,6 +2,7 @@
 #include "dome/weight-edit.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "weight-brush-kernel.hpp"
+#include "weight-preview.hpp"
 #include <iostream>
 #include <limits>
 using namespace dome;
@@ -88,8 +89,45 @@ void check_brush_batches() {
   std::cout<<"WEIGHT_BRUSH samples="<<samples<<" compact_hits="<<hits<<'\n';
   require(hits>1000&&hits<samples,"Batched direct, reflected and combined strengths match the original capsule oracle exactly");
 }
+void check_incremental_preview(){
+  const auto mesh=plane();
+  SkinWeights skin;
+  skin.vertices={{{0,.5f},{1,.5f}},{{0,1}},{{0,.8f},{2,.2f}},{{0,1}}};
+  const std::array surfaces{WeightPaintSurface{9,&mesh,&skin,{}}};
+  WeightEditOptions options;
+  options.symmetry=WeightBrushSymmetry{0,{0,2,1}};
+  std::array<WeightBrush,3> stroke{};
+  stroke[0].from=stroke[0].to={-1,0,0};
+  stroke[1].from=stroke[1].to={1,0,0};
+  stroke[2].from=stroke[2].to={-1,1,0};
+  for(auto &brush:stroke){brush.joint=1;brush.value=.9f;brush.strength=.65f;}
+  for(auto mode:{WeightBrushMode::Add,WeightBrushMode::Subtract,WeightBrushMode::Replace,WeightBrushMode::Smooth}){
+    for(auto &brush:stroke)brush.mode=mode;
+    detail::WeightFalloffPreview cache;
+    const auto exact=[&](std::span<const WeightBrush> samples){
+      const auto incremental=detail::preview_weights(surfaces,3,samples,options,cache,{});
+      const auto replay=edit_weights(surfaces,3,samples,options);
+      return cache.prefix.size()==samples.size()&&incremental.affected==replay.affected&&
+          incremental.changed==replay.changed&&incremental.constrained==replay.constrained&&
+          incremental.diagnostics==replay.diagnostics&&
+          incremental.surfaces.at(0).weights.vertices==replay.surfaces.at(0).weights.vertices;
+    };
+    bool matched=true;
+    for(size_t length:{1,2,3,3,1,2})matched&=exact(std::span(stroke).first(length));
+    auto changed=stroke;
+    changed[0].pressure=.25f;
+    matched&=exact(changed);
+    require(matched,"Appended, repeated, shortened and changed previews match complete replays including mirrored direct ties");
+    unsigned polls=0;
+    rejects([&]{detail::preview_weights(surfaces,3,stroke,options,cache,[&]{return ++polls>4;});},
+            "Interrupted prefix evaluation discards the partial weight cache");
+    require(cache.prefix.empty()&&cache.maxima.empty()&&!cache.query&&exact(stroke),
+            "After cancellation a fresh preview reproduces exact weights from the immutable base");
+  }
+}
 int main() try {
   check_brush_batches();
+  check_incremental_preview();
   auto mesh=plane(); SkinWeights skin; skin.vertices.assign(4,{{0,1}});
   auto original=skin.vertices; auto topology=morph_topology_id(mesh);
   std::array surfaces{WeightPaintSurface{7,&mesh,&skin,{}}};

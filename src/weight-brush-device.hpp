@@ -21,8 +21,10 @@ enum Sides : unsigned { Direct=1, Reflected=2 };
 class Query {
 public:
   virtual ~Query()=default;
+  virtual void set_capsules(std::span<const Capsule> direct,std::span<const Capsule> reflected)=0;
   // Results contain only affected vertices, ordered by input position.
   virtual size_t search(std::span<const Vec3>,unsigned sides,std::span<Hit>)=0;
 };
-std::unique_ptr<Query> upload(std::span<const Capsule> direct,std::span<const Capsule> reflected);
+std::unique_ptr<Query> upload(std::span<const Capsule> direct,std::span<const Capsule> reflected,
+                              bool reusable=false);
 }

@@ -126,8 +126,8 @@ std::unique_ptr<Query> upload(const Surface &surface){return std::make_unique<De
 } // namespace dome::detail::weight_transfer
 
 namespace dome::detail::weight_brush {
-std::unique_ptr<Query> upload(std::span<const Capsule> direct,std::span<const Capsule> reflected){
-  return std::make_unique<DeviceQuery<weight_transfer::GpuApi>>(direct,reflected);
+std::unique_ptr<Query> upload(std::span<const Capsule> direct,std::span<const Capsule> reflected,bool reusable){
+  return std::make_unique<DeviceQuery<weight_transfer::GpuApi>>(direct,reflected,reusable);
 }
 }
 

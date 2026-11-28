@@ -23,6 +23,7 @@
 #include "color-bound-memo.hpp"
 #include "affine-surface.hpp"
 #include "source-skin-world.hpp"
+#include "weight-preview.hpp"
 #include "shapekey-preview.hpp"
 #include "shapekey-mirror-controls.hpp"
 #include "document-authority.hpp"
@@ -1843,17 +1844,32 @@ void Document::mesh_loop() {
     }
   };
   std::shared_ptr<const geometry_detail::Identity> geometry_identity;
+  struct WeightPreviewStamp {
+    uint64_t generation=0,revision=0,view=0,gesture=0;
+    std::shared_ptr<const VrmExpressionView> expressions;
+    bool operator==(const WeightPreviewStamp &) const=default;
+  };
+  std::unique_ptr<detail::WeightScenePreview> weight_preview;
+  WeightPreviewStamp weight_stamp;
+  const auto weight_ended=[&]{
+    return weight_preview&&weight_stamp.gesture!=weight_epoch_.load();
+  };
   while (!stopping_) {
     std::optional<MeshJob> job;
     {
       std::unique_lock lock(mesh_mutex_);
       mesh_changed_.wait(
-          lock, [&] { return stopping_ || pending_mesh_.has_value(); });
+          lock, [&] { return stopping_ || pending_mesh_.has_value() || weight_ended(); });
       if (stopping_)
         break;
       job = std::move(pending_mesh_);
       pending_mesh_.reset();
     }
+    if(weight_ended()||!job||!job->weight_gesture){
+      weight_preview.reset();
+      weight_stamp={};
+    }
+    if(!job)continue;
     auto cancelled = [&] {
       auto state = published_.load();
       return stopping_.load() || state->generation != job->generation || state->revision != job->revision || state->pbr_view!=job->pbr_view || state->view_epoch!=job->view_epoch ||
@@ -1879,9 +1895,14 @@ void Document::mesh_loop() {
       }
       std::optional<Scene> proposed;
       if (job->weight_gesture) {
-        proposed = job->scene.snapshot();
-        paint_scene_weights(*proposed, job->scene.active().id, job->weight_samples,
-                            job->weight_settings, cancelled);
+        const WeightPreviewStamp stamp{job->generation,job->revision,job->view_epoch,
+                                       job->weight_gesture,job->expressions};
+        if(!weight_preview||stamp!=weight_stamp){
+          weight_preview=std::make_unique<detail::WeightScenePreview>(job->scene,
+              job->scene.active().id,job->weight_samples.front().joint,job->weight_settings,cancelled);
+          weight_stamp=stamp;
+        }
+        proposed=weight_preview->paint(job->weight_samples,cancelled);
       }
       // All geometry/scalar/query preparation stays on this worker. Candidate
       // owners remain detached until the exact generation/revision/view fences

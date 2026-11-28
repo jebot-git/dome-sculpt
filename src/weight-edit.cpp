@@ -1,15 +1,20 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/weight-edit.hpp"
 #include "weight-brush-kernel.hpp"
+#include "weight-preview.hpp"
 #include <set>
 #ifdef DOME_WEIGHT_BRUSH_REFERENCE
 namespace dome::detail::weight_brush {
 namespace {
 class ReferenceQuery final:public Query {
-  const std::vector<Capsule> direct_,reflected_;
+  std::vector<Capsule> direct_,reflected_;
 public:
   ReferenceQuery(std::span<const Capsule> direct,std::span<const Capsule> reflected):
       direct_(direct.begin(),direct.end()),reflected_(reflected.begin(),reflected.end()) {}
+  void set_capsules(std::span<const Capsule> direct,std::span<const Capsule> reflected) override {
+    direct_.assign(direct.begin(),direct.end());
+    reflected_.assign(reflected.begin(),reflected.end());
+  }
   size_t search(std::span<const Vec3> points,unsigned sides,std::span<Hit> hits) override {
     const Stroke stroke{direct_.data(),reflected_.data(),uint32_t(direct_.size()),sides};
     size_t count=0;
@@ -20,7 +25,7 @@ public:
   }
 };
 }
-std::unique_ptr<Query> upload(std::span<const Capsule> direct,std::span<const Capsule> reflected){
+std::unique_ptr<Query> upload(std::span<const Capsule> direct,std::span<const Capsule> reflected,bool){
   return std::make_unique<ReferenceQuery>(direct,reflected);
 }
 }
@@ -48,10 +53,16 @@ WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
                               const std::function<bool()> &cancelled) {
   return edit_weights(surfaces, bones, std::span<const WeightBrush>(&brush, 1), std::move(options), cancelled);
 }
-WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
-                              size_t bones, std::span<const WeightBrush> brushes,
-                              WeightEditOptions options,
-                              const std::function<bool()> &cancelled) {
+namespace {
+bool same_capsule(const WeightBrush &a,const WeightBrush &b) {
+  const auto point=[](Vec3 p,Vec3 q){return p.x==q.x&&p.y==q.y&&p.z==q.z;};
+  return point(a.from,b.from)&&point(a.to,b.to)&&a.radius==b.radius&&a.strength==b.strength&&
+      a.pressure==b.pressure&&a.value==b.value&&a.joint==b.joint&&a.mode==b.mode;
+}
+
+WeightEditResult edit_stroke(std::span<const WeightPaintSurface> surfaces,size_t bones,
+    std::span<const WeightBrush> brushes,WeightEditOptions options,detail::WeightFalloffPreview *preview,
+    const std::function<bool()> &cancelled) {
   if (brushes.empty() || brushes.size() > 4096)
     throw std::length_error("Weight gesture must contain 1 to 4096 capsule samples");
   const auto &brush = brushes.front();
@@ -83,9 +94,14 @@ WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
       if (s.joints[i] >= bones || s.joints[s.joints[i]] != i)
         throw std::invalid_argument("Weight symmetry joint map is not involutive");
   }
+  size_t prefix=0;
+  if(preview&&preview->prefix.size()<=brushes.size()&&
+     std::equal(preview->prefix.begin(),preview->prefix.end(),brushes.begin(),same_capsule))
+    prefix=preview->prefix.size();
+  const auto tail=brushes.subspan(prefix);
   std::vector<field::Capsule> direct_stroke,reflected_stroke;
-  direct_stroke.reserve(brushes.size());
-  for(const auto &sample:brushes)direct_stroke.push_back(capsule(sample,sample.from,sample.to));
+  direct_stroke.reserve(tail.size());
+  for(const auto &sample:tail)direct_stroke.push_back(capsule(sample,sample.from,sample.to));
   if (options.symmetry) {
     const auto &symmetry = *options.symmetry;
     std::optional<AffineTransform> reflection;
@@ -102,8 +118,8 @@ WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
       if (!bounded(result)) throw std::invalid_argument("Reflected weight brush leaves the coordinate bounds");
       return result;
     };
-    reflected_stroke.reserve(brushes.size());
-    for(const auto &sample:brushes)
+    reflected_stroke.reserve(tail.size());
+    for(const auto &sample:tail)
       reflected_stroke.push_back(capsule(sample,point(sample.from),point(sample.to)));
   }
   const auto mirror_joint = options.symmetry ? options.symmetry->joints[brush.joint] : brush.joint;
@@ -145,11 +161,19 @@ WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
       if (!bounded(p)) throw std::invalid_argument("Weight position outside finite coordinate bounds");
   }
   const size_t tests_per_vertex=brushes.size()*(options.symmetry?2:1);
-  const size_t batch=std::min(field::batch_capacity,field::batch_capsules/tests_per_vertex);
-  std::unique_ptr<field::Query> query;
+  const size_t batch=std::min(field::batch_capacity,
+      field::batch_capsules/(std::max(tail.size(),size_t{1})*(options.symmetry?2:1)));
+  if(preview&&!prefix){
+    preview->maxima.clear();
+    for(const auto &surface:surfaces)preview->maxima.emplace_back(surface.rest->positions.size(),0);
+  }
+  std::unique_ptr<field::Query> temporary;
+  auto &query=preview?preview->query:temporary;
+  bool staged=false;
   std::vector<field::Hit> hits;
   WeightEditResult result;
-  for (const auto &surface : surfaces) {
+  for(size_t part=0;part<surfaces.size();++part){
+    const auto &surface=surfaces[part];
     const auto &mesh = *surface.rest;
     const auto &original = *surface.weights;
     const auto &joints = surface.joints ? *surface.joints : ordinary;
@@ -172,50 +196,67 @@ WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
     const auto positions=surface.positions.empty()?std::span<const Vec3>(mesh.positions):surface.positions;
     const unsigned sides=(joints.direct?field::Direct:0u)|
                          (joints.mirrored&&options.symmetry?field::Reflected:0u);
+    const auto assign=[&](size_t vertex,float signed_alpha){
+      ++edited.affected;
+      const auto joint=signed_alpha>0?*joints.direct:*joints.mirrored;
+      const float alpha=std::abs(signed_alpha);
+      const auto &before=original.vertices[vertex];
+      step(before.size());
+      const float old=influence(before,joint);
+      float target=old;
+      switch (brush.mode) {
+      case WeightBrushMode::Add: target=std::min(1.f,old+alpha*brush.value); break;
+      case WeightBrushMode::Subtract: target=std::max(0.f,old-alpha*brush.value); break;
+      case WeightBrushMode::Replace: target=old+alpha*(brush.value-old); break;
+      case WeightBrushMode::Smooth: {
+        if(neighbors[vertex].empty())return;
+        double sum=0;
+        for(auto adjacent:neighbors[vertex]){
+          step(original.vertices[adjacent].size());
+          sum+=influence(original.vertices[adjacent],joint);
+        }
+        target=old+alpha*(float(sum/neighbors[vertex].size())-old);
+        break;
+      }
+      }
+      if(std::abs(target-old)<1e-7f)return;
+      try {
+        edited.weights.vertices[vertex]=paint_weight(before,joint,target,joints.bones,joints.locks,options.limits);
+      } catch (const std::logic_error &error) {
+        ++edited.constrained;
+        if(result.diagnostics.size()<8)
+          result.diagnostics.push_back("Object "+std::to_string(surface.object)+
+              " vertex "+std::to_string(vertex)+": "+error.what());
+      }
+      if(edited.weights.vertices[vertex]!=before)++edited.changed;
+    };
     for(size_t first=0;first<positions.size();first+=batch){
       const auto count=std::min(batch,positions.size()-first);
       step(count*(1+tests_per_vertex));
       if(!sides)continue;
-      if(!query){
-        query=field::upload(direct_stroke,reflected_stroke);
-        hits.resize(std::min(batch,vertices));
+      size_t affected=0;
+      if(!tail.empty()){
+        if(!staged){
+          if(query)query->set_capsules(direct_stroke,reflected_stroke);
+          else query=field::upload(direct_stroke,reflected_stroke,preview!=nullptr);
+          hits.resize(std::min(batch,vertices));
+          staged=true;
+        }
+        affected=query->search(positions.subspan(first,count),sides,std::span(hits).first(count));
+        step(0);
       }
-      const auto affected=query->search(positions.subspan(first,count),sides,std::span(hits).first(count));
-      step(0);
-      edited.affected+=affected;
-      for(const auto &hit:std::span(hits).first(affected)){
-        const auto vertex=first+hit.vertex;
-        const auto joint=hit.alpha>0?*joints.direct:*joints.mirrored;
-        const float alpha=std::abs(hit.alpha);
-        const auto &before=original.vertices[vertex];
-        step(before.size());
-        const float old=influence(before,joint);
-        float target=old;
-        switch (brush.mode) {
-        case WeightBrushMode::Add: target=std::min(1.f,old+alpha*brush.value); break;
-        case WeightBrushMode::Subtract: target=std::max(0.f,old-alpha*brush.value); break;
-        case WeightBrushMode::Replace: target=old+alpha*(brush.value-old); break;
-        case WeightBrushMode::Smooth: {
-          if(neighbors[vertex].empty())continue;
-          double sum=0;
-          for(auto adjacent:neighbors[vertex]){
-            step(original.vertices[adjacent].size());
-            sum+=influence(original.vertices[adjacent],joint);
-          }
-          target=old+alpha*(float(sum/neighbors[vertex].size())-old);
-          break;
+      if(preview){
+        auto row=std::span(preview->maxima[part]).subspan(first,count);
+        for(const auto &hit:std::span(hits).first(affected)){
+          auto &prior=row[hit.vertex];
+          const auto before=std::abs(prior),after=std::abs(hit.alpha);
+          // This is the same maximum as a full replay. A direct capsule
+          // wins a tie regardless of which prefix supplied it.
+          if(after>before||(after==before&&hit.alpha>prior))prior=hit.alpha;
         }
-        }
-        if(std::abs(target-old)<1e-7f)continue;
-        try {
-          edited.weights.vertices[vertex]=paint_weight(before,joint,target,joints.bones,joints.locks,options.limits);
-        } catch (const std::logic_error &error) {
-          ++edited.constrained;
-          if(result.diagnostics.size()<8)
-            result.diagnostics.push_back("Object "+std::to_string(surface.object)+
-                " vertex "+std::to_string(vertex)+": "+error.what());
-        }
-        if(edited.weights.vertices[vertex]!=before)++edited.changed;
+        for(size_t v=0;v<count;++v)if(row[v]!=0)assign(first+v,row[v]);
+      }else{
+        for(const auto &hit:std::span(hits).first(affected))assign(first+hit.vertex,hit.alpha);
       }
     }
     edited.weights.validate(mesh.positions.size(), joints.bones);
@@ -224,6 +265,24 @@ WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
     result.surfaces.push_back(std::move(edited));
   }
   step();
+  if(preview)preview->prefix.assign(brushes.begin(),brushes.end());
   return result;
+}
+} // namespace
+
+WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,size_t bones,
+    std::span<const WeightBrush> brushes,WeightEditOptions options,const std::function<bool()> &cancelled) {
+  return edit_stroke(surfaces,bones,brushes,std::move(options),nullptr,cancelled);
+}
+
+WeightEditResult detail::preview_weights(std::span<const WeightPaintSurface> surfaces,size_t bones,
+    std::span<const WeightBrush> brushes,WeightEditOptions options,WeightFalloffPreview &preview,
+    const std::function<bool()> &cancelled) {
+  try{
+    return edit_stroke(surfaces,bones,brushes,std::move(options),&preview,cancelled);
+  }catch(...){
+    preview={};
+    throw;
+  }
 }
 } // namespace dome

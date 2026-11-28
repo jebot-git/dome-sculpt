@@ -74,30 +74,42 @@ namespace dome::detail::weight_brush {
 template<class Api>
 class DeviceQuery final:public Query {
   template<class T>using Buffer=weight_transfer::DeviceBuffer<Api,T>;
+  static constexpr size_t max_capsules=4096;
   Api api_;
+  size_t capacity_;
   Buffer<Capsule> direct_,reflected_;
   Buffer<Vec3> points_{api_,batch_capacity};
   Buffer<Hit> hits_{api_,batch_capacity};
   Buffer<uint32_t> count_{api_,1};
-  uint32_t capsules_;
+  uint32_t capsules_=0;
+  bool mirror_=false;
 
 public:
-  DeviceQuery(std::span<const Capsule> direct,std::span<const Capsule> reflected):
-      direct_(api_,direct.size()),reflected_(api_,reflected.size()),capsules_(uint32_t(direct.size())) {
-    if(direct.empty()||direct.size()>4096||(!reflected.empty()&&reflected.size()!=direct.size()))
+  DeviceQuery(std::span<const Capsule> direct,std::span<const Capsule> reflected,bool reusable):
+      capacity_(reusable?max_capsules:std::min(direct.size(),max_capsules)),
+      direct_(api_,capacity_),reflected_(api_,reflected.empty()?0:capacity_) {
+    set_capsules(direct,reflected);
+  }
+
+  void set_capsules(std::span<const Capsule> direct,std::span<const Capsule> reflected) override {
+    if(direct.empty()||direct.size()>capacity_||
+       (!reflected.empty()&&(!reflected_.data||reflected.size()!=direct.size())))
       throw std::logic_error("Invalid weight brush device stroke");
+    capsules_=0;
     try{
       api_.upload(direct_.data,direct.data(),direct.size_bytes());
-      if(reflected_.data)api_.upload(reflected_.data,reflected.data(),reflected.size_bytes());
+      if(!reflected.empty())api_.upload(reflected_.data,reflected.data(),reflected.size_bytes());
       api_.wait();
     }catch(...){api_.drain();throw;}
+    capsules_=uint32_t(direct.size());
+    mirror_=!reflected.empty();
   }
 
   size_t search(std::span<const Vec3> points,unsigned sides,std::span<Hit> hits) override {
     const auto tests=capsules_*(sides==(Direct|Reflected)?2u:1u);
-    if(points.empty()||points.size()>batch_capacity||points.size()!=hits.size()||
+    if(!tests||points.empty()||points.size()>batch_capacity||points.size()!=hits.size()||
        points.size()>batch_capsules/tests||!sides||sides>(Direct|Reflected)||
-       ((sides&Reflected)&&!reflected_.data))
+       ((sides&Reflected)&&!mirror_))
       throw std::logic_error("Invalid weight brush device batch");
     uint32_t count=0;
     try{

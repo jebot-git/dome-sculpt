@@ -92,6 +92,21 @@ unavailable devices across all three backends. Sustained production-size
 live stroke latency and physical headset testing remain open.
 [GPU weight-brush evidence](validation/weight-brush-gpu-20261128.json)
 
+Live weight-brush feedback now retains one immutable posed source per
+gesture. The mesh worker reuses its device query and submits only capsules
+added since the previous preview. The strongest signed falloff per vertex
+preserves the direct-side tie rule and exact smoothing and lock behavior.
+Shortened or changed prefixes rebuild their falloff, and an interrupted
+update discards the cache. Generation, revision, view, expression and
+gesture fences limit reuse. Release still computes and commits an
+independent full stroke through the ordered asset worker.
+On Arc A770, 96 successive prefixes on a linked 19-part CC0 VRoid fixture
+with 9,851 vertices take a median of 0.952 seconds across three worker
+trials, compared with 3.769 seconds for complete replays. All intermediate
+skin weights match exactly. The longest incremental update in those
+trials is 21.344 ms. These timings cover stroke evaluation and scene
+assembly. End-to-end headset latency still requires qualification.
+
 Ambient occlusion in Bake now traces the biased hemisphere on the selected
 GPU against the existing immutable source BVH. The device returns one
 blocked-ray count per projected texel. Long traversals resume on the device
