@@ -261,6 +261,18 @@ actual controls and saved the expected native project.
 [Paint-layer mask controls](BAKE-RECIPES.md#limit-bake-with-a-paint-layer-mask) ·
 [Validation evidence](validation/bake-mask-20261128.json)
 
+Bake now projects from an ordered group of source objects. Projection and AO
+share a combined GPU intersection surface per pass, and material sampling
+uses each donor's original UV and triangle identities. The Arc fixture
+checks overlapping reflected geometry, separate UV1, cross-donor AO and
+FLOAT emission. Nested DomeD Wayland covers group creation through the
+object hierarchy, recipe recall, ordered Save and exact Undo/Redo. Synthetic
+OpenXR covers choosing an individual donor and recalling the saved group.
+Physical headset interaction and execution on AMD and NVIDIA hardware still
+need qualification.
+[Multi-source Bake controls](BAKE-RECIPES.md#project-from-several-source-objects) ·
+[Validation evidence](validation/bake-group-20261128.json)
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.

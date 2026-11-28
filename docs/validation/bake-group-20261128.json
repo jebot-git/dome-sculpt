@@ -1,0 +1,71 @@
+{
+  "date": "2026-11-28",
+  "product": "f08f4f524376c69b7bf2ad5669b59148534a737e",
+  "preceding": "a21172f17912cf258d026c4f21c79c568becd5e1",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "GPU projection and ambient occlusion from an ordered group of native donor objects with persistent recipes.",
+  "oneapi_arc_release": {
+    "application_sha256": "66f136cc930a87fceb15180571ddc15c19b30f693764f31d46256804bbf48414",
+    "ctest_passed": 19,
+    "ctest_cases": [
+      "bake-supersample-openxr",
+      "bake-group-openxr",
+      "texture-set-active-bake-openxr",
+      "bake-mask-openxr",
+      "bake-workflow",
+      "bake",
+      "texture-set-retained-native-target",
+      "source-prepared-normal-bake",
+      "texture-set-retained-bake-source",
+      "baked-emission-workflow",
+      "bake-recipes",
+      "bake-projection-policy",
+      "bake-controls",
+      "canonical-writable-bake-recipient",
+      "texture-set-retained-bake-target",
+      "application-missing-gpu",
+      "bake-recipe-faults",
+      "canonical-writable-bake-mask",
+      "texture-set-active-bake"
+    ],
+    "ctest_log_sha256": "a0ace356d374b093d4c748637d1e8e40c40dddb07d19dc0708656048205f6796",
+    "native_group_fixture": {
+      "resolution": 64,
+      "projected_texels": 4096,
+      "projection_rays_at_four_samples": 16384,
+      "rays_with_one_projection_and_sixteen_ao_samples": 69632,
+      "covers": "Overlapping reflected geometry, independent UV1 sampling, exact per-donor FLOAT radiance, cross-object AO, ordered Save, exact Undo/Redo, repeatable recipe IDs and missing donor refusal."
+    },
+    "wayland": {
+      "checks_passed": 10,
+      "report_sha256": "5ee687babcc90b26c1089d310242dde465194c0d67fcd97594eb17870808dd43",
+      "compositor_sha256": "47920142c8c803dcf5adb63ba643d2e347fbdcd1e15ecd8bce7c1a8dd47c0b7e",
+      "renderer": "Zink Vulkan on Intel Arc A770",
+      "fltk": "/opt/fltk-vr/toolkit, 1.4.5",
+      "bitmap_runtime": "/opt/fltk-vr/bdf-runtime"
+    },
+    "synthetic_openxr": {
+      "checks_passed": 19,
+      "report_sha256": "49d48b846a7e3331993b67cff7a8066da278737ac1dc109f75946981e67c9644",
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "accepted_and_reference_project_sha256": "ff29c3e2648f1b8dbbc99d837c7b45105d442364df1653a7b142c78bac8dc92f",
+      "input_cancel_and_focus_loss_project_sha256": "9638ae71b5d754aabc2d113941bbb173ed7b2615e1a4935908e061b5b81c536f"
+    }
+  },
+  "sanitizers": {
+    "scope": "Host ASan and UBSan on Bake, Bake authoring, recipes, document Bake admission and the fixture, linked to the matching oneAPI Release core and exercised on Arc. Leak detection was disabled.",
+    "assertions_passed": 67,
+    "log_sha256": "a77d07e4809a5b49a039cd8371ba18d14d0f19159876b4ff549c67dd74b3ec62"
+  },
+  "cuda_and_rocm": {
+    "cuda": {
+      "scope": "Compiled the Bake worker, authoring and shared ray kernel. Hardware execution was unavailable.",
+      "log_sha256": "1d781e3969641a9c79eb8c5116095723c03042c98c0710b00249c78005bea67b"
+    },
+    "rocm": {
+      "scope": "Compiled the Bake worker, authoring and shared ray kernel. Hardware execution was unavailable.",
+      "log_sha256": "bc29c18e94ea17d27fd2aefe94f9d8b18541086aff8882ec6272f520f2f5e380"
+    }
+  },
+  "physical_headset": false
+}
