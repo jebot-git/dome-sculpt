@@ -768,6 +768,17 @@ existing linked-accessory bind on Intel Arc A770. Nested DomeD Wayland verifies
 the universal menu and default Cancel. The nested Apply input check timed out.
 [Mixed-target binding validation](validation/surface-heat-mixed-targets-20261128.json)
 
+The DomeD universal Scene menu now opens a native multi-object chooser using
+the same hierarchy and selection as XR. Confirming the chooser preserves the
+current active mesh if it is still selected. The Skin dialog exposes the batch
+checkbox above the influence locks. The compact chooser keeps its confirmation
+above the DomeD tray. Nested hardware Wayland passes keyboard and pointer
+confirmation with exact bind, Save and Undo/Redo. Ctrl+W discards the pending
+selection. Synthetic OpenXR contact and additive grip/trigger select
+the native accessory alongside the retained part on both CC0 VRoid bases.
+Both controller binds match the independent worker output byte for byte.
+[Mixed-target frontend evidence](validation/surface-heat-mixed-frontends-20261128.json)
+
 Surface Heat now accepts editable retopology patches and their retained rig
 origins. Admission counts the stable topology records and shared patch
 owner before allocating a request. Plain and reflected, sheared source

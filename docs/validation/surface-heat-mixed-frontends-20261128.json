@@ -1,0 +1,95 @@
+{
+  "date": "2026-11-28",
+  "product": "749c28df4261ef57b4337a9e8dc3162f691b0639",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Native FLTK multi-object selection and actual frontend qualification of mixed retained/native Surface Heat binding.",
+  "release": {
+    "backend": "ONEAPI",
+    "application_sha256": "4d8a85e8240d1ddf6642af6b2d19821e5f18e022933ea590a9bce91c6dbde589",
+    "runtime_sha256": "ee9748ba5c83740ea827eb7e88152bd8085885e18fa6a4b730cf574f07f074a1",
+    "case_count": 14,
+    "passed_cases": [
+      "anatomical-female-fixture",
+      "anatomical-male-fixture",
+      "object-selection",
+      "object-selection-openxr",
+      "surface-heat-female-mixed-openxr",
+      "surface-heat-female-mixed-targets",
+      "surface-heat-female-owning",
+      "surface-heat-female-public",
+      "surface-heat-male-mixed-openxr",
+      "surface-heat-male-mixed-targets",
+      "surface-heat-male-owning",
+      "surface-heat-male-public",
+      "vrm1-attachment-openxr",
+      "vrm1-source-export"
+    ],
+    "junit_sha256": "12bd415c21bb61c10f63c7bd300f309b2d096dc9ab85053339c398f715d452d8"
+  },
+  "synthetic_openxr": {
+    "female": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_submissions": 89,
+      "balanced_swapchain_acquires_waits_releases": 178,
+      "bound_project_sha256": "520a05a8d698b86d252fff411d842d09282ac8249db0b38e21eab82427b6a2c2"
+    },
+    "male": {
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "stereo_submissions": 89,
+      "balanced_swapchain_acquires_waits_releases": 178,
+      "bound_project_sha256": "6926e4c3ffc4dbb7605d374a83b0c9012029d5f330737676b5e6d402e52e198c"
+    }
+  },
+  "nested_wayland": {
+    "female": {
+      "confirmation": "keyboard",
+      "checks": [
+        "Native Wayland client publishes the Dome Sculpt identity",
+        "Scene selection opens from the universal menu",
+        "The selection dialog keeps the Dome Sculpt identity",
+        "Ctrl+W cancels the pending selection and preserves the project",
+        "The selection dialog keeps the Dome Sculpt identity",
+        "Selection applies without creating document history",
+        "Batch binding needs explicit opt-in",
+        "Wayland selection, Surface Heat and ordered Save match the independent mixed bind byte for byte",
+        "One universal Undo restores the exact unbound project",
+        "Universal Redo restores the bound project byte for byte",
+        "Wayland client and worker close normally"
+      ],
+      "bound_project_sha256": "cb633926eb4403a4a74ee452396e0bea2f4eb7e450d6ca3628bce819a4d25d70",
+      "driver_sha256": "77580938d66d71f5053e598fb196ba94a4ac3a18066b486b69225dc039f40d06"
+    },
+    "male": {
+      "confirmation": "actual Wayland pointer buttons",
+      "checks": [
+        "Native Wayland client publishes the Dome Sculpt identity",
+        "Scene selection opens from the universal menu",
+        "The selection dialog keeps the Dome Sculpt identity",
+        "Ctrl+W cancels the pending selection and preserves the project",
+        "The selection dialog keeps the Dome Sculpt identity",
+        "Selection applies without creating document history",
+        "Batch binding needs explicit opt-in",
+        "Wayland selection, Surface Heat and ordered Save match the independent mixed bind byte for byte",
+        "One universal Undo restores the exact unbound project",
+        "Universal Redo restores the bound project byte for byte",
+        "Wayland client and worker close normally"
+      ],
+      "bound_project_sha256": "97a48c703f975d3661163a8f874eb1f8a8ce462ee4b8a69dfdfb88d0be3dbcd1",
+      "driver_sha256": "fa7ce10e5b3f0adf17294f6e5d51f1aa83d9db5c360a0bae117f65b93231217c"
+    }
+  },
+  "pointer_diagnostic": {
+    "output_height": 800,
+    "tray_begins_at_y": 740,
+    "selection_confirmation_y_before": 762,
+    "selection_confirmation_y_after": 706,
+    "bind_confirmation_y": 700,
+    "client_enter_and_button_events_after": true,
+    "failed_run_sha256": "05124c7b1349212e51a5f6dee3f5e02779d574bececd0493624a0d3051d60c40",
+    "working_run_sha256": "a7eac1207b6a76425186119eacfa40f4770105b5c62c6356f65e2b298e5d5cdb"
+  },
+  "limits": [
+    "The Xvfb host lacks DRI3 for outer presentation. The nested compositor imports DMA-BUF on the Intel Arc and uses its native Wayland input path.",
+    "Controller poses are synthetic. Physical headset and production-scale rig fitting and automatic-weight qualification remain open."
+  ]
+}

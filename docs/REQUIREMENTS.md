@@ -280,6 +280,15 @@ Undo/Redo. A linked VRM 1.0 texture-set fixture also verifies first binding
 of the reference and its accessory in the same operation.
 [Mixed-target binding evidence](validation/surface-heat-mixed-targets-20261128.json)
 
+The native Scene selection dialog provides desktop multi-selection in the
+same hierarchy as XR. It preserves the active mesh when still selected and
+commits selection independently of authoring history. The native Wayland
+workflow verifies keyboard and pointer confirmation. In synthetic OpenXR,
+additive contact selection and controller binding reproduce the corresponding
+expected saved project for each CC0 base. Physical headset verification
+remains open.
+[Mixed-target frontend evidence](validation/surface-heat-mixed-frontends-20261128.json)
+
 Surface Heat now covers independent native paint frames, authored POSITION
 domains and prepared normal and corner-color recipes. Binding after key
 creation and rebinding after Mirror keep the original role coordinates,
