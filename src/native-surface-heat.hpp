@@ -18,7 +18,8 @@ struct NativeSurfaceHeatOptions:NativeAnatomicalOptions {
   std::optional<VolumeBindingOptions> volume;
 };
 struct NativeSurfaceHeatReport {
-  struct Part {uint64_t object=0;size_t work=0,workspace=0,closed=0,nonembedded=0;double residual=0,partition=0;};
+  struct Part {uint64_t object=0;size_t work=0,workspace=0,closed=0,nonembedded=0;double residual=0,partition=0;
+    visibility_heat::FieldDomainReport domains;};
   size_t work=0,workspace=0,retained_input=0,total_admission=0,changed=0;
   std::vector<Part>parts;
 };
@@ -255,7 +256,7 @@ inline NativeSurfaceHeatPrepared prepare_native_surface_heat(const NativeSurface
     if(!options.locks.empty())for(size_t row=0;row<field.weights.vertices.size();++row){work.step(256);auto&next=field.weights.vertices[row];std::erase_if(next,[&](auto x){return options.locks.at(x.joint)!=0;});for(auto x:before.deformation->skin->vertices.at(row))if(options.locks.at(x.joint))next.push_back(x);next=normalize_weights(std::move(next),d->skeleton->bones.size(),options.locks,options.limits);}
     bool changed=!before.deformation||!before.deformation->skin;
     if(!changed)for(size_t row=0;row<field.weights.vertices.size();++row){work.step(128);if(!geometry_weight_authoring::equal_row(field.weights.vertices[row],before.deformation->skin->vertices.at(row))){changed=true;break;}}
-    result.report_.parts.push_back({id,field.work,field.workspace,field.closed_components,field.nonembedded_components,field.heat_residual,field.partition_error});
+    result.report_.parts.push_back({id,field.work,field.workspace,field.closed_components,field.nonembedded_components,field.heat_residual,field.partition_error,field.heat_domains});
     result.report_.workspace=std::max(result.report_.workspace,bytes.used+field.workspace);
     if(changed){d->skin=std::move(field.weights);weight_surface::validate_rest_deformation(*d,mesh,work);if(before.material_bindings&&before.material_bindings->normal_frames)normal_frame_current_authority(*before.material_bindings,mesh,d.get(),cancelled);auto capsule=before.rig_source;if(!capsule)capsule=capture_polygon_origin(input,id);result.changes_.push_back({id,std::move(d),std::move(capsule)});}
   }

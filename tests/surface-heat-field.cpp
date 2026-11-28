@@ -26,6 +26,55 @@ weight_surface::System grid(uint32_t width,uint32_t height) {
   }
   return system;
 }
+
+void independent_domains(weight_surface::Budget &work) {
+  constexpr size_t count=8;
+  weight_surface::System system;
+  system.diagonal.assign(count,3.);
+  system.heat.assign(count,2.);
+  system.ties.assign(count,1.);
+  system.seeds.resize(count);
+  std::array<visibility_heat::SupportMask,count> supports{};
+  constexpr std::array<uint32_t,count> owners{0,0,255,0,70,130,255,70};
+  for(uint32_t row=0;row<count;++row){
+    system.parent.push_back(row%4);
+    system.starts.push_back(row);
+    system.columns.push_back(row^4);
+    system.values.push_back(-1.);
+    const auto joint=owners[row];
+    const auto bit=uint64_t(1)<<(joint%64);
+    system.seeds[row][joint/64]=bit;
+    supports[row%4][joint/64]|=bit;
+  }
+  system.starts.push_back(count);
+  ContinuationReport proof;
+  visibility_heat::FieldDomainReport report;
+  const auto solved=visibility_heat::solve_supported_domains(system,supports,256,{},work,proof,report);
+  require(report.blocks==2&&report.coupled_rows==6&&report.rigid_rows==2&&
+          report.largest_block==4&&report.field_rows==12&&report.whole_mesh_field_rows==24,
+          "Components must share a solve only when their admitted joint sets agree");
+  require(report.partition_error<=1e-7&&proof.residual<=1e-9,"Compact fields require residual and partition proof");
+  for(size_t row=0;row<count;++row){
+    const auto &weights=solved.vertices[row];
+    auto expected=owners[row]==255?dome::VertexWeights{{255,1.f}}:
+      dome::VertexWeights{{owners[row],.75f},{owners[row^4],.25f}};
+    std::ranges::sort(expected,{},&dome::Influence::joint);
+    require(weights.size()==expected.size(),"An excluded joint entered a disconnected component");
+    for(size_t i=0;i<weights.size();++i)
+      require(weights[i].joint==expected[i].joint&&weights[i].weight==expected[i].weight,
+              "Interleaved rows must recover the exact two-node solution in native order");
+  }
+
+  system.columns[0]=5;
+  bool refused=false;
+  try{
+    visibility_heat::FieldDomainReport bad_report;
+    visibility_heat::solve_supported_domains(system,supports,256,{},work,proof,bad_report);
+  }catch(const std::logic_error &error){
+    refused=std::string_view(error.what()).find("cut a nonzero matrix entry")!=std::string_view::npos;
+  }
+  require(refused,"A false component partition cannot discard a coupled edge");
+}
 } // namespace
 
 int main() try {
@@ -35,6 +84,7 @@ int main() try {
   for(size_t i=0;i<expected.size();++i)expected[i]=.1+.8*double(i%width)/(width-1);
   const std::function<bool()> never;
   weight_surface::Budget work{0,100'000'000,never};
+  independent_domains(work);
   auto scalar=grid(1,1);
   scalar.diagonal[0]=4.;
   visibility_heat::FieldSolver exact_solver(scalar,work);
@@ -73,6 +123,7 @@ int main() try {
   std::cout<<"PASS manufactured open-grid field after Cancel and retry, rows="<<expected.size()
            <<" error="<<worst<<" replay="<<residual<<" iterations="<<proof.iterations<<'\n';
   std::cout<<"PASS exact single-step field stops at its first converged iteration\n";
+  std::cout<<"PASS independent joint domains, interleaved rows and exact rigid weights\n";
   return 0;
 } catch(const std::exception &error) {
   std::cerr<<"FAIL "<<error.what()<<'\n';

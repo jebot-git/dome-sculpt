@@ -11,7 +11,7 @@ struct Prepared {
   weight_surface::System system;
   size_t visible=0,occluded=0;
   size_t closed_components=0,interior_components=0,exterior_components=0,membership_rejected=0,nonembedded_components=0;
-  std::vector<std::array<uint64_t,4>>component_sources;
+  std::vector<SupportMask> component_sources;
 };
 // A distinct positive SURFACE screened energy, not a volumetric solve. The
 // nearest/visibility domain is fixed before solving any field. Cotangent sums
@@ -26,7 +26,8 @@ inline Prepared prepare(const Mesh&m,const Skeleton&rig,BindOptions options,
      !options.limits.max_influences||options.limits.max_influences>32||!std::isfinite(options.limits.prune)||options.limits.prune<0||options.limits.prune>=1)
     throw std::invalid_argument("Invalid positive visibility heat domain/options");
   // Concurrent CSR/map construction, exact owning BVH/scratch, source masks,
-  // IC factors, device CSR and PCG vectors, plus staged top-K output, are forecast first.
+  // Support blocks, compact CSR, IC factors, device PCG vectors and
+  // staged top-K output are forecast before constructing any field.
   bytes.add(65536);bytes.add(n,1024+2*(sizeof(VertexWeights)+options.limits.max_influences*sizeof(Influence)+64));bytes.add(corners,384);bytes.add(bones,2048+4*sizeof(RigMatrix));
   work.step_items(n,4);work.step_items(corners,4*std::bit_width(corners+1)+4);work.step_items(bones,256);
   m.validate();rig.validate();
@@ -49,7 +50,7 @@ inline Prepared prepare(const Mesh&m,const Skeleton&rig,BindOptions options,
   enum class Support : uint8_t { None, Closest, Visible };
   std::vector<Support>support(n);out.component_sources.resize(n);
   size_t seeded_components=0;
-  using Mask=std::array<uint64_t,4>;std::vector<Mask>permitted;std::vector<uint8_t>classified,interior;
+  using Mask=SupportMask;std::vector<Mask>permitted;std::vector<uint8_t>classified,interior;
   if(solid){bytes.add(n,sizeof(Mask)+2*sizeof(uint8_t));permitted.resize(n);classified.resize(n);interior.resize(n);out.closed_components=solid->closed_components;out.nonembedded_components=solid->nonembedded_components;
     for(uint32_t row=0;row<n;++row)if(solid->closed(row)){auto component=solid->component(row);if(classified[component])continue;classified[component]=1;
       // Prospectively classify every finite source BEFORE nearest selection.
@@ -139,29 +140,25 @@ inline VisibilityGeodesicResult visibility_heat_bind(const Mesh&m,const Skeleton
     const std::function<bool()>&cancelled={},size_t maximum_bytes=256u*1024u*1024u,std::span<const HeatSourceSegment>sources={},HeatDomainPolicy policy=HeatDomainPolicy::IntrinsicSurface){
   if(maximum_bytes<65536||maximum_bytes>256u*1024u*1024u)throw std::invalid_argument("Heat workspace bound");
   weight_surface::Budget work{0,options.maximum_work,cancelled};work.stop();visibility_geodesic::Bytes bytes{0,maximum_bytes};
-  auto prepared=visibility_heat::prepare(m,rig,options,work,bytes,sources,policy);auto&s=prepared.system;const size_t n=m.positions.size();
-  std::optional<visibility_heat::FieldSolver> solver;
-  std::vector<double>rhs(n),field(n),sum(n);std::vector<VertexWeights>rows(n);for(auto&r:rows)r.reserve(options.limits.max_influences+1);
+  auto prepared=visibility_heat::prepare(m,rig,options,work,bytes,sources,policy);
   ContinuationReport proof;
-  std::vector<uint32_t>sole(n,UINT32_MAX);
-  for(size_t i=0;i<n;++i){work.step(8);auto mask=prepared.component_sources[s.parent[i]];size_t count=0;uint32_t joint=UINT32_MAX;for(size_t k=0;k<4;++k){count+=std::popcount(mask[k]);if(mask[k])joint=uint32_t(k*64+std::countr_zero(mask[k]));}if(count==1)sole[i]=joint;}
-  // Exact connected-component minimizer: with one supported source the
-  // screened M-matrix equation has x=1 for that source,0 for every other.
-  // Eliminate these blocks prospectively, not after a numerical failure.
-
-  for(uint32_t bone=0;bone<rig.bones.size();++bone)if(rig.bones[bone].deform){
-    bool active=false;for(size_t row=0;row<n;++row){work.step(4);bool yes=(s.seeds[row][bone/64]&(uint64_t(1)<<(bone%64)))!=0;rhs[row]=yes&&sole[row]==UINT32_MAX?s.heat[row]/s.ties[row]:0;active|=rhs[row]>0;}
-    if(active){
-      if(!solver)solver.emplace(s,work);
-      solver->solve(rhs,field,work,proof);
-    }else std::fill(field.begin(),field.end(),0);
-    for(size_t row=0;row<n;++row){work.step();if(sole[row]!=UINT32_MAX)field[row]=sole[row]==bone?1.:0.;}
-    for(size_t row=0;row<n;++row){work.step(8);sum[row]+=field[row];if(field[row]<=0)continue;auto&r=rows[row];r.push_back({bone,float(field[row])});if(r.size()>options.limits.max_influences){auto small=std::min_element(r.begin(),r.end(),[&](auto a,auto b){work.step();return a.weight==b.weight?a.joint>b.joint:a.weight<b.weight;});r.erase(small);}}
-  }
-  VisibilityGeodesicResult result;result.negative_stiffness_edges=s.negative_edges;result.heat_iterations=proof.iterations;result.heat_residual=proof.residual;
-  result.weights.vertices.reserve(n);for(size_t row=0;row<n;++row){work.step(64+rows[row].size()*8);result.partition_error=std::max(result.partition_error,std::abs(sum[row]-1));result.weights.vertices.push_back(normalize_weights(std::move(rows[row]),rig.bones.size(),{},options.limits));}
-  if(result.partition_error>1e-7)throw std::runtime_error("Heat failed independently replayed pre-prune partition bound");
-  work.step_items(n,options.limits.max_influences+1);result.weights.validate(n,rig.bones.size());work.stop();result.nonembedded_components=prepared.nonembedded_components;result.closed_components=prepared.closed_components;result.interior_components=prepared.interior_components;result.exterior_components=prepared.exterior_components;result.membership_rejected=prepared.membership_rejected;result.visible_seeds=prepared.visible;result.occluded_candidates=prepared.occluded;result.work=work.used;result.workspace=bytes.used;return result;
+  VisibilityGeodesicResult result;
+  result.weights=visibility_heat::solve_supported_domains(prepared.system,prepared.component_sources,
+      rig.bones.size(),options.limits,work,proof,result.heat_domains);
+  result.negative_stiffness_edges=prepared.system.negative_edges;
+  result.heat_iterations=proof.iterations;
+  result.heat_residual=proof.residual;
+  result.partition_error=result.heat_domains.partition_error;
+  result.nonembedded_components=prepared.nonembedded_components;
+  result.closed_components=prepared.closed_components;
+  result.interior_components=prepared.interior_components;
+  result.exterior_components=prepared.exterior_components;
+  result.membership_rejected=prepared.membership_rejected;
+  result.visible_seeds=prepared.visible;
+  result.occluded_candidates=prepared.occluded;
+  result.work=work.used;
+  result.workspace=bytes.used;
+  return result;
 }
 inline VisibilityGeodesicResult visibility_heat_bind_object(const SculptObject&object,const Skeleton&rig,
     BindOptions options={},const std::function<bool()>&cancelled={},size_t maximum_bytes=256u*1024u*1024u,std::span<const HeatSourceSegment>sources={},HeatDomainPolicy policy=HeatDomainPolicy::IntrinsicSurface){

@@ -2,6 +2,7 @@
 #include "surface-heat-field.hpp"
 #include "screened-continuation-solve.hpp"
 #include "weight-surface-system.hpp"
+#include <map>
 
 #ifndef DOME_SURFACE_HEAT_REFERENCE
 #include "surface-heat-device.hpp"
@@ -324,5 +325,156 @@ FieldSolver::~FieldSolver()=default;
 void FieldSolver::solve(std::span<const double> rhs,std::span<double> field,
                         weight_surface::Budget &work,ContinuationReport &proof) {
   impl_->solve(rhs,field,work,proof);
+}
+
+namespace {
+struct CoupledBlock {
+  SupportMask support;
+  std::vector<uint32_t> rows;
+};
+struct ComponentField {
+  uint32_t block=UINT32_MAX;
+  uint32_t sole_joint=UINT32_MAX;
+};
+
+std::vector<CoupledBlock> group_supported_rows(const weight_surface::System &system,
+    std::span<const SupportMask> supports,size_t bones,std::span<uint32_t> compact_index,
+    std::span<VertexWeights> weights,weight_surface::Budget &work,FieldDomainReport &report) {
+  std::map<SupportMask,uint32_t> index_by_support;
+  std::vector<ComponentField> components(supports.size());
+  std::vector<CoupledBlock> blocks;
+  for(uint32_t row=0;row<system.diagonal.size();++row){
+    work.step();
+    auto &component=components.at(system.parent[row]);
+    if(component.block==UINT32_MAX&&component.sole_joint==UINT32_MAX){
+      work.step(8);
+      const auto &support=supports[system.parent[row]];
+      uint32_t joint=UINT32_MAX;
+      size_t count=0;
+      for(size_t word=0;word<support.size();++word){
+        const uint64_t bits=support[word];
+        if(!bits)continue;
+        count+=std::popcount(bits);
+        joint=uint32_t(64*word+63-std::countl_zero(bits));
+      }
+      if(!count||joint>=bones)throw std::logic_error("Surface Heat component lost its supported joints");
+      if(count==1)component.sole_joint=joint;
+      else{
+        work.step(16*std::bit_width(index_by_support.size()+1));
+        auto [at,inserted]=index_by_support.try_emplace(support,uint32_t(blocks.size()));
+        if(inserted)blocks.push_back({support,{}});
+        component.block=at->second;
+      }
+    }
+    if(component.sole_joint!=UINT32_MAX){
+      // The screened equation on this connected component has the constant
+      // solution one for its only supported joint and zero for other joints.
+      weights[row].push_back({component.sole_joint,1.f});
+      ++report.rigid_rows;
+    }else{
+      auto &rows=blocks[component.block].rows;
+      compact_index[row]=uint32_t(rows.size());
+      rows.push_back(row);
+      ++report.coupled_rows;
+    }
+  }
+  report.blocks=blocks.size();
+  SupportMask all_coupled_sources{};
+  for(const auto &block:blocks){
+    work.step(block.support.size());
+    for(size_t word=0;word<block.support.size();++word)all_coupled_sources[word]|=block.support[word];
+  }
+  for(auto word:all_coupled_sources)report.whole_mesh_field_rows+=system.diagonal.size()*std::popcount(word);
+  return blocks;
+}
+
+weight_surface::System compact_matrix(const weight_surface::System &system,
+    std::span<const uint32_t> rows,std::span<const uint32_t> compact_index,
+    weight_surface::Budget &work) {
+  weight_surface::System matrix;
+  matrix.starts.reserve(rows.size()+1);
+  matrix.starts.push_back(0);
+  matrix.diagonal.reserve(rows.size());
+  size_t edges=0;
+  for(auto row:rows){work.step();edges+=system.starts[row+1]-system.starts[row];}
+  matrix.columns.reserve(edges);
+  matrix.values.reserve(edges);
+  for(auto row:rows){
+    work.step();
+    matrix.diagonal.push_back(system.diagonal[row]);
+    for(size_t at=system.starts[row];at<system.starts[row+1];++at){
+      work.step();
+      const auto neighbor=system.columns[at];
+      if(system.parent[row]!=system.parent[neighbor])
+        throw std::logic_error("Surface Heat component would cut a nonzero matrix entry");
+      matrix.columns.push_back(compact_index[neighbor]);
+      matrix.values.push_back(system.values[at]);
+    }
+    matrix.starts.push_back(matrix.columns.size());
+  }
+  return matrix;
+}
+} // namespace
+
+SkinWeights solve_supported_domains(const weight_surface::System &system,std::span<const SupportMask> supports,
+    size_t bones,WeightLimits limits,weight_surface::Budget &work,ContinuationReport &proof,
+    FieldDomainReport &report) {
+  const size_t n=system.diagonal.size();
+  if(supports.size()!=n||system.parent.size()!=n)
+    throw std::logic_error("Surface Heat support dimensions do not match the numerical field");
+  SkinWeights weights;
+  weights.vertices.resize(n);
+  std::vector<uint32_t> compact_index(n);
+  const auto blocks=group_supported_rows(system,supports,bones,compact_index,weights.vertices,work,report);
+  const auto weaker=[&](Influence a,Influence b){
+    work.step();
+    return a.weight==b.weight?a.joint>b.joint:a.weight<b.weight;
+  };
+
+  for(const auto &block:blocks){
+    work.stop();
+    const auto count=block.rows.size();
+    report.largest_block=std::max(report.largest_block,count);
+    // The GPU only receives this block. All its components admit the same
+    // joint set. For excluded joints the homogeneous equation is exactly zero.
+    weight_surface::System compact;
+    if(count!=n)compact=compact_matrix(system,block.rows,compact_index,work);
+    FieldSolver solver(count==n?system:compact,work);
+    std::vector<double> rhs(count),field(count),sum(count);
+    for(auto row:block.rows){work.step();weights.vertices[row].reserve(limits.max_influences+1);}
+    for(size_t word=0;word<block.support.size();++word){
+      for(uint64_t bits=block.support[word];bits;bits&=bits-1){
+        work.stop();
+        const auto bone=uint32_t(64*word+std::countr_zero(bits));
+        const uint64_t bit=uint64_t(1)<<(bone%64);
+        for(size_t local=0;local<count;++local){
+          work.step(4);
+          const auto row=block.rows[local];
+          rhs[local]=(system.seeds[row][word]&bit)?system.heat[row]/system.ties[row]:0.;
+        }
+        solver.solve(rhs,field,work,proof);
+        report.field_rows+=count;
+        for(size_t local=0;local<count;++local){
+          work.step(8);
+          sum[local]+=field[local];
+          if(field[local]<=0)continue;
+          auto &row=weights.vertices[block.rows[local]];
+          row.push_back({bone,float(field[local])});
+          if(row.size()>limits.max_influences)row.erase(std::min_element(row.begin(),row.end(),weaker));
+        }
+      }
+    }
+    work.step(count);
+    for(auto value:sum)report.partition_error=std::max(report.partition_error,std::abs(value-1.));
+  }
+  if(report.partition_error>1e-7)throw std::runtime_error("Heat failed independently replayed pre-prune partition bound");
+  for(auto &row:weights.vertices){
+    work.step(64+row.size()*8);
+    row=normalize_weights(std::move(row),bones,{},limits);
+  }
+  work.step_items(n,limits.max_influences+1);
+  weights.validate(n,bones);
+  work.stop();
+  return weights;
 }
 } // namespace dome::detail::visibility_heat

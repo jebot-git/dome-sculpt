@@ -48,6 +48,15 @@ took 9.83 seconds with batching and 10.28 seconds with the preceding GPU solver.
 The run-to-run times overlap. The saved project matched in all six runs.
 [Batched Surface Heat evidence](validation/gpu-surface-heat-batches-20261128.json)
 
+Surface Heat now allocates a separate solve for each distinct admitted joint
+set. Components with one admitted joint receive exact unit weights without a
+device field. The retained 19-part female and male VRoid cases submit 65,355
+and 68,324 rows across all joint fields. The preceding whole-mesh solves
+would submit 90,679 and 93,478. The median native male bind was 8.93 seconds
+across three alternating Arc trials, down from 9.08 seconds. All six saves
+match exactly, and the timing change is small.
+[Compact Surface Heat evidence](validation/gpu-surface-heat-domains-20261128.json)
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.

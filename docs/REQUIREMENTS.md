@@ -310,6 +310,13 @@ requires original-residual replay before field adoption. Tests cover a field
 that stops after one iteration and cancellation followed by exact retry.
 [Batched Surface Heat evidence](validation/gpu-surface-heat-batches-20261128.json)
 
+Surface Heat now groups disconnected positive-diffusion components by their
+admitted joint set. Single-joint components receive exact unit weight before
+GPU allocation. Every coupled block retains its original matrix entries and
+solves only the fields for its supported joints. The residual and pre-prune
+partition bounds apply to each block.
+[Compact Surface Heat evidence](validation/gpu-surface-heat-domains-20261128.json)
+
 Volume Geodesic binds consistently oriented closed meshes to internal
 deforming bones. It checks topology and seeds on the worker and propagates
 through the certified material on the selected GPU. The Arc A770 results

@@ -4,6 +4,7 @@
 #include "closest-ray-visibility.hpp"
 #include "weight-surface-system.hpp"
 #include "weight-nearest-support.hpp"
+#include "surface-heat-field.hpp"
 #include "dome/rig.hpp"
 #include <numeric>
 namespace dome::detail {
@@ -14,6 +15,7 @@ struct VisibilityGeodesicResult {
   size_t heat_iterations=0, negative_stiffness_edges=0;
   size_t closed_components=0,interior_components=0,exterior_components=0,membership_rejected=0,nonembedded_components=0;
   double heat_residual=0, partition_error=0;
+  visibility_heat::FieldDomainReport heat_domains;
 };
 namespace visibility_geodesic {
 using Budget=weight_surface::Budget;
