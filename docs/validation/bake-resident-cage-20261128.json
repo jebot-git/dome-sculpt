@@ -1,0 +1,164 @@
+{
+  "date": "2026-11-28",
+  "product": "438ba03177a327801981da7e444d3d608ed38360",
+  "preceding": "786694fa8a81ce8fb5cef7f29fd4f61c2c03813e",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Resident automatic and explicit cage-ray preparation from compacted Bake raster samples, followed by GPU source projection on the same queue.",
+  "oneapi_arc_release": {
+    "application_sha256": "c781ad1794196bc4307f5aafb375f98ab24b78d74bb39c0e4306305510d2e9e2",
+    "focused": {
+      "passed": 15,
+      "junit_sha256": "3b2bfb3d8be79309e973979b85acc897837afb4b3b6fe079377f4d7362be4d7f"
+    },
+    "focused_full_log_sha256": "c6f828e7ed1610b883b13095b23a1600ecf8a043b8bc0573f122366e97d820c9",
+    "material_authoring": {
+      "passed": 6,
+      "junit_sha256": "0faf1555d1929fa8b8d1f6d691d6dc523e8a2ce88105e8ecf9701827a10c9ef7"
+    },
+    "material_full_log_sha256": "784576558548d77900bc91be4508b679e028d1318e49b9922a890705d66e6d3c",
+    "dense_2048_retained_bake": {
+      "passed": 1,
+      "junit_sha256": "c0d3b2cb81f0f57e4534016f35e3b7ddf16bb5bbd1a3eee6e390ac33806128ed",
+      "workflow_checks": 13,
+      "full_log_sha256": "1dd982ee276b6778e8b1cfa7b16dee9b9ce372e7d0b01408759e88de787f8191"
+    },
+    "no_device_refusal": "No device of requested type 'info::device_type::gpu' available.",
+    "cage_oracle": {
+      "ray_records": 16384,
+      "mismatches": 0,
+      "invalid_origin_refused": true,
+      "log_sha256": "20559eabb693646b431e97a47a90fb569b565252060c61c720205b22dd8b99bb"
+    },
+    "benchmarks": {
+      "512_combined_cold": {
+        "exact_native_archive_sha256": "1062add51b001620d6b2655bcf682c4e942dfceb7988d89ca197519b55d59b00",
+        "projected_texels": 262144,
+        "total_rays": 17039360,
+        "distinct_ao_bytes": 53,
+        "seconds": {
+          "preceding": [
+            10.8314
+          ],
+          "candidate": [
+            11.5995
+          ]
+        },
+        "log_sha256": "65c9ef127c4e288d10621535c45114f725abc5af19dd819c8a224f7850660489"
+      },
+      "1024_projection_cold_then_warm": {
+        "exact_native_archive_sha256": "3e091457d8f7f62aeed1bdf48e4cfdf3cc608956285df5853ac22a9c7583348c",
+        "projected_texels": 1048576,
+        "total_rays": 1048576,
+        "distinct_ao_bytes": 1,
+        "seconds": {
+          "candidate": [
+            7.2678,
+            0.649811,
+            0.623852
+          ],
+          "preceding": [
+            6.52941,
+            0.65433,
+            0.622705
+          ]
+        },
+        "log_sha256": "82173db23d954a043db2256d1d1b5a711c690d5c15f73c2763b073460c367856"
+      }
+    },
+    "1024_projection_transfer": {
+      "preceding": {
+        "ray_uploads": 256,
+        "ray_upload_bytes": 41943040,
+        "corner_uploads": 0,
+        "corner_upload_bytes": 0,
+        "total_host_upload_bytes": 41959036,
+        "total_device_readback_bytes": 55051520,
+        "trace_sha256": "54ae094e6bc85377de29c7b080ebb2d3e610fc389a233b6e690814f698458fa7"
+      },
+      "candidate": {
+        "ray_uploads": 0,
+        "ray_upload_bytes": 0,
+        "corner_uploads": 32,
+        "corner_upload_bytes": 4096,
+        "total_host_upload_bytes": 20092,
+        "total_device_readback_bytes": 55051584,
+        "trace_sha256": "9b70c384efa3b32436b87e9bfdbefd6e3b524d61c1bfd1634bfbda8f3309b874"
+      }
+    }
+  },
+  "nested_wayland": {
+    "checks": 15,
+    "report_sha256": "3206993dcd5a5c556e4a8584dc324197fcbb72c60819d1efa07f2d98534a9aa7",
+    "dma_buf_render_node": "/dev/dri/renderD129",
+    "trace_sha256": "876f41a71276fbb7000b2b3b6ac6073bad7cbb6135be3ee438551a6cb26456c9",
+    "kernel_launches_on_one_queue": {
+      "raster": 1,
+      "compact": 1,
+      "cage": 1,
+      "projection": 1
+    },
+    "exact_active_set_save_clear_and_undo": true
+  },
+  "synthetic_openxr": {
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "suites": {
+      "bake-cage-xr": {
+        "checks": 21,
+        "report_sha256": "7e8949de5105428d14cf8e2622a4a7e9dc383648aea4783a7307d96be63d48ff",
+        "native_project_sha256": "ad45bc1cb2727b0bd42ba47a86ad3b44bf06c347406a43efbb240e781055ba89",
+        "stereo_submissions": 86,
+        "images_acquired_waited_and_released": 172
+      },
+      "bake-recipes-xr": {
+        "checks": 22,
+        "report_sha256": "f48e8a4a93ca396c1595859d68ea0c7b859f811f300db398dbcbc98c32e823b9",
+        "native_project_sha256": "c497a7a385907bb3cbe0d7901b0a6aaba2b2a342fe45a1bdb4fd78fc24581b8d",
+        "stereo_submissions": 86,
+        "images_acquired_waited_and_released": 172
+      },
+      "texture-set-active-bake-openxr": {
+        "checks": 19,
+        "report_sha256": "adabf84b795df8d36f9ed533335dab271845709f2d8d68cbd0741d595311b18b",
+        "native_project_sha256": "4391b246e47412949b07eebd2e969ddec55ae4e35552259cf0a172f1846412ef",
+        "stereo_submissions": 86,
+        "images_acquired_waited_and_released": 172
+      },
+      "mtoon-texture-set-bake-openxr": {
+        "checks": 19,
+        "report_sha256": "adabf84b795df8d36f9ed533335dab271845709f2d8d68cbd0741d595311b18b",
+        "native_project_sha256": "3840bb393dceb07f022228961663763fb333d2aac9dfb5876104b85ca0e1494a",
+        "stereo_submissions": 86,
+        "images_acquired_waited_and_released": 172
+      }
+    }
+  },
+  "headless_reference": {
+    "focused": {
+      "passed": 4,
+      "junit_sha256": "a012f313cdb8986ddc518b4dee1bfe7c856eb71084ba3bb1977829bfe5909d0f"
+    },
+    "scoped_asan_ubsan": {
+      "sources": [
+        "src/bake.cpp",
+        "src/mesh-processing.cpp",
+        "tests/bake.cpp"
+      ],
+      "log_sha256": "28c18567cf614f71b7bec803c142703eea04ae5aa071ebe178f179667d87e85c"
+    }
+  },
+  "cuda_and_rocm": {
+    "cuda": {
+      "compiled_kernel_sha256": "a76077c63e94c3887cd0550c32f727b8d0946cf5cffa57f06b9134a19d1605da",
+      "no_device_refusal": "CUDA driver version is insufficient for CUDA runtime version"
+    },
+    "rocm": {
+      "compiled_kernel_sha256": "b13a1a864c3c3df3a8177c2783e8e8c388123671d79629f9a4674cdf92f724e8",
+      "no_device_refusal": "no ROCm-capable device is detected"
+    }
+  },
+  "limits": [
+    "The host prepares triangle bounds and per-span corner descriptions and still evaluates material and tangent-frame output. Compact target samples and source hits read back for that stage.",
+    "The transfer and timing measurements use one synthetic donor. Warm 1024 Bake is near parity and cold startup includes compilation of the cage program.",
+    "CUDA and ROCm kernels compile and link and reject missing hardware. Positive vendor hardware runs and physical headset testing remain open."
+  ]
+}
