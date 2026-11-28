@@ -32,6 +32,7 @@
 #include "affine-surface.hpp"
 #include "source-skin-world.hpp"
 #include "deformation-active.hpp"
+#include <set>
 namespace dome {
 namespace {
 // The source and target share one allowance for transient posed frames.
@@ -39,6 +40,7 @@ namespace {
 struct RetainedBakePose {
   const std::function<bool()> &cancelled;
   size_t bytes=0,work=0;
+  size_t atlas_budget=TextureSetLimits{}.maximum_bytes;
 
   std::shared_ptr<const detail::PolygonSurfacePreview> field(
       const TextureSetView &field,const Mesh *geometry) {
@@ -125,7 +127,7 @@ std::vector<detail::RetainedSourceBakeField> capture_texture_set_bake_source(
   TextureSetLimits limits;limits.cancelled=cancelled;
   // The Bake may revisit donors across raster batches. Keep their atlases
   // ready within one texture-set workspace allowance for the whole donor.
-  size_t atlas_budget=limits.maximum_bytes;
+  auto &atlas_budget=pose.atlas_budget;
   const auto capture=[&](const TextureSetView &field) {
     if (cancelled && cancelled())
       throw std::runtime_error("Texture-set Bake source capture cancelled");
@@ -222,8 +224,188 @@ std::vector<Tangent> place_bake_target(Mesh &mesh,BakeOptions &options,
   }
   return corners;
 }
+bool has_vertex_colors(const std::vector<PolygonRgba> &colors){
+  return std::ranges::any_of(colors,[](auto rgba){return rgba!=PolygonRgba{1,1,1,1};});
+}
+struct CapturedBakeDonor {
+  BakeSource source;
+  detail::SourceBakeNormalResolver normals;
+  std::vector<detail::RetainedSourceBakeField> fields;
+  std::vector<Tangent> placed_corners;
+  bool reverse_winding=false,requires_colors=false,has_mtoon_normals=false;
+};
+CapturedBakeDonor capture_bake_donor(const Scene &scene,SculptObject source,
+    CanvasTransform target_inverse,bool target_affine,const AffineTransform &metric_from_world,
+    AffineVector bake_origin,bool precise_frame,RetainedBakePose &pose,bool force_absolute_emission){
+  const auto &cancelled=pose.cancelled;
+  const auto check=[&]{if(cancelled&&cancelled())throw std::runtime_error("Bake source capture cancelled");};
+  check();
+  const bool source_affine=scene.has_affine_placement(source.id);
+  if((source.texture_sets||source_affine)&&!detail::bake_source_supported(source,source_affine))
+    throw std::logic_error("A Bake source needs an eligible material and normal frame adapter");
+  if(!source.texture_sets&&source.mesh_active&&source.painted&&
+     source.painted->baked()&&source.painted->baked()->normal_field&&
+     (!source.material_bindings||!source.material_bindings->canonical_attributes))
+    throw std::invalid_argument("Independent normal-field source requires its native canonical attributes");
+  const bool current_source=source.polygon&&source.polygon->active&&source.polygon->colors;
+  if(current_source&&!detail::cut_color_supported(source)&&!detail::writable_bake_source_supported(source))
+    throw std::logic_error("This corner-color source needs an eligible shading adapter");
+  std::optional<PolygonColorSurface> current;
+  if(current_source){
+    current.emplace();current->topology=std::shared_ptr<const PolygonMesh>(source.polygon,&source.polygon->topology);
+    current->field=source.polygon->colors;
+  }
+  const auto placement=source_affine
+    ? std::optional(detail::placement_frame(scene,source.id)) : std::nullopt;
+  const auto relative=placement?target_inverse:
+      ob::compose(target_inverse,scene.world_transform(source.id));
+  detail::SourceBakeNormalOptions source_normal_options;
+  source_normal_options.cancelled=cancelled;
+  source_normal_options.placement=placement?&*placement:nullptr;
+  auto source_normals=source.texture_sets?detail::SourceBakeNormalResolver{}:
+      detail::source_bake_normals(source,relative,source_normal_options);
+  // Authenticate ordered REST geometry before evaluation. Skin/morph changes
+  // positions/normals later, never the source field's corner identity or RGBA.
+  auto source_maps=source.texture_sets?std::shared_ptr<const TextureMaps>{}:
+      detail::raw_bake_source(source,cancelled,&source_normals);
+  if(!source_maps&&source.mesh_active&&!source.texture_sets)source_maps=source.painted->preview(source.material,cancelled);
+  auto source_colors=source.mesh_active&&!source.texture_sets?detail::current_vertex_colors(source.painted->mesh(),current?&*current:nullptr,
+      source.appearance.get(),source.material_bindings.get(),source_maps.get(),cancelled):std::vector<PolygonRgba>{};
+  BakeSource high;
+  const bool source_prepared=source.mesh_active&&!source.texture_sets&&source.painted->color_projection();
+  const bool requires_colors=source_prepared||has_vertex_colors(source_colors);
+  if (source.mesh_active) {
+    high.mesh = source.deformation ? source.deformation->preview(source.painted->mesh())
+                                   : source.painted->mesh();
+    high.materials[0].maps = std::move(source_maps);
+    if(source_normals.paired_maps())
+      high.materials[0].maps_are_composited=!source_normals.paired_maps()->source_only;
+    if(!source_prepared)high.colors=std::move(source_colors);
+  } else
+    high.mesh = surface_mesh(*source.volume, cancelled);
+  std::vector<detail::RetainedSourceBakeField> source_fields;
+  if(source.texture_sets)source_fields=capture_texture_set_bake_source(high,source,relative,placement,pose);
+  else{
+    high.materials[0].material=source.material;
+    auto &material=high.materials[0];
+    material.resolved_emission=detail::emission_bake_source(source,cancelled,&source_normals,
+        &material.emission_batch,force_absolute_emission);
+  }
+  std::vector<Tangent> placed_corners;
+  if(placement&&!source_normals&&std::any_of(high.materials.begin(),high.materials.end(),[](const auto &field){
+       return field.maps&&!field.maps->polygon_surface&&!field.maps->normal.rgba.empty();
+      })){
+    placed_corners=tangent_corners(high.mesh,cancelled);
+    for(size_t i=0;i<placed_corners.size();++i){
+      if((i&1023)==0)check();
+      auto t=detail::placed_tangent(*placement,placed_corners[i]);
+      const auto rotated=ob::rotate(relative.orientation,{t[0],t[1],t[2]});
+      placed_corners[i]={rotated.x,rotated.y,rotated.z,t[3]};
+    }
+  }
+  if(placement||target_affine||precise_frame){
+    // Keep original triangle and corner identities even under reflection.
+    // The Bake hit keeps its source barycentrics and tests effective winding.
+    auto source_to_bake=placement?affine_similarity(target_inverse)*placement->world():affine_similarity(relative);
+    if(!target_affine){
+      // Keep the float ray workspace near the donor. A large translation can
+      // collapse tiny but distinct isosurface triangles after rounding.
+      auto matrix=source_to_bake.matrix();
+      for(size_t axis=0;axis<3;++axis){
+        matrix[12+axis]-=bake_origin[axis];
+      }
+      source_to_bake=AffineTransform(matrix);
+    }
+    const auto transform=target_affine?metric_from_world*source_to_bake:source_to_bake;
+    std::optional<std::vector<Vec3>> source_positions;
+    if(placement&&source.mesh_active&&source.appearance&&source.deformation&&source.deformation->skin){
+      // The retained mesh node and original joint graph can have different
+      // spaces. Use the same authenticated evaluation as the viewport, and
+      // center the result before converting the skin positions to float.
+      ObjectSurface surface;
+      surface.id=source.id;surface.transform=source.transform;surface.mesh=source.painted->mesh();
+      surface.deformation=source.deformation;surface.groups=scene.group_path(source.group);
+      surface.appearance=source.appearance;surface.affine_edit=source.affine_edit;surface.rig_source=source.rig_source;
+      auto matrix=affine_similarity(target_inverse).matrix();
+      for(size_t axis=0;axis<3;++axis)matrix[12+axis]-=bake_origin[axis];
+      const auto output_from_world=target_affine?metric_from_world:AffineTransform(matrix);
+      source_positions=detail::source_skin_world_positions(surface,cancelled,256u*1024u*1024u,&output_from_world);
+      if(source_positions)high.mesh.positions=std::move(*source_positions);
+    }
+    for(size_t i=0;i<high.mesh.positions.size();++i){
+      if((i&1023)==0)check();
+      if(!source_positions)
+        high.mesh.positions[i]=detail::affine_position(transform.point(detail::affine_vector(high.mesh.positions[i])));
+      const auto n=placement?detail::placed_normal(*placement,high.mesh.normals[i]):high.mesh.normals[i];
+      const auto rotated=ob::rotate(relative.orientation,{n.x,n.y,n.z});
+      high.mesh.normals[i]={rotated.x,rotated.y,rotated.z};
+    }
+  }else{
+    for (auto &p : high.mesh.positions) {
+      auto world = ob::transform(relative, {p.x,p.y,p.z});
+      p = {world.x,world.y,world.z};
+    }
+    for (auto &n : high.mesh.normals) {
+      auto world = ob::rotate(relative.orientation, {n.x,n.y,n.z});
+      n = {world.x,world.y,world.z};
+    }
+  }
+  const bool reverse=placement&&placement->orientation()==AffineOrientation::Reversing;
+  const bool mtoon=source_normals&&source.material_bindings&&source.material_bindings->has_mtoon;
+  return {std::move(high),std::move(source_normals),std::move(source_fields),std::move(placed_corners),
+          reverse,requires_colors,mtoon};
+}
+
+struct BakeDonorSize {
+  size_t vertices=0,triangles=0,materials=0;
+  void add(const BakeSource &donor){
+    if(donor.mesh.positions.size()>2'000'000-vertices||
+       donor.mesh.indices.size()/3>2'000'000-triangles||
+       donor.materials.size()>4096-materials)
+      throw std::length_error("Combined Bake sources exceed the geometry or material budget");
+    vertices+=donor.mesh.positions.size();
+    triangles+=donor.mesh.indices.size()/3;
+    materials+=donor.materials.size();
+  }
+};
+
+BakeSource combine_bake_donors(std::span<CapturedBakeDonor> donors,const BakeDonorSize &size,
+    std::vector<detail::SourceBakeDomain> &domains,std::vector<detail::RetainedSourceBakeField> &fields,
+    const auto &check){
+  BakeSource combined;
+  combined.materials.clear();
+  combined.mesh.positions.reserve(size.vertices);
+  combined.mesh.normals.reserve(size.vertices);
+  combined.mesh.indices.reserve(size.triangles*3);
+  combined.triangle_materials.reserve(size.triangles);
+  combined.materials.reserve(size.materials);
+  fields.reserve(size.materials);
+  domains.reserve(donors.size());
+  for(auto &donor:donors){
+    check();
+    const auto base_vertex=uint32_t(combined.mesh.positions.size());
+    const auto base_material=uint32_t(combined.materials.size());
+    const auto &mesh=donor.source.mesh;
+    combined.mesh.positions.insert(combined.mesh.positions.end(),mesh.positions.begin(),mesh.positions.end());
+    combined.mesh.normals.insert(combined.mesh.normals.end(),mesh.normals.begin(),mesh.normals.end());
+    for(size_t k=0;k<mesh.indices.size();++k){
+      if((k&4095)==0)check();
+      combined.mesh.indices.push_back(base_vertex+mesh.indices[k]);
+    }
+    for(size_t t=0;t<mesh.indices.size()/3;++t){
+      if((t&4095)==0)check();
+      combined.triangle_materials.push_back(base_material+
+          (donor.source.triangle_materials.empty()?0:donor.source.triangle_materials[t]));
+    }
+    combined.materials.insert(combined.materials.end(),donor.source.materials.begin(),donor.source.materials.end());
+    if(donor.fields.empty())fields.resize(fields.size()+donor.source.materials.size());
+    else fields.insert(fields.end(),donor.fields.begin(),donor.fields.end());
+    domains.push_back({&donor.source,&donor.normals,donor.placed_corners,donor.reverse_winding});
+  }
+  return combined;
+}
 } // namespace
-ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
+ObjectBakeReport bake_objects(Scene &scene, std::span<const uint64_t> source_ids,
                               ObjectBakeSettings settings,
                               const std::function<bool()> &cancelled,
                               const std::function<void(float)> &progress) {
@@ -234,13 +416,19 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   if(progress)progress(0);
   scene.validate();
   auto target = scene.active();
-  auto source = scene.object(source_id);
+  if(source_ids.empty()||source_ids.size()>256)
+    throw std::invalid_argument("Choose one or more Bake sources");
+  std::set<uint64_t> eligible;
+  for(const auto id:source_ids){
+    if(!id||id==target.id||!eligible.insert(id).second)
+      throw std::invalid_argument("Bake sources must be distinct from each other and the target");
+  }
+  if(settings.corresponding_topology&&source_ids.size()!=1)
+    throw std::invalid_argument("Matching source triangles requires exactly one Bake source");
+  const auto source_id=source_ids.front();
+  const auto &source=scene.object(source_id);
   if(target.texture_sets && !detail::bake_target_supported(target))
     throw std::logic_error("The selected target field needs its source-retaining Bake adapter");
-  const bool source_affine=scene.has_affine_placement(source_id);
-  if((source.texture_sets||source_affine) && !detail::bake_source_supported(source,source_affine))
-    throw std::logic_error(source.texture_sets ? "The source texture collection needs its retained material Bake adapter" :
-        "This affine Bake source needs its original material and normal frame adapter");
   std::optional<TextureSetView> recipient;
   if(target.texture_sets){
     if(settings.prepare_colors || settings.prepare_normals)
@@ -269,17 +457,10 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     auto layered=convert_canonical_normals({target.painted,target.appearance,target.material_bindings,target.deformation,target.material,{}},normal_options);
     target.painted=std::move(layered.paint);target.material_bindings=std::move(layered.material_bindings);
   }
-  const bool current_source=source.polygon&&source.polygon->active&&source.polygon->colors;
   const bool current_target=target.polygon&&target.polygon->active&&target.polygon->colors;
   if(!target.texture_sets && !detail::bake_target_supported(target))
     throw std::logic_error("This corner-color target has shading roles that target baking cannot yet preserve");
 
-  // This source route uses the same authenticated ordinary shading domain as
-  // plane cutting. Other original/prepared roles still require their adapters.
-  if(current_source&&!detail::cut_color_supported(source)&&!detail::writable_bake_source_supported(source))
-    throw std::logic_error("This corner-color source has shading roles that source baking cannot yet preserve");
-  if (source.id == target.id)
-    throw std::invalid_argument("Choose a different source object for baking");
   if (!target.visible || target.locked || !target.mesh_active || !target.painted)
     throw std::logic_error("Show, unlock and prepare the target painting mesh before baking");
   if(settings.corresponding_topology){
@@ -298,10 +479,6 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
         throw std::invalid_argument("Matching source triangles requires the same vertex count and ordered indices");
     }
   }
-  if(!source.texture_sets&&source.mesh_active&&source.painted&&
-      source.painted->baked()&&source.painted->baked()->normal_field&&
-      (!source.material_bindings||!source.material_bindings->canonical_attributes))
-    throw std::invalid_argument("Independent normal-field source requires its native canonical attributes");
   if(!std::isfinite(settings.color_error)||settings.color_error<0||settings.color_error>1)
     throw std::invalid_argument("Invalid vertex-color preparation tolerance");
   if(!std::isfinite(settings.normal_error)||settings.normal_error<0||settings.normal_error>.25f)
@@ -322,31 +499,10 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
           length(preview.normals[i]-rest.normals[i]) > 1e-5f)
         throw std::logic_error("Return the target to its rest pose and zero morphs before baking");
   }
-  std::optional<PolygonColorSurface> current;
-  if(current_source){
-    current.emplace();current->topology=std::shared_ptr<const PolygonMesh>(source.polygon,&source.polygon->topology);
-    current->field=source.polygon->colors;
-  }
   const auto target_placement=scene.has_affine_placement(target.id)
     ? std::optional(detail::placement_frame(scene,target.id)) : std::nullopt;
   const auto target_world=target_placement?CanvasTransform{}:scene.world_transform(target.id);
   const auto target_inverse=ob::inverse(target_world);
-  const auto placement=source_affine
-    ? std::optional(detail::placement_frame(scene,source.id)) : std::nullopt;
-  const auto relative=placement?target_inverse:
-      ob::compose(target_inverse,scene.world_transform(source.id));
-  detail::SourceBakeNormalOptions source_normal_options;
-  source_normal_options.cancelled=cancelled;
-  source_normal_options.placement=placement?&*placement:nullptr;
-  const auto source_normals=source.texture_sets?detail::SourceBakeNormalResolver{}:
-      detail::source_bake_normals(source,relative,source_normal_options);
-  // Authenticate ordered REST geometry before evaluation. Skin/morph changes
-  // positions/normals later, never the source field's corner identity or RGBA.
-  auto source_maps=source.texture_sets?std::shared_ptr<const TextureMaps>{}:
-      detail::raw_bake_source(source,cancelled,&source_normals);
-  if(!source_maps&&source.mesh_active&&!source.texture_sets)source_maps=source.painted->preview(source.material,cancelled);
-  auto source_colors=source.mesh_active&&!source.texture_sets?detail::current_vertex_colors(source.painted->mesh(),current?&*current:nullptr,
-      source.appearance.get(),source.material_bindings.get(),source_maps.get(),cancelled):std::vector<PolygonRgba>{};
   std::shared_ptr<const PolygonColorSurface> target_current;
   if(current_target){
     auto descriptor=std::make_shared<PolygonColorSurface>();
@@ -357,11 +513,9 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   auto target_colors=current_target?detail::current_vertex_colors(target.painted->mesh(),target_current.get(),
       target.appearance.get(),target.material_bindings.get(),target_maps.get(),cancelled)
       :detail::source_vertex_colors(target.appearance.get(),target.painted->mesh().positions.size(),cancelled);
-  auto nonidentity=[](const auto &colors){return std::any_of(colors.begin(),colors.end(),[](auto c){return c!=std::array<float,4>{1,1,1,1};});};
-  const bool source_prepared=source.mesh_active&&!source.texture_sets&&source.painted->color_projection();
   const bool target_prepared=bool(target.painted->color_projection());
   const bool separate=target_prepared||settings.prepare_colors;
-  if(!separate&&(source_prepared||nonidentity(source_colors)||nonidentity(target_colors)))
+  if(!separate&&has_vertex_colors(target_colors))
     throw std::logic_error("Enable PBR color preparation to bake colored source or target data without losing or multiplying its vertex colors");
   bool converted=false;
   if(settings.prepare_colors&&!target_prepared){
@@ -382,16 +536,6 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     target.painted=std::move(prepared.paint);target.material_bindings=std::move(prepared.material_bindings);normal_converted=prepared.converted;
   }
   if(progress)progress(.05f);
-  BakeSource high;
-  if (source.mesh_active) {
-    high.mesh = source.deformation ? source.deformation->preview(source.painted->mesh())
-                                   : source.painted->mesh();
-    high.materials[0].maps = std::move(source_maps);
-    if(source_normals.paired_maps())
-      high.materials[0].maps_are_composited=!source_normals.paired_maps()->source_only;
-    if(!source_prepared)high.colors=std::move(source_colors);
-  } else
-    high.mesh = surface_mesh(*source.volume, cancelled);
   AffineTransform metric_from_world;
   if(target_placement){
     auto matrix=metric_from_world.matrix();
@@ -399,84 +543,44 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     for(size_t i=12;i<15;++i)matrix[i]=-world[i];
     metric_from_world=AffineTransform(matrix);
   }
-  std::vector<detail::RetainedSourceBakeField> source_fields;
+  const bool multiple=source_ids.size()>1;
+  AffineVector bake_origin{};
+  if(!multiple&&!target_placement&&scene.has_affine_placement(source_id)){
+    // Retain the single-donor origin convention, including its exact
+    // archive output. Combined donors share the target's local origin.
+    const auto placement=detail::placement_frame(scene,source_id);
+    const auto transform=affine_similarity(target_inverse)*placement.world();
+    for(size_t axis=0;axis<3;++axis)bake_origin[axis]=transform.matrix()[12+axis];
+  }
   RetainedBakePose retained_pose{cancelled};
   const auto retained_recipient=retained_target
     ?retained_pose.field(*recipient,posed_target?&*posed_target:nullptr):nullptr;
-  // A typed recipient's relative layer gain must not dim or amplify the donor.
   const auto &recipient_binding=recipient?recipient->material_bindings:target.material_bindings;
   const bool absolute_emission=(!recipient||!recipient->source)&&recipient_binding&&
       recipient_binding->has_mtoon&&recipient_binding->material.parameters.emission_strength!=1;
-  if(source.texture_sets)source_fields=capture_texture_set_bake_source(high,source,relative,placement,retained_pose);
-  else{
-    high.materials[0].material=source.material;
-    auto &material=high.materials[0];
-    material.resolved_emission=detail::emission_bake_source(source,cancelled,&source_normals,
-        &material.emission_batch,absolute_emission&&!recipient);
+  std::vector<CapturedBakeDonor> captured;
+  captured.reserve(source_ids.size());
+  BakeDonorSize donor_size;
+  for(const auto object:source_ids){
+    auto donor=capture_bake_donor(scene,scene.object(object),target_inverse,bool(target_placement),
+        metric_from_world,bake_origin,multiple,retained_pose,absolute_emission&&!recipient);
+    if(!separate&&donor.requires_colors)
+      throw std::logic_error("Enable PBR color preparation to retain the source's vertex colors");
+    if(multiple)donor_size.add(donor.source);
+    captured.push_back(std::move(donor));
   }
-  std::vector<Tangent> placed_corners;
-  if(placement&&!source_normals&&std::any_of(high.materials.begin(),high.materials.end(),[](const auto &field){
-       return field.maps&&!field.maps->polygon_surface&&!field.maps->normal.rgba.empty();
-      })){
-    placed_corners=tangent_corners(high.mesh,cancelled);
-    for(size_t i=0;i<placed_corners.size();++i){
-      if((i&1023)==0)check();
-      auto t=detail::placed_tangent(*placement,placed_corners[i]);
-      const auto rotated=ob::rotate(relative.orientation,{t[0],t[1],t[2]});
-      placed_corners[i]={rotated.x,rotated.y,rotated.z,t[3]};
-    }
-  }
-  AffineVector bake_origin{};
-  if(placement||target_placement){
-    // Keep original triangle and corner identities even under reflection.
-    // The Bake hit keeps its source barycentrics and tests effective winding.
-    auto source_to_bake=placement?affine_similarity(target_inverse)*placement->world():affine_similarity(relative);
-    if(!target_placement){
-      // Keep the float ray workspace near the donor. A large translation can
-      // collapse tiny but distinct isosurface triangles after rounding.
-      auto matrix=source_to_bake.matrix();
-      for(size_t axis=0;axis<3;++axis){
-        bake_origin[axis]=matrix[12+axis];
-        matrix[12+axis]=0;
-      }
-      source_to_bake=AffineTransform(matrix);
-    }
-    const auto transform=target_placement?metric_from_world*source_to_bake:source_to_bake;
-    std::optional<std::vector<Vec3>> source_positions;
-    if(placement&&source.mesh_active&&source.appearance&&source.deformation&&source.deformation->skin){
-      // The retained mesh node and original joint graph can have different
-      // spaces. Use the same authenticated evaluation as the viewport, and
-      // center the result before converting the skin positions to float.
-      ObjectSurface surface;
-      surface.id=source.id;surface.transform=source.transform;surface.mesh=source.painted->mesh();
-      surface.deformation=source.deformation;surface.groups=scene.group_path(source.group);
-      surface.appearance=source.appearance;surface.affine_edit=source.affine_edit;surface.rig_source=source.rig_source;
-      auto matrix=affine_similarity(target_inverse).matrix();
-      for(size_t axis=0;axis<3;++axis)matrix[12+axis]-=bake_origin[axis];
-      const auto output_from_world=target_placement?metric_from_world:AffineTransform(matrix);
-      source_positions=detail::source_skin_world_positions(surface,cancelled,256u*1024u*1024u,&output_from_world);
-      if(source_positions)high.mesh.positions=std::move(*source_positions);
-    }
-    for(size_t i=0;i<high.mesh.positions.size();++i){
-      if((i&1023)==0)check();
-      if(!source_positions)
-        high.mesh.positions[i]=detail::affine_position(transform.point(detail::affine_vector(high.mesh.positions[i])));
-      const auto n=placement?detail::placed_normal(*placement,high.mesh.normals[i]):high.mesh.normals[i];
-      const auto rotated=ob::rotate(relative.orientation,{n.x,n.y,n.z});
-      high.mesh.normals[i]={rotated.x,rotated.y,rotated.z};
-    }
-  }else{
-    for (auto &p : high.mesh.positions) {
-      auto world = ob::transform(relative, {p.x,p.y,p.z});
-      p = {world.x,world.y,world.z};
-    }
-    for (auto &n : high.mesh.normals) {
-      auto world = ob::rotate(relative.orientation, {n.x,n.y,n.z});
-      n = {world.x,world.y,world.z};
-    }
-  }
-  const detail::SourceBakePlacement source_placement{placed_corners,
-      placement&&placement->orientation()==AffineOrientation::Reversing,bake_origin};
+  std::vector<detail::SourceBakeDomain> domains;
+  std::vector<detail::RetainedSourceBakeField> combined_fields;
+  std::optional<BakeSource> combined;
+  if(multiple)combined.emplace(combine_bake_donors(captured,donor_size,domains,combined_fields,check));
+  const auto &high=combined?*combined:captured.front().source;
+  const auto &source_fields=multiple?combined_fields:captured.front().fields;
+  const detail::SourceBakeNormalResolver no_normal;
+  const auto &source_normals=multiple?no_normal:captured.front().normals;
+  const detail::SourceBakePlacement source_placement{
+      multiple?std::span<const Tangent>{}:std::span<const Tangent>(captured.front().placed_corners),
+      !multiple&&captured.front().reverse_winding,bake_origin,domains};
+  const bool have_mtoon_source=std::ranges::any_of(captured,&CapturedBakeDonor::has_mtoon_normals);
   BakeOptions options;
   options.resolution = target.painted->resolution();
   options.front_distance = float(double(settings.front_mm) * .001 / double(target_world.scale));
@@ -666,7 +770,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   if(separate_normal_pass&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
   const bool paired_canonical=!recipient&&!prepared_normals&&target.appearance&&
       target.material_bindings&&target.material_bindings->has_mtoon&&target.painted->source_sampling_prepared()&&
-      ((source_normals&&source.material_bindings&&source.material_bindings->has_mtoon)||
+      (have_mtoon_source||
        (old_bake&&!old_bake->maps.mtoon_normal.rgba.empty()));
   auto result = native_attributes?detail::bake_mesh_native_attributes(low_mesh,high,options,
       source_normals,source_fields,source_placement,target_metric_corners,settings.corresponding_topology):
@@ -794,7 +898,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     painting=detail::install_source_bake(*painting,std::move(textures),source_options);
   }else painting->install_bake(std::move(textures));
   auto next = scene;
-  auto recipe=capture_bake_recipe(scene,source_id,settings);
+  auto recipe=multiple?capture_bake_recipe(scene,source_ids,settings):capture_bake_recipe(scene,source_id,settings);
   if(recipient){
     TextureSetLimits limits;limits.cancelled=cancelled;
     detail::stage_texture_set_bake(next.active(),target.texture_sets,*recipient,std::move(painting),std::move(recipe),limits,std::move(native_normal));
@@ -813,5 +917,9 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   static_assert(std::is_nothrow_move_assignable_v<Scene>);
   scene = std::move(next);
   return report;
+}
+ObjectBakeReport bake_object(Scene &scene,uint64_t source,ObjectBakeSettings settings,
+    const std::function<bool()> &cancelled,const std::function<void(float)> &progress){
+  return bake_objects(scene,std::span(&source,1),settings,cancelled,progress);
 }
 } // namespace dome

@@ -78,6 +78,7 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
   if(bake_admission){
     static_assert(std::is_nothrow_copy_assignable_v<ObjectBakeSettings>);
     state_.bake_source=bake_admission->source;
+    state_.bake_donors=std::move(bake_admission->donors);
     state_.bake_settings=bake_admission->settings;
   }
   if(skin_admission){

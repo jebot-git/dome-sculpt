@@ -3,7 +3,9 @@
 #include "bake-settings.hpp"
 #include <memory>
 #include <optional>
+#include <span>
 #include <string>
+#include <vector>
 #include <nlohmann/json_fwd.hpp>
 namespace dome {
 // Scene IDs are strictly less than UINT64_MAX. Missing dependencies retain an
@@ -18,6 +20,7 @@ struct ObjectBakeRecipe {
   BakeObjectReference source;
   std::optional<BakeObjectReference> cage;
   ObjectBakeSettings settings;
+  std::vector<BakeObjectReference> additional_sources;
   void validate()const;
   nlohmann::json encode()const;
   static std::shared_ptr<const ObjectBakeRecipe> decode(const nlohmann::json &);
@@ -25,4 +28,6 @@ struct ObjectBakeRecipe {
 class Scene;
 std::shared_ptr<const ObjectBakeRecipe> capture_bake_recipe(
     const Scene &,uint64_t source,const ObjectBakeSettings &);
+std::shared_ptr<const ObjectBakeRecipe> capture_bake_recipe(
+    const Scene &,std::span<const uint64_t> sources,const ObjectBakeSettings &);
 } // namespace dome

@@ -19,4 +19,8 @@ struct ObjectBakeReport {
 ObjectBakeReport bake_object(Scene &, uint64_t source, ObjectBakeSettings = {},
                               const std::function<bool()> &cancelled = {},
                               const std::function<void(float)> &progress = {});
+// Project an ordered group of source objects in the same ray workspace.
+ObjectBakeReport bake_objects(Scene &, std::span<const uint64_t> sources, ObjectBakeSettings = {},
+                              const std::function<bool()> &cancelled = {},
+                              const std::function<void(float)> &progress = {});
 } // namespace dome

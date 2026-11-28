@@ -2,6 +2,7 @@
 #include "canonical-paint-native.hpp"
 #include "dome/bake-distance.hpp"
 #include "dome/bake-recipe.hpp"
+#include "bake-source-choice.hpp"
 #include "paint-overlay-packet.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "emission-export.hpp"
@@ -720,6 +721,9 @@ void Document::publish_locked(bool force,bool checkpoint) {
   const auto recipe=selected_field?selected_field->bake_recipe:active.bake_recipe;
   if(state_.bake_settings_object!=active.id||state_.active_texture_set!=field_id||
       state_.bake_recipe!=recipe){
+    state_.bake_saved_donors=recipe&&!recipe->additional_sources.empty()?
+        detail::recipe_bake_donors(*recipe):std::vector<uint64_t>{};
+    state_.bake_donors=state_.bake_saved_donors;
     if(recipe){
       state_.bake_source=recipe->source.object;
       state_.bake_settings=recipe->settings;
@@ -736,6 +740,13 @@ void Document::publish_locked(bool force,bool checkpoint) {
   }
   state_.bake_sources = bake_sources_locked();
   state_.bake_cages = bake_cages_locked();
+  state_.bake_selected_donors.clear();
+  if(state_.selected_objects.size()>2&&!state_.bake_sources.empty()){
+    for(const auto id:state_.selected_objects)
+      if(id!=active.id)state_.bake_selected_donors.push_back(id);
+    if(state_.bake_selected_donors.size()<2||!bake_donors_ready_locked(state_.bake_selected_donors))
+      state_.bake_selected_donors.clear();
+  }
   if(std::find(state_.bake_sources.begin(),state_.bake_sources.end(),state_.bake_source)==state_.bake_sources.end())
     state_.bake_source=state_.bake_sources.empty()?0:state_.bake_sources.front();
   state_.can_bake=!state_.object_grabbing && bake_target_ready_locked() && !state_.bake_sources.empty();
@@ -2498,14 +2509,19 @@ void Document::finish_control_locked(bool accept) {
         if(controls.components!=2||!std::isfinite(controls.value[0])||!std::isfinite(controls.value[1])||
             controls.value[0]<0||controls.value[0]>1||controls.value[1]<0||controls.value[1]>1)
           throw std::invalid_argument("Invalid source and cage controls");
-        auto ids=bake_sources_locked(),cages=bake_cages_locked();
-        if(ids.empty())return; // Conversion-only legacy project: Done changes no bake binding.
-        const auto source=ids.at(size_t(std::lround(controls.value[0]*float(ids.size()-1))));
+        const auto count=detail::bake_source_choice_count(state_);
+        if(!count)return; // Conversion-only legacy project: Done changes no bake binding.
+        const auto donors=detail::bake_source_choice(state_,size_t(std::lround(controls.value[0]*float(count-1))));
+        const auto source=donors.front();
+        std::vector<uint64_t> group;
+        if(donors.size()>1)group.assign(donors.begin(),donors.end());
+        const auto cages=bake_cages_locked();
         const auto cage=cages.at(size_t(std::lround(controls.value[1]*float(cages.size()-1))));
         Transaction transaction(*this);
         if(controls.bake_preset)state_.bake_settings=controls.bake_preset->settings;
-        state_.bake_source=source;state_.bake_settings.cage_object=cage;
-        if(cage)state_.bake_settings.corresponding_topology=false;
+        state_.bake_source=source;state_.bake_donors=std::move(group);
+        state_.bake_settings.cage_object=cage;
+        if(cage||!state_.bake_donors.empty())state_.bake_settings.corresponding_topology=false;
         publish_locked(false,false);transaction.commit(false);
       }
     }catch(...){control_before_=std::move(before);state_.controls=std::move(controls);input_.resume_control(VrParameter::BakeSource);throw;}
@@ -2630,6 +2646,8 @@ void Document::finish_control_locked(bool accept) {
       else if(c.parameter==VrParameter::BakeProjection){
         state_.bake_settings.allow_partial=c.value[0]>=.5f;
         state_.bake_settings.allow_backfaces=c.value[1]>=.5f;
+        if(c.value[2]>=.5f&&!state_.bake_donors.empty())
+          throw std::invalid_argument("Matching source triangles requires exactly one Bake source");
         state_.bake_settings.corresponding_topology=c.value[2]>=.5f;
         if(state_.bake_settings.corresponding_topology)state_.bake_settings.cage_object=0;
       }
@@ -2854,12 +2872,13 @@ void Document::control_event_locked(VrControlEvent event) {
       c.title = "Retopology projection distance (mm)";
       c.minimum = 1; c.maximum = 200; c.logarithmic = true; c.value[0] = retopo_snap_mm_; break;
     case VrParameter::BakeSource: {
-      auto ids=bake_sources_locked(),cages=bake_cages_locked();
-      c.title=o.texture_sets?"Bake source / cage - "+text::utf8_prefix(active_texture_set(o).name,32):
-          "Bake source / editable cage (hidden meshes allowed)";
+      const auto count=detail::bake_source_choice_count(state_);
+      auto cages=bake_cages_locked();
+      c.title=o.texture_sets?"Bake sources / cage - "+text::utf8_prefix(active_texture_set(o).name,32):
+          "Bake sources / editable cage";
       c.components=2;
-      auto found=std::find(ids.begin(),ids.end(),state_.bake_source);
-      c.value[0]=ids.size()<2||found==ids.end()?0:float(found-ids.begin())/float(ids.size()-1);
+      const auto found=detail::bake_source_choice_index(state_,detail::current_bake_donors(state_));
+      c.value[0]=count<2||found==count?0:float(found)/float(count-1);
       auto cage=std::find(cages.begin(),cages.end(),state_.bake_settings.cage_object);
       c.value[1]=cages.size()<2||cage==cages.end()?0:float(cage-cages.begin())/float(cages.size()-1);break;
     }
@@ -3032,12 +3051,13 @@ void Document::control_event_locked(VrControlEvent event) {
     require_authority_locked(control_source_);
     if(control_source_.generation!=state_.generation||control_source_.revision!=state_.revision||control_source_.object!=scene_.active().id)
       throw std::logic_error("Bake recipe target changed; reopen controls");
-    const auto sources=bake_sources_locked(),cages=bake_cages_locked();
-    const auto source=std::find(sources.begin(),sources.end(),recipe->source.object);
+    const auto count=detail::bake_source_choice_count(state_);
+    const auto source=detail::bake_source_choice_index(state_,detail::recipe_bake_donors(*recipe));
+    const auto cages=bake_cages_locked();
     const auto cage=std::find(cages.begin(),cages.end(),recipe->settings.cage_object);
-    if(source==sources.end()||cage==cages.end())throw std::logic_error("Saved bake dependency is unavailable; select its replacement");
+    if(source==count||cage==cages.end())throw std::logic_error("Saved bake dependency is unavailable; select its replacement");
     Transaction transaction(*this);
-    c.bake_preset=recipe;c.title="Source / cage - recipe staged";c.value[0]=sources.size()<2?0:float(source-sources.begin())/float(sources.size()-1);
+    c.bake_preset=recipe;c.title="Sources / cage - recipe staged";c.value[0]=count<2?0:float(source)/float(count-1);
     c.value[1]=cages.size()<2?0:float(cage-cages.begin())/float(cages.size()-1);
     publish_locked(false,false);transaction.commit(false);return;
   }
@@ -3359,7 +3379,9 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
     if (command == SpatialCommand::Redo) return !retopo_stroking_ && state_.retopology->can_redo;
     return false;
   }
-  if(command==SpatialCommand::BakeSurface)return !control_before_ && bake_source_eligible_locked(state_.bake_source) && state_.bake_settings.cage_object!=unavailable_bake_object && bake_target_ready_locked();
+  if(command==SpatialCommand::BakeSurface)return !control_before_ && bake_target_ready_locked() &&
+      bake_donors_ready_locked(detail::current_bake_donors(state_)) &&
+      state_.bake_settings.cage_object!=unavailable_bake_object;
   if(command==SpatialCommand::ClearBake)return !control_before_ && bake_target_ready_locked() && detail::texture_set_bake_present(active_texture_set(scene_.active()));
   if(command==SpatialCommand::BindSkin) return !control_before_ && skin_target_ready_locked() &&
     !skin_sources_locked(state_.skin_options.mode).empty() &&
@@ -3606,7 +3628,7 @@ void Document::command_locked(SpatialCommand command) {
     return;
   }
   if(command==SpatialCommand::CancelWork){cancel_background_work_locked();return;}
-  if(command==SpatialCommand::BakeSurface){if(command_enabled_locked(command))queue_bake_locked(state_.bake_source,state_.bake_settings);return;}
+  if(command==SpatialCommand::BakeSurface){if(command_enabled_locked(command))queue_bake_locked(detail::current_bake_donors(state_),state_.bake_settings);return;}
   if(command==SpatialCommand::ClearBake){if(command_enabled_locked(command))queue_clear_bake_locked();return;}
   if(command==SpatialCommand::BindSkin) {
     if(command_enabled_locked(command)) {

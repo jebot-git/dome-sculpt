@@ -121,6 +121,7 @@ struct EditorState {
   float asset_progress = 0;
   uint64_t bake_source = 0;
   std::vector<uint64_t> bake_sources;
+  std::vector<uint64_t> bake_donors, bake_saved_donors, bake_selected_donors;
   std::vector<uint64_t> bake_cages; // First entry0 = normal-offset projection.
   std::vector<uint64_t> bake_mask_layers; // First 0 = whole field, then paint layers and unavailable saved IDs.
   ObjectBakeSettings bake_settings;
@@ -366,6 +367,7 @@ public:
   void remesh_to_sculpt(float world_voxel_mm, AssetSource expected = {});
   void remesh_to_triangles(float world_edge_mm, AssetSource expected = {});
   void bake_from_object(uint64_t source, ObjectBakeSettings = {}, AssetSource expected = {});
+  void bake_from_objects(std::span<const uint64_t> sources, ObjectBakeSettings = {}, AssetSource expected = {});
   void clear_bake(AssetSource expected = {});
   void convert_baked_normals(AssetSource expected = {});
   void cancel_asset_work();
@@ -931,7 +933,7 @@ private:
                              std::shared_ptr<std::string>);
   // Configuration belongs to the same accepted publication as its Bake job.
   // POD metadata only; no callback or permission to alter arbitrary scene data.
-  struct BakeAdmission { uint64_t source=0; ObjectBakeSettings settings; };
+  struct BakeAdmission { uint64_t source=0; ObjectBakeSettings settings; std::vector<uint64_t> donors; };
   struct SkinAdmission {
     SkinAuthoringOptions options;
     std::vector<uint8_t> locks;
@@ -955,7 +957,8 @@ private:
   bool bake_source_eligible_locked(uint64_t) const;
   std::vector<uint64_t> bake_cages_locked() const;
   bool bake_target_ready_locked() const;
-  void queue_bake_locked(uint64_t, ObjectBakeSettings, AssetSource = {});
+  bool bake_donors_ready_locked(std::span<const uint64_t>) const;
+  void queue_bake_locked(std::span<const uint64_t>, ObjectBakeSettings, AssetSource = {});
   void queue_clear_bake_locked(AssetSource = {});
   bool canonical_conversion_ready_locked() const;
   void queue_convert_bake_locked(AssetSource = {});

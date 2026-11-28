@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "bake-editor.hpp"
+#include "bake-source-choice.hpp"
 #include "dome/texture-sets.hpp"
 #include "dome/bake-recipe.hpp"
 #include "dome/material-bindings.hpp"
@@ -63,13 +64,12 @@ void edit_bake_dialog(Document &doc){
   hint.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);
   int label=std::min(width/2,dx::size*15),y=header;
   Fl_Choice source(label,y,width-label-40,row-6,"Source");y+=row;
-  std::vector<std::string> names;std::vector<Fl_Menu_Item> choices;std::vector<uint64_t> ids=state->bake_sources;
-  size_t selected=0;
-  for(size_t i=0;i<ids.size();++i){
-    const auto o=std::find_if(draft.scene.objects().begin(),draft.scene.objects().end(),[&](const auto &v){return v.id==ids[i];});
-    names.push_back(o==draft.scene.objects().end()?"Unavailable source - reselect":o->name+(o->visible?"":" [hidden]"));
-    if(ids[i]==state->bake_source)selected=i;
-  }
+  source.tooltip("Select donors in the object hierarchy and make the target active last to use Selected objects.");
+  std::vector<std::string> names;std::vector<Fl_Menu_Item> choices;
+  const auto source_count=detail::bake_source_choice_count(*state);
+  const auto current=detail::bake_source_choice_index(*state,detail::current_bake_donors(*state));
+  for(size_t i=0;i<source_count;++i)names.push_back(detail::bake_source_choice_label(*state,i));
+  const auto selected=current==source_count?0:current;
   for(auto &name:names){Fl_Menu_Item item{};item.label(name.c_str());choices.push_back(item);}choices.emplace_back();source.copy(choices.data());source.value(int(selected));
   Fl_Choice cage(label,y,width-label-40,row-6,"Cage mesh");y+=row;
   std::vector<uint64_t> cage_ids=state->bake_cages;
@@ -130,16 +130,16 @@ void edit_bake_dialog(Document &doc){
   Fl_Box status(16,y,width-48,row*2);status.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);y+=row*2;
   content.size(width-24,y);content.end();scroll.end();
   Fl_Button close(24,height-row*2+8,width/2-36,row,"Cancel"),bake(width/2+12,height-row*2+8,width/2-36,row,"Bake");
-  struct Run {Document *doc;Fl_Window *window;Fl_Choice *source,*cage,*mask;std::array<BakeSlider*,7> fields;const std::vector<uint64_t>*ids,*cage_ids,*mask_ids;AssetSource *expected;Fl_Check_Button *partial,*backfaces,*corresponding,*sampling,*colors,*normals;std::shared_ptr<const ObjectBakeRecipe> recipe;bool running=false,ever_ran=false;} run{&doc,&window,&source,&cage,&mask,sliders,&ids,&cage_ids,&mask_ids,&expected,&partial,&backfaces,&corresponding,&sampling,&colors,&normals,state->bake_recipe};
+  struct Run {Document *doc;Fl_Window *window;Fl_Choice *source,*cage,*mask;std::array<BakeSlider*,7> fields;const EditorState *state;const std::vector<uint64_t>*cage_ids,*mask_ids;AssetSource *expected;Fl_Check_Button *partial,*backfaces,*corresponding,*sampling,*colors,*normals;std::shared_ptr<const ObjectBakeRecipe> recipe;bool running=false,ever_ran=false;} run{&doc,&window,&source,&cage,&mask,sliders,state.get(),&cage_ids,&mask_ids,&expected,&partial,&backfaces,&corresponding,&sampling,&colors,&normals,state->bake_recipe};
   recall.callback([](Fl_Widget*,void *p){auto &r=*static_cast<Run*>(p);try{
     if(!r.recipe)throw std::logic_error("No successful bake has been saved for this target");
     r.recipe->validate();const auto &v=r.recipe->settings;
-    auto source=std::find(r.ids->begin(),r.ids->end(),r.recipe->source.object);
+    const auto source=detail::bake_source_choice_index(*r.state,detail::recipe_bake_donors(*r.recipe));
     auto cage=std::find(r.cage_ids->begin(),r.cage_ids->end(),v.cage_object);
     auto mask=std::ranges::find(*r.mask_ids,v.mask_layer);
-    if(source==r.ids->end()||cage==r.cage_ids->end()||mask==r.mask_ids->end())
+    if(source==detail::bake_source_choice_count(*r.state)||cage==r.cage_ids->end()||mask==r.mask_ids->end())
       throw std::logic_error("Saved bake dependencies changed; reopen the options");
-    r.source->value(int(source-r.ids->begin()));r.cage->value(int(cage-r.cage_ids->begin()));
+    r.source->value(int(source));r.cage->value(int(cage-r.cage_ids->begin()));
     r.mask->value(int(mask-r.mask_ids->begin()));
     const double values[]{v.front_mm,v.back_mm,v.ao_distance_mm,double(v.ao_samples),double(v.padding),v.color_error,v.normal_error*57.29577951308232};
     for(size_t i=0;i<r.fields.size();++i){r.fields[i]->physical(values[i]);r.fields[i]->redraw();}
@@ -160,7 +160,8 @@ void edit_bake_dialog(Document &doc){
     if(s.mask_layer&&(s.prepare_colors||s.prepare_normals))
       throw std::invalid_argument("Choose Whole field for color or normal preparation, or turn off preparation for masked Bake");
     if(!s.corresponding_topology)s.cage_object=r.cage_ids->at(size_t(r.cage->value()));
-    r.doc->bake_from_object(r.ids->at(size_t(r.source->value())),s,*r.expected);r.running=r.ever_ran=true;
+    r.doc->bake_from_objects(detail::bake_source_choice(*r.state,size_t(r.source->value())),s,*r.expected);
+    r.running=r.ever_ran=true;
   }catch(const std::exception&e){r.doc->report_error(e.what());}},&run);
   window.end();window.set_modal();dx::style(&window);window.show();close.take_focus();
   while(window.shown()){
@@ -173,11 +174,13 @@ void edit_bake_dialog(Document &doc){
     }
     if(s->active_object!=target || s->generation!=expected.generation){window.hide();break;}
     if(run.running){normals.deactivate();colors.deactivate();partial.deactivate();backfaces.deactivate();corresponding.deactivate();sampling.deactivate();source.deactivate();cage.deactivate();mask.deactivate();for(auto f:sliders)f->deactivate();bake.deactivate();if(work.cancellable)close.activate();else close.deactivate();close.copy_label(work.cancelling?"Cancelling...":"Cancel bake");progress.value(std::min(99.f,work.progress*100));}
-    else {partial.activate();backfaces.activate();corresponding.activate();sampling.activate();source.activate();mask.activate();
+    else {partial.activate();backfaces.activate();sampling.activate();source.activate();mask.activate();
+      const auto donors=detail::bake_source_choice(*state,size_t(source.value()));
+      if(donors.size()>1){corresponding.value(0);corresponding.deactivate();}else corresponding.activate();
       if(corresponding.value())cage.deactivate();else cage.activate();bake.activate();
       for(size_t i=0;i<(existing_basis?5:sliders.size());++i)sliders[i]->activate();
       if(!existing_basis){colors.activate();normals.activate();}
-      if(ids.at(size_t(source.value()))==unavailable_bake_object||
+      if(donors.empty()||detail::missing_bake_donor(donors)||
          (!corresponding.value()&&cage_ids.at(size_t(cage.value()))==unavailable_bake_object)||
          size_t(mask.value())>state->paint_layers.size())bake.deactivate();
       close.activate();close.copy_label(run.ever_ran?"Close":"Cancel");if(run.ever_ran && s->error.empty() && s->message.find("complete")!=std::string::npos)progress.value(100);}

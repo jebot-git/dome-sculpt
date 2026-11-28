@@ -10,6 +10,7 @@
 #include <bit>
 #include "polygon-conversion.hpp"
 #include "dome/shapekey-authoring.hpp"
+#include "dome/source-maps.hpp"
 #include "dome/texture-sets.hpp"
 #include "texture-set-paint-access.hpp"
 
@@ -99,6 +100,136 @@ void bake_mask_regression(const std::filesystem::path &out){
       "A deleted mask layer never rebinds to a newly created layer with the same name");
   auto bad=direct.active().bake_recipe->encode();bad["settings"]["mask_layer"]=0;
   require_cage(rejected_cage([&]{ObjectBakeRecipe::decode(bad);}),"A masked recipe requires a real nonzero layer identity");
+}
+
+Scene grouped_bake_scene(){
+  Scene scene;
+  const auto target=scene.active().id;
+  auto place=[&](uint64_t id,Mesh mesh){
+    auto &object=scene.object(id);
+    object.mesh_active=true;
+    object.painted=std::make_shared<PaintedMesh>(std::move(mesh),64);
+  };
+  place(target,cage_quad(-.01f,.01f,-.01f,.01f,0));
+  const auto rear=scene.add("Rear red donor",Volume{});
+  place(rear,cage_quad(-.011f,.011f,-.011f,.011f,.012f));
+  scene.object(rear).visible=false;
+  scene.object(rear).material.color={1,0,0,1};
+  scene.object(rear).material.emissive={4,2,.5f};
+  const auto front=scene.add("Reflected green donor",Volume{});
+  place(front,cage_quad(-.011f,0,-.011f,.011f,.021f));
+  auto reflected=AffineTransform{}.matrix();
+  reflected[0]=-1;
+  scene.object(front).affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(reflected));
+  scene.object(front).material.color={0,1,0,1};
+  scene.select(target);
+  return scene;
+}
+
+ObjectBakeSettings grouped_bake_settings(){
+  auto settings=cage_settings(0);
+  settings.front_mm=35;
+  settings.back_mm=0;
+  settings.ao_distance_mm=0;
+  settings.supersample=true;
+  return settings;
+}
+
+void bake_group_regression(const std::filesystem::path &out){
+  auto input=grouped_bake_scene();
+  auto direct=input.snapshot();
+  const std::array<uint64_t,2> donors{2,3};
+  const auto settings=grouped_bake_settings();
+  const auto result=bake_objects(direct,donors,settings);
+  const auto &baked=*direct.active().painted->baked();
+  require_cage(result.projected==4096&&!result.missed&&result.rays==4*4096&&baked.emission_field&&
+      cage_sources(direct)==cage_sources(input),
+      "Two donors share one projection query per sample and preserve their complete native input");
+  bool exact=true;
+  for(size_t i=0;i<4096;++i){
+    const bool left=i%64<32;
+    const std::array<uint8_t,4> expected=left?std::array<uint8_t,4>{255,0,0,255}:std::array<uint8_t,4>{0,255,0,255};
+    const auto at=baked.maps.color.rgba.data()+4*i;
+    const auto emission=baked.emission_field->texel(i).resolve({},1);
+    exact&=std::ranges::equal(expected,std::span(at,4))&&
+        emission==(left?std::array<float,3>{4,2,.5f}:std::array<float,3>{});
+  }
+  require_cage(exact,"The first surface from the envelope supplies its own color and FLOAT radiance across reflected overlap");
+  auto texture_source=input.snapshot();
+  auto &textured=texture_source.object(3);
+  auto originals=std::make_shared<PaintSourceMaps>();
+  originals->color.image=std::make_shared<const Image>(Image{2,1,{0,255,0,255,0,0,255,255}});
+  originals->color.texcoord=1;
+  originals->color.min_filter=originals->color.mag_filter=9728;
+  originals->uv1=std::make_shared<const std::vector<std::array<float,2>>>(
+      std::initializer_list<std::array<float,2>>{{0,.5f},{0,.5f},{1,.5f},{1,.5f}});
+  textured.affine_edit.reset();
+  textured.material.color={1,1,1,1};
+  textured.painted=PaintedMesh::from_maps(cage_quad(0,.011f,-.011f,.011f,.021f),originals,64);
+  const auto textured_sources=cage_sources(texture_source);
+  const auto textured_result=bake_objects(texture_source,donors,settings);
+  const auto &textured_bake=*texture_source.active().painted->baked();
+  const auto &pixels=textured_bake.maps.color.rgba;
+  auto color_at=[&](size_t x,size_t y){return std::span(pixels).subspan(4*(y*64+x),4);};
+  require_cage(!textured_result.missed&&cage_sources(texture_source)==textured_sources&&
+      std::ranges::equal(color_at(48,8),std::array<uint8_t,4>{0,255,0,255})&&
+      std::ranges::equal(color_at(48,56),std::array<uint8_t,4>{0,0,255,255})&&
+      std::ranges::equal(color_at(8,56),std::array<uint8_t,4>{255,0,0,255}),
+      "The second donor uses its original UV1 and device sampler while the first keeps its independent material");
+  auto shaded=input.snapshot();
+  auto solo=input.snapshot();
+  auto ao=settings;
+  ao.supersample=false;
+  ao.ao_samples=16;
+  ao.ao_distance_mm=30;
+  const auto shaded_report=bake_objects(shaded,donors,ao);
+  bake_object(solo,donors.front(),ao);
+  const auto &shaded_orm=shaded.active().painted->baked()->maps.metal_rough.rgba;
+  const auto &solo_orm=solo.active().painted->baked()->maps.metal_rough.rgba;
+  const size_t near_edge=4*(32*64+30);
+  require_cage(shaded_report.rays==4096*17&&shaded_orm[near_edge]<solo_orm[near_edge]&&
+      solo_orm[near_edge]==255&&shaded_orm[near_edge+1]==solo_orm[near_edge+1],
+      "An adjacent donor occludes a hit on the rear surface while leaving roughness unchanged");
+  const auto &recipe=*direct.active().bake_recipe;
+  const auto wire=recipe.encode();
+  require_cage(wire["version"]==5&&recipe.source.object==2&&recipe.additional_sources.size()==1&&
+      recipe.additional_sources.front().object==3&&ObjectBakeRecipe::decode(wire)->encode()==wire,
+      "Plural recipes preserve ordered live and original source identities");
+  auto malformed=wire;
+  malformed["additional_sources"][0]=malformed["source"];
+  require_cage(rejected_cage([&]{ObjectBakeRecipe::decode(malformed);}),"The codec refuses a duplicate donor");
+  auto bad=settings;bad.corresponding_topology=true;
+  const auto unchanged=input.encode();
+  require_cage(rejected_cage([&]{bake_objects(input,donors,bad);})&&input.encode()==unchanged,
+      "A plural group cannot use matching triangles");
+  auto appended=append_native_scene(Scene{},direct);
+  const auto &rebased=*appended.scene.active().bake_recipe;
+  require_cage(rebased.source.object==appended.objects.at(1)&&
+      rebased.additional_sources[0].object==appended.objects.at(2)&&rebased.additional_sources[0].original_object==3,
+      "Append rebases all donor IDs together and preserves original provenance");
+  auto missing=direct.snapshot();
+  missing.erase(3);
+  const auto &removed=missing.active().bake_recipe->additional_sources[0];
+  require_cage(removed.object==unavailable_bake_object&&removed.original_object==3&&removed.name=="Reflected green donor",
+      "Deleting a donor leaves its exact unavailable recipe reference");
+  const auto file=out/"grouped.dsculpt";
+  Document doc;doc.replace(input);ready_cage(doc);
+  const std::array<uint64_t,3> selected{2,3,input.active().id};
+  doc.select_objects(selected,ObjectSelection::Replace);
+  require_cage(doc.frame().state->active_object==input.active().id&&
+      std::ranges::equal(doc.frame().state->bake_selected_donors,donors),
+      "The hierarchy's active target stays separate from its ordered donor selection");
+  doc.bake_from_objects(donors,settings);
+  doc.save_async(file).get();ready_cage(doc);
+  const auto endpoint=direct.encode();
+  require_cage(Scene::load(file).encode()==endpoint&&doc.copy_scene().encode()==endpoint&&
+      doc.undo()&&doc.copy_scene().encode()==unchanged&&doc.redo()&&doc.copy_scene().encode()==endpoint,
+      "Plural Bake, ordered Save and Undo/Redo reproduce the complete native scene");
+  doc.replace(std::move(missing));ready_cage(doc);
+  const std::array<uint64_t,2> unavailable{2,unavailable_bake_object};
+  require_cage(std::ranges::equal(doc.frame().state->bake_saved_donors,unavailable)&&
+      rejected_cage([&]{doc.bake_from_objects(unavailable,settings);}),
+      "Reopening an incomplete source group leaves it visibly unavailable and rejects partial rebinding");
 }
 
 Mesh material_quads(float height) {
@@ -248,6 +379,15 @@ void texture_set_bake(const std::filesystem::path &output) {
 } // namespace
 
 int main(int argc,char **argv)try{
+  if(argc==4&&std::string_view(argv[1])=="--ui-group-fixture"){
+    auto scene=grouped_bake_scene();
+    const std::array<uint64_t,2> donors{2,3};
+    bake_objects(scene,donors,grouped_bake_settings());
+    scene.save(argv[3]);
+    scene.active().painted->clear_bake();
+    scene.save(argv[2]);
+    return 0;
+  }
   if(argc==3&&std::string_view(argv[1])=="--texture-set-bake"){
     texture_set_bake(argv[2]);return 0;
   }
@@ -316,6 +456,7 @@ int main(int argc,char **argv)try{
   }
   const auto out=std::filesystem::path(argc>1?argv[1]:"bake-recipes");std::filesystem::create_directories(out);
   bake_mask_regression(out);
+  bake_group_regression(out);
   auto scene=cage_scene();const auto source=scene.object(2).painted,cage=scene.object(3).painted;
   const auto options=cage_settings();bake_object(scene,2,options);
   const auto recipe=scene.active().bake_recipe;

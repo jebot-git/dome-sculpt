@@ -1,7 +1,7 @@
 # Saved bake recipes
 
 Each target now retains its last successful bake settings and the explicitly
-chosen source and optional editable cage. Opening a native project restores
+chosen sources and optional editable cage. Opening a native project restores
 those settings. **Use last bake** in the existing desktop dialog and **Recall
 last bake** in the XR Source / cage panel restore a local draft. Cancel discards
 the draft; Done accepts settings without starting a bake or adding document
@@ -22,6 +22,26 @@ recipes retain their previous format and byte-identical output in the recorded
 legacy fixtures. The published Scene29 readers explicitly reject Scene30;
 opening a new recipe-bearing project with an older binary is unsupported.
 The C++ object/control layouts change and require coherent consumer rebuilds.
+
+## Project from several source objects
+
+On desktop, make the target active, open **Scene → Select objects**, and check
+the target and each donor. In XR, add the donors to the hierarchy selection and
+make the target the last object added. Open **Bake surface** on desktop or
+**Bake sources / cage** in XR and choose **Selected objects (N)**. The target
+stays editable while donor objects can be hidden or locked.
+
+Each pass uses one combined GPU intersection surface for projection and AO.
+The first hit from the projection envelope contributes its own material, UVs,
+normals, and emission. The list is ordered and each donor retains its original
+corner identities. Existing cage, mask, partial coverage and sampling settings
+apply to the target. **Match source triangles** is available for a single donor.
+
+Recipe version 5 stores the ordered group and preserves the existing recipe
+format for single donors. **Use last bake** on desktop and **Recall last bake**
+in XR restore the saved group even after the object selection changes. If a
+donor has been removed, select the replacement group explicitly. Bake publishes
+the result and its recipe in one Undo step.
 
 ## Limit Bake with a paint-layer mask
 
@@ -167,7 +187,6 @@ application/archive/SDK/evidence hashes, actual commands, original negatives and
 per-profile scope. CMake configuration registers the native recipe, persistent
 fault and loader tests; registration alone is not an execution result.
 
-Multi-source recipes, broader deformations and portable tangent emission
-remain required. Every unfinished original and additional goal row and the
-later controller-drawer phase remain active. No system installation, headset
-launch or active-session restart occurred.
+Broader deformation and portable tangent emission workflows remain required.
+The unfinished original and additional goal rows and the later controller
+drawers remain active.

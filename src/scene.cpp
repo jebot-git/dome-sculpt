@@ -441,9 +441,12 @@ void Scene::validate(bool deep_sources) const {
   }
   auto recipe_references=[&](const std::shared_ptr<const ObjectBakeRecipe> &recipe,uint64_t target){
     if(!recipe)return;recipe->validate();
-    for(const auto ref:{recipe->source.object,recipe->settings.cage_object})
+    auto check_ref=[&](uint64_t ref){
       if(ref&&ref!=unavailable_bake_object&&(!ids.contains(ref)||(target&&ref==target)))
         throw std::invalid_argument("Bake recipe has a missing or self live reference");
+    };
+    check_ref(recipe->source.object);check_ref(recipe->settings.cage_object);
+    for(const auto &donor:recipe->additional_sources)check_ref(donor.object);
   };
   for(const auto &o:objects_){recipe_references(o.bake_recipe,o.id);if(o.texture_sets)for(const auto &set:o.texture_sets->additional())recipe_references(set.bake_recipe,o.id);}
   for(const auto &o:polygons.origins()){recipe_references(o->bake_recipe,0);if(o->texture_sets)for(const auto &set:o->texture_sets->additional())recipe_references(set.bake_recipe,0);}

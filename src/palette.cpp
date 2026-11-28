@@ -1,4 +1,5 @@
 #include "dome/bake-distance.hpp"
+#include "bake-source-choice.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Adapted from OpenBrush Native's BDF palette and texture renderer
 // (Apache-2.0).
@@ -350,12 +351,15 @@ void SpatialPalette::raster(const EditorState &s) {
       else if(c.parameter==VrParameter::SkinFalloff){char size[48];snprintf(size,sizeof(size),"Falloff %.2f",double(value));label=size;}
       else if(c.parameter==VrParameter::SkinInfluences)label="Max influences "+std::to_string(int(std::lround(value)));
       else if(c.parameter==VrParameter::BakeSource){
-        const auto &ids=row==0?s.bake_sources:s.bake_cages;
-        const auto index=size_t(std::clamp(std::lround(value*float(ids.empty()?0:ids.size()-1)),0l,long(ids.empty()?0:ids.size()-1)));
-        const auto id=ids.empty()?0:ids[index];
-        auto found=std::find_if(s.objects.begin(),s.objects.end(),[&](auto&o){return o.id==id;});
-        label=row==0?"Source: ":"Cage: ";
-        label+=row==1&&!id?"Normal offset":found==s.objects.end()?"Unavailable mesh":found->name+(found->visible?"":" [hidden]");
+        const auto count=row==0?detail::bake_source_choice_count(s):s.bake_cages.size();
+        const auto last=long(count?count-1:0);
+        const auto index=size_t(std::clamp(std::lround(value*float(last)),0l,last));
+        if(row==0)label="Source: "+detail::bake_source_choice_label(s,index);
+        else {
+          const auto id=count?s.bake_cages[index]:0;
+          const auto found=std::ranges::find(s.objects,id,&ObjectInfo::id);
+          label=std::string("Cage: ")+(!id?"Normal offset":found==s.objects.end()?"Unavailable mesh":found->name+(found->visible?"":" [hidden]"));
+        }
       }
       else if(c.parameter==VrParameter::BakeColors){if(row==0||row==2)label=std::string(row==0?"Prepare source colors: ":"Author portable normals: ")+(value>=.5f?"Yes":"No");else{char text[96];if(row==1)snprintf(text,sizeof(text),"Maximum color error %.3f",double(value));else snprintf(text,sizeof(text),"Rest normal error %.2f deg",double(value)*.25*57.29577951308232);label=text;}}
       else if(c.parameter==VrParameter::BakeProjection){
@@ -665,8 +669,8 @@ void SpatialPalette::raster(const EditorState &s) {
     text(320 * unit_, 310 * unit_, !r ? "Source retained on Apply" : r->committing ? "Applying patch..." : r->busy ? "Updating patch..."
          : std::to_string(r->selected.size()) + " selected / " + std::to_string(r->topology ? r->topology->faces().size() : 0) + " faces", fg);
   } else if(s.menu_page==12){
-    auto source=std::find_if(s.objects.begin(),s.objects.end(),[&](auto&o){return o.id==s.bake_source;});
-    text(320*unit_,285*unit_,source==s.objects.end()?"Choose a different source":source->name,fg);
+    const auto source=detail::bake_source_choice_index(s,detail::current_bake_donors(s));
+    text(320*unit_,285*unit_,detail::bake_source_choice_label(s,source),fg);
     auto cage=std::find_if(s.objects.begin(),s.objects.end(),[&](const auto &o){return o.id==s.bake_settings.cage_object;});
     const auto cage_label=!s.bake_settings.cage_object?std::string("Normal-offset projection"):"Cage: "+(cage==s.objects.end()?std::string("Unavailable - reselect"):cage->name);
     text(320*unit_,318*unit_,s.asset_busy?"Working "+std::to_string(std::min(99,int(s.asset_progress*100)))+"% / Cancel work":cage_label,fg);
@@ -704,7 +708,8 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
   std::string signature =
       s.font_file + std::to_string(s.font_pixels) +
       std::to_string(s.menu_index) + std::to_string(s.menu_page) +
-      std::to_string(s.bake_source)+":"+std::to_string(s.bake_settings.cage_object)+":"+std::to_string(s.asset_busy)+":"+std::to_string(int(s.asset_progress*100))+":"+
+      std::to_string(s.bake_source)+":"+detail::bake_source_choice_label(s,detail::bake_source_choice_index(s,detail::current_bake_donors(s)))+":"+
+      std::to_string(s.bake_settings.cage_object)+":"+std::to_string(s.asset_busy)+":"+std::to_string(int(s.asset_progress*100))+":"+
       std::to_string(s.skin_options.reference)+":"+std::to_string(int(s.skin_options.mode))+":"+std::to_string(s.skin_use_locks)+":"+
       std::to_string(s.rig_joint) + ":" + std::to_string(s.morph_target) + ":" +
       std::to_string(s.active_object) + std::to_string(s.revision) + s.message + std::to_string(s.recovery_selected) +

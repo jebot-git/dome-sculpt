@@ -7,6 +7,7 @@
 #include "text-utf8.hpp"
 #include <nlohmann/json.hpp>
 #include <cmath>
+#include <set>
 namespace dome {
 namespace {
 void reference(const BakeObjectReference &r){
@@ -31,6 +32,15 @@ BakeObjectReference decode_reference(const nlohmann::json &j){
 }
 void ObjectBakeRecipe::validate()const{
   reference(source);if(cage)reference(*cage);
+  if(additional_sources.size()>255||(settings.corresponding_topology&&!additional_sources.empty()))
+    throw std::invalid_argument("Invalid Bake recipe source group");
+  std::set<uint64_t> live;
+  if(!additional_sources.empty())live.insert(source.object);
+  for(const auto &donor:additional_sources){
+    reference(donor);
+    if(donor.object!=unavailable_bake_object&&!live.insert(donor.object).second)
+      throw std::invalid_argument("Duplicate Bake recipe source");
+  }
   if(settings.cage_object!=(cage?cage->object:0))
     throw std::invalid_argument("Bake recipe lost its explicit cage binding");
   if(settings.corresponding_topology&&cage)
@@ -48,7 +58,7 @@ void ObjectBakeRecipe::validate()const{
 }
 nlohmann::json ObjectBakeRecipe::encode()const{
   validate();const auto &s=settings;
-  const int version=s.mask_layer?4:s.supersample?3:s.corresponding_topology?2:1;
+  const int version=!additional_sources.empty()?5:s.mask_layer?4:s.supersample?3:s.corresponding_topology?2:1;
   nlohmann::json out={{"version",version},{"source",encode_reference(source)},
     {"cage",cage?nlohmann::json(encode_reference(*cage)):nlohmann::json(nullptr)},
     {"settings",{{"front_mm",s.front_mm},{"back_mm",s.back_mm},{"ao_distance_mm",s.ao_distance_mm},
@@ -58,19 +68,30 @@ nlohmann::json ObjectBakeRecipe::encode()const{
   if(s.corresponding_topology)out["settings"]["corresponding_topology"]=true;
   if(s.supersample)out["settings"]["supersample"]=true;
   if(s.mask_layer)out["settings"]["mask_layer"]=s.mask_layer;
+  if(version==5){
+    auto &sources=out["additional_sources"]=nlohmann::json::array();
+    for(const auto &donor:additional_sources)sources.push_back(encode_reference(donor));
+  }
   return out;
 }
 std::shared_ptr<const ObjectBakeRecipe> ObjectBakeRecipe::decode(const nlohmann::json &j){
-  if(!j.is_object()||j.size()!=4||!j.at("version").is_number_integer()||
-      (j.at("version")!=1&&j.at("version")!=2&&j.at("version")!=3&&j.at("version")!=4))
+  if(!j.is_object()||!j.at("version").is_number_integer()||j.at("version")<1||j.at("version")>5||
+      j.size()!=(j.at("version")==5?5:4))
     throw std::invalid_argument("Invalid bake recipe record");
   const auto version=j.at("version").get<int>();
   auto result=std::make_shared<ObjectBakeRecipe>();result->source=decode_reference(j.at("source"));
+  if(version==5){
+    const auto &sources=j.at("additional_sources");
+    if(!sources.is_array()||sources.empty()||sources.size()>255)
+      throw std::invalid_argument("Invalid Bake recipe source group");
+    for(const auto &donor:sources)result->additional_sources.push_back(decode_reference(donor));
+  }
   if(!j.at("cage").is_null())result->cage=decode_reference(j.at("cage"));
   const auto &v=j.at("settings");auto &s=result->settings;
   const bool corresponding=version==2||(version>=3&&v.contains("corresponding_topology"));
-  const bool supersampled=version==3||(version==4&&v.contains("supersample"));
-  if(!v.is_object()||v.size()!=11u+unsigned(corresponding)+unsigned(supersampled)+unsigned(version==4))
+  const bool supersampled=version==3||(version>=4&&v.contains("supersample"));
+  const bool masked=version==4||(version==5&&v.contains("mask_layer"));
+  if(!v.is_object()||v.size()!=11u+unsigned(corresponding)+unsigned(supersampled)+unsigned(masked))
     throw std::invalid_argument("Incomplete bake recipe settings");
   auto real=[&](const char *key){if(!v.at(key).is_number())throw std::invalid_argument("Invalid bake recipe scalar");return v.at(key).get<float>();};
   auto flag=[&](const char *key){if(!v.at(key).is_boolean())throw std::invalid_argument("Invalid bake recipe flag");return v.at(key).get<bool>();};
@@ -87,18 +108,25 @@ std::shared_ptr<const ObjectBakeRecipe> ObjectBakeRecipe::decode(const nlohmann:
     throw std::invalid_argument("Invalid four-sample bake recipe");
   s.corresponding_topology=corresponding;
   s.supersample=supersampled;
-  if(version==4){
+  if(masked){
     s.mask_layer=number(v.at("mask_layer"));
-    if(!s.mask_layer)throw std::invalid_argument("Version four Bake recipe needs a specific target mask layer");
+    if(!s.mask_layer)throw std::invalid_argument("Bake recipe needs a specific target mask layer");
   }
   s.cage_object=result->cage?result->cage->object:0;
   result->validate();return result;
 }
 std::shared_ptr<const ObjectBakeRecipe> capture_bake_recipe(const Scene &scene,
     uint64_t source,const ObjectBakeSettings &settings){
+  return capture_bake_recipe(scene,std::span(&source,1),settings);
+}
+std::shared_ptr<const ObjectBakeRecipe> capture_bake_recipe(const Scene &scene,
+    std::span<const uint64_t> sources,const ObjectBakeSettings &settings){
+  if(sources.empty()||sources.size()>256)throw std::invalid_argument("Invalid Bake recipe source count");
   auto result=std::make_shared<ObjectBakeRecipe>();
   auto capture=[&](uint64_t id){const auto &o=scene.object(id);return BakeObjectReference{id,id,o.name};};
-  result->source=capture(source);if(settings.cage_object)result->cage=capture(settings.cage_object);
+  result->source=capture(sources.front());
+  for(auto id:sources.subspan(1))result->additional_sources.push_back(capture(id));
+  if(settings.cage_object)result->cage=capture(settings.cage_object);
   result->settings=settings;result->validate();return result;
 }
 } // namespace dome

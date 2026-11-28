@@ -4244,6 +4244,13 @@ if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
     ${CMAKE_CURRENT_BINARY_DIR}/bake-mask-xr --mask)
   set_tests_properties(bake-mask-openxr PROPERTIES TIMEOUT 600
     ENVIRONMENT_MODIFICATION "LD_LIBRARY_PATH=path_list_prepend:$<TARGET_FILE_DIR:fltk::fltk-shared>")
+  add_test(NAME bake-group-openxr COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-recipes-xr.py
+    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    $<TARGET_FILE:dome-sculpt-bake-recipes-test>
+    ${CMAKE_CURRENT_BINARY_DIR}/bake-group-xr --group)
+  set_tests_properties(bake-group-openxr PROPERTIES TIMEOUT 600
+    ENVIRONMENT_MODIFICATION "LD_LIBRARY_PATH=path_list_prepend:$<TARGET_FILE_DIR:fltk::fltk-shared>")
   add_test(NAME texture-set-active-bake-openxr COMMAND ${Python3_EXECUTABLE}
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-recipes-xr.py
     $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>

@@ -3,6 +3,7 @@
 #include "dome/document.hpp"
 #include "dome/bake-recipe.hpp"
 #include "bake-mask.hpp"
+#include "bake-source-choice.hpp"
 #include "dome/polygon-scene.hpp"
 #include "texture-set-bake.hpp"
 #include "texture-set-stroke.hpp"
@@ -84,12 +85,26 @@ bool Document::bake_target_ready_locked() const {
     !state_.asset_busy && !state_.recovery_busy && !action_active_locked() &&
     object_editable_locked(o.id) && o.mesh_active && o.painted;
 }
-void Document::queue_bake_locked(uint64_t source,ObjectBakeSettings settings,AssetSource expected){
-  if(source==unavailable_bake_object||settings.cage_object==unavailable_bake_object)
+bool Document::bake_donors_ready_locked(std::span<const uint64_t> donors)const{
+  return !donors.empty()&&donors.size()<=256&&
+      std::ranges::all_of(donors,[&](auto id){return bake_source_eligible_locked(id);});
+}
+void Document::queue_bake_locked(std::span<const uint64_t> donors,ObjectBakeSettings settings,AssetSource expected){
+  if(detail::missing_bake_donor(donors)||settings.cage_object==unavailable_bake_object)
     throw std::logic_error("The saved bake source or cage is unavailable; select its replacement explicitly");
-  auto ids=bake_sources_locked();
-  if(!bake_target_ready_locked() || !bake_source_eligible_locked(source) || std::find(ids.begin(),ids.end(),source)==ids.end())
+  if(!bake_target_ready_locked() || !bake_donors_ready_locked(donors))
     throw std::logic_error("Choose a prepared, visible, unlocked target and a different nonempty source");
+  if(settings.corresponding_topology&&donors.size()!=1)
+    throw std::invalid_argument("Matching source triangles requires exactly one Bake source");
+  const auto source=donors.front();
+  std::vector<uint64_t> group;
+  if(donors.size()>1){
+    group.assign(donors.begin(),donors.end());
+    auto sorted=group;
+    std::ranges::sort(sorted);
+    if(std::ranges::adjacent_find(sorted)!=sorted.end())
+      throw std::invalid_argument("Choose distinct Bake sources");
+  }
   const auto &target=scene_.active();
   if(!detail::has_bake_mask_layer(*active_texture_set(target).painted,settings.mask_layer))
     throw std::invalid_argument("The saved Bake mask layer is unavailable; select another layer or Whole field");
@@ -100,17 +115,24 @@ void Document::queue_bake_locked(uint64_t source,ObjectBakeSettings settings,Ass
     throw std::invalid_argument("Bake uses the existing material and normal basis for this target");
   auto lease=target.texture_sets?detail::capture_texture_set_stroke(scene_,target.id):nullptr;
   auto report=std::make_shared<std::string>();auto work=std::make_shared<AssetWork>();
-  queue_scene_operation_locked("Bake surface",[source,settings,report,work](Scene &scene,const auto &cancelled){
-    auto result=bake_object(scene,source,settings,cancelled,[work](float p){work->progress.store(p);});
+  auto bake=[source,group,settings,report,work](Scene &scene,const auto &cancelled){
+    const auto progress=[work](float p){work->progress.store(p);};
+    auto result=group.empty()?bake_object(scene,source,settings,cancelled,progress):
+        bake_objects(scene,group,settings,cancelled,progress);
     *report=std::to_string(result.projected)+" projected, "+std::to_string(result.missed)+" missed ("+std::to_string(result.preserved_misses)+" kept from prior bake)";
     if(result.protected_texels)*report+=", "+std::to_string(result.protected_texels)+" protected by mask";
     if(result.color_prepared){char quality[96];snprintf(quality,sizeof(quality),"; color error bound %.4f",double(*std::max_element(result.color_error_bound.begin(),result.color_error_bound.end())));*report+=quality;}
     if(result.canonical_captured)*report+="; verified normal frame captured";
     if(result.normal_prepared){char quality[128];snprintf(quality,sizeof(quality),"; portable normal attributes authored (rest quantization %.3f deg)",result.normal_initial_error*57.29577951308232);*report+=quality;}
-  },expected,report,work,{}, {},0,0,{},BakeAdmission{source,settings},0,{},std::move(lease));
+  };
+  queue_scene_operation_locked("Bake surface",std::move(bake),expected,report,work,{}, {},0,0,{},
+      BakeAdmission{source,settings,std::move(group)},0,{},std::move(lease));
 }
 void Document::bake_from_object(uint64_t source,ObjectBakeSettings settings,AssetSource expected){
-  std::lock_guard lock(model_mutex_);queue_bake_locked(source,settings,expected);
+  bake_from_objects(std::span(&source,1),settings,expected);
+}
+void Document::bake_from_objects(std::span<const uint64_t> donors,ObjectBakeSettings settings,AssetSource expected){
+  std::lock_guard lock(model_mutex_);queue_bake_locked(donors,settings,expected);
 }
 void Document::queue_clear_bake_locked(AssetSource expected){
   const auto &target=scene_.active();

@@ -2,6 +2,7 @@
 #pragma once
 #include "dome/bake-recipe.hpp"
 #include "dome/polygon-scene.hpp"
+#include <algorithm>
 #include <map>
 #include <functional>
 namespace dome::detail {
@@ -20,8 +21,11 @@ inline std::shared_ptr<const ObjectBakeRecipe> remap_bake_recipe(
   };
   const auto source=remap(recipe->source.object);
   const auto cage=recipe->cage?remap(recipe->cage->object):0;
-  if(source==recipe->source.object&&cage==recipe->settings.cage_object)return recipe;
+  const bool unchanged_sources=std::all_of(recipe->additional_sources.begin(),recipe->additional_sources.end(),
+      [&](const auto &donor){return remap(donor.object)==donor.object;});
+  if(source==recipe->source.object&&cage==recipe->settings.cage_object&&unchanged_sources)return recipe;
   auto result=std::make_shared<ObjectBakeRecipe>(*recipe);result->source.object=source;
+  for(auto &donor:result->additional_sources)donor.object=remap(donor.object);
   if(result->cage)result->cage->object=cage;
   result->settings.cage_object=cage;result->validate();return result;
 }

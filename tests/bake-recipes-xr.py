@@ -10,10 +10,12 @@ p.add_argument('--texture-set',action='store_true',help='Replay Recall and Bake 
 p.add_argument('--mtoon',action='store_true',help='Use a typed MToon material on the selected texture set')
 p.add_argument('--supersample',action='store_true',help='Select four samples with the actual controller before baking')
 p.add_argument('--mask',action='store_true',help='Select a target mask with the actual controller before rebaking')
+p.add_argument('--group',action='store_true',help='Recall an ordered group after choosing an individual source')
 a=p.parse_args()
 if a.mtoon and not a.texture_set:p.error('--mtoon requires --texture-set')
 if a.supersample and a.texture_set:p.error('--supersample uses the primary-field cage fixture')
 if a.mask and (a.supersample or a.texture_set):p.error('--mask uses the primary-field mask fixture')
+if a.group and (a.texture_set or a.supersample or a.mask):p.error('--group uses its own overlapping source fixture')
 out=a.out;out.mkdir(parents=True,exist_ok=True);checks=[]
 def check(ok,label):
  checks.append({'passed':bool(ok),'check':label});(out/'report.json').write_text(json.dumps({'checks':checks,'physical_headset':False},indent=2)+'\n');print(('PASS ' if ok else 'FAIL ')+label,flush=True);assert ok,label
@@ -27,6 +29,9 @@ with tempfile.TemporaryDirectory(prefix='dome-cage-xr-') as directory:
  elif a.mask:
   env['DOME_XR_FIXTURE_BAKE_MASK']='1'
   subprocess.run([str(a.helper),'--ui-mask-fixture',str(source),str(reference)],env=env,check=True)
+ elif a.group:
+  env['DOME_XR_FIXTURE_BAKE_GROUP']='1'
+  subprocess.run([str(a.helper),'--ui-group-fixture',str(source),str(reference)],env=env,check=True)
  else:
   subprocess.run([str(a.helper),'--ui-wide-fixture' if os.environ.get('DOME_RECIPE_WIDE')=='1' else '--ui-fixture',str(source)],env=env,check=True)
   if a.supersample:
@@ -56,9 +61,9 @@ with tempfile.TemporaryDirectory(prefix='dome-cage-xr-') as directory:
   check(detail.get('acquires',0)>0 and detail.get('acquires')==detail.get('image_waits')==detail.get('releases') and detail.get('left_eye_nonblank',0)>0 and detail.get('right_eye_nonblank',0)>0,mode+': actual stereo ownership balances and both eyes contain rendered output')
   check(all(detail.get('cage_images',{}).get('58',{}).get(eye,0)>1000 for eye in ['0','1']),mode+': both real GL eyes render the edited Source/Cage controls')
   check(source.read_bytes()==before,mode+': input project bytes remain untouched')
-  if a.texture_set:
+  if a.texture_set or a.group:
    expected=reference.read_bytes() if mode=='accept' else before
-   check(target.read_bytes()==expected,mode+': exact entire native project matches the selected-field Bake reference or the original cancelled project')
+   check(target.read_bytes()==expected,mode+': exact native project matches the Bake reference or the cancelled project')
   elif mode=='accept':
    if a.supersample or a.mask:
     check(all(detail.get('cage_images',{}).get('76',{}).get(eye,0)>1000 for eye in ['0','1']),mode+': both eyes render the Bake quality controls')

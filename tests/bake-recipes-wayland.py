@@ -14,8 +14,10 @@ root=Path(__file__).resolve().parents[1];build=Path(os.environ.get('DOME_SCULPT_
 texture_set=os.environ.get('DOME_CAGE_TEXTURE_SET')=='1'
 supersample=os.environ.get('DOME_CAGE_SUPERSAMPLE')=='1'
 masked=os.environ.get('DOME_CAGE_MASK')=='1'
+grouped=os.environ.get('DOME_CAGE_GROUP')=='1'
 if texture_set and supersample:raise ValueError('Use the primary cage fixture for supersampling')
 if masked and (supersample or texture_set):raise ValueError('Use the primary cage fixture for the mask')
+if grouped and (supersample or texture_set or masked):raise ValueError('Use the overlapping source fixture for group selection')
 def check(ok,label):
  checks.append({'passed':bool(ok),'check':label});(out/'report.json').write_text(json.dumps({'checks':checks,'complete':False},indent=2)+'\n');print(('PASS ' if ok else 'FAIL ')+label,flush=True);assert ok,label
 async def wait(fn,seconds=60):
@@ -44,6 +46,7 @@ async def main():
   helper=Path(os.environ['DOME_CAGE_HELPER']);project=Path(home,'cage.dsculpt');reference=Path(home,'reference.dsculpt')
   fixture=['--texture-set-xr-fixture',str(project),str(reference)] if texture_set else ['--ui-fixture',str(project)]
   if masked:fixture=['--ui-mask-fixture',str(project),str(reference)]
+  if grouped:fixture=['--ui-group-fixture',str(project),str(reference)]
   subprocess.run([str(helper),*fixture],env=env,check=True)
   if supersample:subprocess.run([str(helper),'--ui-supersample-reference',str(project),str(reference)],env=env,check=True)
   original_bytes=project.read_bytes()
@@ -77,7 +80,7 @@ async def main():
    walk(result[1]);old=project.stat().st_mtime_ns;await menu.call_event(nodes[label],'clicked',Variant('i',0),0)
    if label=='Save':await wait(lambda:project.stat().st_mtime_ns!=old)
    await asyncio.sleep(.15)
-  def widget(label):
+  def widget(label,title='Bake surface'):
    try:windows=json.loads(report.read_text())
    except (OSError,ValueError):return None
    def walk(item):
@@ -86,32 +89,55 @@ async def main():
      found=walk(c)
      if found:return found
    for w in windows:
-    if w['label']=='Bake surface':
+    if w['label']==title:
      found=walk(w)
      if found:return found
-  await command('Bake surface...');dialog=await wait(lambda:named('Bake surface'));action({'op':'focus','id':dialog['id']});choice=await wait(lambda:widget('Cage mesh'));check(choice['choice']==2,'Native Wayland project restores the saved custom-cage recipe')
+  async def open_bake():
+   await command('Bake surface...');dialog=await wait(lambda:named('Bake surface'));action({'op':'focus','id':dialog['id']})
+  async def focus_widget(label,title='Bake surface'):
+   for _ in range(28):
+    if widget(label,title) and widget(label,title)['focused']:return
+    await key('Tab')
+   raise TimeoutError('DomeD keyboard navigation could not focus '+label)
+  await open_bake()
+  if grouped:
+   await wait(lambda:widget('Source'))
+   check(widget('Source')['selected']=='Saved sources (2)' and not widget('Match source triangles')['active'],
+         'The saved group restores both sources and disables matching topology')
+   await focus_widget('Source');await key('space');await key('Up');await key('Up');await key('Return')
+   await wait(lambda:widget('Source')['selected'].startswith('Rear red donor'))
+   await focus_widget('Use last bake');await key('space')
+   await wait(lambda:widget('Source')['selected']=='Saved sources (2)')
+   check(widget('Four samples per texel')['checked'],'Native FLTK Recall restores the full donor list and sampling policy')
+  else:
+   choice=await wait(lambda:widget('Cage mesh'));check(choice['choice']==2,'Native Wayland project restores the saved custom-cage recipe')
   if texture_set:
    check(widget('Bake beneath editable paint in Right set. Bounds use world mm.') is not None,'FLTK dialog identifies the active texture field')
    policies=['Prepare source colors','Color error (0..1)','Author portable normal targets','Rest error (deg)']
    check(all(widget(label) is not None and not widget(label)['active'] for label in policies),'Texture-set Bake keeps whole-mesh preparation inputs inactive')
-  for _ in range(20):
-   if widget('Cage mesh') and widget('Cage mesh')['focused']:break
-   await key('Tab');await asyncio.sleep(.08)
-  check(widget('Cage mesh')['focused'],'Actual compositor keyboard input focuses the native cage chooser')
-  await key('space');await key('Up');await key('Up');await key('Return');choice=await wait(lambda:widget('Cage mesh') if widget('Cage mesh') and widget('Cage mesh')['choice']==0 else None)
-  check('automatic' in choice['selected'],'Actual compositor keyboard changes the custom cage to automatic in the local draft')
-  await key('Tab');await wait(lambda:widget('Use last bake')['focused']);await key('space')
-  await wait(lambda:widget('Cage mesh')['choice']==2)
-  expected_title='Full matched cage' if texture_set else 'envelope'
-  expected_front=80 if texture_set else 100
-  check(expected_title in widget('Cage mesh')['selected'] and abs(widget('Front (mm)')['value']-math.log1p(expected_front/.01)/math.log1p(100000/.01))<1e-6,'Actual native Wayland Recall restores the custom cage and saved projection range')
-  await chord('Control_L','w');await wait(lambda:named('Bake surface') is None);await command('Save');check(inspect()['scene']==original,'Native Ctrl+W cancels staged cage choice and ordered Save preserves the complete scene')
-  await command('Bake surface...');dialog=await wait(lambda:named('Bake surface'));action({'op':'focus','id':dialog['id']});choice=await wait(lambda:widget('Cage mesh'));check(choice['choice']==2,'Reopened Wayland options retain saved recipe after cancelling the recalled draft')
-  async def focus_widget(label):
-   for _ in range(28):
-    if widget(label) and widget(label)['focused']:return
-    await key('Tab')
-   raise TimeoutError('DomeD keyboard navigation could not focus '+label)
+  if not grouped:
+   await focus_widget('Cage mesh')
+   check(widget('Cage mesh')['focused'],'Actual compositor keyboard input focuses the native cage chooser')
+   await key('space');await key('Up');await key('Up');await key('Return');choice=await wait(lambda:widget('Cage mesh') if widget('Cage mesh') and widget('Cage mesh')['choice']==0 else None)
+   check('automatic' in choice['selected'],'Actual compositor keyboard changes the custom cage to automatic in the local draft')
+   await key('Tab');await wait(lambda:widget('Use last bake')['focused']);await key('space')
+   await wait(lambda:widget('Cage mesh')['choice']==2)
+   expected_title='Full matched cage' if texture_set else 'envelope'
+   expected_front=80 if texture_set else 100
+   check(expected_title in widget('Cage mesh')['selected'] and abs(widget('Front (mm)')['value']-math.log1p(expected_front/.01)/math.log1p(100000/.01))<1e-6,'Actual native Wayland Recall restores the custom cage and saved projection range')
+  await chord('Control_L','w');await wait(lambda:named('Bake surface') is None);await command('Save');check(inspect()['scene']==original,'Native Ctrl+W cancels staging and ordered Save preserves the complete scene')
+  if grouped:
+   title='Select objects'
+   await command('Select objects...');hierarchy=await wait(lambda:named(title));action({'op':'focus','id':hierarchy['id']})
+   for donor in ('Rear red donor [hidden]','Reflected green donor'):
+    await focus_widget(donor,title);await key('space');await wait(lambda:widget(donor,title)['checked'])
+   await focus_widget('Select',title);await key('space');await wait(lambda:named(title) is None)
+  await open_bake()
+  if grouped:
+   source=await wait(lambda:widget('Source'))
+   check(source['selected']=='Selected objects (2)','The native hierarchy supplies both donors while leaving the target active')
+  else:
+   choice=await wait(lambda:widget('Cage mesh'));check(choice['choice']==2,'Reopened Wayland options retain saved recipe after cancelling the recalled draft')
   if supersample:
    label='Four samples per texel'
    await focus_widget(label)
@@ -132,12 +158,12 @@ async def main():
    await wait(lambda:widget(label)['selected']=='Whole field')
    check(widget(label)['choice']==0,'Recall restores the saved mask choice')
    await select_mask()
-  if texture_set or supersample or masked:
+  if texture_set or supersample or masked or grouped:
    await focus_widget('Bake')
    await key('space');await wait(lambda:named('Bake surface - complete'))
    await chord('Control_L','w');await wait(lambda:named('Bake surface') is None);await command('Save')
    check(project.read_bytes()==reference.read_bytes(),'FLTK Bake and ordered Save match the entire expected native project')
-   if supersample or masked:
+   if supersample or masked or grouped:
     await command('Undo');await command('Save')
     check(project.read_bytes()==original_bytes,'Universal Undo restores the exact pre-bake project and recipe')
     await command('Redo');await command('Save')
