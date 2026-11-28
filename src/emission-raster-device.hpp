@@ -56,6 +56,16 @@ public:
     uint8_t color[4]{},orm[4]{},legacy[4]{},normals[2][4]{};
     uint8_t coverage=0,invalid_normal=0;
   };
+  struct RetopoBakeTexel {
+    uint8_t color[4]{},orm[3]{},legacy[3]{},normal[3]{},pbr[4]{},coverage=0;
+    BakedEmissionSample emission{};
+  };
+  struct RetopoBakePixel {
+    std::array<float,13> material{};
+    std::array<float,4> pbr{};
+    float coverage=0;
+    BakedEmissionSample emission{};
+  };
   static constexpr size_t mapped_batch=16384;
   using TextureSetPreview=std::array<float,4>; // RGB radiance, coverage
   virtual void read(size_t first,std::span<Pixel>,const std::function<bool()> &) = 0;
@@ -69,6 +79,10 @@ public:
                                  std::span<BakedEmissionSample>,const std::function<bool()> &) = 0;
   virtual void read_bake_uv_points(std::span<const BakeUvPoint>,std::span<BakeUvMapsPixel>,
                                    std::span<BakedEmissionSample>,const std::function<bool()> &) = 0;
+  virtual void read_retopo_bake(std::span<const BakeUvPoint>,std::span<RetopoBakePixel>,
+                                const std::function<bool()> &) = 0;
+  virtual void read_staged_retopo_bake(std::span<const BakeUvSample>,std::span<const RetopoBakeTexel>,
+                                       std::span<RetopoBakePixel>,const std::function<bool()> &) = 0;
   virtual void read_texture_set_preview(size_t first,std::span<TextureSetPreview>,const std::function<bool()> &) = 0;
   virtual void read_uv_layer(std::span<const BakeUvPoint>,std::span<paint_grid::Pixel>,
                              const std::function<bool()> &) = 0;
@@ -94,6 +108,11 @@ std::unique_ptr<EmissionRasterDevice> create_bake_uv_emission_device(const Baked
 std::unique_ptr<EmissionRasterDevice> create_bake_uv_maps_device(const BakedTextures &,uint32_t resolution,
     std::span<const EmissionRasterDevice::BakeUvFrame>,size_t capacity,const std::function<bool()> &,
     EmissionRasterDevice::BakeUvSource source={});
+size_t retopo_bake_staging_bytes(size_t capacity);
+size_t retopo_bake_resident_bytes(const BakedTextures &,size_t triangles,size_t capacity);
+std::unique_ptr<EmissionRasterDevice> create_retopo_bake_device(const BakedTextures &, uint32_t resolution,
+    EmissionRasterDevice::BakeUvSource, bool imported_overlay, size_t capacity,
+    const std::function<bool()> &);
 size_t resident_uv_layer_bytes(const PaintLayer &,uint32_t resolution,size_t triangles,size_t capacity);
 std::unique_ptr<EmissionRasterDevice> create_resident_uv_layer(const PaintLayer &,uint32_t resolution,
     EmissionRasterDevice::BakeUvSource,size_t capacity,const paint_grid::Tables &,const std::function<bool()> &);
@@ -138,6 +157,10 @@ struct BakeUvMaps {
   const uint8_t *color=nullptr,*orm=nullptr,*legacy=nullptr,*coverage=nullptr,*normals[2]{};
   const paint_compute::Quantization *quantization=nullptr;
   const EmissionRasterDevice::BakeUvFrame *frames=nullptr;
+  const uint8_t *pbr=nullptr;
+};
+struct RetopoBakeFormat {
+  bool normals=false, resolved=false, physical=false, imported_overlay=false;
 };
 struct BakeUvGeometry {
   const EmissionRasterDevice::BakeUvTriangle *triangles=nullptr;
@@ -194,6 +217,7 @@ struct Input {
   uint32_t strength=0,resolution=0;
   std::vector<SourceTextureAxis> finite_axis;
   size_t mapped_capacity=0,bake_uv_capacity=0,bake_radiance_capacity=0;
+  std::optional<RetopoBakeFormat> retopo_bake;
   bool physical_bake=false,texture_set=false,mapped_field=false,summarize_bake_radiance=false;
 };
 Input describe_bake_overlay(const PaintOverlayPacket &,MaterialInput &,bool separate_pbr,bool include_emission,

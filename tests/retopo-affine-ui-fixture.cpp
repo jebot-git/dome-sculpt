@@ -22,6 +22,22 @@ int main(int argc,char **argv)try {
   o.painted->begin_stroke();p.channel=PaintChannel::Mask;p.mask=0;o.painted->stamp(b,p);
   if(!o.painted->end_stroke())throw std::runtime_error("Real source mask did not change");
   o.painted->layer_properties("保護",false,0);
+  BakedTextures bake;
+  bake.coverage.assign(64*64,255);
+  bake.maps.color={64,64,std::vector<uint8_t>(64*64*4,96)};
+  bake.maps.metal_rough=bake.maps.color;
+  bake.maps.normal=bake.maps.color;
+  for(size_t i=0;i<bake.coverage.size();++i){
+    const auto pixel=4*i;
+    bake.maps.color.rgba[pixel+3]=255;
+    bake.maps.metal_rough.rgba[pixel+3]=255;
+    bake.maps.normal.rgba[pixel]=bake.maps.normal.rgba[pixel+1]=128;
+    bake.maps.normal.rgba[pixel+2]=bake.maps.normal.rgba[pixel+3]=255;
+  }
+  bake.emission_field=BakedEmissionField::generate_compact(64,[](size_t){
+    return BakedEmissionSample{{},{2.5f,.25f,.5f},1.f};
+  });
+  o.painted->install_bake(std::move(bake));
   DeformationState d(m);d.skeleton=Skeleton{{{"root",-1,{},.2f}}};
   d.skin=SkinWeights{};d.skin->vertices.assign(4,{{0,1}});
   d.morphs=MorphSet(m);auto target=m.positions;for(auto &v:target){v.x+=.04f*(v.y+.6f);v.y+=.025f*(v.x+.6f);}

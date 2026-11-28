@@ -15,9 +15,11 @@ def check(ok,message):
     (out/'report.json').write_text(json.dumps({'checks':checks,'failed':sum(not x['passed'] for x in checks)},indent=2)+'\n')
     print(('PASS ' if ok else 'FAIL ')+message,flush=True)
     assert ok,message
+def scene_payload(value):
+    return value.get('payload', value)
 def scene(path):
     value=json.loads(subprocess.check_output([str(inspector),str(path)],text=True))
-    for obj in value['objects']:
+    for obj in scene_payload(value)['objects']:
         volume=obj['volume'];volume['samples'].sort()
         for layer in volume.get('sculpt_layers',[]):layer['delta'].sort()
         if 'sculpt_mask' in volume:volume['sculpt_mask']['values'].sort()
@@ -54,10 +56,10 @@ def run(mode,frames):
 # Allow the three component edits, their trigger releases, and Apply to finish
 # before saving the committed comparison scene.
 committed,_=run('committed',22)
-source=committed['objects'][0]
+source=scene_payload(committed)['objects'][0]
 check(source['material']['color'][2]>.7 and source['material']['color'][0]<.1,
       'Real controller commits its material change before the retopo draft')
-expected=dict(before['objects'][0]);actual=dict(source);expected.pop('material');actual.pop('material')
+expected=dict(scene_payload(before)['objects'][0]);actual=dict(source);expected.pop('material');actual.pop('material')
 check(expected==actual,'Committed controller prefix retains every affine, posed, painted and sculpt source channel')
 for mode in ('accept','focus','unconfirmed'):
     # Wait for actual menu readiness on cold device compilation, then stop
@@ -72,14 +74,15 @@ for mode in ('accept','focus','unconfirmed'):
         check(after==committed,'Unconfirmed standalone Save cancels the draft and preserves the exact committed prefix')
         check(report.get('retopo_pressure_samples',0)>=3,'Unconfirmed case contains actual pressure placement')
         continue
-    check(report.get('retopo_face_ready') is True and report.get('retopo_apply_ready') is True and len(after['objects'])==2 and
-          not after['objects'][0]['visible'] and after['objects'][1]['visible'],
+    objects=scene_payload(after)['objects']
+    check(report.get('retopo_face_ready') is True and report.get('retopo_apply_ready') is True and len(objects)==2 and
+          not objects[0]['visible'] and objects[1]['visible'],
           mode+' uses genuine Face/Apply and retains the hidden affine source')
-    retained=dict(after['objects'][0]);expected=dict(source)
+    retained=dict(objects[0]);expected=dict(source)
     retained.pop('visible');expected.pop('visible')
     check(retained==expected,mode+' preserves full original paint, pose, morphs, affine placement and source identities')
     guide_paint=source['painted'].get('payload',source['painted'])
-    replacement=after['objects'][1]['painted']
+    replacement=objects[1]['painted']
     replacement=replacement.get('payload',replacement)
     def metadata(layers):
         return [{key:layer[key] for key in ('id','name','visible','opacity')} for layer in layers]
@@ -87,7 +90,11 @@ for mode in ('accept','focus','unconfirmed'):
           metadata(replacement['layers'])==metadata(guide_paint['layers']) and
           bool(replacement['layers'][0]['physical_emission_tiles']) and bool(replacement['layers'][1]['tiles']),
           mode+' publishes a writable FLOAT layer and hidden mask on the new native patch')
-    patch=after['objects'][1]['retopology'];topology=json.loads(patch['topology'])
+    baked = replacement.get('baked', {})
+    check(baked.get('version') == 6 and bool(baked.get('float_emission', {}).get('bytes')) and
+          bool(baked.get('normal', {}).get('bytes')) and 255 in baked.get('coverage', {}).get('bytes', []),
+          mode+' publishes the separate FLOAT Bake and covered normal map')
+    patch=objects[1]['retopology'];topology=json.loads(patch['topology'])
     positions=sorted(v[1] for v in topology['vertices'])
     want=sorted([[-.2,-.2,0],[.2,-.2,0],[0,.2,0]])
     check(patch['source']==source['id'] and len(topology['faces'])==1 and len(positions)==3 and

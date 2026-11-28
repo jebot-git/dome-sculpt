@@ -4,6 +4,7 @@
 #include "dome/document.hpp"
 #include "dome/source-placement.hpp"
 #include "../src/retopo-transfer.hpp"
+#include "../src/emission-raster-device.hpp"
 #include "../src/texture-set-paint-access.hpp"
 #include "../src/texture-set-resample.hpp"
 #include <algorithm>
@@ -267,6 +268,47 @@ void bounded_layer_sampling() {
         "Bounded and resident layer sampling publish the same editable paint bytes");
 }
 
+void bounded_bake_sampling() {
+  Mesh mesh;
+  mesh.positions={{-1,-1,0},{1,-1,0},{1,1,0},{-1,1,0}};
+  mesh.normals.assign(4,{0,0,1});
+  mesh.indices={0,1,2,0,2,3};
+  mesh.uv={{0,0},{1,0},{1,1},{0,1}};
+  constexpr uint32_t source_resolution=512,target_resolution=64;
+  constexpr size_t count=source_resolution*source_resolution;
+  PaintedMesh guide(mesh,source_resolution);
+  BakedTextures bake;
+  bake.coverage.assign(count,255);
+  bake.maps.metal_rough={source_resolution,source_resolution,std::vector<uint8_t>(count*4,255)};
+  bake.maps.color=bake.maps.metal_rough;
+  for(size_t i=0;i<count;++i)bake.maps.color.rgba[i*4]=uint8_t(i^(i/31));
+  bake.emission_field=BakedEmissionField::generate_compact(source_resolution,[](size_t i) {
+    return i%13?BakedEmissionSample{{.25f,0,0},{40000.f,12000.f,2.f},1.f}:
+                BakedEmissionSample{{0,.25f,0},{80000.f,40000.f,3.f},1.f};
+  });
+  guide.install_bake(std::move(bake));
+  const auto original=guide.encode();
+  const std::function<bool()> cancelled;
+  const auto apply=[&](size_t working_bytes) {
+    detail::RetopoTransferBudget budget(cancelled);
+    if(working_bytes<budget.remaining_bytes())budget.reserve(budget.remaining_bytes()-working_bytes,1);
+    detail::RetopoTransfer transfer(mesh,AffineTransform{},AffineTransform{},budget,{},true);
+    PaintedMesh patch(mesh,target_resolution);
+    detail::TextureSetPaintAccess::reproject_retopology(guide,patch,transfer);
+    const auto baked=patch.baked();
+    check(baked&&baked->emission_field&&baked->coverage.front()==255,
+          "Retopology publishes its filtered native Bake");
+    const auto sample=baked->emission_field->texel(0);
+    check(sample.coverage==1&&sample.absolute[0]>=40000.f&&sample.absolute[1]>=12000.f,
+          "Bake transfer preserves radiance above the editable brush limit");
+    return patch.encode();
+  };
+  const auto staging=detail::retopo_bake_staging_bytes(target_resolution*target_resolution);
+  const auto staged=apply(staging+1600*1024);
+  check(staged==apply(SIZE_MAX)&&guide.encode()==original,
+        "Bounded and resident Bake filtering agree without changing the guide");
+}
+
 void topology_transform() {
   RetopoMesh t;std::array<TopologyID,4> v;
   const Vec3 p[4]{{-.2f,-.2f,0},{.2f,-.2f,0},{.2f,.2f,0},{-.2f,.2f,0}};
@@ -289,6 +331,11 @@ void topology_transform() {
 }
 }
 int main(int argc,char **argv)try {
+  if(argc==2&&std::string_view(argv[1])=="--bake-budget-only"){
+    bounded_bake_sampling();
+    std::cout<<"PASS "<<checks<<" bounded retopology Bake checks\n";
+    return 0;
+  }
   if(argc==2&&std::string_view(argv[1])=="--layer-budget-only"){
     bounded_layer_sampling();
     std::cout<<"PASS "<<checks<<" bounded retopology layer checks\n";
@@ -302,6 +349,7 @@ int main(int argc,char **argv)try {
   if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
   topology_transform();
   bounded_layer_sampling();
+  bounded_bake_sampling();
   first_native_material(out);
   const Matrix matrices[]{
     {0,1,0,0,-1,0,0,0,0,0,1,0,.15,-.1,.2,1},

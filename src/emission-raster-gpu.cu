@@ -11,6 +11,7 @@
 #endif
 
 #include "emission-raster-upload.hpp"
+#include "emission-raster-retopo-bake-kernel.hpp"
 
 namespace dome::detail::emission_raster {
 namespace {
@@ -78,6 +79,12 @@ __global__ void filter_bake_uv_map_pixels(BakeUvMaps maps,Bake bake,BakeUvReques
     if(out)out[index]=filter_bake_uv_maps(maps,sample);
     if(emission)filter_bake_uv(bake,sample,emission+7*index);
   }
+}
+__global__ void filter_retopo_bake_pixels(BakeUvMaps maps,Bake bake,BakeUvRequests requests,
+    const EmissionRasterDevice::RetopoBakeTexel *texels,RetopoBakeFormat format,size_t count,
+    EmissionRasterDevice::RetopoBakePixel *out){
+  const size_t index=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+  if(index<count)out[index]=filter_retopo_bake(bake_uv_sample(requests,index),maps,bake,texels,format);
 }
 __global__ void filter_uv_layer_pixels(UvLayer layer,BakeUvGeometry geometry,
     const EmissionRasterDevice::BakeUvPoint *points,size_t count,paint_grid::Pixel *out){
@@ -172,6 +179,13 @@ public:
       size_t count,EmissionRasterDevice::BakeUvMapsPixel *out,uint32_t *emission){
     constexpr size_t block=128;
     filter_bake_uv_map_pixels<<<(count+block-1)/block,block,0,stream_>>>(maps,bake,requests,count,out,emission);
+    checked(DOME_DEVICE(GetLastError)());
+  }
+  void filter_retopo_bake(BakeUvMaps maps,Bake bake,BakeUvRequests requests,
+      const EmissionRasterDevice::RetopoBakeTexel *texels,RetopoBakeFormat format,size_t count,
+      EmissionRasterDevice::RetopoBakePixel *out){
+    constexpr size_t block=128;
+    filter_retopo_bake_pixels<<<(count+block-1)/block,block,0,stream_>>>(maps,bake,requests,texels,format,count,out);
     checked(DOME_DEVICE(GetLastError)());
   }
   void filter_uv_layer(UvLayer layer,BakeUvGeometry geometry,const EmissionRasterDevice::BakeUvPoint *points,

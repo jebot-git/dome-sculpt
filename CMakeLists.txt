@@ -68,7 +68,7 @@ elseif(DOME_COMPUTE_BACKEND STREQUAL "ONEAPI")
   set_source_files_properties(${bake_ray_compute_source} PROPERTIES COMPILE_OPTIONS "-fsycl;-ffp-contract=off")
   set(paint_compute_source src/paint-composite-sycl.cpp src/paint-grid-sycl.cpp
     src/paint-source-coordinate-sycl.cpp src/emission-raster-sycl.cpp
-    src/emission-raster-bake-sycl.cpp src/emission-raster-typed-sycl.cpp
+    src/emission-raster-bake-sycl.cpp src/emission-raster-retopo-bake-sycl.cpp src/emission-raster-typed-sycl.cpp
     src/emission-raster-finite-sycl.cpp src/emission-raster-mapped-sycl.cpp src/bake-radiance-sycl.cpp src/source-material-raster-sycl.cpp
     src/emission-raster-texture-set-sycl.cpp
     src/emission-raster-texture-set-source-sycl.cpp src/portable-normal-raster-sycl.cpp

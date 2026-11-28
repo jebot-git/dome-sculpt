@@ -43,6 +43,22 @@ private:
         stop();
         return;
       }
+      if(input.retopo_bake){
+        const auto &bake=*input.bake_uv_maps;
+        retopo_bake_=*input.retopo_bake;
+        retopo_bake_output_=allocate<RetopoBakePixel>(bake_uv_capacity_);
+        bake_uv_maps_.quantization=upload(std::span(&paint_compute::quantization(),1));
+        if(bake_uv_triangles_){
+          bake_uv_maps_.color=upload(std::span(bake.maps.color.rgba));
+          bake_uv_maps_.orm=upload(std::span(bake.maps.metal_rough.rgba));
+          bake_uv_maps_.coverage=upload(std::span(bake.coverage));
+          bake_uv_maps_.normals[0]=upload(std::span(bake.maps.normal.rgba));
+          bake_uv_maps_.pbr=upload(std::span(bake.maps.pbr_color.rgba));
+          if(!retopo_bake_.physical)bake_uv_maps_.legacy=upload(std::span(bake.maps.emission.rgba));
+        }else retopo_bake_staged_=allocate<RetopoBakeTexel>(4*bake_uv_capacity_);
+        stop();
+        return;
+      }
       if(input.physical_bake)output_=allocate<uint32_t>(7*bake_uv_capacity_);
       if(input.bake_uv_maps){
         const auto &bake=*input.bake_uv_maps;
@@ -213,6 +229,27 @@ public:
     if(!maps.empty())device_.download(maps.data(),bake_uv_maps_output_,maps.size_bytes());
     download_bake_uv(emission,cancelled);
   }
+  void read_retopo_bake(std::span<const BakeUvPoint> points,std::span<RetopoBakePixel> output,
+                        const std::function<bool()> &cancelled) override {
+    if(!retopo_bake_output_||!bake_uv_points_||points.size()!=output.size())
+      throw std::invalid_argument("Invalid resident Retopology Bake batch");
+    upload_bake_uv_points(points,cancelled);
+    finish_retopo_bake({bake_uv_geometry_,nullptr,bake_uv_points_},output,cancelled);
+  }
+  void read_staged_retopo_bake(std::span<const BakeUvSample> taps,std::span<const RetopoBakeTexel> texels,
+                               std::span<RetopoBakePixel> output,const std::function<bool()> &cancelled) override {
+    if(!retopo_bake_staged_||taps.empty()||taps.size()!=output.size()||taps.size()>bake_uv_capacity_||
+        texels.size()>taps.size()*4)
+      throw std::invalid_argument("Invalid staged Retopology Bake batch");
+    paint_compute::checkpoint(cancelled);
+    for(const auto &sample:taps)for(size_t i=0;i<4;++i)
+      if(!std::isfinite(sample.weights[i])||sample.weights[i]<0||sample.weights[i]>1||
+          (sample.weights[i]>0&&sample.texels[i]>=texels.size()))
+        throw std::invalid_argument("Invalid staged Retopology Bake tap");
+    if(!texels.empty())device_.upload(retopo_bake_staged_,texels.data(),texels.size_bytes());
+    device_.upload(bake_uv_samples_,taps.data(),taps.size_bytes());
+    finish_retopo_bake({{},bake_uv_samples_,nullptr},output,cancelled);
+  }
   void read_uv_layer(std::span<const BakeUvPoint> points,std::span<paint_grid::Pixel> output,
                      const std::function<bool()> &cancelled) override {
     if(!uv_layer_output_||points.size()!=output.size())
@@ -292,6 +329,14 @@ public:
   }
 
 private:
+  void finish_retopo_bake(BakeUvRequests requests,std::span<RetopoBakePixel> output,
+                          const std::function<bool()> &cancelled) {
+    device_.filter_retopo_bake(bake_uv_maps_,view_.bake,requests,retopo_bake_staged_,retopo_bake_,
+                               output.size(),retopo_bake_output_);
+    device_.download(output.data(),retopo_bake_output_,output.size_bytes());
+    paint_compute::checkpoint(cancelled);
+  }
+
   void upload_bake(const Input &input){
     transfer_bake(view_.bake,input,[&](auto data){return upload(data);});
   }
@@ -426,6 +471,9 @@ private:
   BakeUvGeometry bake_uv_geometry_{};
   BakeUvMaps bake_uv_maps_{};
   BakeUvMapsPixel *bake_uv_maps_output_=nullptr;
+  RetopoBakeFormat retopo_bake_{};
+  RetopoBakeTexel *retopo_bake_staged_=nullptr;
+  RetopoBakePixel *retopo_bake_output_=nullptr;
   UvLayer uv_layer_{};
   paint_grid::Pixel *uv_layer_output_=nullptr;
   size_t bake_uv_faces_=0,bake_uv_triangles_=0;

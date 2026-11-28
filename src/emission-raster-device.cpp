@@ -357,6 +357,46 @@ std::unique_ptr<EmissionRasterDevice> create_bake_uv_maps_device(const BakedText
   return emission_raster::upload(input,cancelled);
 }
 
+size_t retopo_bake_staging_bytes(size_t capacity) {
+  using Device=EmissionRasterDevice;
+  return sizeof(paint_compute::Quantization)+2*capacity*(sizeof(Device::BakeUvSample)+
+      4*sizeof(Device::RetopoBakeTexel)+sizeof(Device::RetopoBakePixel));
+}
+
+size_t retopo_bake_resident_bytes(const BakedTextures &bake,size_t triangles,size_t capacity) {
+  using Device=EmissionRasterDevice;
+  const auto &maps=bake.maps;
+  return sizeof(paint_compute::Quantization)+bake.coverage.size()*5+
+      maps.color.rgba.size()+maps.metal_rough.rgba.size()+maps.pbr_color.rgba.size()+maps.normal.rgba.size()+
+      (bake.emission_field?bake.emission_field->storage_bytes():maps.emission.rgba.size())+
+      2*triangles*sizeof(Device::BakeUvTriangle)+
+      2*capacity*(sizeof(Device::BakeUvPoint)+sizeof(Device::RetopoBakePixel));
+}
+
+std::unique_ptr<EmissionRasterDevice> create_retopo_bake_device(const BakedTextures &bake,uint32_t resolution,
+    EmissionRasterDevice::BakeUvSource source, bool imported_overlay, size_t capacity,
+    const std::function<bool()> &cancelled) {
+  paint_compute::checkpoint(cancelled);
+  bake.validate(resolution,true);
+  if(!capacity||capacity>EmissionRasterDevice::mapped_batch||
+      source.triangles.empty()!=source.padding.empty()||
+      (!source.triangles.empty()&&source.padding.size()!=bake.coverage.size()))
+    throw std::invalid_argument("Invalid Retopology Bake source or batch capacity");
+  validate_uv_source(source,cancelled);
+  emission_raster::Input input;
+  input.resolution=resolution;
+  input.bake_uv_capacity=capacity;
+  input.bake_uv_maps=&bake;
+  input.bake_uv_source=source;
+  input.retopo_bake=emission_raster::RetopoBakeFormat{!bake.maps.normal.rgba.empty(),
+      bake.color_interpretation==BakedColorInterpretation::ResolvedPbr,bool(bake.emission_field),imported_overlay};
+  if(bake.emission_field&&!source.triangles.empty()){
+    input.physical_bake=true;
+    input.bake=bake.emission_field->storage();
+  }
+  return emission_raster::upload(input,cancelled);
+}
+
 size_t resident_uv_layer_bytes(const PaintLayer &layer,uint32_t resolution,size_t triangles,size_t capacity){
   using namespace emission_raster;
   size_t common=0,pbr=0,words=0,physical=0;

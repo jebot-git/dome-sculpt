@@ -5,6 +5,7 @@
 #include "dome/source-maps.hpp"
 #include "emission-export.hpp"
 #include "emission-raster-device.hpp"
+#include "baked-emission-access.hpp"
 #include "paint-emission-sample.hpp"
 #include "paint-overlay-sample.hpp"
 #include "paint-grid-filter-kernel.hpp"
@@ -516,6 +517,109 @@ void compare_uv_correspondence(){
   std::cout<<"PASS GPU UV correspondence matches host taps over "<<2*count<<" map texels and "<<count<<" FLOAT-only texels\n";
 }
 
+void compare_retopology_bake(){
+  constexpr uint32_t extent=64;
+  constexpr size_t count=extent*extent;
+  using Device=detail::EmissionRasterDevice;
+  BakedTextures bake;
+  bake.color_interpretation=BakedColorInterpretation::ResolvedPbr;
+  bake.coverage.resize(count);
+  const std::array images{&bake.maps.color,&bake.maps.metal_rough,&bake.maps.emission,
+                         &bake.maps.normal,&bake.maps.pbr_color};
+  for(size_t k=0;k<images.size();++k){
+    *images[k]={extent,extent,std::vector<uint8_t>(count*4)};
+    for(size_t i=0;i<count*4;++i)images[k]->rgba[i]=uint8_t((i*(61+14*k))^(i/(31+k)));
+  }
+  const std::array triangles{Device::BakeUvTriangle{{{0,0},{1,0},{0,1}}},
+                             Device::BakeUvTriangle{{{1,1},{0,1},{1,0}}}};
+  std::vector<int32_t> padding(count);
+  for(size_t i=0;i<count;++i){
+    padding[i]=i%17==0?-1:i%23==0?int32_t((i+13)%count):int32_t(i);
+    bake.coverage[i]=i%11?uint8_t(i^(i/7)):0;
+  }
+  const auto unit=[](uint8_t b){return float(b)/255;};
+  const auto add=[](float a,float b){volatile float result=a+b;return result;};
+  const auto mul=[](float a,float b){volatile float result=a*b;return result;};
+  for(bool physical:{false,true}){
+    if(physical){
+      bake.maps.emission={};
+      bake.emission_field=BakedEmissionField::generate(extent,[](size_t i){
+        const auto coverage=float(i%17)/16;
+        return BakedEmissionSample{{coverage*.25f,coverage*.125f,0},
+            {coverage*(i%2?60000.f:std::numeric_limits<float>::max()),coverage*1e-37f,coverage*12},coverage};
+      });
+    }
+    auto resident=detail::create_retopo_bake_device(bake,extent,{triangles,padding,true,physical},!physical,count,{});
+    auto bounded=detail::create_retopo_bake_device(bake,extent,{},!physical,count,{});
+    std::vector<Device::RetopoBakeTexel> input(count);
+    std::vector<Device::RetopoBakePixel> expected(count),output(count),staged(count);
+    std::vector<Device::BakeUvPoint> points(count);
+    std::vector<Device::BakeUvSample> queries(count);
+    for(size_t i=0;i<count;++i){
+      auto &in=input[i];
+      const auto pixel=4*i;
+      in.coverage=bake.coverage[i];
+      std::copy_n(bake.maps.color.rgba.data()+pixel,4,in.color);
+      std::copy_n(bake.maps.pbr_color.rgba.data()+pixel,4,in.pbr);
+      std::copy_n(bake.maps.normal.rgba.data()+pixel,3,in.normal);
+      std::copy_n(bake.maps.metal_rough.rgba.data()+pixel,3,in.orm);
+      if(physical)in.emission=bake.emission_field->texel(i);
+      else std::copy_n(bake.maps.emission.rgba.data()+pixel,3,in.legacy);
+    }
+    for(size_t i=0;i<count;++i){
+      if(i%13==0)continue;
+      const auto a=float(i%97)/97,b=(1-a)*float(i%71)/71,c=float(1.-double(a)-double(b));
+      points[i]={uint32_t(i%2),{a,b,c}};
+      const float bary[]{a,b,c};
+      std::array<float,2> uv{};
+      for(size_t k=0;k<3;++k)for(size_t axis=0;axis<2;++axis)
+        uv[axis]=add(uv[axis],mul(triangles[i%2].uv[k][axis],bary[k]));
+      const auto taps=detail::paint_bilinear_taps(extent,uv,padding,!physical);
+      auto &result=expected[i];
+      for(size_t k=0;k<4;++k){
+        const auto at=taps[k].texel;
+        const auto w=float(taps[k].weight);
+        queries[i].texels[k]=uint32_t(at);
+        queries[i].weights[k]=w;
+        if(!w)continue;
+        const auto &in=input[at];
+        const auto alpha=mul(w,unit(in.coverage));
+        const auto emission=detail::baked_emission_texel(bake,at);
+        result.coverage=add(result.coverage,alpha);
+        result.emission.coverage=add(result.emission.coverage,mul(emission.coverage,w));
+        for(unsigned c=0;c<4;++c){
+          const auto linear=[&](uint8_t v){return c<3?srgb_to_linear(unit(v)):unit(v);};
+          result.material[c]=add(result.material[c],mul(linear(in.color[c]),alpha));
+          result.pbr[c]=add(result.pbr[c],mul(linear(in.pbr[c]),alpha));
+          if(c==3)continue;
+          result.material[4+c]=add(result.material[4+c],mul(unit(in.orm[c]),alpha));
+          result.material[7+c]=add(result.material[7+c],mul(srgb_to_linear(unit(in.legacy[c])),alpha));
+          result.material[10+c]=add(result.material[10+c],mul(add(mul(unit(in.normal[c]),2),-1),alpha));
+          result.emission.legacy[c]=add(result.emission.legacy[c],mul(emission.legacy[c],w));
+          result.emission.absolute[c]=add(result.emission.absolute[c],mul(emission.absolute[c],w));
+        }
+      }
+      result.emission.coverage=std::min(result.emission.coverage,1.f);
+      for(unsigned c=0;c<3;++c){
+        result.emission.legacy[c]=std::min(result.emission.legacy[c],result.emission.coverage);
+        if(result.emission.coverage>0)result.emission.absolute[c]=std::min(result.emission.absolute[c],
+            result.emission.coverage*std::numeric_limits<float>::max());
+      }
+    }
+    resident->read_retopo_bake(points,output,{});
+    bounded->read_staged_retopo_bake(queries,input,staged,{});
+    const auto exact=[&](const auto &actual){
+      return std::memcmp(actual.data(),expected.data(),expected.size()*sizeof(expected[0]))==0;
+    };
+    check(exact(output)&&exact(staged),"Retopology Bake differs from independent weighted FLOAT oracle");
+    bool cancelled=false;
+    try{resident->read_retopo_bake(std::span(points).first(1),std::span(output).first(1),[]{return true;});}
+    catch(const std::runtime_error &){cancelled=true;}
+    check(cancelled,"Retopology Bake did not respect cancellation");
+  }
+  std::cout<<"PASS Retopology Bake exact resident and staged legacy, resolved color, normal and FLOAT "<<2*count<<" texels\n";
+}
+
 void compare_finite(Fixture fixture,uint32_t extent,bool original){
   const auto scene=model(fixture);
   const auto &object=scene.active();
@@ -847,6 +951,7 @@ int main(int argc,char **argv)try{
     compare_bake_uv_maps();
     compare_uv_layers();
     compare_uv_correspondence();
+    if(!host_reference)compare_retopology_bake();
     compare_finite(Fixture::BakeOnly,512,false);
     compare_finite(Fixture::LegacyBake,256,false);
     compare_finite(Fixture::Paint,512,true);

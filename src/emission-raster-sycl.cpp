@@ -8,6 +8,8 @@ void launch_bake(sycl::queue &,DeviceInput,size_t,size_t,uint32_t *);
 void launch_bake_uv_filter(sycl::queue &,Bake,const EmissionRasterDevice::BakeUvSample *,size_t,uint32_t *);
 void launch_bake_uv_maps(sycl::queue &,BakeUvMaps,Bake,BakeUvRequests,size_t,
                          EmissionRasterDevice::BakeUvMapsPixel *,uint32_t *);
+void launch_retopo_bake(sycl::queue &,BakeUvMaps,Bake,BakeUvRequests,
+    const EmissionRasterDevice::RetopoBakeTexel *,RetopoBakeFormat,size_t,EmissionRasterDevice::RetopoBakePixel *);
 void launch_resident_uv_layer(sycl::queue &,UvLayer,BakeUvGeometry,const EmissionRasterDevice::BakeUvPoint *,
                               size_t,paint_grid::Pixel *);
 void launch_typed(sycl::queue &,DeviceInput,size_t,size_t,uint32_t *);
@@ -87,6 +89,11 @@ public:
   void filter_bake_uv_maps(BakeUvMaps maps,Bake bake,BakeUvRequests requests,
       size_t count,EmissionRasterDevice::BakeUvMapsPixel *out,uint32_t *emission){
     launch_bake_uv_maps(queue_,maps,bake,requests,count,out,emission);
+  }
+  void filter_retopo_bake(BakeUvMaps maps,Bake bake,BakeUvRequests requests,
+      const EmissionRasterDevice::RetopoBakeTexel *texels,RetopoBakeFormat format,size_t count,
+      EmissionRasterDevice::RetopoBakePixel *out){
+    launch_retopo_bake(queue_,maps,bake,requests,texels,format,count,out);
   }
   void filter_uv_layer(UvLayer layer,BakeUvGeometry geometry,const EmissionRasterDevice::BakeUvPoint *points,
                        size_t count,paint_grid::Pixel *out){
