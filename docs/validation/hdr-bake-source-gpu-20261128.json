@@ -1,0 +1,76 @@
+{
+  "date": "2026-11-28",
+  "product": "fb90fe6ae14bd42af8e7baa2847e5b1aa5f62b92",
+  "previous": "b8f39390",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "operation": "HDR Bake donor emission image lookup and ordered binary64 source sampler affine on the selected GPU.",
+  "device": "Intel Arc A770, renderD129, Level Zero",
+  "worker": {
+    "ordered_capture": "Projection supplies original triangle and barycentrics. PBR samples the transported source carrier, and typed MToon samples the authored logical UV.",
+    "capacity": 16384,
+    "resident_source_images": 1,
+    "mixed_raster_texels": 65536,
+    "mixed_float_coverage_exact": true,
+    "coupled_affine_float_oracle_texels": 16384,
+    "trace_launch_widths": [
+      16384,
+      16256,
+      128,
+      16384,
+      16384,
+      4096,
+      4096,
+      4096
+    ],
+    "document_ordered_save_reopen_undo_redo": true,
+    "cancellation_boundaries": 4
+  },
+  "profile": {
+    "fixture": "512 by 512 complete HDR Bake from a prepared donor with a 2 by 2 source image, 262144 projected texels.",
+    "protocol": "One process per build with persistent oneAPI cache disabled, then four warm iterations. Times include the complete Bake and exclude Save.",
+    "project_sha256": "668717dc4f20e2d7ce36585cbf7a849d20a5f5defe72547f662a7f57949e9b79",
+    "previous": {
+      "cold_ms": 186.354,
+      "warm_ms": [
+        183.213,
+        182.429,
+        184.376,
+        173.944
+      ],
+      "warm_median_ms": 182.821
+    },
+    "current": {
+      "cold_ms": 1438.8,
+      "warm_ms": [
+        193.634,
+        191.578,
+        190.812,
+        188.038
+      ],
+      "warm_median_ms": 191.195
+    }
+  },
+  "release_tests": [
+    "source-advanced-normal-bake",
+    "baked-emission-uv1-worker",
+    "source-paint-physical-authoring",
+    "bake-policy-openxr",
+    "source-uv-bake",
+    "source-role-domain-emission"
+  ],
+  "synthetic_openxr_bake_policy_checks": 16,
+  "headless_asan_ubsan": [
+    "source-uv-bake",
+    "source-uv-adopt",
+    "source-role-domain-emission"
+  ],
+  "missing_device": {
+    "oneapi": "FAIL No device of requested type 'info::device_type::gpu' available.",
+    "cuda": "CUDA driver version is insufficient for CUDA runtime version",
+    "rocm": "no ROCm-capable device is detected"
+  },
+  "open": [
+    "Projection geometry, typed coordinate mapping, and FLOAT paint/coverage composition remain on the worker.",
+    "Direct retained alternate-coordinate export, physical headset testing and positive AMD/NVIDIA device testing remain open."
+  ]
+}

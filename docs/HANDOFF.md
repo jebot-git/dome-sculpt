@@ -334,6 +334,25 @@ checks pass through the native OpenXR loader with synthetic tracking.
 CUDA and ROCm compile, and all three backends reject an unavailable GPU.
 [Animated mask evidence](validation/mtoon-animation-mask-gpu-20261128.json)
 
+HDR Bake now samples donor textures on the selected GPU from the actual
+source triangle and barycentrics. The batch uses the transported PBR
+carrier or the typed MToon role's original UV set. It preserves the
+source sampler's binary64 affine evaluation, wrap, filtering and color
+decoding. Up to 16,384 hits share a batch, with one source image resident
+at a time. The worker still resolves overlay coverage and FLOAT
+coefficients and publishes only the completed Bake.
+
+The mixed PBR and MToon fixture reproduces all 65,536 FLOAT texels and
+coverage exactly. A 512-pixel Bake with a 2×2 source image produces a
+byte-identical native project on Arc. Its median warm Bake time is
+191 ms, up from 183 ms, and its first dispatch takes the full cold Bake to
+1.44 s, up from 0.19 s. The trace confirms dispatches in the Document
+worker. Six focused Release tests and three sanitizer suites pass. The
+synthetic OpenXR Bake policy fixture passes 16 checks. CUDA and ROCm
+compile, and all three backends reject missing compute hardware. Direct
+retained alternate-coordinate export remains a separate requirement.
+[HDR Bake donor validation](validation/hdr-bake-source-gpu-20261128.json)
+
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
 their hashes verified and their workspace paths preserved. The same sweep
