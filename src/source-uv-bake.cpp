@@ -14,6 +14,7 @@
 #include "paint-overlay-sample.hpp"
 #include "dome/source-paint-bake.hpp"
 #include "source-paint-physical.hpp"
+#include "source-uv-sampler.hpp"
 #include "emission-paint-access.hpp"
 #include "normal-projection-identity.hpp"
 #include "normal-sampling-access.hpp"
@@ -24,6 +25,7 @@
 #include "dome/polygon-scene.hpp"
 #include "dome/polygon-color.hpp"
 #include <algorithm>
+#include <bit>
 #include <deque>
 #include <limits>
 #include <map>
@@ -379,13 +381,58 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
   uint32_t size=o.resolution?o.resolution:std::max({p.view.image->width,p.view.image->height,i.paint->resolution()});if(size_t(size)*size>o.max_image_pixels)throw std::length_error("Source UV output image pixel budget exceeded");size_t bytes=size_t(size)*size*4;if(bytes>o.max_output_bytes-result.image_bytes)throw std::length_error("Source UV output image budget exceeded");
   if(!current||current->size!=size){current.reset();current=raster(i.target,size,false,true,budget);}
   auto image=std::make_shared<Image>();image->width=image->height=size;image->rgba.assign(bytes,0);
-  for(uint32_t y=0;y<size;++y){budget.cancel();for(uint32_t x=0;x<size;++x){size_t at=size_t(y)*size+x;auto &h=current->hits[at];if(h.face==UINT32_MAX)continue;auto q=mapped(p,h);auto sample_view=p.view;sample_view.uv_transform={1,0,0,1,0,0};sample_view.texcoord=0;auto value=sample_source_texture(sample_view,q[0],q[1],p.srgb);budget.work();
-   if(p.normal){std::array<std::array<float,2>,3> oq,nq;for(int k=0;k<3;++k){Hit corner{h.face,{}};corner.bary[k]=1;oq[k]=mapped(p,corner);nq[k]=i.target.uv[i.target.indices[size_t(h.face)*3+k]];}
+  auto write_normal=[&](size_t at,std::array<float,4> value){
+   const auto &h=current->hits[at];
+   std::array<std::array<float,2>,3> oq,nq;for(int k=0;k<3;++k){Hit corner{h.face,{}};corner.bary[k]=1;oq[k]=mapped(p,corner);nq[k]=i.target.uv[i.target.indices[size_t(h.face)*3+k]];}
     if(p.animated){constexpr float step=.001f;auto q0=mapped(p,h);Hit bx=h,by=h;bx.bary[0]-=step;bx.bary[1]+=step;by.bary[0]-=step;by.bary[2]+=step;auto qx=mapped(p,bx),qy=mapped(p,by);oq[0]=q0;oq[1]={q0[0]+(qx[0]-q0[0])/step,q0[1]+(qx[1]-q0[1])/step};oq[2]={q0[0]+(qy[0]-q0[0])/step,q0[1]+(qy[1]-q0[1])/step};}
     auto nf=frame(i.target,h,nq);if(!nf)throw std::runtime_error("Destination UV normal frame is degenerate");Vec3 world=nf->n;auto of=frame(old,h,oq);if(of){if(p.check_backface&&(std::abs(dot(of->t,nf->b))>1e-5f||std::abs(dot(of->b,nf->t))>1e-5f))throw std::invalid_argument("MToon1 backface normal frame rotates across UVs; preserve authored tangent transport before baking this material");Vec3 v{value[0]*2-1,value[1]*2-1,value[2]*2-1};if(length(v)>1e-8f)world=normalized(of->t*v.x+of->b*v.y+of->n*v.z);}Vec3 v{dot(world,nf->t),dot(world,nf->b),dot(world,nf->n)};value[0]=v.x*.5f+.5f;value[1]=v.y*.5f+.5f;value[2]=v.z*.5f+.5f;
-   }
    for(int k=0;k<4;++k)image->rgba[at*4+k]=byte(p.srgb&&k<3?linear_to_srgb(value[k]):value[k]);
-  }}
+  };
+  using Sampler=detail::SourceUvSampler;
+  const size_t words_per_sample=p.normal?4:1;
+  const size_t scratch_per_sample=2*(sizeof(Sampler::Coordinate)+words_per_sample*sizeof(uint32_t))+sizeof(size_t);
+  const size_t fixed_bytes=current->hits.size()*(sizeof(Hit)+sizeof(int32_t))+
+    p.view.image->rgba.size()+Sampler::table_bytes;
+  if(fixed_bytes>=o.max_working_bytes||(o.max_working_bytes-fixed_bytes)<scratch_per_sample)
+   throw std::length_error("Source UV sampling working memory budget exceeded");
+  const size_t capacity=std::min({Sampler::max_batch,current->hits.size(),
+    (o.max_working_bytes-fixed_bytes)/scratch_per_sample});
+  budget.cancel();
+  auto sampler=detail::upload_source_uv_sampler(p.view,p.srgb,!p.normal,capacity);
+  std::vector<Sampler::Coordinate> coordinates;
+  std::vector<size_t> texels;
+  std::vector<uint32_t> colors(capacity*words_per_sample);
+  coordinates.reserve(capacity);
+  texels.reserve(capacity);
+  auto flush=[&]{
+   if(coordinates.empty())return;
+   budget.cancel();
+   sampler->read(coordinates,std::span(colors).first(coordinates.size()*words_per_sample));
+   budget.cancel();
+   if(p.normal){
+    for(size_t index=0;index<texels.size();++index){
+     std::array<float,4> color;
+     for(size_t c=0;c<4;++c)color[c]=std::bit_cast<float>(colors[4*index+c]);
+     write_normal(texels[index],color);
+    }
+   }else{
+    for(size_t index=0;index<texels.size();++index)
+     for(size_t c=0;c<4;++c)image->rgba[texels[index]*4+c]=uint8_t(colors[index]>>(8*c));
+   }
+   coordinates.clear();
+   texels.clear();
+  };
+  for(size_t at=0;at<current->hits.size();++at){
+   if(at%size==0)budget.cancel();
+   const auto &h=current->hits[at];
+   if(h.face==UINT32_MAX)continue;
+   const auto q=mapped(p,h);
+   coordinates.push_back({q[0],q[1]});
+   texels.push_back(at);
+   budget.work();
+   if(coordinates.size()==capacity)flush();
+  }
+  flush();
   for(size_t at=0;at<current->hits.size();++at)if(current->hits[at].face==UINT32_MAX&&current->padding[at]>=0){auto from=size_t(current->padding[at]);std::copy_n(image->rgba.begin()+from*4,4,image->rgba.begin()+at*4);++result.padded_texels;}
   result.image_bytes+=bytes;completed.push_back({p,image});auto out=p.view;out.image=std::move(image);out.texcoord=0;out.uv_transform={1,0,0,1,0,0};out.wrap_s=out.wrap_t=33071;return out;
  };

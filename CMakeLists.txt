@@ -48,7 +48,7 @@ elseif(DOME_COMPUTE_BACKEND STREQUAL "ONEAPI")
     src/emission-raster-bake-sycl.cpp src/emission-raster-typed-sycl.cpp
     src/emission-raster-finite-sycl.cpp src/emission-raster-texture-set-sycl.cpp
     src/emission-raster-texture-set-source-sycl.cpp src/portable-normal-raster-sycl.cpp
-    src/portable-normal-certificate-sycl.cpp)
+    src/portable-normal-certificate-sycl.cpp src/source-uv-sampler-sycl.cpp)
 else()
   message(FATAL_ERROR "Unknown DOME_COMPUTE_BACKEND=${DOME_COMPUTE_BACKEND}")
 endif()
@@ -1649,6 +1649,7 @@ if(BUILD_TESTING)
     add_executable(dome-sculpt-${component}-test tests/${component}.cpp)
     target_link_libraries(dome-sculpt-${component}-test PRIVATE dome-sculpt-core)
   endforeach()
+  target_include_directories(dome-sculpt-source-uv-bake-test PRIVATE src)
   add_test(NAME source-uv-bake COMMAND dome-sculpt-source-uv-bake-test
     ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-female.vrm
     ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-male.vrm)

@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/source-uv-bake.hpp"
+#include "source-uv-sampler.hpp"
+#include <algorithm>
+#include <bit>
 #include <chrono>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -11,6 +14,43 @@ template<class F>bool rejects(F f){try{f();return false;}catch(const std::except
 Mesh quad(){Mesh m;m.positions={{-1,-1,0},{1,-1,0},{1,1,0},{-1,1,0}};m.normals.assign(4,{0,0,1});m.uv={{{0,0}},{{1,0}},{{1,1}},{{0,1}}};m.indices={0,1,2,0,2,3};return m;}
 std::shared_ptr<const Image> flat(std::array<uint8_t,4>p){return std::make_shared<const Image>(Image{1,1,{p[0],p[1],p[2],p[3]}});}
 std::shared_ptr<const Image> gradient(){Image image;image.width=image.height=64;for(int y=0;y<64;++y)for(int x=0;x<64;++x){image.rgba.push_back(uint8_t(x*4));image.rgba.push_back(uint8_t(y*4));image.rgba.push_back(128);image.rgba.push_back(uint8_t(x==48&&y==47?0:192));}return std::make_shared<const Image>(std::move(image));}
+void check_mapped_sampler() {
+ using Sampler=detail::SourceUvSampler;
+ const auto count=Sampler::max_batch;
+ std::vector<Sampler::Coordinate> coordinates(count);
+ std::vector<uint32_t> colors(4*count),encoded(count);
+ for(size_t at=0;at<count;++at)
+  coordinates[at]={float(int(at%197)-98)/31, float(int(at%251)-125)/43};
+ coordinates[0]={std::numeric_limits<float>::max(),-std::numeric_limits<float>::max()};
+ coordinates[1]={-std::numeric_limits<float>::denorm_min(),std::numeric_limits<float>::denorm_min()};
+ PaintSourceTexture source;
+ source.image=gradient();
+ for(const int wrap:{10497,33648,33071}){
+  source.wrap_s=wrap;
+  source.wrap_t=wrap;
+  for(const bool nearest:{false,true}){
+   source.mag_filter=nearest?9728:9729;
+   auto sampler=detail::upload_source_uv_sampler(source,!nearest,false,count);
+   auto byte_sampler=detail::upload_source_uv_sampler(source,!nearest,true,count);
+   sampler->read(coordinates,colors);
+   byte_sampler->read(coordinates,encoded);
+   bool exact=true,exact_bytes=true;
+   for(size_t at=0;at<count;++at){
+    const auto &uv=coordinates[at];
+    const auto expected=sample_source_texture(source,uv.u,uv.v,!nearest);
+    for(size_t c=0;c<4;++c){
+     exact&=std::bit_cast<float>(colors[4*at+c])==expected[c];
+     const float value=!nearest&&c<3?linear_to_srgb(expected[c]):expected[c];
+     exact_bytes&=uint8_t(encoded[at]>>(8*c))==std::lround(std::clamp(value,0.f,1.f)*255);
+    }
+   }
+   check(exact,"Mapped source batch matches CPU reference for wrapped barycentric UVs");
+   check(exact_bytes,"Mapped source byte encoding matches the reference channel by channel");
+   byte_sampler->read(std::span(coordinates).subspan(193,3),std::span(encoded).first(3));
+   check(encoded[2]==encoded[195],"Partial dispatch replaces preceding sample results");
+  }
+ }
+}
 std::shared_ptr<PaintSourceMaps> maps(){auto m=std::make_shared<PaintSourceMaps>();m->color.image=gradient();m->metal_rough.image=flat({64,96,128,255});m->emission.image=flat({32,64,128,255});m->normal.image=flat({255,128,128,255});m->occlusion.image=flat({96,0,0,255});for(auto view:{&m->color,&m->metal_rough,&m->emission,&m->normal,&m->occlusion}){view->min_filter=view->mag_filter=9728;view->wrap_s=view->wrap_t=33071;}m->normal_scale=.75f;m->occlusion_strength=.6f;return m;}
 SourceUvBakeInput input(std::shared_ptr<const PaintedMesh>paint){SourceUvBakeInput i;i.paint=paint;i.target=paint->mesh();for(auto &q:i.target.uv)q={1-q[1],q[0]};for(uint32_t n=0;n<i.target.positions.size();++n)i.source_vertices.push_back(n);return i;}
 std::array<int,4> pixel(const PaintSourceTexture&t,int x=16,int y=48){auto &i=*t.image;size_t at=(size_t(y)*i.width+x)*4;return {i.rgba[at],i.rgba[at+1],i.rgba[at+2],i.rgba[at+3]};}
@@ -20,6 +60,7 @@ void set(std::shared_ptr<CreatorAppearance>a,const MToonMaterial&m){if(m.version
 SourceUvBakeInput triangles(std::shared_ptr<const PaintedMesh>paint,std::shared_ptr<const CreatorAppearance>a){SourceUvBakeInput i;i.paint=paint;i.appearance=a;auto &source=paint->mesh();uint32_t faces=uint32_t(source.indices.size()/3),side=uint32_t(std::ceil(std::sqrt(double(faces))));for(uint32_t f=0;f<faces;++f)for(int k=0;k<3;++k){auto original=source.indices[size_t(f)*3+k];i.target.positions.push_back(source.positions[original]);i.target.normals.push_back(source.normals[original]);i.source_vertices.push_back(original);i.target.indices.push_back(uint32_t(i.target.positions.size()-1));float x=float(f%side),y=float(f/side);std::array<float,2> q=k==0?std::array<float,2>{.1f,.1f}:k==1?std::array<float,2>{.9f,.1f}:std::array<float,2>{.1f,.9f};i.target.uv.push_back({(x+q[0])/side,(y+q[1])/side});}return i;}
 }
 int main(int argc,char**argv)try{
+ check_mapped_sampler();
  auto source=maps();auto paint=PaintedMesh::from_maps(quad(),source,64);auto before=paint->encode();SourceUvBakeOptions options;options.resolution=64;auto i=input(paint);auto baked=bake_source_uv(i,options);
  check(pixel(baked.maps->color)==std::array<int,4>{192,188,128,0},"Exact same-face barycentrics rotate original RGBA including transparent RGB without material flattening");
  check(pixel(baked.maps->metal_rough)==std::array<int,4>{64,96,128,255}&&pixel(baked.maps->emission)==std::array<int,4>{32,64,128,255}&&pixel(baked.maps->occlusion)==std::array<int,4>{96,0,0,255},"All raw PBR data/emission slots retain original channel values independently");

@@ -4,7 +4,44 @@
 #include "paint-source-coordinate-kernel.hpp"
 #include "paint-grid-filter.hpp"
 #include "portable-normal-raster.hpp"
+#include "source-uv-sampler.hpp"
+#include "dome/source-maps.hpp"
 #include <cstring>
+namespace dome::detail {
+namespace {
+class ReferenceSourceUvSampler final : public SourceUvSampler {
+  PaintSourceTexture source_;
+  bool srgb_, encode_;
+public:
+  ReferenceSourceUvSampler(const PaintSourceTexture &source, bool srgb, bool encode, size_t capacity)
+      : SourceUvSampler(capacity, encode), source_(source), srgb_(srgb), encode_(encode) {
+    source_.texcoord = 0;
+    source_.uv_transform = {1, 0, 0, 1, 0, 0};
+  }
+private:
+  void dispatch(std::span<const Coordinate> pending, std::span<uint32_t> result) override {
+    for (size_t i = 0; i < pending.size(); ++i) {
+      const auto color = sample_source_texture(source_, pending[i].u, pending[i].v, srgb_);
+      if (encode_) {
+        uint32_t rgba = 0;
+        for (unsigned c = 0; c < 4; ++c) {
+          const float value = srgb_ && c < 3 ? linear_to_srgb(color[c]) : color[c];
+          const auto byte = uint32_t(std::lround(std::clamp(value, 0.f, 1.f) * 255));
+          rgba |= byte << (8 * c);
+        }
+        result[i] = rgba;
+      } else {
+        for (unsigned c = 0; c < 4; ++c) result[4 * i + c] = std::bit_cast<uint32_t>(color[c]);
+      }
+    }
+  }
+};
+}
+std::unique_ptr<SourceUvSampler> upload_source_uv_sampler(
+    const PaintSourceTexture &source, bool srgb, bool encode, size_t capacity) {
+  return std::make_unique<ReferenceSourceUvSampler>(source, srgb, encode, capacity);
+}
+}
 namespace dome::detail::portable_normal {
 std::unique_ptr<Raster> upload(const Image &,const std::function<bool()> &){
  throw std::logic_error("Select a GPU backend for portable normal reprojection");

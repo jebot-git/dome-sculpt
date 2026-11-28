@@ -30,7 +30,9 @@
 #include "paint-source-coordinate-kernel.hpp"
 #include "portable-normal-raster-kernel.hpp"
 #include "portable-normal-certificate-kernel.hpp"
+#include "source-uv-sampler-kernel.hpp"
 #include "dome/paint.hpp"
+#include "dome/source-maps.hpp"
 namespace dome {namespace {
 template<class E>void checked(E value){if(value!=DS_SUCCESS)throw std::runtime_error(DS_ERROR_TEXT(value));}
 __global__ void map_source_coordinates(paint_compute::SourceCoordinateBatch batch,uint32_t width,
@@ -62,6 +64,48 @@ template<class T> struct Buffer {
   ~Buffer(){if(data)(void)DS_FREE(data);}
   Buffer(const Buffer &)=delete;
 };
+}
+namespace detail {
+namespace {
+__global__ void sample_source_uvs(MappedSourceImage source, const paint_compute::Quantization *table,
+    const SourceUvSampler::Coordinate *coordinates, uint32_t *colors, size_t count) {
+  const size_t at = size_t(blockIdx.x) * blockDim.x + threadIdx.x;
+  if (at < count) sample_mapped_source(source, coordinates[at], *table, colors, at);
+}
+
+class GpuSourceUvSampler final : public SourceUvSampler {
+  Buffer<uint8_t> image_;
+  Buffer<paint_compute::Quantization> table_{1};
+  Buffer<Coordinate> coordinates_;
+  Buffer<uint32_t> colors_;
+  MappedSourceImage source_;
+
+public:
+  GpuSourceUvSampler(const PaintSourceTexture &source, bool srgb, bool encode, size_t capacity)
+      : SourceUvSampler(capacity, encode), image_(source.image->rgba.size()), coordinates_(capacity),
+        colors_(capacity * (encode ? 1 : 4)),
+        source_{image_.data, source.image->width, source.image->height,
+                source.wrap_s, source.wrap_t, source.mag_filter == 9728, srgb, encode} {
+    const auto &table = paint_compute::quantization();
+    checked(DS_COPY(image_.data, source.image->rgba.data(), source.image->rgba.size(), DS_TO_DEVICE));
+    checked(DS_COPY(table_.data, &table, sizeof(table), DS_TO_DEVICE));
+  }
+
+private:
+  void dispatch(std::span<const Coordinate> pending, std::span<uint32_t> result) override {
+    checked(DS_COPY(coordinates_.data, pending.data(), pending.size_bytes(), DS_TO_DEVICE));
+    sample_source_uvs<<<(pending.size() + 127) / 128, 128>>>(source_, table_.data,
+        coordinates_.data, colors_.data, pending.size());
+    checked(DS_LAST_ERROR());
+    checked(DS_COPY(result.data(), colors_.data, result.size_bytes(), DS_TO_HOST));
+  }
+};
+}
+
+std::unique_ptr<SourceUvSampler> upload_source_uv_sampler(
+    const PaintSourceTexture &source, bool srgb, bool encode, size_t capacity) {
+  return std::make_unique<GpuSourceUvSampler>(source, srgb, encode, capacity);
+}
 }
 namespace detail::portable_normal {
 namespace {
