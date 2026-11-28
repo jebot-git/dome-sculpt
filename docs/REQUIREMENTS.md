@@ -185,11 +185,15 @@ Static prepared MToon1 HDR Bake supports a shared glTF base color role with
 independent or linked shade. It emits the baked color, authored normal, ORM
 and emission atlas in Standard GLB, with exact native Save, Undo/Redo and
 recovery. The GPU compiles linked shade to its own atlas. Shade beyond the
-portable range retains its native authoring data. The projection resolver
-preserves both original normal roles on misses. Separately projected normal planes,
-broader deformation and physical headset workflows remain open.
+portable range retains its native authoring data. Standalone imported MToon
+also projects both normal roles from a typed donor into separate native
+planes. A partial rebake keeps both directions on misses. Standard GLB
+displays the authored MToon normal and stores both planes for native recovery.
+Paired-normal UV transfer, broader deformation and physical headset workflows
+remain open.
 [Prepared MToon1 Bake evidence](validation/prepared-mtoon-bake-20261128.json)
 [Linked MToon shade evidence](validation/prepared-mtoon-shared-shade-20261128.json)
+[Paired Bake evidence](validation/prepared-mtoon-paired-bake-20261128.json)
 
 ## Current validation — 2026-11-27
 

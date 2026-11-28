@@ -67,8 +67,16 @@ also composites the core material and emission textures. Projection ray
 queries and normal encoding run on the host. The native package keeps the
 independent original Core PBR and MToon normal frames, Bake
 coverage and absolute FLOAT donor radiance. An ordinary donor keeps its
-radiance regardless of the receiving material's emission gain. Dual
-projected normal fields and animated UVs remain open.
+radiance regardless of the receiving material's emission gain.
+
+When a standalone imported MToon Bake projects a typed donor, the native
+project can store separate Core PBR and MToon normal directions on the same
+writable atlas. The `paired-mikk-v1` Bake payload retains the two images
+under the original-source material and geometry binding. Earlier single-plane
+Bakes remain readable. Standard GLB emits the authored MToon plane in its
+`normalTexture` and recovers both planes through the native package. Paired
+normal UV transfer, independently selectable portable material variants and
+animated UVs remain open.
 
 ## First GLB implementation
 

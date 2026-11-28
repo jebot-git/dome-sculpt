@@ -1,0 +1,118 @@
+{
+  "date": "2026-11-28",
+  "product": "dc66702c1c9e32ffba70689be779bf6673cc3447",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Separate projected Core PBR and MToon normal planes for standalone imported MToon on a prepared writable atlas.",
+  "baseline_refused_new_paired_archive": true,
+  "fixture": {
+    "size": 64,
+    "distinct_projected_texels": 767,
+    "maximum_donor_direction_distance": 0.00499457,
+    "native_sha256": "630654ae86abfa675010108d4abbdbf131e6651ad3b66b5c5ca7511b98b4c8e6",
+    "exact_ordered_save_and_native_recovery": true,
+    "matching_geometry_donor_already_baked": true,
+    "subsequent_partial_rebake_preserved_both_planes_on_misses": true,
+    "exact_undo_redo": true,
+    "portable_glb_selects_authored_mtoon_normal": true
+  },
+  "arc": {
+    "device": "Intel Arc A770 with oneAPI Level Zero and hardware EGL",
+    "checks": 706,
+    "bake_export_kernels": [
+      "launch_mapped_field",
+      "launch_material_sources",
+      "launch_material"
+    ]
+  },
+  "release_ctest": [
+    "baked-emission-native",
+    "emission-raster-finite-compute",
+    "source-material-raster-compute",
+    "emission-raster-mapped-compute",
+    "emission-raster-mapped-missing-gpu",
+    "emission-raster-texture-set-compute",
+    "source-prepared-normal-bake",
+    "source-advanced-normal-bake",
+    "source-canonical-normal-bake",
+    "baked-emission-workflow",
+    "baked-emission-source",
+    "baked-emission-uv1-worker",
+    "emission-export",
+    "emission-export-worker",
+    "source-paint-export",
+    "source-paint-bake",
+    "source-paint-authoring",
+    "source-paint-physical-authoring",
+    "surface-program-switch",
+    "mtoon-render",
+    "mtoon-texture-sets",
+    "mtoon-painted-texture-sets",
+    "mtoon-resized-texture-set",
+    "mtoon-baked-texture-sets",
+    "source-uv-bake",
+    "vrm1-source-export",
+    "raw-hdr-authoring",
+    "xr-editable-export",
+    "source-role-missing-uv1"
+  ],
+  "release_junit_sha256": "6d3f7071de596959de193877802f00bf8b1bf08fbb134b8b03d24c5df7b620a3",
+  "other_gpu_profiles": {
+    "cuda": "changed host Bake sources compiled",
+    "rocm": "changed host Bake sources compiled"
+  },
+  "asan_ubsan": {
+    "mode": "opt-in headless reference",
+    "checks": 706,
+    "export_matches_arc": true
+  },
+  "native_wayland": {
+    "checks": 7,
+    "artifact_sha256": "396525a57e5a777ed8b56ebd579c8dffcd6252f648fbc2465174732dd5f359cc"
+  },
+  "openxr": {
+    "checks": 10,
+    "synthetic_tracking": true,
+    "artifact_sha256": "396525a57e5a777ed8b56ebd579c8dffcd6252f648fbc2465174732dd5f359cc",
+    "native_sha256": "630654ae86abfa675010108d4abbdbf131e6651ad3b66b5c5ca7511b98b4c8e6",
+    "focus_loss_cancelled_export": true
+  },
+  "release_cli_missing_gpu_preserves_existing_export": true,
+  "khronos": {
+    "prepared-mtoon-paired-bake.glb": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 402736,
+      "sha256": "396525a57e5a777ed8b56ebd579c8dffcd6252f648fbc2465174732dd5f359cc",
+      "errors": 0,
+      "warnings": 0
+    },
+    "prepared-mtoon-paired-bake-portable.glb": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 401740,
+      "sha256": "33792e7fd74283b814ada63710becbdbaabc665e599e9307d5eeeba8f34a992d",
+      "errors": 0,
+      "warnings": 0
+    }
+  },
+  "official_mtoon_schema_validated": 2,
+  "prior_glbs_byte_identical": {
+    "prepared-mtoon-shared-shade-bake.glb": "fbb0ea9d68f5013fb682b8e60d3c8dc974fed4faae0b5dc2c3e2474acd45ae51",
+    "prepared-mtoon-baked.glb": "930e295138979556aadc7505cec4397f62c781c538812cc5c849c5c1bf64a5a7",
+    "prepared-mtoon-hdr.glb": "55b80b4d2158b808a0db172236e4bbe6b938aea88cbf8790402abedf892e6062",
+    "prepared-mtoon-hdr-uv0.glb": "5821ff66098c95168efba401eada214444e2fdfa25ffe234113f6319a75abc88",
+    "baked-source-hdr.glb": "7a8d9dd3f41218ef527fe2fed9346a0607ca554d28ea1b10b2e328f939c95729",
+    "baked-generated-tangents-hdr.glb": "40b51a7c7cfe9259bd9f0c6ad8c66cfa95b9090b7661495dca255255d2ae4f70",
+    "baked-native-tangents-hdr.glb": "5c8f728a32c527c18eec64ad30f8aab5664e1dae3ae7158ea75c89696e826273",
+    "baked-mask-visible.glb": "7829e58d94294a184e1d04ef606a6511b10c12dd8c50bb343648c114401e61cf",
+    "baked-mask-hidden.glb": "b83e6cd6a27af1a137093069194dcf0a009b09e6618fd57efa66f5b9d442c218",
+    "baked-mask-mixed.glb": "679d0e26b8bcd883e9d3b3b34038fba217614469e96874d9130bdcea5b88d882",
+    "varying-source-hdr.glb": "497b70223ba5aeb39e6556950e824b471cc39714ff83de0966c42081cfaf9cc6",
+    "single-surface-hdr.glb": "54fe8dccaaf6fc0ba69ace992aade6199eaea18b60dc5aa19d6bd6a444527971",
+    "mixed-source.glb": "ff769fff8afebfb62309e67abf0bc5efc1843dc13151d909bb2d981ebe9c84fa",
+    "mixed-source-hidden.glb": "484678692c4aad88173eb79876d79241c09895fa3faf1a52c04020612a689f5d",
+    "uniform-mask-cross.glb": "98e526883365742fef5b60880641cb918d3f4b761424f88089ab9c3a948b1b9a"
+  },
+  "open": [
+    "Frame-aware UV transport of both projected directions and portable material variants for independent normal maps.",
+    "Physical-headset, CUDA and ROCm device qualification."
+  ]
+}

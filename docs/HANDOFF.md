@@ -560,8 +560,7 @@ the authored MToon normal and retains independent shade and rim sampling.
 The portable re-import matches the authored Arc A770 viewport within one
 output byte. All 25 focused Arc Release tests pass. Native DomeD Wayland,
 synthetic OpenXR and the release CLI export the same GLB byte for byte.
-Separately projected donor normal planes and physical headset acceptance
-remain open.
+Physical headset acceptance remains open.
 [Prepared MToon1 Bake evidence](validation/prepared-mtoon-bake-20261128.json)
 
 Prepared MToon1 Bake also exports linked base and shade. The GPU samples the
@@ -575,6 +574,19 @@ shade increases the measured difference to 44. All 25 focused Release cases
 pass. The headless sanitizer reference and the native Wayland export produce
 the same GLB bytes as Arc.
 [Linked MToon shade evidence](validation/prepared-mtoon-shared-shade-20261128.json)
+
+Standalone imported MToon Bake now projects two normal directions when
+the donor supplies distinct Core PBR and authored MToon frames. Each plane
+is encoded in the target's writable Mikk frame and both share the same hit
+coverage. The app displays the appropriate plane in each material view.
+A partial rebake retains both previous directions wherever projection misses.
+Standard GLB exposes the authored MToon normal and preserves both planes in
+its native package. The Arc fixture resolves 767 distinct texels within
+0.005 unit-vector distance of their respective donor directions. The 29
+focused Release cases pass. The headless sanitizer reference passes 706
+checks and produces the same native project and GLB bytes as Arc. Frame-aware
+UV transfer of both planes remains open.
+[Paired Bake evidence](validation/prepared-mtoon-paired-bake-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
