@@ -366,10 +366,22 @@ emission maps. The export worker verifies that the patch's Mikk tangents
 agree with the material's derivative frame, then resolves and certifies a
 separate normal map for the MToon variant. Both GLB formats retain the
 independent Core PBR normal and Editable GLB restores the native Bake and
-all layers. This path covers certified static frames. Physical emission,
-separate Core source atlases with retained Bakes and more general tangent
-frames still need their export adapters.
+all layers. This path covers certified static frames. Separate Core source
+atlases with retained Bakes and more general tangent frames still need their
+export adapters.
 [Retained MToon Bake export evidence](validation/retopo-baked-mtoon-20261128.json)
+
+Standard and Editable GLB now export physical emission on a standalone
+static MToon 1 retopology patch. The GPU resolves the patch's FLOAT Bake
+and paint from separate legacy, absolute and coverage coefficients. The
+MToon variant keeps its authored background and material-relative strength.
+The Core material gets its own radiance map. The variant's PNG and emissive
+strength carry a continuous error bound over the emitted UVs for a constant
+or aligned clamp-linear source. Both native packages restore the exact paint
+and Bake. Hidden FLOAT layers preserve the visible material's legacy
+filtering when there is no active physical emission. Broader source sampler
+domains and physical headset qualification remain open.
+[Standalone MToon physical emission evidence](validation/retopo-float-mtoon-20261128.json)
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing

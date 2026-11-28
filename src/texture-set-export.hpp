@@ -13,6 +13,7 @@ struct TextureSetExportEmission {
   float strength=1;
   ResolvedFallbackMetrics measured;
   std::optional<double> filter_error;
+  bool retopo_uv_domain=false;
 };
 bool texture_set_physical_emission(const TextureSetView &);
 struct EmissionExportRaster;
@@ -55,6 +56,9 @@ std::optional<PortableMToonSetPaint> compile_mtoon_set_paint(
     const TextureSetLimits &);
 std::optional<PortableMToonSetPaint> compile_retopo_mtoon_paint(
     const TextureSetView &,const MToonMaterial &,TextureSetLimits &remaining);
+bool retopo_mtoon_uses_float(const TextureSetView &);
+std::optional<TextureSetExportEmission> compile_retopo_mtoon_emission(
+    const TextureSetView &,TextureSetLimits &remaining);
 struct MToonFloatPreview {
   TextureSetExportEmission emission;
   Image metal_rough;

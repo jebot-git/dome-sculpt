@@ -784,6 +784,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
   // Keep generated texture owners alive for the image-identity table.
   std::vector<std::shared_ptr<const Image>> mtoon_paint_images;
   std::deque<MToonFloatPreview> mtoon_float_previews;
+  std::deque<TextureSetExportEmission> retopo_emission_images;
   TextureSetLimits retopo_paint_limits;
   retopo_paint_limits.maximum_bytes-=bundle_working_bytes;
   retopo_paint_limits.maximum_work=256'000'000;
@@ -800,10 +801,11 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       return false;
     };
     const auto *hdr=compiled.emission&&compiled.emission->filter_error?&*compiled.emission:nullptr;
+    const bool float_retopo=variant&&retopo_mtoon_uses_float(field);
     const bool try_editable_float=editable_preview&&compiled.emission&&!hdr&&
         compiled.portable_mtoon_bake_frame;
     if(field.source||binding->material.version()!=MToonVersion::V1||
-       binding->physical_emission||(compiled.emission&&!hdr&&!try_editable_float))
+       (binding->physical_emission&&!float_retopo)||(compiled.emission&&!hdr&&!try_editable_float))
       return retain_native();
 
     const auto &attributes=j["meshes"][result.objects[object].mesh]["primitives"][primitive]["attributes"];
@@ -835,7 +837,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     for(size_t channel=0;channel<emission.size();++channel){
       auto &factor=emission[channel];
       factor=mtoon_factor(factor,native.emission[channel],current.emissive[channel]);
-      if(!(hdr||try_editable_float)&&!unit(factor))return retain_native();
+      if(!(hdr||try_editable_float||float_retopo)&&!unit(factor))return retain_native();
     }
     params.emission={emission[0],emission[1],emission[2]};
     if(current.double_sided!=native.double_sided)
@@ -878,6 +880,13 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
         paint=compile_mtoon_set_paint(field,compiled,typed,limits);
       }
       if(!paint)return retain_native();
+    }
+    if(float_retopo){
+      auto candidate=compile_retopo_mtoon_emission(field,retopo_paint_limits);
+      if(!candidate)return retain_native();
+      hdr=&retopo_emission_images.emplace_back(std::move(*candidate));
+    }
+    if(paint){
       const auto replace_role=[&](MToonSlot slot,const std::shared_ptr<const Image> &image,
                                   MToonEncoding encoding=MToonEncoding::Srgb){
         auto &role=roles[size_t(slot)];
@@ -972,12 +981,15 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     }
     if(hdr){
       output["extras"]["domeSculptPortableEmission"]={{"version",1},
-          {"evaluation","finite-current-authored-mtoon-texture-set"},{"units","native-linear-radiance"},
+          {"evaluation",variant?"finite-current-authored-mtoon-retopology":"finite-current-authored-mtoon-texture-set"},
+          {"units","native-linear-radiance"},
           {"lossless",false},{"unlitIgnoresEmission",false},{"errorScope","clamp-linear-level-zero"},
           {"betweenTexelErrorBound",*hdr->filter_error},
           {"maximumAbsoluteError",hdr->measured.maximum_absolute_error},
           {"maximumRelativeError",hdr->measured.maximum_relative_error},
           {"erasedNonzeroSamples",hdr->measured.erased_nonzero_samples}};
+      if(hdr->retopo_uv_domain)
+        output["extras"]["domeSculptPortableEmission"]["errorDomain"]="mesh-uv-triangles";
     }
     extensions.clear();
     if(!collect_mtoon_extensions(output,extensions))

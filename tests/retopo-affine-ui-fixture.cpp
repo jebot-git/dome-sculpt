@@ -10,7 +10,8 @@
 using namespace dome;
 int main(int argc,char **argv)try {
   const bool prepared=argc==3 && std::string_view(argv[2])=="prepared";
-  const bool baked_mtoon=argc==3 && std::string_view(argv[2])=="baked-mtoon";
+  const bool float_mtoon=argc==3 && std::string_view(argv[2])=="float-mtoon";
+  const bool baked_mtoon=float_mtoon || (argc==3 && std::string_view(argv[2])=="baked-mtoon");
   const bool painted_mtoon=baked_mtoon || (argc==3 && std::string_view(argv[2])=="painted-mtoon");
   const bool mtoon=painted_mtoon || (argc==3 && std::string_view(argv[2])=="mtoon");
   if(argc!=2 && !prepared && !mtoon)return 2;
@@ -24,11 +25,13 @@ int main(int argc,char **argv)try {
           {{"rotation",.2},{"offset",{-.15,.18}},{"scale",{1.14,.83}}}}}}};
     };
     auto binding=std::make_shared<SourceMaterialBindings>();
-    binding->material=MToonMaterial::from_vrm1({
+    nlohmann::json authored={
         {"pbrMetallicRoughness",{{"baseColorTexture",info(0)},{"baseColorFactor",o.material.color}}},
         {"normalTexture",info(2)},{"emissiveTexture",info(3)},{"emissiveFactor",{.3,.12,.08}},
         {"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"},
-            {"shadeColorFactor",{.55,.61,.64}},{"shadeMultiplyTexture",info(painted_mtoon?0:1)}}}}}},4);
+            {"shadeColorFactor",{.55,.61,.64}},{"shadeMultiplyTexture",info(painted_mtoon?0:1)}}}}}};
+    if(float_mtoon)authored["extensions"]["KHR_materials_emissive_strength"]={{"emissiveStrength",1.7}};
+    binding->material=MToonMaterial::from_vrm1(authored,4);
     binding->native_reference={o.material.color,o.material.emissive,int(o.material.alpha),
                                o.material.alpha_cutoff,o.material.double_sided};
     for(size_t role=0;role<4;++role){
@@ -51,6 +54,11 @@ int main(int argc,char **argv)try {
       p.channel=PaintChannel::Emission;p.emission={.035f,.04f,.03f};
       o.painted->begin_stroke();o.painted->stamp(b,p);
       if(!o.painted->end_stroke())throw std::runtime_error("MToon emission stroke made no change");
+      if(float_mtoon){
+        p.emission_units=PaintEmissionUnits::Physical;p.emission={4.3f,.45f,.19f};
+        o.painted->begin_stroke();o.painted->stamp(b,p);
+        if(!o.painted->end_stroke())throw std::runtime_error("MToon physical stroke made no change");
+      }
       o.painted->layer_properties("Visible color and emission",true,.63f);
       o.painted->add_layer("Hidden ink");
       p.channel=PaintChannel::Color;p.color={.88f,.08f,.11f,1};
@@ -75,6 +83,14 @@ int main(int argc,char **argv)try {
         const auto x=int(i%64),y=int(i/64);
         bake.coverage[i]=uint8_t(std::clamp((x-19)*16,0,255));
         bake.maps.normal.rgba[i*4]=uint8_t(132+y/4);
+      }
+      if(float_mtoon){
+        bake.emission_field=BakedEmissionField::generate_compact(64,[&](size_t i){
+          const float coverage=bake.coverage[i]/255.f;
+          return BakedEmissionSample{{.06f*coverage,.04f*coverage,.02f*coverage},
+              {(1.1f+(i/64)/128.f)*coverage,.12f*coverage,.03f*coverage},coverage};
+        });
+        bake.maps.emission={};
       }
       o.painted->install_bake(std::move(bake));
     }

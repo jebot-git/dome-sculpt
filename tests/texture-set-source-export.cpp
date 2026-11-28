@@ -2525,6 +2525,11 @@ void retopology_imported_pbr(bool prior_bake=false,bool resize=false) {
 
 struct PortableRetopoImages {
  Image core_orm, mtoon_base, mtoon_normal, mtoon_emission, mtoon_shade;
+ Image core_emission;
+ std::array<float,3> core_factor{},mtoon_factor{};
+ std::array<float,2> core_emission_offset{};
+ float core_strength=1,mtoon_strength=1;
+ double mtoon_filter_error=0;
 };
 
 PortableRetopoImages check_portable_retopo_mtoon(const std::filesystem::path &path,const SculptObject &patch,bool ink=false) {
@@ -2539,6 +2544,7 @@ PortableRetopoImages check_portable_retopo_mtoon(const std::filesystem::path &pa
        "GLB has a selectable authored MToon variant and an independent Core PBR material");
  const auto &core=*primitive.material,&toon=*primitive.mappings[0].material;
  const auto &source_maps=patch.painted->source_maps();
+ const bool portable_float=!source_maps&&patch.painted->has_physical_emission();
  const auto &bake=patch.painted->baked();
  const bool baked_normal=bake&&!bake->maps.normal.rgba.empty();
  const bool core_normal=(source_maps&&source_maps->normal.image)||baked_normal;
@@ -2552,20 +2558,21 @@ PortableRetopoImages check_portable_retopo_mtoon(const std::filesystem::path &pa
  const auto &typed=json.at("materials").at(&toon-data->materials);
  const auto &extension=typed.at("extensions").at("VRMC_materials_mtoon");
  const auto &binding=*patch.material_bindings;
- const auto &extensions=typed.at("extensions");
+ const auto strength=[](const cgltf_material &material){
+  return material.has_emissive_strength?material.emissive_strength.emissive_strength:1.f;
+ };
  const auto has=[&](MToonSlot slot){return bool(binding.roles[size_t(slot)].image);};
  check(extension.at("specVersion")=="1.0"&&extension.contains("matcapTexture")==has(MToonSlot::Matcap)&&
        extension.contains("rimMultiplyTexture")==has(MToonSlot::Rim)&&
        extension.contains("shadingShiftTexture")==has(MToonSlot::Shift)&&
-       extensions.value("KHR_materials_emissive_strength",nlohmann::json::object()).value("emissiveStrength",1.f)==
-           binding.material.parameters.emission_strength,
+       (portable_float?strength(toon)>1:strength(toon)==binding.material.parameters.emission_strength),
        "Portable MToon carries the actual typed roles and original emissive strength");
  check((extension.at("shadeMultiplyTexture").at("index")==typed.at("pbrMetallicRoughness").at("baseColorTexture").at("index"))==
            (!ink&&binding.roles[0].image==binding.roles[1].image),"The portable Base and Shade roles preserve the applicable shared or resolved samples");
  if(ink){
   const auto &proof=typed.at("extras").at("domeSculptMToonPaint");
   check(proof.at("maximumLinearColorError").get<double>()<=.008&&
-        proof.at("maximumLinearEmissionError").get<double>()<=.008*binding.material.parameters.emission_strength&&
+        proof.at("maximumLinearEmissionError").get<double>()<=.008*strength(toon)&&
         (proof.contains("maximumLinearShadeError")==(binding.roles[0].image==binding.roles[1].image))&&
         (!proof.contains("maximumLinearShadeError")||proof.at("maximumLinearShadeError").get<double>()<=.008),
         "Visible ink records its colour, emitted radiance and applicable shared shade bounds");
@@ -2613,9 +2620,26 @@ PortableRetopoImages check_portable_retopo_mtoon(const std::filesystem::path &pa
  if(shade_index>=data->textures_count)throw std::runtime_error("Portable MToon shade texture index is out of range");
  cgltf_texture_view shade{};
  shade.texture=&data->textures[shade_index];
- return {read_image(core.pbr_metallic_roughness.metallic_roughness_texture),
+ PortableRetopoImages images{read_image(core.pbr_metallic_roughness.metallic_roughness_texture),
          read_image(toon.pbr_metallic_roughness.base_color_texture),read_image(toon.normal_texture),
          read_image(toon.emissive_texture),read_image(shade)};
+ if(portable_float){
+  check(core.emissive_texture.texture&&core.emissive_texture.texture!=toon.emissive_texture.texture&&
+        strength(core)>1,"The HDR variant and Core each own a radiance texture and strength");
+  const auto &evidence=typed.at("extras").at("domeSculptPortableEmission");
+  check(evidence.at("evaluation")=="finite-current-authored-mtoon-retopology"&&
+        evidence.at("units")=="native-linear-radiance"&&evidence.at("errorDomain")=="mesh-uv-triangles",
+        "The variant identifies its own authored radiance proof over the emitted UVs");
+  images.mtoon_filter_error=evidence.at("betweenTexelErrorBound").get<double>();
+  images.core_emission=read_image(core.emissive_texture);
+  if(core.emissive_texture.has_transform)
+   std::copy_n(core.emissive_texture.transform.offset,2,images.core_emission_offset.begin());
+  std::copy_n(core.emissive_factor,3,images.core_factor.begin());
+  std::copy_n(toon.emissive_factor,3,images.mtoon_factor.begin());
+  images.core_strength=strength(core);
+ }
+ images.mtoon_strength=strength(toon);
+ return images;
 }
 
 void verify_mixed_retopo_sampling(const Scene &scene,const PortableRetopoImages &exported,bool visible_only=false) {
@@ -2630,6 +2654,7 @@ void verify_mixed_retopo_sampling(const Scene &scene,const PortableRetopoImages 
  const auto view=std::ranges::find(preview,patch.id,&ObjectSurface::id);
  check(view!=preview.end()&&view->textures,"The native renderer's actual derived paint and coverage maps are available");
  const auto &derived=*view->textures;
+ const bool portable_float=!exported.core_emission.rgba.empty();
  const bool hdr=std::ranges::max(patch.material.emissive)>1;
  const bool shared=binding.roles[0].image==binding.roles[1].image;
  const auto packet=detail::PaintOverlayFactory::capture(*patch.painted);
@@ -2641,6 +2666,9 @@ void verify_mixed_retopo_sampling(const Scene &scene,const PortableRetopoImages 
   return role;
  };
  const auto base=texture(exported.mtoon_base),shade=texture(exported.mtoon_shade),emission=texture(exported.mtoon_emission);
+ auto core_emission=texture(exported.core_emission);
+ core_emission.uv_transform[4]=exported.core_emission_offset[0];
+ core_emission.uv_transform[5]=exported.core_emission_offset[1];
  const auto composed_base=texture(derived.color),composed_emission=texture(derived.emission);
  const auto color_coverage=texture(derived.color_coverage),emission_coverage=texture(derived.emission_coverage);
  const bool baked_normal=!patch.painted->source_maps()&&patch.painted->baked()&&
@@ -2649,7 +2677,7 @@ void verify_mixed_retopo_sampling(const Scene &scene,const PortableRetopoImages 
   check(!derived.baked_normal.rgba.empty()&&!derived.baked_coverage.rgba.empty(),
         "The native renderer exposes the actual covered normal Bake");
  const auto normal=texture(exported.mtoon_normal);
- float max_base=0,max_shade=0,max_emission=0,max_normal=0;
+ float max_base=0,max_shade=0,max_emission=0,max_normal=0,max_core_emission=0,view_difference=0;
  size_t painted_samples=0,partial_normals=0;
  const auto &mesh=patch.painted->mesh();
  const auto uv_visible=[&](float u,float v){
@@ -2671,11 +2699,13 @@ void verify_mixed_retopo_sampling(const Scene &scene,const PortableRetopoImages 
   const auto darkness=srgb(binding.roles[size_t(MToonSlot::Shade)]);
   const auto authored_emission=srgb(binding.roles[size_t(MToonSlot::Emission)]);
   const auto pbr=srgb(core.color),pbr_emission=srgb(core.emission);
-  const auto composed=srgb(composed_base),composed_glow=srgb(composed_emission);
-  const float cover=linear(color_coverage)[0],glow=linear(emission_coverage)[0];
-  const auto contributions=hdr?detail::sample_overlay_values(*packet,u,v,false):detail::PaintOverlayValues{};
+  const auto composed=srgb(composed_base);
+  const auto composed_glow=portable_float?std::array<float,4>{}:srgb(composed_emission);
+  const float cover=linear(color_coverage)[0],glow=portable_float?0:linear(emission_coverage)[0];
+  const auto contributions=hdr||portable_float?detail::sample_overlay_values(*packet,u,v,false):detail::PaintOverlayValues{};
   if(cover>.01f)++painted_samples;
   const auto actual_base=srgb(base),actual_shade=srgb(shade),actual_emission=srgb(emission);
+  const auto actual_core=portable_float?srgb(core_emission):std::array<float,4>{};
   if(baked_normal){
    const auto direction=[](const auto &rgb){return Vec3{2*rgb[0]-1,2*rgb[1]-1,2*rgb[2]-1};};
    auto source=direction(linear(binding.roles[size_t(MToonSlot::Normal)]));
@@ -2711,14 +2741,31 @@ void verify_mixed_retopo_sampling(const Scene &scene,const PortableRetopoImages 
               typed_emission;
    max_base=std::max(max_base,std::abs(actual_base[k]-expected_base));
    max_shade=std::max(max_shade,std::abs((shared?actual_shade[k]:actual_shade[k]*shade_factor[k])-expected_shade*shade_factor[k]));
-   max_emission=std::max(max_emission,std::abs(actual_emission[k]-expected_emission));
+   if(portable_float){
+    const auto uncovered=1-contributions[3][3];
+    const auto legacy=contributions[2][k],physical=contributions[4][k];
+    const auto expected_toon=(typed_emission*uncovered+legacy)*params.emission_strength+physical;
+    const auto expected_core=pbr_emission[k]*patch.material.emissive[k]*uncovered+legacy+physical;
+    const auto toon_radiance=actual_emission[k]*exported.mtoon_factor[k]*exported.mtoon_strength;
+    const auto core_radiance=actual_core[k]*exported.core_factor[k]*exported.core_strength;
+    max_emission=std::max(max_emission,std::abs(toon_radiance-expected_toon));
+    max_core_emission=std::max(max_core_emission,std::abs(core_radiance-expected_core));
+    view_difference=std::max(view_difference,std::abs(toon_radiance-core_radiance));
+   }else max_emission=std::max(max_emission,std::abs(actual_emission[k]-expected_emission));
   }
  }
- check(painted_samples>50&&max_base<.00801f&&max_shade<.00801f&&max_emission<.00801f,
-       "Independent filtered material reads stay within tolerance between both grids");
  std::cout<<"MIXED_MTOON painted="<<painted_samples<<" base_error="<<max_base<<" shade_error="<<max_shade
           <<" emission_error="<<max_emission<<" base_size="<<exported.mtoon_base.width<<" emission_size="
-          <<exported.mtoon_emission.width<<" strength="<<params.emission_strength<<'\n';
+          <<exported.mtoon_emission.width<<" strength="<<exported.mtoon_strength<<'\n';
+ const double emission_limit=portable_float?exported.mtoon_filter_error+1e-5:.00801;
+ if(portable_float){
+  std::cout<<"RETOPO_MTOON_FLOAT core_error="<<max_core_emission<<" typed_error="<<max_emission
+           <<" view_difference="<<view_difference<<" typed_bound="<<exported.mtoon_filter_error<<'\n';
+  check(view_difference>.05f&&max_core_emission<.006f*exported.core_strength,
+        "Core and MToon radiance separately match the retained FLOAT fields");
+ }
+ check(painted_samples>50&&max_base<.00801f&&max_shade<.00801f&&max_emission<emission_limit,
+       "Independent filtered material reads stay within tolerance between both grids");
  if(baked_normal){
   check(partial_normals>100&&max_normal<.02f,"Independent fractional UV reads agree with the covered MToon normal mix");
   std::cout<<"RETOPO_BAKE_MTOON partial="<<partial_normals<<" maximum_angle="<<max_normal<<'\n';
@@ -2753,9 +2800,11 @@ void standalone_retopo_mtoon(const Scene &guide) {
  const auto accepted=doc.copy_scene();
  const auto &patch=accepted.active();
  const bool baked=bool(guide.active().painted->baked());
+ const bool physical=guide.active().painted->has_physical_emission();
  check(patch.retopology&&patch.retopology->source==guide.active().id&&patch.material_bindings->has_mtoon&&
        !patch.painted->source_maps()&&bool(patch.painted->baked())==baked&&patch.painted->has_paint_data()&&
-       patch.painted->layers().size()==2&&!patch.painted->layers().back().visible,
+       patch.painted->layers().size()==2&&!patch.painted->layers().back().visible&&
+       patch.painted->has_physical_emission()==physical,
        "The accepted standalone patch owns visible and hidden paint without a Core texture atlas");
  doc.export_asset("standalone-standard.glb",AssetExportFormat::Glb).get();
  doc.export_asset("standalone-editable.glb",AssetExportFormat::EditableGlb256).get();
@@ -2768,8 +2817,42 @@ void standalone_retopo_mtoon(const Scene &guide) {
  check(doc.copy_scene().encode()==accepted.encode()&&Scene::load("standalone-editable.glb").encode()==accepted.encode()&&
        Scene::load("standalone-patch.dsculpt").encode()==accepted.encode(),
        "Both exports preserve the live project and the editable round trip restores every layer");
+ if(physical)
+  check(Scene::load("standalone-standard.glb").encode()==accepted.encode(),
+        "Standard GLB also restores the exact FLOAT project through the native emission package");
  check(doc.undo()&&doc.copy_scene().encode()==before&&doc.redo()&&doc.copy_scene().encode()==accepted.encode(),
        "Undo and Redo retain the exact native guide and accepted standalone patch");
+ if(physical){
+  auto unbaked=accepted.snapshot();
+  auto writable=unbaked.active().painted->snapshot();
+  writable->clear_bake();
+  unbaked.active().painted=writable;
+  doc.replace(unbaked);
+  ready(doc);
+  doc.export_asset("unbaked-physical-standard.glb",AssetExportFormat::Glb).get();
+  verify_mixed_retopo_sampling(unbaked,check_portable_retopo_mtoon("unbaked-physical-standard.glb",unbaked.active(),true),true);
+  auto hidden=unbaked.snapshot();
+  writable=hidden.active().painted->snapshot();
+  writable->select_layer(writable->layers().front().id);
+  writable->layer_properties("Hidden FLOAT paint",false,1);
+  hidden.active().painted=std::move(writable);
+  doc.replace(hidden);
+  ready(doc);
+  doc.export_asset("hidden-physical-standard.glb",AssetExportFormat::Glb).get();
+  const auto visible=hidden.encode();
+  check(Scene::load("hidden-physical-standard.glb").encode()==visible,
+        "The native package retains hidden physical paint after clearing the Bake");
+  std::ifstream stream("hidden-physical-standard.glb",std::ios::binary);
+  const std::vector<uint8_t> glb{std::istreambuf_iterator<char>(stream),{}};
+  const auto json=nlohmann::json::parse(glb.begin()+20,glb.begin()+20+word(glb,12));
+  const auto &primitive=json.at("meshes").at(0).at("primitives").at(0);
+  const auto material=primitive.at("extensions").at("KHR_materials_variants").at("mappings").at(0).at("material").get<size_t>();
+  const auto &toon=json.at("materials").at(material);
+  check(!toon.value("extras",nlohmann::json::object()).contains("domeSculptPortableEmission")&&
+        toon.at("extensions").at("KHR_materials_emissive_strength").at("emissiveStrength").get<float>()==
+            hidden.active().material_bindings->material.parameters.emission_strength,
+        "Hidden physical paint leaves the visible MToon emission map and strength authored");
+ }
 }
 
 void resize_retopo_paint(Document &doc,const Scene &original) {

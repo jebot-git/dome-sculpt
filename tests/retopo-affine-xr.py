@@ -90,7 +90,10 @@ for mode in ('accept','focus','unconfirmed'):
           metadata(replacement['layers'])==metadata(guide_paint['layers']),
           mode+' keeps the writable layers on the new native patch')
     base = guide_paint.get('baked')
-    if base and base.get('float_emission'):
+    bindings=scene_payload(after).get('source_materials',{}).get('bindings',[])
+    binding_id=source.get('material_bindings')
+    typed_guide=binding_id is not None and bindings[binding_id].get('material')
+    if base and not typed_guide:
         check(bool(replacement['layers'][0]['physical_emission_tiles']) and bool(replacement['layers'][1]['tiles']),
               mode+' preserves FLOAT paint and its hidden mask')
         baked = replacement.get('baked', {})
@@ -104,7 +107,6 @@ for mode in ('accept','focus','unconfirmed'):
               normal_preserved and 255 in baked.get('coverage', {}).get('bytes', []),
               mode+' publishes the separate FLOAT Bake and covered normal map')
     else:
-        bindings = scene_payload(after)['source_materials']['bindings']
         old_binding, new_binding = [bindings[obj['material_bindings']] for obj in objects]
         check(old_binding['material'] and new_binding['material'] and bool(replacement.get('baked'))==bool(base) and
               all(old['image'] != new['image'] and new['image'] is not None and new['wrap'] == [33071,33071]
@@ -117,9 +119,14 @@ for mode in ('accept','focus','unconfirmed'):
         if base:
             baked=replacement['baked']
             coverage=baked['coverage']['bytes']
-            check(baked['normal']['bytes'] and baked['emission']['bytes'] and
+            floating=bool(base.get('float_emission'))
+            emission=baked.get('float_emission') if floating else baked.get('emission')
+            check(baked['normal']['bytes'] and emission['bytes'] and
                   any(0<value<255 for value in coverage) and max(coverage)>128,
                   mode+' retains partially covered native normal and emission Bake maps')
+            if floating:
+                check(replacement['layers'][0]['physical_emission_tiles'],
+                      mode+' keeps physical paint separate from the FLOAT Bake')
         if mode=='accept':
             glb=out/'mtoon-portable.glb'
             subprocess.run([str(binary),'--export-project',str(out/'accept.dsculpt'),str(glb)],
@@ -136,15 +143,22 @@ for mode in ('accept','focus','unconfirmed'):
                   'Standard GLB includes the authored MToon variant and its four sampled roles')
             if painted:
                 bounds=material['extras']['domeSculptMToonPaint']
+                emission_limit=.008*bounds['emissiveStrength']
                 check(bounds['errorDomain']=='mesh-uv-triangles' and
-                      all(bounds[key]<=.008 for key in ('maximumLinearColorError','maximumLinearShadeError',
-                                                      'maximumLinearEmissionError')),
+                      all(bounds[key]<=.008 for key in ('maximumLinearColorError','maximumLinearShadeError')) and
+                      bounds['maximumLinearEmissionError']<=emission_limit,
                       'Standard GLB certifies color, shared shade and emission from the visible paint layers')
                 if base:
                     core=exported['materials'][primitive['material']]
                     check(0<bounds['maximumNormalErrorRadians']<.02 and
                           core['normalTexture']['index']!=material['normalTexture']['index'],
                           'Standard GLB certifies the independent covered MToon normal Bake')
+                    if floating:
+                        proof=material['extras']['domeSculptPortableEmission']
+                        check(proof['evaluation']=='finite-current-authored-mtoon-retopology' and
+                              0<proof['betweenTexelErrorBound']<=emission_limit and
+                              core['emissiveTexture']['index']!=material['emissiveTexture']['index'],
+                              'Standard GLB keeps separate Core and authored MToon HDR textures')
     patch=objects[1]['retopology'];topology=json.loads(patch['topology'])
     positions=sorted(v[1] for v in topology['vertices'])
     want=sorted([[-.2,-.2,0],[.2,-.2,0],[0,.2,0]])

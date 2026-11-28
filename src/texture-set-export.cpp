@@ -385,6 +385,16 @@ double mtoon_normal_cell_error(const std::array<const MToonNormalTap *,4> &taps)
  return normal_length_low>delta?std::asin(delta/normal_length_low):std::acos(-1.);
 }
 
+bool retopo_sampled_cell(std::span<const uint8_t> sampled,uint32_t r,uint32_t x,uint32_t y) {
+ if(sampled.empty())return true;
+ const size_t stride=size_t(r)+2;
+ const size_t at=(size_t(y)+1)*stride+x+1;
+ // The last cell on each axis also bounds the constant clamp interval
+ // beyond its right or bottom edge.
+ return sampled[at]||(x+1==r&&sampled[at+1])||(y+1==r&&sampled[at+stride])||
+     (x+1==r&&y+1==r&&sampled[at+stride+1]);
+}
+
 std::shared_ptr<const Image> compose_mtoon_baked_normal(const TextureSetView &field,
     const TextureMaps &maps,const MToonMaterial &effective,double &bound,const TextureSetLimits &limits,
     std::span<const uint8_t> sampled={}){
@@ -418,15 +428,6 @@ std::shared_ptr<const Image> compose_mtoon_baked_normal(const TextureSetView &fi
  constexpr double limit=.02;
  auto output=std::make_shared<Image>(normal);
  std::vector<MToonNormalTap> previous(r),row(r);
- const auto sampled_cell=[&](uint32_t x,uint32_t y){
-  if(sampled.empty())return true;
-  const size_t stride=size_t(r)+2;
-  const size_t at=(size_t(y)+1)*stride+x+1;
-  // The last cell on each axis also bounds the constant clamp interval
-  // beyond its right or bottom edge.
-  return sampled[at]||(x+1==r&&sampled[at+1])||(y+1==r&&sampled[at+stride])||
-      (x+1==r&&y+1==r&&sampled[at+stride+1]);
- };
  for(size_t y=0;y<r;++y){
   stop(limits);
   for(size_t x=0;x<r;++x){
@@ -447,7 +448,7 @@ std::shared_ptr<const Image> compose_mtoon_baked_normal(const TextureSetView &fi
    }
    const size_t left=x?x-1:x;
    const auto &above=y?previous:row;
-   if(!sampled_cell(x,y))continue;
+   if(!retopo_sampled_cell(sampled,r,x,y))continue;
    const std::array<const MToonNormalTap*,4> taps{&above[left],&above[x],&row[left],&tap};
    bound=std::max(bound,mtoon_normal_cell_error(taps));
    if(bound>limit)return {};
@@ -769,6 +770,12 @@ bool native_mtoon_float_bake(const TextureSetView &field) {
      !field.painted->baked()->maps.normal.rgba.empty();
 }
 
+bool standalone_mtoon_hdr_grid(const TextureSetView &field) {
+ return !field.domain&&!field.source&&!field.material.unlit&&
+     native_texture_set_mtoon(field.painted.get(),field.appearance.get(),field.material_bindings.get())&&
+     field.material_bindings->material.version()==MToonVersion::V1&&native_hdr_grid(*field.painted);
+}
+
 // Padding refers to the actual writable owner texel, which can be in a
 // different tile from the display texel. Preserve native layer order there.
 class SparseExportGrid {
@@ -1042,9 +1049,8 @@ std::shared_ptr<TextureMaps> compile_native_material_grid(const PaintedMesh &pai
  const bool typed=mode==TextureSetGridMode::NativeMToonHdr;
  const bool native=mode==TextureSetGridMode::NativeHdr||mode==TextureSetGridMode::NativeLdr||typed;
  const auto &baked=paint.baked();
- if(!(native?native_hdr_grid(paint):retained_color_grid(paint))||
-    (typed&&(!baked||baked->maps.normal.rgba.empty())))
-  throw std::invalid_argument("Material grid compilation needs actual colour and normal owners");
+ if(!(native?native_hdr_grid(paint):retained_color_grid(paint)))
+  throw std::invalid_argument("Material grid compilation needs its actual paint owner");
  const auto bytes=native_material_grid_bytes(paint,mode);
  if(bytes>limits.maximum_bytes||native_material_grid_scratch_bytes(paint,mode)>limits.maximum_bytes-bytes)
   throw std::length_error("Native material fields exceed their working budget");
@@ -1225,21 +1231,22 @@ public:
   if(const auto maps=paint_->source_maps();maps&&(!binding||!binding->physical_emission))
    source_=maps->emission;
   if(authored_mtoon){
-   if(!native_mtoon_float_bake(field))
-    throw std::invalid_argument("Typed FLOAT Bake requires its native MToon 1.0 paint grid");
+   if(!native_mtoon_float_bake(field)&&!standalone_mtoon_hdr_grid(field))
+    throw std::invalid_argument("Typed FLOAT emission requires its native MToon 1.0 paint grid");
    const auto &typed=binding->material;
    const auto &p=typed.parameters;
    if(p.scroll!=std::array<float,2>{}||p.rotation_speed!=0)
-    throw MToonFloatUnavailable("Typed FLOAT Bake needs static texture coordinates");
+    throw MToonFloatUnavailable("Typed FLOAT emission needs static texture coordinates");
    if(const auto &image=binding->roles[size_t(MToonSlot::Emission)].image)
     charge(work,size_t(image->width)*image->height,1,limits.maximum_work);
    typed_source_=mtoon_paint_source(*binding,typed,MToonSlot::Emission,resolution,limits);
    if(!typed_source_)
-    throw MToonFloatUnavailable("Typed FLOAT Bake needs a constant or aligned clamp-linear emission source");
+    throw MToonFloatUnavailable("Typed FLOAT emission needs a constant or aligned clamp-linear emission source");
    legacy_strength_=p.emission_strength;
    const std::array factor{p.emission.x,p.emission.y,p.emission.z};
    for(size_t k=0;k<3;++k){
-    background_[k]=mtoon_factor(factor[k],binding->native_reference.emission[k],field.material.emissive[k])*legacy_strength_;
+    if(!binding->physical_emission)
+     background_[k]=mtoon_factor(factor[k],binding->native_reference.emission[k],field.material.emissive[k])*legacy_strength_;
     if(!std::isfinite(background_[k]))
      throw std::overflow_error("Typed FLOAT Bake background exceeds the radiance range");
    }
@@ -1249,7 +1256,8 @@ public:
   charge(work,sampler_.index_work(),1,limits.maximum_work);
   const size_t count=size_t(resolution)*resolution;
   size_t variable_count=count;
-  if(native_material_grid(field)||retained_hdr_grid(field)||baked_mtoon_pbr_fallback(field))
+  if(native_material_grid(field)||retained_hdr_grid(field)||baked_mtoon_pbr_fallback(field)||
+     (authored_mtoon&&!field.domain))
    grid_.emplace(*paint_,work,limits);
   if(grid_&&!varying_typed_source()){
    constants_[0]=coefficients({},background(0,0));
@@ -1359,7 +1367,7 @@ public:
  uint32_t resolution;
 };
 TextureSetExportEmission compile_emission(const TextureSetView &field,size_t &work,
-    const TextureSetLimits &limits,bool authored_mtoon) {
+    const TextureSetLimits &limits,bool authored_mtoon,std::span<const uint8_t> sampled={}) {
  TextureSetEmissionSamples samples(field,work,2,limits,authored_mtoon);
  const auto resolution=samples.resolution;
  const auto count=size_t(resolution)*resolution;
@@ -1399,13 +1407,17 @@ TextureSetExportEmission compile_emission(const TextureSetView &field,size_t &wo
    auto &tap=row[x];
    for(size_t k=0;k<3;++k)tap.background[k]=background[k];
    tap.uncovered=1.-rgb[3];
-   if(!x||!y)continue;
-   const std::array<const MToonSourceTap *,4> taps{&previous[x-1],&previous[x],&row[x-1],&tap};
+   if(sampled.empty()&&(!x||!y))continue;
+   if(!retopo_sampled_cell(sampled,resolution,x,y))continue;
+   const auto left=x?x-1:x;
+   const auto &above=y?previous:row;
+   const std::array<const MToonSourceTap *,4> taps{&above[left],&above[x],&row[left],&tap};
    for(size_t k=0;k<3;++k)source_filter_error=std::max(source_filter_error,mtoon_source_filter_error(taps,k));
   }
   previous.swap(row);
  }
  TextureSetExportEmission out;
+ out.retopo_uv_domain=!sampled.empty();
  const float scale=std::max({1.f,peak[0],peak[1],peak[2]});
  out.strength=field.material.unlit?1.f:scale;
  for(size_t k=0;k<3;++k)out.factor[k]=peak[k]/scale;
@@ -1444,7 +1456,7 @@ TextureSetExportEmission compile_emission(const TextureSetView &field,size_t &wo
   // fraction and original emission contributes a non-linear term.
   const double filter_error=out.measured.maximum_absolute_error+source_filter_error+1e-6*scale;
   if(filter_error>.005*scale)
-   throw MToonFloatUnavailable("Typed FLOAT Bake emission exceeds its portable filter bound");
+   throw MToonFloatUnavailable("Typed FLOAT emission exceeds its portable filter bound");
   out.filter_error=filter_error;
  }
  return out;
@@ -2053,6 +2065,55 @@ std::shared_ptr<const Image> compose_retopo_mtoon_role(const TextureSetView &fie
 }
 } // namespace
 
+bool retopo_mtoon_uses_float(const TextureSetView &field) {
+ if(!standalone_mtoon_hdr_grid(field))return false;
+ if(hdr_emission(field.material.emissive)||physical_emission(*field.material_bindings))return true;
+ const auto &paint=*field.painted;
+ if(paint.baked()&&paint.baked()->emission_field)return true;
+ // Match the live material. Hidden physical paint remains in the native
+ // project without changing the visible material's legacy filtering.
+ return std::ranges::any_of(paint.layers(),[](const auto &layer){
+  return layer.visible&&layer.opacity>0&&std::ranges::any_of(layer.emission_tiles,
+      [](const auto &tile){return bool(tile);});
+ });
+}
+
+std::optional<TextureSetExportEmission> compile_retopo_mtoon_emission(
+    const TextureSetView &field,TextureSetLimits &remaining) {
+ if(!retopo_mtoon_uses_float(field))return {};
+ size_t bytes=0,work=0;
+ const auto &paint=*field.painted;
+ const auto r=paint.resolution();
+ try {
+  charge(bytes,size_t(r)*r,4,remaining.maximum_bytes);
+  auto budget=remaining;
+  budget.maximum_bytes-=bytes;
+  size_t staging=sizeof(TextureSetEmissionSamples);
+  charge(staging,1,emission_device_scratch(paint,true),budget.maximum_bytes);
+  charge(staging,r,2*sizeof(MToonSourceTap),budget.maximum_bytes);
+  charge(staging,size_t(r/PaintTile::size)*(r/PaintTile::size),sizeof(uint16_t),budget.maximum_bytes);
+  std::vector<uint8_t> sampled;
+  if(std::ranges::all_of(paint.mesh().uv,[](const auto &uv){return uv[0]>=0&&uv[0]<=1&&uv[1]>=0&&uv[1]<=1;})){
+   charge(staging,size_t(r+2)*(r+2),1,budget.maximum_bytes);
+   charge(staging,r+2,sizeof(double),budget.maximum_bytes);
+   const auto knots=mtoon_filter_knots({r});
+   auto mesh_budget=budget;
+   sampled=retopo_sampled_cells(paint.mesh(),knots,knots,mesh_budget);
+   work=budget.maximum_work-mesh_budget.maximum_work;
+  }
+  auto emission=compile_emission(field,work,budget,true,sampled);
+  remaining.maximum_work-=work;
+  remaining.maximum_bytes-=bytes;
+  return emission;
+ } catch(const MToonFloatUnavailable &) {
+  // Keep the independent Core view and the exact editable radiance.
+ } catch(const ExportBudgetExceeded &) {
+ } catch(const std::overflow_error &) {
+ }
+ remaining.maximum_work-=work;
+ return {};
+}
+
 std::optional<PortableMToonSetPaint> compile_retopo_mtoon_paint(const TextureSetView &field,
     const MToonMaterial &effective,TextureSetLimits &remaining)try {
  const auto &paint=*field.painted;
@@ -2064,7 +2125,9 @@ std::optional<PortableMToonSetPaint> compile_retopo_mtoon_paint(const TextureSet
  work=0;
  const auto r=paint.resolution();
  const bool shade=color&&mtoon_shared_shade(binding);
- const bool render_hdr=EmissionExportAccess::requires_preview(paint,field.material,&binding);
+ const bool float_retopo=retopo_mtoon_uses_float(field);
+ const bool render_hdr=!standalone_mtoon_hdr_grid(field)&&
+     EmissionExportAccess::requires_preview(paint,field.material,&binding);
  const auto &core=paint.source_maps();
  const bool normal=paint.baked()&&!paint.baked()->maps.normal.rgba.empty();
  std::optional<PaintEmissionSampler> coefficients;
@@ -2077,7 +2140,7 @@ std::optional<PortableMToonSetPaint> compile_retopo_mtoon_paint(const TextureSet
  // grid and enter the subsequent role proof.
  std::shared_ptr<const TextureMaps> maps;
  if(!core&&!render_hdr){
-  constexpr auto mode=TextureSetGridMode::NativeLdr;
+  const auto mode=float_retopo?TextureSetGridMode::NativeMToonHdr:TextureSetGridMode::NativeLdr;
   charge(bytes,1,native_material_grid_bytes(paint,mode),remaining.maximum_bytes);
   if(native_material_grid_scratch_bytes(paint,mode)>remaining.maximum_bytes-bytes)return {};
   maps=compile_native_material_grid(paint,field.material,work,remaining,mode);
@@ -2109,7 +2172,7 @@ std::optional<PortableMToonSetPaint> compile_retopo_mtoon_paint(const TextureSet
  };
  if((color&&!compose(MToonSlot::Base,out.color))||
     (shade&&!compose(MToonSlot::Shade,out.shade))||
-    (emission&&effective.parameters.emission_strength!=0&&
+    (emission&&!float_retopo&&effective.parameters.emission_strength!=0&&
      !compose(MToonSlot::Emission,out.emission,coefficients?&*coefficients:nullptr))){
   return {};
  }
@@ -2193,13 +2256,15 @@ std::shared_ptr<const RetopoMToonExport> RetopoMToonExport::capture(const Sculpt
  const auto &binding=object.material_bindings;
  if(!object.retopology||object.texture_sets||!object.mesh_active||object.deformation||
     !native_texture_set_mtoon(paint.get(),object.appearance.get(),binding.get())||
-    binding->material.version()!=MToonVersion::V1||paint->in_stroke()||
-    paint->has_physical_emission()||binding->physical_emission)
+    binding->material.version()!=MToonVersion::V1||paint->in_stroke())
   return {};
  const auto &params=binding->material.parameters;
  if(params.rotation_speed!=0||params.scroll!=std::array<float,2>{})return {};
  const auto &core=paint->source_maps();
- if(paint->baked()&&(core||EmissionExportAccess::requires_preview(*paint,object.material,binding.get())))return {};
+ const auto field=texture_set_view(object,0);
+ const bool standalone=standalone_mtoon_hdr_grid(field);
+ if((paint->has_physical_emission()||binding->physical_emission)&&!standalone)return {};
+ if(paint->baked()&&(core||(!standalone&&EmissionExportAccess::requires_preview(*paint,object.material,binding.get()))))return {};
  if(!core&&paint->has_paint_data()&&!native_hdr_grid(*paint))return {};
  const auto &normal=binding->material.textures[size_t(MToonSlot::Normal)];
  // Both materials read the same explicit tangent attribute in a portable
@@ -2211,7 +2276,7 @@ std::shared_ptr<const RetopoMToonExport> RetopoMToonExport::capture(const Sculpt
  if(cancelled&&cancelled())throw std::runtime_error("MToon export capture cancelled");
  auto result=std::shared_ptr<RetopoMToonExport>(new RetopoMToonExport);
  result->object_=object.id;
- result->field_=texture_set_view(object,0);
+ result->field_=field;
  result->field_.painted=paint->snapshot();
  return result;
 }

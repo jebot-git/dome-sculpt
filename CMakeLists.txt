@@ -912,6 +912,9 @@ if(BUILD_TESTING)
   add_test(NAME retopology-baked-mtoon-affine-ui-fixture COMMAND dome-sculpt-retopo-affine-ui-fixture
     ${CMAKE_CURRENT_BINARY_DIR}/retopology-baked-mtoon-affine-ui.dsculpt baked-mtoon)
   set_tests_properties(retopology-baked-mtoon-affine-ui-fixture PROPERTIES FIXTURES_SETUP retopology_baked_mtoon_affine_ui)
+  add_test(NAME retopology-float-mtoon-affine-ui-fixture COMMAND dome-sculpt-retopo-affine-ui-fixture
+    ${CMAKE_CURRENT_BINARY_DIR}/retopology-float-mtoon-affine-ui.dsculpt float-mtoon)
+  set_tests_properties(retopology-float-mtoon-affine-ui-fixture PROPERTIES FIXTURES_SETUP retopology_float_mtoon_affine_ui)
   add_executable(dome-sculpt-cut-color-publication-test tests/cut-color-publication.cpp)
   target_include_directories(dome-sculpt-cut-color-publication-test PRIVATE src)
   target_link_libraries(dome-sculpt-cut-color-publication-test PRIVATE dome-sculpt-core)
@@ -4953,6 +4956,10 @@ if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND 
     $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-native-authoring-inspect>
     ${CMAKE_CURRENT_BINARY_DIR}/retopology-baked-mtoon-affine-ui.dsculpt ${CMAKE_CURRENT_BINARY_DIR}/retopology-baked-mtoon-affine-openxr)
   set_tests_properties(retopology-baked-mtoon-affine-openxr PROPERTIES FIXTURES_REQUIRED retopology_baked_mtoon_affine_ui TIMEOUT 600)
+  add_test(NAME retopology-float-mtoon-affine-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/retopo-affine-xr.py
+    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-native-authoring-inspect>
+    ${CMAKE_CURRENT_BINARY_DIR}/retopology-float-mtoon-affine-ui.dsculpt ${CMAKE_CURRENT_BINARY_DIR}/retopology-float-mtoon-affine-openxr)
+  set_tests_properties(retopology-float-mtoon-affine-openxr PROPERTIES FIXTURES_REQUIRED retopology_float_mtoon_affine_ui TIMEOUT 600)
 endif()
 
 if(BUILD_TESTING)
@@ -5438,6 +5445,11 @@ if(BUILD_TESTING)
     ${CMAKE_CURRENT_BINARY_DIR}/retopology-baked-mtoon-affine-ui.dsculpt)
   set_tests_properties(retopology-baked-mtoon-native PROPERTIES
     FIXTURES_REQUIRED retopology_baked_mtoon_affine_ui TIMEOUT 400)
+  add_test(NAME retopology-float-mtoon-native COMMAND dome-sculpt-texture-set-source-export-test
+    --standalone-mtoon ${CMAKE_CURRENT_BINARY_DIR}/retopology-float-mtoon-native
+    ${CMAKE_CURRENT_BINARY_DIR}/retopology-float-mtoon-affine-ui.dsculpt)
+  set_tests_properties(retopology-float-mtoon-native PROPERTIES
+    FIXTURES_REQUIRED retopology_float_mtoon_affine_ui TIMEOUT 400)
   add_test(NAME native-mikk-export COMMAND dome-sculpt-texture-set-source-export-test
     --native-mikk-export ${CMAKE_CURRENT_BINARY_DIR}/native-mikk-export)
   set_tests_properties(native-mikk-export PROPERTIES TIMEOUT 400)
