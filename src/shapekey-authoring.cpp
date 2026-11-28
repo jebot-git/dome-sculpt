@@ -144,11 +144,15 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
   auto result=detail::author_derived_normal_shapekey(paired,object,edit,cancelled);
   paired.object(object).shape_source=first;paired.validate();stop(cancelled);scene=std::move(paired);return result;
  }
- if(!source.texture_sets&&detail::needs_independent_key_domain(source,edit,cancelled))
-  return detail::author_derived_normal_shapekey(scene,object,edit,cancelled);
+ std::vector<Vec3> vertex_delta;
+ if(!source.texture_sets&&detail::needs_independent_key_domain(source,edit,vertex_delta,cancelled))
+  return detail::author_derived_normal_shapekey(scene,object,edit,cancelled,std::move(vertex_delta));
  if(edit.action==ShapeKeyAction::Mirror&&edit.mirror_frames!=ShapeKeyMirrorFrames::VertexPositions&&(edit.mirror_plane!=0||edit.mirror_frames!=ShapeKeyMirrorFrames::ExactAuthored))throw std::invalid_argument("Explicit-plane frame conversion requires genuine owning native frame authority");
- if(!source.texture_sets&&source.material_bindings&&source.material_bindings->normal_preparation)
-  return detail::author_prepared_normal_shapekey(scene,object,edit,cancelled);
+ if(!source.texture_sets&&source.material_bindings&&source.material_bindings->normal_preparation){
+  // Replay authenticates the earlier domain and cannot borrow the current field.
+  std::vector<Vec3>().swap(vertex_delta);
+  return detail::author_prepared_normal_shapekey(scene,object,edit,cancelled,true);
+ }
  auto deform=std::make_shared<DeformationState>(source.deformation?*source.deformation:DeformationState(rest));if(!deform->morphs)deform->morphs=MorphSet(rest);
  Scene next=scene;auto &o=next.object(object);
  if(!o.shape_source)o.shape_source=capture_polygon_origin(scene,object);
@@ -160,10 +164,10 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
  }
  std::vector<Vec3> positions=rest.positions;
  if(edit.action==ShapeKeyAction::Duplicate||edit.action==ShapeKeyAction::Mirror){
-  std::vector<uint32_t> mirror;std::vector<Vec3> vertex_delta;
+  std::vector<uint32_t> mirror;
   if(edit.action==ShapeKeyAction::Mirror){if(!std::isfinite(edit.mirror_tolerance)||edit.mirror_tolerance<=0||edit.mirror_tolerance>1)throw std::invalid_argument("Invalid local mirror tolerance");
-   if(edit.mirror_frames==ShapeKeyMirrorFrames::VertexPositions){detail::KeyMirrorLimits limits;limits.cancelled=cancelled;vertex_delta=detail::reflected_key_vertex_deltas(rest,deform->morphs->targets[edit.target].delta,{edit.mirror_plane},edit.mirror_tolerance,limits);}
-   else mirror=mirror_vertices(rest,edit.mirror_tolerance,cancelled);
+   if(edit.mirror_frames!=ShapeKeyMirrorFrames::VertexPositions)mirror=mirror_vertices(rest,edit.mirror_tolerance,cancelled);
+   else if(vertex_delta.empty()){detail::KeyMirrorLimits limits;limits.cancelled=cancelled;vertex_delta=detail::reflected_key_vertex_deltas(rest,deform->morphs->targets[edit.target].delta,{edit.mirror_plane},edit.mirror_tolerance,limits);}
   }
   for(size_t v=0;v<positions.size();++v){if((v&1023)==0)stop(cancelled);auto d=vertex_delta.empty()?deform->morphs->targets[edit.target].delta[mirror.empty()?v:mirror[v]]:vertex_delta[v];if(!mirror.empty())d.x=-d.x;positions[v]+=d;}
  }else if(edit.action==ShapeKeyAction::CaptureMix){

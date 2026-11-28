@@ -3,5 +3,5 @@
 #include "dome/shapekey-authoring.hpp"
 namespace dome::detail {
 ShapeKeyResult author_prepared_normal_shapekey(Scene &,uint64_t,const ShapeKeyEdit &,
-    const std::function<bool()> &);
+    const std::function<bool()> &,bool domain_classified=false);
 }

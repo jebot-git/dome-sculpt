@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "key-mirror-correspondence.hpp"
+#include "key-mirror-kernel.hpp"
+#include <algorithm>
 #include <unordered_map>
 #include <cmath>
 #include <limits>
 namespace dome::detail {
 namespace {
 struct Budget {const KeyMirrorLimits &limits;size_t work=0;explicit Budget(const KeyMirrorLimits&v):limits(v){if(!v.max_bytes||v.max_bytes>256*1024*1024||!v.max_work||v.max_work>256*1024*1024)throw std::invalid_argument("Invalid key mirror resource policy");check();}void check(size_t n=1){if(n>limits.max_work-work)throw std::length_error("Key mirror correspondence exceeds bounded work");work+=n;if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Key mirror correspondence cancelled");}};
-struct Cell {int64_t x,y,z;bool operator==(const Cell&)const=default;};
+using key_mirror::Cell;
 struct Hash {size_t operator()(Cell c)const noexcept{auto h=std::hash<int64_t>{}(c.x);h^=std::hash<int64_t>{}(c.y)+0x9e3779b9+(h<<6)+(h>>2);h^=std::hash<int64_t>{}(c.z)+0x9e3779b9+(h<<6)+(h>>2);return h;}};
 Vec3 reflect(Vec3 p){return {-p.x,p.y,p.z};}
 bool same(Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}
@@ -35,11 +37,12 @@ std::vector<Vec3> reflected_key_vertex_deltas(const Mesh &mesh,std::span<const V
  if(!count||count>2'000'000||delta.size()!=count||!std::isfinite(plane.offset)||std::abs(plane.offset)>1e6||
     !std::isfinite(tolerance)||tolerance<=0||tolerance>1)
   throw std::invalid_argument("Vertex-position Mirror needs a complete bounded displacement field and local plane/tolerance");
- // Worst-case hash nodes, buckets, per-cell vectors and output, including
- // allocator overhead. Spatial candidates are additionally work-metered.
+ // Bound the directory construction, host and device ownership, batch scratch
+ // and output. The reference's hash nodes/vectors fit within the same limit.
  if(count>limits.max_bytes/160)throw std::length_error("Vertex-position Mirror exceeds prospective scratch/output budget");
  const double size=std::max(double(tolerance),1e-6),square=double(tolerance)*tolerance;
  auto cell=[&](double x,double y,double z){auto q=[&](double v){v=std::floor(v/size);if(!std::isfinite(v)||std::abs(v)>=0x1p63-4096.0)throw std::length_error("Vertex-position Mirror exceeds spatial coordinate bounds");return int64_t(v);};return Cell{q(x),q(y),q(z)};};
+#ifdef DOME_KEY_MIRROR_REFERENCE
  std::unordered_map<Cell,std::vector<uint32_t>,Hash> bins;bins.reserve(count);
  for(size_t v=0;v<count;++v){budget.check();if(!finite(delta[v]))throw std::invalid_argument("Vertex-position Mirror requires finite source displacements");const auto p=mesh.positions[v];bins[cell(p.x,p.y,p.z)].push_back(uint32_t(v));}
  std::vector<Vec3> out;out.reserve(count);
@@ -56,6 +59,64 @@ std::vector<Vec3> reflected_key_vertex_deltas(const Mesh &mesh,std::span<const V
   out.push_back({-value.x,value.y,value.z});
  }
  return out;
+#else
+ using namespace key_mirror;
+ auto device=[&]{
+  std::vector<Bin> bins;
+  std::vector<uint32_t> order;
+  order.reserve(count);
+  {
+   struct IndexedCell { Cell cell; uint32_t vertex; };
+   std::vector<IndexedCell> indexed;
+   indexed.reserve(count);
+   for(size_t v=0;v<count;++v){
+    budget.check();
+    if(!finite(delta[v]))throw std::invalid_argument("Vertex-position Mirror requires finite source displacements");
+    const auto p=mesh.positions[v];
+    indexed.push_back({cell(p.x,p.y,p.z),uint32_t(v)});
+   }
+   size_t comparisons=0;
+   std::sort(indexed.begin(),indexed.end(),[&](const auto &a,const auto &b){
+    if((++comparisons&4095)==0)budget.check(0);
+    return a.cell==b.cell?a.vertex<b.vertex:before(a.cell,b.cell);
+   });
+   bins.reserve(count);
+   for(const auto &entry:indexed){
+    if((order.size()&1023)==0)budget.check(0);
+    if(bins.empty()||bins.back().cell!=entry.cell)bins.push_back({entry.cell,uint32_t(order.size()),0});
+    ++bins.back().count;
+    order.push_back(entry.vertex);
+   }
+  }
+  budget.check(0);
+  return upload(bins,order,mesh.positions,delta);
+ }();
+
+ const double twice_plane=2*plane.offset;
+ const Metric metric{std::bit_cast<uint64_t>(twice_plane),std::bit_cast<uint64_t>(square)};
+ const auto capacity=std::min(count,batch_capacity);
+ std::vector<Cell> cells(capacity);
+ std::vector<uint32_t> donors(capacity);
+ std::vector<Vec3> out;
+ out.reserve(count);
+ for(size_t first=0;first<count;first+=capacity){
+  const auto batch=std::min(capacity,count-first);
+  for(size_t i=0;i<batch;++i){
+   budget.check(28); // Target setup and its 27 spatial directory lookups.
+   const auto p=mesh.positions[first+i];
+   cells[i]=cell(twice_plane-p.x,p.y,p.z);
+  }
+  const auto visits=device->search(first,std::span(cells).first(batch),metric,
+      uint32_t(limits.max_work-budget.work),std::span(donors).first(batch),limits.cancelled);
+  budget.check(visits);
+  for(const auto donor:std::span(donors).first(batch)){
+   if(donor==conflict)throw std::invalid_argument("Coincident mirrored vertices have different shapekey displacements; select an explicit seam correspondence");
+   if(donor==missing)throw std::invalid_argument("Vertex-position Mirror has no reflected source within the explicit local tolerance");
+   out.push_back(reflect(delta[donor]));
+  }
+ }
+ return out;
+#endif
 }
 std::vector<int8_t> reflected_key_role_signs(const NormalFrames &frame,std::span<const std::array<float,2>> uv,const KeyMirrorCorrespondence &map,const KeyMirrorLimits &limits){
  Budget budget(limits);frame.validate();const auto count=frame.normals.size();if(map.corners.size()!=count||count%3||count>limits.max_bytes||(!frame.tangents.empty()&&uv.size()!=count))throw std::invalid_argument("Mirror role/corner-coordinate dimensions differ");

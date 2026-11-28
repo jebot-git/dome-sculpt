@@ -2,10 +2,13 @@
 #include "weight-transfer-sycl-memory.hpp"
 #include "weight-transfer-device-query.hpp"
 #include "surface-ray-softfloat.hpp"
+#include "key-mirror-device-query.hpp"
 
 namespace dome::detail::retopo_surface {
 class NearestTriangles;
 }
+
+namespace dome::detail::key_mirror { class MirrorVertices; }
 
 namespace dome::detail::weight_transfer {
 namespace {
@@ -20,6 +23,20 @@ struct Counter {
 class SyclApi : public SyclSurfaceMemory {
 public:
   void reset(uint32_t *value){queue_.fill(value,uint32_t(0),1);}
+  void mirror_vertices(key_mirror::View view,size_t first,const key_mirror::Cell *cells,
+      key_mirror::Metric metric,uint32_t allowance,key_mirror::Progress *progress,uint32_t *donors,
+      size_t count,uint32_t *status,bool initialize){
+    queue_.parallel_for<key_mirror::MirrorVertices>(sycl::range<1>{count},[=](sycl::id<1> index){
+      const auto i=index[0];
+      if(initialize)progress[i]={};
+      const auto visited=key_mirror::visit<surface_ray::SoftPrecision>(
+          view,view.rest[first+i],cells[i],metric,allowance,progress[i],donors[i]);
+      using Atomic=sycl::atomic_ref<uint32_t,sycl::memory_order::relaxed,sycl::memory_scope::device,
+          sycl::access::address_space::global_space>;
+      if(visited&key_mirror::pending)Atomic(*status).fetch_or(key_mirror::pending);
+      if(visited&~key_mirror::pending)Atomic(*status).fetch_add(visited&~key_mirror::pending);
+    });
+  }
   void clear_brush(float *values,size_t count){queue_.fill(values,0.f,count);}
   void brush(weight_brush::Stroke stroke,const Vec3 *points,float *previous,size_t count,
       weight_brush::Hit *hits,uint32_t *size){
@@ -55,6 +72,13 @@ public:
 
 std::unique_ptr<Query> upload(const Surface &surface){return std::make_unique<DeviceQuery<SyclApi>>(surface);}
 } // namespace dome::detail::weight_transfer
+
+namespace dome::detail::key_mirror {
+std::unique_ptr<Query> upload(std::span<const Bin> bins,std::span<const uint32_t> order,
+                             std::span<const Vec3> rest,std::span<const Vec3> delta){
+  return std::make_unique<DeviceQuery<weight_transfer::SyclApi>>(bins,order,rest,delta);
+}
+}
 
 namespace dome::detail::weight_brush {
 std::unique_ptr<Query> upload(std::span<const Capsule> direct,std::span<const Capsule> reflected,bool reusable){

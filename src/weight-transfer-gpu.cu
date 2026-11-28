@@ -9,6 +9,7 @@
 #include "weight-transfer-device-query.hpp"
 #include "retopo-material-kernel.hpp"
 #include "surface-ray-kernel.hpp"
+#include "key-mirror-device-query.hpp"
 
 namespace dome::detail::weight_transfer {
 namespace {
@@ -25,6 +26,17 @@ struct Counter {
 #endif
   }
 };
+__global__ void key_mirror_vertices(key_mirror::View view,size_t first,const key_mirror::Cell *cells,
+    key_mirror::Metric metric,uint32_t allowance,key_mirror::Progress *progress,uint32_t *donors,
+    size_t count,uint32_t *status,bool initialize){
+  const size_t i=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+  if(i>=count)return;
+  if(initialize)progress[i]={};
+  const auto visited=key_mirror::visit<surface_ray::NativePrecision>(
+      view,view.rest[first+i],cells[i],metric,allowance,progress[i],donors[i]);
+  if(visited&key_mirror::pending)atomicOr(status,key_mirror::pending);
+  if(visited&~key_mirror::pending)atomicAdd(status,visited&~key_mirror::pending);
+}
 __global__ void weight_brush_hits(weight_brush::Stroke stroke,const Vec3 *points,float *previous,size_t count,
     weight_brush::Hit *hits,uint32_t *size){
   const size_t i=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
@@ -96,6 +108,14 @@ public:
     wait();
   }
   void reset(uint32_t *value){checked(DOME_GPU(MemsetAsync)(value,0,sizeof(*value),stream_));}
+  void mirror_vertices(key_mirror::View view,size_t first,const key_mirror::Cell *cells,
+      key_mirror::Metric metric,uint32_t allowance,key_mirror::Progress *progress,uint32_t *donors,
+      size_t count,uint32_t *status,bool initialize){
+    constexpr unsigned lanes=128;
+    key_mirror_vertices<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(
+        view,first,cells,metric,allowance,progress,donors,count,status,initialize);
+    checked(DOME_GPU(GetLastError)());
+  }
   void clear_brush(float *values,size_t count){
     checked(DOME_GPU(MemsetAsync)(values,0,count*sizeof(float),stream_));
   }
@@ -137,6 +157,13 @@ public:
 
 std::unique_ptr<Query> upload(const Surface &surface){return std::make_unique<DeviceQuery<GpuApi>>(surface);}
 } // namespace dome::detail::weight_transfer
+
+namespace dome::detail::key_mirror {
+std::unique_ptr<Query> upload(std::span<const Bin> bins,std::span<const uint32_t> order,
+                             std::span<const Vec3> rest,std::span<const Vec3> delta){
+  return std::make_unique<DeviceQuery<weight_transfer::GpuApi>>(bins,order,rest,delta);
+}
+}
 
 namespace dome::detail::weight_brush {
 std::unique_ptr<Query> upload(std::span<const Capsule> direct,std::span<const Capsule> reflected,bool reusable){

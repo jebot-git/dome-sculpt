@@ -2,6 +2,7 @@
 #include "key-mirror-correspondence.hpp"
 #include "normal-domain-fixtures.hpp"
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <numeric>
 #include <nlohmann/json.hpp>
@@ -15,6 +16,12 @@ Mesh square(){Mesh m;m.positions={{-1,-1,0},{1,-1,0},{1,1,0},{-1,1,0}};m.normals
 bool equal(Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}
 }
 int main(int argc,char **argv)try{
+ if(argc==2&&std::string_view(argv[1])=="--require-device"){
+  const auto input=square();
+  const std::vector<Vec3> delta(input.positions.size());
+  check(rejects([&]{detail::reflected_key_vertex_deltas(input,delta,{},.0001f);}),"Vertex-position Mirror must refuse an unavailable GPU");
+  return 0;
+ }
  if(argc==3&&std::string_view(argv[1])=="--source-fixture"){
   auto scene=normal_domain_fixture::model();auto &object=scene.active();
   SourceUvBakeInput input;input.paint=object.painted;input.current_material=object.material_bindings;input.current_deformation=object.deformation;input.appearance=object.appearance;input.source_vertices=input.paint->mesh().indices;
@@ -59,5 +66,35 @@ int main(int argc,char **argv)try{
  delta.back().z=std::numeric_limits<float>::infinity();check(rejects([&]{detail::reflected_key_vertex_deltas(mesh,delta,{},.0001f);}),"Nonfinite input displacement refuses before spatial publication");delta.back()=delta[0];
  for(int choice=0;choice<3;++choice){detail::KeyMirrorLimits limits;if(choice==0)limits.max_bytes=1;if(choice==1)limits.max_work=1;if(choice==2)limits.cancelled=[]{return true;};check(rejects([&]{detail::reflected_key_vertex_deltas(mesh,delta,{},.0001f,limits);}),"Actual scratch, work and cancellation controls refuse immutable input");}
  mesh.positions[1].x+=.01f;check(rejects([&]{detail::reflected_key_vertex_deltas(mesh,delta,{},.0001f);}),"Missing reflected geometry refuses within the explicit local tolerance");
+
+ auto boundary=square();
+ const auto on_edge=detail::reflected_key_vertex_deltas(boundary,values,{.0625},.125f);
+ check(equal(on_edge[0],{-values[1].x,values[1].y,values[1].z}),"The exact binary64 radius is inclusive across adjacent cells");
+ check(rejects([&]{detail::reflected_key_vertex_deltas(boundary,values,{std::nextafter(.0625,1.0)},.125f);}),"One binary64 step outside the tolerance refuses before publication");
+
+ auto dense=square();
+ std::vector<Vec3> field(values.begin(),values.end());
+ auto add=[&](Vec3 p,Vec3 d){
+  dense.positions.push_back(p);
+  dense.normals.push_back({0,0,1});
+  dense.uv.push_back({0,0});
+  field.push_back(d);
+ };
+ constexpr size_t coincident=513,pairs=1790;
+ for(size_t i=0;i<coincident;++i)add({0,4,0},i+1==coincident?Vec3{-0.f,-0.f,0}:Vec3{});
+ for(size_t i=0;i<pairs;++i){
+  const float y=8+float(i)*2;
+  add({-1,y,0},{0,y,1});
+  add({1,y,0},{1,y,0});
+ }
+ detail::KeyMirrorLimits exact;
+ exact.max_work=1+29*field.size()+coincident*coincident+field.size()-coincident;
+ const auto many=detail::reflected_key_vertex_deltas(dense,field,{},.0001f,exact);
+ check(!std::signbit(many[4].x)&&std::signbit(many[4].y),"Agreement retains the last signed zeros after a dense bucket continues across launches");
+ check(many.size()==field.size()&&equal(many.back(),{0,field.back().y,1}),"The partial final batch indexes the remaining target correctly");
+ --exact.max_work;
+ check(rejects([&]{detail::reflected_key_vertex_deltas(dense,field,{},.0001f,exact);}),"Every candidate visit and neighboring cell still counts against the complete edit budget");
+ field[4+coincident-1].z=std::numeric_limits<float>::denorm_min();
+ check(rejects([&]{detail::reflected_key_vertex_deltas(dense,field,{},.0001f);}),"A dense bucket's late subnormal disagreement is detected exactly");
  std::cout<<"PASS "<<checks<<" vertex-position Mirror oracle checks\n";return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

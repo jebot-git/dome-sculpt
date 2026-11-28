@@ -54,11 +54,12 @@ private:
       MorphNormalBasis = MorphNormalBasis::Geometry) const;
   MorphNormalBasis validate_impl(bool deep, bool read_archive,
       const std::function<bool()> &) const;
-  friend ShapeKeyResult author_derived_normal_shapekey(Scene &,uint64_t,const ShapeKeyEdit &,const std::function<bool()> &);
+  friend ShapeKeyResult author_derived_normal_shapekey(Scene &,uint64_t,const ShapeKeyEdit &,
+      const std::function<bool()> &,std::vector<Vec3>);
 };
 bool needs_independent_key_domain(const SculptObject &,const ShapeKeyEdit &,
-    const std::function<bool()> &cancelled={});
+    std::vector<Vec3> &mirrored_delta,const std::function<bool()> &cancelled);
 ShapeKeyResult author_derived_normal_shapekey(Scene &,uint64_t,const ShapeKeyEdit &,
-    const std::function<bool()> &cancelled={});
+    const std::function<bool()> &cancelled,std::vector<Vec3> mirrored_delta={});
 bool key_recipe_sampling_matches(const SourceNormalPreparation &,const SourceNormalPreparation &);
 } // namespace dome::detail

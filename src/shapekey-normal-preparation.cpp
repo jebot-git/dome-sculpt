@@ -273,14 +273,18 @@ ShapeKeyResult author_domain_prepared_key(Scene &scene, uint64_t object,
 }
 }
 ShapeKeyResult author_prepared_normal_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &edit,
-    const std::function<bool()> &cancelled){
+    const std::function<bool()> &cancelled,bool domain_classified){
   auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Prepared normal shapekey authoring cancelled");};stop();
   const auto &source=scene.object(object);const auto binding=source.material_bindings;
   if(!binding||!binding->normal_preparation||!source.painted||!source.painted->normal_projection()||source.painted->in_stroke())
     throw std::invalid_argument("Prepared shapekey authoring requires its finished owning normal model");
   const auto &recipe=*binding->normal_preparation;binding->validate();
   recipe.validate_current(source.painted->mesh(),source.appearance.get(),cancelled);
-  if(needs_independent_key_domain(source,edit,cancelled))return author_derived_normal_shapekey(scene,object,edit,cancelled);
+  if(!domain_classified){
+    std::vector<Vec3> mirrored_delta;
+    if(needs_independent_key_domain(source,edit,mirrored_delta,cancelled))
+      return author_derived_normal_shapekey(scene,object,edit,cancelled,std::move(mirrored_delta));
+  }
   if(recipe.uv_reprojection||recipe.sampling_domain)return author_domain_prepared_key(scene,object,edit,cancelled);
   const auto projection=source.painted->normal_projection();
   if(!normal_projection_identity(*projection,*recipe.projection)||!normal_projection_identity(*projection,*recipe.initial_projection))
