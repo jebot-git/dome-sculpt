@@ -1,0 +1,162 @@
+{
+  "date": "2026-11-28",
+  "product": "618fc55baf8098037002c00c6dc601f1287f7cf1",
+  "preceding": "ea6b1990774aa344ffe8f001ef7b6eeddbb349f1",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Distinct UV columns and channel-selective FLOAT records for device Bake material batches.",
+  "oneapi_arc_release": {
+    "application_sha256": "63845e9a24dea5b22321c51de9554fee8871162ea4740f319382d3bf989cbc9c",
+    "fltk_core_sha256": "35aa46ebf11f5f3a9772d926b05a24938572471d9dbcf3e2718e98376fadbdb3",
+    "bake_regression": {
+      "passed": 27,
+      "synthetic_openxr": 4,
+      "log_sha256": "44dda6f078d5b21c0ff8a783d9d897f5dc38c801cc6813494b1901a582d865ea",
+      "junit_sha256": "6df17d90902d216f403be46144cdac229547f02eaf490bef40cf1795701aebaa"
+    },
+    "retained_regression": {
+      "passed": 6,
+      "synthetic_openxr": 1,
+      "log_sha256": "5322725c1c6323482f71377394654b9a338d99fd538df1f91dea5ff608a78f55",
+      "junit_sha256": "622ac7af8bab403ccfa4a187c50bdab48ebbe30f60d2ed6f8dbb6638280d3200"
+    },
+    "paint_export_regression": {
+      "passed": 10,
+      "synthetic_openxr": 0,
+      "log_sha256": "059070cb36dba1bf5f7b6a149a678317c4f90ff46cb3e1cb4afaa969395f3149",
+      "junit_sha256": "c5b4b87d8067ccb468938b7e085adbc94f91be63ae16eb244fc4ab883c3ef389"
+    },
+    "overlap_between_regressions": [
+      "texture-set-retained-bake-source"
+    ],
+    "identical_regression_project_sha256": {
+      "affine-target.dsculpt": "7b72d9389b8365f9f330f53a70278789bb4f90183312584d0336d1c601c68b6b",
+      "mixed-before.dsculpt": "172a4a4084468e1f3d4b16c7dbe569633c329002ea78d8a595250f13705c658e",
+      "mixed-baked.dsculpt": "17338f40b4521cce6880102778bce603e72d13a2b877724e2c19c2b62ddfa37c",
+      "retained-bake-source.dsculpt": "27578419255b987de8c64a534a070bb3125b3d09269443cb769e26dd91cf25ad"
+    },
+    "prepared_hdr_bake": {
+      "donor_fields": 2,
+      "donor_resolution": 512,
+      "target_resolution": 1024,
+      "projected_texels": 430336,
+      "projection_rays": 0,
+      "material_bytes_per_texel": {
+        "upload": {
+          "preceding": 64,
+          "candidate": 16
+        },
+        "readback": {
+          "preceding": 92,
+          "candidate": 48
+        }
+      },
+      "identical_project_sha256": "9783c773289c0914f41364ea99ba692a71cc6790e0e0ad074ec57e864d079554",
+      "seconds_first_then_repeats": {
+        "preceding": [
+          7.24523,
+          0.476283,
+          0.475747
+        ],
+        "candidate": [
+          7.34344,
+          0.478608,
+          0.475884
+        ]
+      },
+      "median_repeat_seconds": {
+        "preceding": 0.47601499999999997,
+        "candidate": 0.47724599999999995
+      },
+      "log_sha256": "cd960d325b3644c276ef720fd9df5a1ec9619219595503e45d362dd63da931c1",
+      "unified_runtime_trace": {
+        "scope": "First Bake on the same persisted donor after input setup. End markers exclude setup and publication I/O.",
+        "copy_count_and_bytes_order": [
+          "count",
+          "bytes"
+        ],
+        "measurements": {
+          "preceding": {
+            "trace_sha256": "cf651e06a1765c070c1b0f35c695067feb3696b4ff2f671c4ba17440e1a3c3a9",
+            "copy_counts_and_bytes": {
+              "device_to_host": [
+                124,
+                53576944
+              ],
+              "host_to_device": [
+                227,
+                66047272
+              ]
+            },
+            "device_memory_allocations": 51,
+            "device_queue_creations": 5,
+            "resident_2m_allocations": 2,
+            "full_material_result_buffer_allocations": 2,
+            "hdr_material_result_buffer_allocations": 0,
+            "radiance_result_buffer_allocations": 2
+          },
+          "candidate": {
+            "trace_sha256": "817dccff9c634248a2d2467eb0c3f0b50ed6e309a09f321cd5c84dcef3078153",
+            "copy_counts_and_bytes": {
+              "device_to_host": [
+                124,
+                34642160
+              ],
+              "host_to_device": [
+                227,
+                45391144
+              ]
+            },
+            "device_memory_allocations": 51,
+            "device_queue_creations": 5,
+            "resident_2m_allocations": 2,
+            "full_material_result_buffer_allocations": 0,
+            "hdr_material_result_buffer_allocations": 2,
+            "radiance_result_buffer_allocations": 2
+          }
+        },
+        "bytes_avoided": {
+          "host_to_device": 20656128,
+          "device_to_host": 18934784
+        }
+      }
+    },
+    "wayland": {
+      "passed": 15,
+      "report_sha256": "3206993dcd5a5c556e4a8584dc324197fcbb72c60819d1efa07f2d98534a9aa7",
+      "runtime_maps_sha256": "7efa066452829ed95029d2e0834dc2c12eb98baca6e6569b3cd4953b68fdec53",
+      "log_sha256": "73ceb02c01635b06559179321da5b01a986e00d0db7561fe65b8d347340bd3de"
+    }
+  },
+  "missing_device": {
+    "target": "OneAPI retained HDR Bake with the Arc device masked",
+    "result": "No device of requested type 'info::device_type::gpu' available.",
+    "log_sha256": "d4577ebb23da302893a8aacfc19231c1d481a473c21468fe783fffd72618f566"
+  },
+  "headless_reference": {
+    "passed": 5,
+    "log_sha256": "7573536a2eb83b66dc6a307d1c30950c55d453b552491b96e1bd911d6a9c0873",
+    "asan_ubsan_retained_checks": 1191,
+    "sanitizer_log_sha256": "664fb3fd6cef60e02f27b23fa4ebbbbe288c429515cbcb44996b8dd711d3ac51",
+    "asan_ubsan_packing_checks": "PASS 16 layouts preserve binary32 values and fault status",
+    "packing_sanitizer_log_sha256": "36c903ea1f71d8e07a1786975f9760d41cf07a68bc2bd2a56f8b6d66d47cf518"
+  },
+  "vendor_compile_only": {
+    "cuda": {
+      "bake-ray-gpu.cu": "03dc085e3587e222c258ae65797b65c5b924007045ee0ccee3edf4f495636beb",
+      "emission-raster-gpu.cu": "c0328b0427b7a1f0aa045d05b6a46b8bed1c7bf1261c9dd2a0a8a49cb708dd77",
+      "bake.cpp": "a19e010adefd0e3691f042d26dd424ab45b60535856bae37ce3bccc383674436"
+    },
+    "rocm": {
+      "bake-ray-gpu.cu": "f406e19f301df51eee71292b0c2be8fe7864e78b03494d025dd9ab14748c3185",
+      "emission-raster-gpu.cu": "d1f11d255a91f56586b58f13f47eb73c1985fb4724d4d5a1f1d71c34ec7bbb2d",
+      "bake.cpp": "62f91c0a7e99612c85a19c427d87c68fd24848f0240a5ebb522fa32fd24dd2cb"
+    }
+  },
+  "limits": [
+    "Record sizes depend on texture-coordinate domains and consumed material channels. The quoted byte savings cover the two-donor HDR fixture.",
+    "Target geometry, normal frame transport, and ordered Bake result assembly remain on the worker.",
+    "The standalone sanitizer check covers host packing for all flag layouts. GPU numerical and archive parity are covered separately.",
+    "Timing is one paired matching-topology fixture with two repeat runs per executable.",
+    "AMD and NVIDIA hardware execution and physical OpenXR acceptance remain open."
+  ]
+}

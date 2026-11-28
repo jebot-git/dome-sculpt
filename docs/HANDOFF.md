@@ -208,6 +208,15 @@ Each cache evicts by recency before new allocations and retries on device
 allocation pressure after releasing idle buffers.
 [Bake sampler reuse evidence](validation/bake-sampler-reuse-20261128.json)
 
+Bake now sends distinct coordinate domains once and returns only the
+material channels needed for that source. For the two-field 512² HDR
+donor, each material sample uploads 16 bytes of UVs, down from 64, and
+reads 48 bytes of results, down from 92. The Arc trace of the 1024² Bake
+shows 19.70 MiB less upload and 18.06 MiB less readback. The saved project
+matches byte for byte. The paired median repeat was about 0.48 seconds
+on both builds. Normal frames still use the retained field owner.
+[Bake material transfer evidence](validation/bake-material-transfer-20261128.json)
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.

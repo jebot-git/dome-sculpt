@@ -93,6 +93,14 @@ releases cached buffers and retries on the selected GPU. The Bake keeps
 native result order and cancellation behavior across material switches.
 [Bake sampler reuse evidence](validation/bake-sampler-reuse-20261128.json)
 
+GPU Bake material batches send each distinct UV domain once per texel.
+Texture roles sharing a domain still apply their own affine transform,
+wrap and filter. The device returns color and ORM plus the emission,
+separate PBR and normal channels the worker needs. The material and sparse
+paint kernels use the same packed record, including the invalid-coordinate
+flag and normal alpha coverage. FLOAT radiance has its own sampling path.
+[Bake material transfer evidence](validation/bake-material-transfer-20261128.json)
+
 Eligible 512–2048 current-grid RGB8 Bake materials now composite color, ORM
 and legacy emission on the selected GPU. Their ordered paint, coverage,
 native normal-map output, and GLB export match the preceding implementation.
