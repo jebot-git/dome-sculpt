@@ -1,0 +1,147 @@
+{
+  "adjacent_openxr": {
+    "atlas": {
+      "checks": 21,
+      "synthetic_tracking": true
+    },
+    "raw": {
+      "checks": 20,
+      "synthetic_tracking": true
+    }
+  },
+  "backend": "Intel Arc A770 with oneAPI Level Zero and renderD129",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "comparison": "73b9329f, the preceding product",
+  "date": "2026-11-28",
+  "missing_device_rejection": {
+    "cuda": "CUDA driver version is insufficient for CUDA runtime version",
+    "oneapi": "No device of requested type 'info::device_type::gpu' available.",
+    "rocm": "no ROCm-capable device is detected"
+  },
+  "open": [
+    "Typed double-precision UV mapping and tangent-frame conversion are worker operations.",
+    "Direct retained alternate-coordinate export is a different path.",
+    "Positive AMD/NVIDIA hardware and physical headset qualification remain open."
+  ],
+  "product": "b8f39390686d984d48754ccf226245c0578e0fae",
+  "profile": {
+    "description": "A covered quad bakes the original PBR images and eight MToon surface slots with varying scroll and rotation, a linearly sampled transformed UV1 mask and a typed normal. The separate matcap is carried unmodified.",
+    "exact_files": 28,
+    "protocol": "One fresh process per build and resolution, persistent oneAPI cache disabled. First bake is cold, followed by four warm bakes. Output byte comparisons and hashes use the first bake per invocation.",
+    "sizes": {
+      "1024": {
+        "current": {
+          "cold_ms": 4654.9,
+          "image_bytes": 54525952,
+          "sample_operations": 27262976,
+          "warm_median_ms": 3828.165,
+          "warm_ms": [
+            3869.61,
+            3683.85,
+            3798.01,
+            3858.32
+          ]
+        },
+        "previous": {
+          "cold_ms": 7848.95,
+          "image_bytes": 54525952,
+          "sample_operations": 31457280,
+          "warm_median_ms": 6756.235000000001,
+          "warm_ms": [
+            6829.35,
+            6646.21,
+            6683.12,
+            6912.65
+          ]
+        },
+        "sha256": {
+          "mtoon-0": "0b641dfd9ba01558b475497d16a99355b1fa03e9eac668c1cbe77b2a344b99b9",
+          "mtoon-1": "0b641dfd9ba01558b475497d16a99355b1fa03e9eac668c1cbe77b2a344b99b9",
+          "mtoon-2": "29bf2f61e6c9d9534e3975f684c68e3f2339a8878aa2abec7a7d60314be597c4",
+          "mtoon-3": "da328e74fd07696fd80a31fc45ec556a59e51031356f3a5e726c9725e6016b6b",
+          "mtoon-4": "0b641dfd9ba01558b475497d16a99355b1fa03e9eac668c1cbe77b2a344b99b9",
+          "mtoon-5": "9a3907b2354b615886dab6f6c9caeb1f426d083fe24a76562152a9d2c3a04da6",
+          "mtoon-6": "e13b51f531c1bd429ef50ddc3d84c88ecb5d27776ab74aca0daa7a60982a1fa0",
+          "mtoon-7": "e13b51f531c1bd429ef50ddc3d84c88ecb5d27776ab74aca0daa7a60982a1fa0",
+          "mtoon-8": "ebd211ef5b61c51fda42fd26d516bec9dc28b64320b86867573069377b7d4310",
+          "pbr-ao": "1e30aa4cb125fc4118409461705a00bf32a5c8f0765839893e39b93ef723e963",
+          "pbr-color": "420485c75a265f7c1c450661350845bde30266b5487962c0d7f6667bcee06277",
+          "pbr-emission": "da328e74fd07696fd80a31fc45ec556a59e51031356f3a5e726c9725e6016b6b",
+          "pbr-normal": "6a217b6fac36cbf2ba6b95542d685c844be01ad36d9b560b2d0b9d5fcc5fb1d1",
+          "pbr-orm": "cedde8c1cd289aee88f2e154e7792352d31aa17297e234778f8e83967bbb8dc0"
+        }
+      },
+      "64": {
+        "current": {
+          "cold_ms": 1089.69,
+          "image_bytes": 212992,
+          "sample_operations": 106496,
+          "warm_median_ms": 38.447,
+          "warm_ms": [
+            26.2851,
+            43.0727,
+            33.8213,
+            63.2214
+          ]
+        },
+        "previous": {
+          "cold_ms": 1045.25,
+          "image_bytes": 212992,
+          "sample_operations": 122880,
+          "warm_median_ms": 33.2263,
+          "warm_ms": [
+            36.8601,
+            18.07,
+            30.8231,
+            35.6295
+          ]
+        },
+        "sha256": {
+          "mtoon-0": "a571d8114df5bd3ef5f8dbda3c29d8c36f76bfd591e18b872e96522df811d93b",
+          "mtoon-1": "a571d8114df5bd3ef5f8dbda3c29d8c36f76bfd591e18b872e96522df811d93b",
+          "mtoon-2": "d64fd52d8c3a3172fa6137a3f71abc411b789c2f631630addcd722af5e02e17b",
+          "mtoon-3": "a594e00b63141fb3bcfdf531723b428df9109b50fe69808406b59639314ddb7f",
+          "mtoon-4": "a571d8114df5bd3ef5f8dbda3c29d8c36f76bfd591e18b872e96522df811d93b",
+          "mtoon-5": "9a3907b2354b615886dab6f6c9caeb1f426d083fe24a76562152a9d2c3a04da6",
+          "mtoon-6": "c72917a7a45494b6c1794d72f447286c739f4f4c7d83ecd7b6aa99d63384b81e",
+          "mtoon-7": "c72917a7a45494b6c1794d72f447286c739f4f4c7d83ecd7b6aa99d63384b81e",
+          "mtoon-8": "f08604a871f854a747fa0c19fcef07b40e2dae0698713bb60648ba1840683275",
+          "pbr-ao": "5bd5b1cd839c5f744e385c5f1d693820a21b2ceea4f63244ccfa9a6004236b1c",
+          "pbr-color": "771352e579ae6918a3e45e01f4adbd2799e3c6a20b94847c4bdef2694f401233",
+          "pbr-emission": "a594e00b63141fb3bcfdf531723b428df9109b50fe69808406b59639314ddb7f",
+          "pbr-normal": "309e0aa627ab9326fb8065eea01b1585904fc93717319db5ff247c26c48f010e",
+          "pbr-orm": "4a11b7af5efb0769d4326b3018259be5f9037f395b57623a51454c36ac7d94a0"
+        }
+      }
+    }
+  },
+  "release_tests": [
+    "source-uv-bake",
+    "source-uv-adopt",
+    "mtoon-gpu",
+    "mtoon-visibility",
+    "source-extra-uv-roles",
+    "source-extra-uv-raw",
+    "source-extra-uv-atlas-openxr",
+    "source-extra-uv-raw-openxr",
+    "vrm1-source-export"
+  ],
+  "sampling": {
+    "maximum_mask_probe_batch": 16384,
+    "memory": "Both input images, both quantization tables and simultaneously resident host/device batches are reserved under max_working_bytes.",
+    "mtoon_0": "sRGB-red mask in the shared source domain",
+    "mtoon_1": "linear-blue mask with authored alternate UV coordinates, transform, wrap and filtering",
+    "normal_probe_locations": "One texel center and two shifted barycentrics. Exact center mapping reused by normal conversion.",
+    "output_bytes_per_mask_probe": 4,
+    "scalar_word_comparisons": 393216
+  },
+  "sanitizers": {
+    "configuration": "headless CPU reference ASan/UBSan",
+    "passed": [
+      "source-uv-bake",
+      "source-uv-adopt"
+    ],
+    "source_uv_checks": 144
+  },
+  "scope": "Source-aware RGBA8 PBR and MToon UV reprojection with explicitly frozen animation, including tangent-space normal conversion."
+}

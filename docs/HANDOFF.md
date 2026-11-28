@@ -303,8 +303,7 @@ including UV1 and extra UV sets, source transforms, and the existing
 padding and tangent-frame rules. The GPU writes ordinary material samples
 as RGBA bytes and returns linear floats where the worker must convert
 normal frames. It uploads one image per sampled role and batches at most
-16,384 mapped coordinates within the job's working-memory budget. The
-animated MToon mask lookup and tangent conversion still run on the worker.
+16,384 mapped coordinates within the job's working-memory budget.
 
 On Intel Arc all 98,304 sampler checks reproduce the independent CPU
 samples and encoded bytes. Four UV1 output maps have matching hashes at
@@ -316,6 +315,24 @@ also takes longer on the GPU. Six focused Release tests pass, including
 Both headless sanitizer references pass. CUDA and ROCm compile, and all
 three vendors reject a missing GPU for the sampler.
 [Source UV sampler evidence](validation/source-uv-sampler-gpu-20261128.json)
+
+Source-aware MToon UV baking now samples animation masks on the selected
+GPU. MToon 0 samples its sRGB red channel, and MToon 1 samples the linear blue
+channel through the role's authored UV set and transform. The worker
+retains the double-precision UV transform and normal-frame conversion.
+Only one float per mask probe returns from the GPU. The normal pass uses
+the actual center and two shifted barycentric samples. It reuses the center
+transform and removes four redundant mask lookups per normal texel.
+
+All 28 output image comparisons match the preceding build byte for byte
+across the 64- and 1024-pixel fixtures. The larger bake's median warm time
+decreased from 6.76 to 3.83 seconds on Intel Arc. The cold run decreased
+from 7.85 to 4.65 seconds. The 64-pixel case remained slower. All nine
+focused Release tests and both sanitizer suites pass. Source UV Bake
+covers all 38 parts of the two CC0 bases. The adjacent alternate-UV import
+checks pass through the native OpenXR loader with synthetic tracking.
+CUDA and ROCm compile, and all three backends reject an unavailable GPU.
+[Animated mask evidence](validation/mtoon-animation-mask-gpu-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
