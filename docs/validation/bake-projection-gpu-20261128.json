@@ -1,0 +1,152 @@
+{
+  "date": "2026-11-28",
+  "product": "d92a80cace8c4e735e73a19ab4177e565a518ca8",
+  "preceding": "2fcb6240b7f5c84c38bb2312c9a0f69dc9e65d98",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Exact Bake projection and bounded edge recovery on the selected GPU, sharing the resident source index with ambient occlusion.",
+  "oneapi_arc_release": {
+    "application_sha256": "bade8770d0c31e010fc5d71a4260bb354de0034dff50b12201916599b5256069",
+    "focused": {
+      "passed": 15,
+      "junit_sha256": "90bce63a4bdbc2cd89eb5fee6da82e25948368d6d26a7f601e8da4576303f39b"
+    },
+    "focused_full_log_sha256": "6c22523604e25688c0e901f272f0fccf12b69a9de04e25b9f4598f8624a60ba0",
+    "material_authoring": {
+      "passed": 6,
+      "junit_sha256": "89b1e83fa21995b1e67ef2160ee14fcb65edcfdf6cf99126a6a87d515cd7150a"
+    },
+    "material_full_log_sha256": "5c5b2a1fb910421e775f18c00dce0829756d302c765ac7a9a1fdcf70f1eb7880",
+    "no_device_refusal": "FAIL No device of requested type 'info::device_type::gpu' available.",
+    "oblique_projection": {
+      "exact": 5025,
+      "edge_recoveries": 1458,
+      "misses": 1709,
+      "mismatches": 0,
+      "module_launches": {
+        "projection": 2,
+        "edge_recovery": 2
+      },
+      "independently_loaded_edge_module": true,
+      "traced_log_sha256": "b4264e667a412fc0a8f0d2e2d342f14b9ce069eb8caaae6eda5ce9d4a1a5aa87"
+    },
+    "signed_binary64_quotients": {
+      "cases": 60000,
+      "subnormal": 2634,
+      "rounded_to_zero": 8776,
+      "overflow": 4279,
+      "mismatches": 0,
+      "traced_log_sha256": "1974894d0a4c059e2c004e1f06eb335b98ce606fc414d234372a15885b206b6b"
+    },
+    "benchmarks": {
+      "512_combined_cold": {
+        "exact_native_archive_sha256": "1062add51b001620d6b2655bcf682c4e942dfceb7988d89ca197519b55d59b00",
+        "projected_texels": 262144,
+        "total_rays": 17039360,
+        "distinct_ao_bytes": 53,
+        "seconds": {
+          "preceding": [
+            5.71279
+          ],
+          "candidate": [
+            8.28271
+          ]
+        },
+        "log_sha256": "115a33228fbe1a6aa84822e276e9dc20decf7639efc05dc811d7d285e9e01075"
+      },
+      "1024_projection_cold_then_warm": {
+        "exact_native_archive_sha256": "3e091457d8f7f62aeed1bdf48e4cfdf3cc608956285df5853ac22a9c7583348c",
+        "projected_texels": 1048576,
+        "total_rays": 1048576,
+        "distinct_ao_bytes": 1,
+        "seconds": {
+          "candidate": [
+            4.9587,
+            0.574569,
+            0.575343
+          ],
+          "preceding": [
+            0.562262,
+            0.560377,
+            0.554433
+          ]
+        },
+        "log_sha256": "be968670e72ec7cfc3fe1f41fedda898cab17b9446f83363c9c6c5cc69377eb0"
+      }
+    }
+  },
+  "nested_wayland": {
+    "checks": 15,
+    "report_sha256": "3206993dcd5a5c556e4a8584dc324197fcbb72c60819d1efa07f2d98534a9aa7",
+    "dma_buf_render_node": "/dev/dri/renderD129",
+    "trace_sha256": "b15270e6aa5902bb8a26267d855a395d4d00ebb3df4794e29aee3bb429bc12a9",
+    "kernel_launches": {
+      "projection": 1,
+      "ambient": 1,
+      "ambient_reduce": 1
+    },
+    "edge_module_needed": false,
+    "exact_active_set_save_clear_and_undo": true
+  },
+  "synthetic_openxr": {
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "suites": {
+      "bake-cage-xr": {
+        "checks": 21,
+        "report_sha256": "7e8949de5105428d14cf8e2622a4a7e9dc383648aea4783a7307d96be63d48ff",
+        "native_project_sha256": "ad45bc1cb2727b0bd42ba47a86ad3b44bf06c347406a43efbb240e781055ba89",
+        "stereo_submissions": 86,
+        "images_acquired_waited_and_released": 172
+      },
+      "bake-recipes-xr": {
+        "checks": 22,
+        "report_sha256": "f48e8a4a93ca396c1595859d68ea0c7b859f811f300db398dbcbc98c32e823b9",
+        "native_project_sha256": "c497a7a385907bb3cbe0d7901b0a6aaba2b2a342fe45a1bdb4fd78fc24581b8d",
+        "stereo_submissions": 86,
+        "images_acquired_waited_and_released": 172
+      },
+      "texture-set-active-bake-openxr": {
+        "checks": 19,
+        "report_sha256": "adabf84b795df8d36f9ed533335dab271845709f2d8d68cbd0741d595311b18b",
+        "native_project_sha256": "4391b246e47412949b07eebd2e969ddec55ae4e35552259cf0a172f1846412ef",
+        "stereo_submissions": 86,
+        "images_acquired_waited_and_released": 172
+      },
+      "mtoon-texture-set-bake-openxr": {
+        "checks": 19,
+        "report_sha256": "adabf84b795df8d36f9ed533335dab271845709f2d8d68cbd0741d595311b18b",
+        "native_project_sha256": "3840bb393dceb07f022228961663763fb333d2aac9dfb5876104b85ca0e1494a",
+        "stereo_submissions": 86,
+        "images_acquired_waited_and_released": 172
+      }
+    }
+  },
+  "headless_reference": {
+    "focused": {
+      "passed": 4,
+      "junit_sha256": "ec4114c94b7df71e062ab8d8798959f3e894c8202b32ac42782f734543f9d24c"
+    },
+    "scoped_asan_ubsan": {
+      "sources": [
+        "src/bake.cpp",
+        "src/mesh-processing.cpp",
+        "tests/bake.cpp"
+      ],
+      "log_sha256": "5f97a076663509509f84d1b1542ed3a9645be92af3b1f9ba81a2934e8690af3b"
+    }
+  },
+  "cuda_and_rocm": {
+    "cuda": {
+      "compiled_kernel_sha256": "f832a9b88a38b42d9144fc9e78985a702a8222cdc84bad4327c8f878c1a98c4e",
+      "no_device_refusal": "CUDA driver version is insufficient for CUDA runtime version"
+    },
+    "rocm": {
+      "compiled_kernel_sha256": "79516652bbc66e82f20b2d805ef7fc2d39c354cb97d31ea441c7dea83a94fa49",
+      "no_device_refusal": "no ROCm-capable device is detected"
+    }
+  },
+  "limits": [
+    "Target UV rasterization, cage-ray preparation, hit-normal and material evaluation, and result publication remain host work.",
+    "Benchmarks use a synthetic donor. The split kernel avoids edge compilation on the ordinary fixture, but the first projection dispatch still incurs device program startup and the 512 combined cold bake was slower than the preceding hybrid path.",
+    "CUDA and ROCm compile and link the kernels and refuse missing hardware. Positive execution on those backends and physical headset checks remain open."
+  ]
+}
