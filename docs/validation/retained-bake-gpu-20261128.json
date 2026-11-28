@@ -1,0 +1,101 @@
+{
+  "date": "2026-11-28",
+  "product": "b154e6bacbfd7a43664f5871e86ccca9a8a38f7d",
+  "preceding": "43eb2cae7a91ebb29d4b6f5797a81d7deec9a7a8",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Retained polygon source material normal-map filtering and FLOAT radiance resolution on the selected GPU.",
+  "oneapi_arc_release": {
+    "application_sha256": "379d36d4cb9c16aa6672a3e0c048cea78d3226eeddcc347cb172ed541391e0dd",
+    "fltk_core_sha256": "35aa46ebf11f5f3a9772d926b05a24938572471d9dbcf3e2718e98376fadbdb3",
+    "bake_regression": {
+      "passed": 27,
+      "junit_sha256": "41ffa0e8ae90e7efe3921aaeaa88275953b8429af78b2588a5e85b236f4420e2",
+      "log_sha256": "d2c9f74b64f59fc17be5dc518e3142190057ff10d28c3a585c9db9ab2499e938",
+      "synthetic_openxr": 4
+    },
+    "retained_and_mixed_regression": {
+      "passed": 6,
+      "junit_sha256": "0c0ac85310ed62983faef99c9b74501c8e728321d328230d0237bd5ee907fcab",
+      "log_sha256": "1e85aab8fd253474e09061e7c6e769bdab5e94681dcca7e7611eb7e2a13d737d",
+      "synthetic_openxr": 1
+    },
+    "normal_alpha_oracle_log_sha256": "e9def8bd548936723555302b885475d3e51fe1d52b5054286b315931340ab151",
+    "identical_regression_project_sha256": {
+      "retained-bake-source.dsculpt": "27578419255b987de8c64a534a070bb3125b3d09269443cb769e26dd91cf25ad",
+      "mixed-baked.dsculpt": "17338f40b4521cce6880102778bce603e72d13a2b877724e2c19c2b62ddfa37c",
+      "mixed-before.dsculpt": "172a4a4084468e1f3d4b16c7dbe569633c329002ea78d8a595250f13705c658e"
+    },
+    "prepared_hdr_1024": {
+      "projected_texels": 430336,
+      "projection_rays": 0,
+      "identical_project_sha256": "d205ad22e5e11efddb04830c0bc7d8dcd988370c30336e66de9fb7ac6492388f",
+      "seconds_cold_then_warm": {
+        "preceding": [
+          2.27049,
+          0.607747,
+          0.598923
+        ],
+        "candidate": [
+          6.41396,
+          0.475149,
+          0.473284
+        ]
+      },
+      "median_warm_seconds": {
+        "preceding": 0.603335,
+        "candidate": 0.4742165
+      },
+      "log_sha256": "fe5920192752fa7debad920a157b5b900dc45d8a5a2cd2ea031e30e98b788680"
+    },
+    "native_normal_512": {
+      "projected_texels": 107584,
+      "projection_rays": 0,
+      "identical_project_sha256": "b86ab0583d6c11e2b77293dc5f3f18271884a22db2525e7a1f41e41a96202eb0",
+      "seconds_cold_then_warm": {
+        "preceding": [
+          1.84654,
+          0.141021
+        ],
+        "candidate": [
+          1.84686,
+          0.126818
+        ]
+      },
+      "median_warm_seconds": {
+        "preceding": 0.141021,
+        "candidate": 0.126818
+      },
+      "log_sha256": "014633b7c62a16bb0c882cb547c98796f4206a4fef939789bff87189bbfe20dd"
+    },
+    "wayland": {
+      "passed": 15,
+      "report_sha256": "3206993dcd5a5c556e4a8584dc324197fcbb72c60819d1efa07f2d98534a9aa7",
+      "runtime_maps_sha256": "8888b59ca134cbc7f0e3e87c0e17dbd0e01a0a6747eecefca026bb1e48bab184",
+      "log_sha256": "73ceb02c01635b06559179321da5b01a986e00d0db7561fe65b8d347340bd3de"
+    },
+    "no_device_refusal": "No device of requested type 'info::device_type::gpu' available."
+  },
+  "headless_reference": {
+    "passed": 5,
+    "bake_log_sha256": "0bd247642d6bd324ce6f3486f76a17bf727e2651f5ff3ea70b34fa177b3fadb1",
+    "retained_log_sha256": "9aa026b50ddaf36ac403c207ecaa458dddbf626bceee575f976db01b360f9df9",
+    "asan_ubsan_retained_checks": 1155,
+    "sanitizer_log_sha256": "59b24befa8d1312a93bb5f9c82ead5ce1b565961765673692e843536b1792d1d"
+  },
+  "cuda_and_rocm": {
+    "cuda": {
+      "compiled_kernel_sha256": "37d3a36fb9550fda3021df73f41b9e7cc6111fee960aaf4185cd8ed38d42d6df",
+      "no_device_refusal": "CUDA driver version is insufficient for CUDA runtime version"
+    },
+    "rocm": {
+      "compiled_kernel_sha256": "2bbe6d1ec35079cdcadeed031913eed27fae9404a787dfa3870ddc35a03da67f",
+      "no_device_refusal": "no ROCm-capable device is detected"
+    }
+  },
+  "limits": [
+    "Retained material grid compilation, logical triangle ownership, normal frame transport and native publication still use the worker.",
+    "Timed fixtures use matching topology. Reported texels are the rendered UV domain, not the whole atlas extent.",
+    "The first prepared HDR timing includes GPU program loading and compilation.",
+    "Positive AMD and NVIDIA execution and physical headset testing remain open."
+  ]
+}

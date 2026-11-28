@@ -66,6 +66,7 @@ Retained polygon Bake also filters FLOAT emission and authored normal texture
 samples on the GPU. The prepared and native normal roles use their own retained
 coordinates. Normal-frame transport and logical triangle validation stay with
 the existing field owner.
+[Retained GPU Bake evidence](validation/retained-bake-gpu-20261128.json)
 
 Eligible 512–2048 current-grid RGB8 Bake materials now composite color, ORM
 and legacy emission on the selected GPU. Their ordered paint, coverage,

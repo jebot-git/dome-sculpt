@@ -170,7 +170,12 @@ paint UV coordinates for each material field. It also samples prepared PBR
 normal maps in their independent UV domain and authored native normal maps in
 the retained paint domain, including the alpha coverage used by native
 detail. The worker validates logical triangle ownership and applies the
-retained normal frames for skin, morph and affine placement.
+retained normal frames for skin, morph and affine placement. The 1024²
+prepared HDR and 512² native-normal fixtures both produce byte-identical
+projects. The prepared HDR Bake takes 0.47 seconds warm, down from 0.60,
+and 6.41 seconds on the first run, up from 2.27. The ordinary app completes
+retained Bake and exact Save/Undo through DomeD Wayland and synthetic OpenXR.
+[Retained GPU Bake evidence](validation/retained-bake-gpu-20261128.json)
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
