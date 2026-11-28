@@ -1,0 +1,137 @@
+{
+  "date": "2026-11-28",
+  "product": "7571b2c0d300307495312ff3dc9fedc157deab00",
+  "preceding": "99b9c79bb0fe945319590a69a33576442238874e",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Static standalone MToon 1 retopology with a canonical Bake, independent power-of-two clamp-linear UV0 normal grids, and an authenticated common tangent frame.",
+  "arc_a770_release": {
+    "application_sha256": "47d35c983d157c426cb38e45c2683d289c4ee89d1399eb5fc42d7a7dfa1183c0",
+    "ctest": {
+      "cases": 83,
+      "log_sha256": "32e15357d4a0b4af38c386ee35632a39075e0e1e442af2d786ded3bdab93362c"
+    },
+    "byte_identical_baseline_files": {
+      ".dsculpt": 43,
+      ".glb": 58
+    },
+    "native": {
+      "checks": 106,
+      "normal_oracle": {
+        "standard": {
+          "partially_covered_fractional_samples": 11828,
+          "measured_maximum_radians": 0.00564997,
+          "certified_maximum_radians": 0.0068757,
+          "resolution": [
+            256,
+            256
+          ]
+        },
+        "editable": {
+          "partially_covered_fractional_samples": 11828,
+          "measured_maximum_radians": 0.00564997,
+          "certified_maximum_radians": 0.0068757,
+          "resolution": [
+            256,
+            256
+          ]
+        },
+        "resized_editable": {
+          "partially_covered_fractional_samples": 11540,
+          "measured_maximum_radians": 0.00572094,
+          "certified_maximum_radians": 0.00687094,
+          "resolution": [
+            512,
+            512
+          ]
+        }
+      },
+      "gpu_trace_sha256": "4b206a9f80c7fc16447a097e6ce591988badf5646b79a023089c61617e646e01",
+      "headless_same_input_files_bit_identical": [
+        "hidden-physical-standard.glb",
+        "resized-physical-editable.glb",
+        "standalone-editable.glb",
+        "standalone-patch.dsculpt",
+        "standalone-standard.glb"
+      ]
+    },
+    "synthetic_openxr": {
+      "checks": 47,
+      "project_sha256": "a30d47bb4aea9ff8ad96e2e1b26d7a6955fc506e0643a16645f6c9d0c0df54ab",
+      "report_sha256": "f8473c2983c0515fe189d409fd17a606996b1342ba8dc3d37111241ae2b751eb"
+    },
+    "nested_domed_wayland": {
+      "checks": 10,
+      "canonical_fltk": "/opt/fltk-vr/toolkit",
+      "dmabuf_render_node": "/dev/dri/renderD129",
+      "project_sha256": "93b747a7c87d54268d6629d4c7a5b5b1f42293d5dbbc30da2eeb1c856f2ff22b",
+      "gpu_trace_sha256": "1a2a80eaad82b56177af3a6e26582c85b59aa2d506f30797f03fc24618141f05",
+      "report_sha256": "0393becaead1dcf0aed3dcc7918400ec7f64484dcafa1dca691a03569d0df0b2"
+    }
+  },
+  "headless_numerical_test_reference": {
+    "cases": 29,
+    "log_sha256": "68e0a2018b1036f91d4fd865be90dea5622460ecdc8eeaf7fdc3c1d8dd0369cd"
+  },
+  "arc_asan_ubsan": {
+    "instrumented_units": [
+      "texture-set-export.cpp",
+      "export.cpp",
+      "texture-set-source-export.cpp"
+    ],
+    "checks": 106,
+    "log_sha256": "93c912571839b5ba7a4724e1540eb8e50ea7278d617342688050e720ac145cf6"
+  },
+  "vendor_compile": {
+    "cuda": {
+      "compiled_translation_units": [
+        "texture-set-export.cpp",
+        "export.cpp",
+        "paint-composite-gpu.cu"
+      ],
+      "log_sha256": "0beafd78eff5753c5066d2826125695d5a9e4b2d0ece65e6177398b2e39e13a4"
+    },
+    "rocm": {
+      "compiled_translation_units": [
+        "texture-set-export.cpp",
+        "export.cpp",
+        "paint-composite-gpu.cu"
+      ],
+      "log_sha256": "317dae14e58a8abe1ad9c9438015a4afc07ccfc5ac79980391e6e116202db882"
+    }
+  },
+  "khronos_zero_errors_or_warnings": {
+    "hidden-physical-standard.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "2600ad1c361366fccc40753951fb2d20275bf8cf602853972a34e216ad485cc3"
+    },
+    "mtoon-portable.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "bcc8393162308324d7ef6d9ed9e4d157dc5a648a83e9fc255d6a6cf9f710d7cc"
+    },
+    "resized-physical-editable.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "9826b55b530b45f998d4e15c181d9fd5644bf68e9d6c4686beca908203f1faa7"
+    },
+    "standalone-editable.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "4634c0376a1bc2760875d31e85c3299e4b5adea9300d0a529cd1963c3f6aa613"
+    },
+    "standalone-standard.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "8e8af9bb5d4cae433461559655a893ac340ceb861466616b9f69186b648176b4"
+    },
+    "wayland-patch.glb": {
+      "version": "2.0.0-dev.3.10",
+      "report_sha256": "eb6312ede380f87ea01de820584f09aee335d25e988161020e2f7d913b1ea86c"
+    }
+  },
+  "vrm_official_schema_reports": {
+    "official-schema-native-xr.json": "588ccff049fb74be2091a28af378b55d5dca127f787d74e050190d28035301b0",
+    "official-schema-wayland.json": "a96a40d12f94f27a9b2df843b90043bb5dccc4d5bf7ae9579e5d3c30205a43d6"
+  },
+  "remaining_scope": [
+    "Broader normal sampler domains and production retopology assemblies",
+    "Positive CUDA and ROCm execution",
+    "Physical headset and full GPU-only Release suite"
+  ]
+}

@@ -404,6 +404,12 @@ Editable GLB carry the typed normal alongside independent HDR emission.
 The fixture crosses from 64-pixel paint and a 128-pixel source to 256-pixel
 paint while keeping the Bake and native layers. The normal proof covers
 static clamp-linear UV0 sampling in the certified tangent frame.
+The largest measured angle is 0.00573 radians. All 83 selected Arc
+Release tests pass, and 101 prior project and GLB outputs match byte for
+byte. Nested Wayland, synthetic OpenXR, the scoped Arc sanitizer run, and
+six Khronos and MToon validations pass. CUDA and ROCm compile the changed
+units. Positive execution on those vendors and physical XR remain open.
+[Independent MToon normal grids evidence](validation/retopo-mixed-normal-20261128.json)
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
