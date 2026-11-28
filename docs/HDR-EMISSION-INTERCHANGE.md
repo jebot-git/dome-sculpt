@@ -74,9 +74,12 @@ project can store separate Core PBR and MToon normal directions on the same
 writable atlas. The `paired-mikk-v1` Bake payload retains the two images
 under the original-source material and geometry binding. Earlier single-plane
 Bakes remain readable. Standard GLB emits the authored MToon plane in its
-`normalTexture` and recovers both planes through the native package. Paired
-normal UV transfer, independently selectable portable material variants and
-animated UVs remain open.
+`normalTexture` and recovers both planes through the native package. The UV
+workspace applies new charts over the same ordered geometry. It transports
+projected normals through the old and new tangent frames, filters FLOAT
+emission and layer samples, and retains the original UV mapping for each
+material sampler. Independently selectable portable material variants,
+topology-changing transfer and animated UVs remain open.
 
 ## First GLB implementation
 

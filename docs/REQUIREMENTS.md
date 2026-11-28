@@ -189,11 +189,13 @@ portable range retains its native authoring data. Standalone imported MToon
 also projects both normal roles from a typed donor into separate native
 planes. A partial rebake keeps both directions on misses. Standard GLB
 displays the authored MToon normal and stores both planes for native recovery.
-Paired-normal UV transfer, broader deformation and physical headset workflows
-remain open.
+UV Apply on existing geometry now transports both normal planes and FLOAT
+Bake and paint without replacing the original image samplers. Topology-changing
+transfer, broader deformation and physical headset workflows remain open.
 [Prepared MToon1 Bake evidence](validation/prepared-mtoon-bake-20261128.json)
 [Linked MToon shade evidence](validation/prepared-mtoon-shared-shade-20261128.json)
 [Paired Bake evidence](validation/prepared-mtoon-paired-bake-20261128.json)
+[Paired Bake UV evidence](validation/prepared-mtoon-uv-bake-20261128.json)
 
 ## Current validation — 2026-11-27
 

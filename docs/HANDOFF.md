@@ -584,9 +584,22 @@ Standard GLB exposes the authored MToon normal and preserves both planes in
 its native package. The Arc fixture resolves 767 distinct texels within
 0.005 unit-vector distance of their respective donor directions. The 29
 focused Release cases pass. The headless sanitizer reference passes 706
-checks and produces the same native project and GLB bytes as Arc. Frame-aware
-UV transfer of both planes remains open.
+checks and produces the same native project and GLB bytes as Arc.
 [Paired Bake evidence](validation/prepared-mtoon-paired-bake-20261128.json)
+
+UV Apply now moves the writable atlas of a standalone prepared-source Bake
+while retaining the original material samplers and logical UV sets. It
+transports the two coverage-weighted normal images through the old and new
+Mikk frames, filters linear FLOAT Bake emission, and keeps editable layer
+identities and FLOAT paint. The scaled and rotated Arc fixture checks both
+directions at 2,704 texels and matches the filtered energy at each sample.
+Cancel, ordered Save, Undo/Redo and Standard GLB recovery pass. The portable
+re-import differs by one channel value out of 255. All 31 focused Release
+cases pass. Synthetic OpenXR controller Scale and Apply also save an edited
+atlas with both normal maps, the FLOAT Bake and the original source sampling.
+UV raster transfer and normal encoding run on the host. Topology-changing
+transfer remains open.
+[Paired Bake UV evidence](validation/prepared-mtoon-uv-bake-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
