@@ -7,7 +7,9 @@
 #include "baked-emission-access.hpp"
 #include "emission-fallback-metrics.hpp"
 #include "emission-authority.hpp"
+#include "emission-bake-source.hpp"
 #include "paint-overlay-packet.hpp"
+#include "source-paint-export.hpp"
 #include "native-paint-sampling.hpp"
 #include "texture-set-export.hpp"
 #include "texture-set-paint-access.hpp"
@@ -26,6 +28,11 @@
 #include <tuple>
 namespace dome::detail {namespace {
 void stop(const std::function<bool()> &cancelled){if(cancelled&&cancelled())throw std::runtime_error("HDR emission export cancelled");}
+bool object_has_hdr(const SculptObject &object){
+ return hdr_emission(object.material.emissive)||
+        (object.painted&&object.painted->has_physical_emission())||
+        (object.material_bindings&&physical_emission(*object.material_bindings));
+}
 float linear(float v){return v<=.04045f?v/12.92f:std::pow((v+.055f)/1.055f,2.4f);}
 float srgb(float v){return v<=.0031308f?v*12.92f:1.055f*std::pow(v,1/2.4f)-.055f;}
 bool exact(const auto&a,const auto&b){return a.size()==b.size()&&(a.empty()||std::memcmp(a.data(),b.data(),a.size()*sizeof(a[0]))==0);}
@@ -292,8 +299,7 @@ EmissionExportPrepared prepare_emission_export(std::span<const ObjectSurface> ob
     }
    continue;
   }
-  if(!hdr_emission(owner.material.emissive)&&!(owner.painted&&owner.painted->has_physical_emission())&&
-     !(owner.material_bindings&&physical_emission(*owner.material_bindings)))continue;
+  if(!object_has_hdr(owner))continue;
   if(!owner.mesh_active||!owner.painted)throw std::invalid_argument("HDR export requires its editable mesh owner");
   charge_pixels(owner.painted->resolution());
  }
@@ -316,7 +322,31 @@ EmissionExportPrepared prepare_emission_export(std::span<const ObjectSurface> ob
     result.images.push_back(std::move(entry));
    }
   continue;
- }const auto source_mesh=owner.mesh_active?Mesh{}:surface_mesh(*owner.volume,cancelled);const auto &expected=owner.mesh_active?owner.painted->mesh():source_mesh;if(!identities.insert(surface.id).second||!same_mesh(surface.mesh,expected)||surface.material.name!=owner.material.name||surface.material.toon!=owner.material.toon||surface.material.color!=owner.material.color||surface.material.emissive!=owner.material.emissive||surface.material.metallic!=owner.material.metallic||surface.material.roughness!=owner.material.roughness||surface.material.unlit!=owner.material.unlit||surface.material.alpha!=owner.material.alpha||surface.material.alpha_cutoff!=owner.material.alpha_cutoff||surface.material.double_sided!=owner.material.double_sided||surface.deformation!=owner.deformation||surface.appearance!=owner.appearance||surface.material_bindings!=owner.material_bindings||surface.world_matrix().float_matrix()!=options.scene->world_matrix(owner.id).float_matrix())throw std::invalid_argument("HDR export surface does not match its immutable native source");result.ids.push_back(surface.id);if(!hdr_emission(owner.material.emissive)&&!(owner.painted&&owner.painted->has_physical_emission())&&!(owner.material_bindings&&physical_emission(*owner.material_bindings)))continue;const bool native_domain=owner.material_bindings&&bool(owner.material_bindings->native_paint_sampling);const auto canonical=owner.material_bindings?owner.material_bindings->canonical_paint_sampling:nullptr;
+ }
+ const auto source_mesh=owner.mesh_active?Mesh{}:surface_mesh(*owner.volume,cancelled);
+ const auto &expected=owner.mesh_active?owner.painted->mesh():source_mesh;
+ if(!identities.insert(surface.id).second||!same_mesh(surface.mesh,expected)||
+    surface.material.name!=owner.material.name||surface.material.toon!=owner.material.toon||
+    surface.material.color!=owner.material.color||surface.material.emissive!=owner.material.emissive||
+    surface.material.metallic!=owner.material.metallic||surface.material.roughness!=owner.material.roughness||
+    surface.material.unlit!=owner.material.unlit||surface.material.alpha!=owner.material.alpha||
+    surface.material.alpha_cutoff!=owner.material.alpha_cutoff||surface.material.double_sided!=owner.material.double_sided||
+    surface.deformation!=owner.deformation||surface.appearance!=owner.appearance||
+    surface.material_bindings!=owner.material_bindings||
+    surface.world_matrix().float_matrix()!=options.scene->world_matrix(owner.id).float_matrix())
+  throw std::invalid_argument("HDR export surface does not match its immutable native source");
+ result.ids.push_back(surface.id);
+ auto &safe=result.surfaces[i];
+ if(!object_has_hdr(owner)){
+  if(!authored_mtoon&&owner.mesh_active&&owner.painted->source_sampling_prepared()){
+   // The immutable Scene owns the contributions even when two surfaces share source maps.
+   safe.textures=source_baked_preview(owner,cancelled);
+   if(!safe.textures)safe.textures=owner.painted->preview(owner.material,cancelled);
+   source_paint_export(*owner.painted,safe,cancelled,true);
+  }
+  continue;
+ }
+ const bool native_domain=owner.material_bindings&&bool(owner.material_bindings->native_paint_sampling);const auto canonical=owner.material_bindings?owner.material_bindings->canonical_paint_sampling:nullptr;
  if(native_domain||canonical){if(surface.material_bindings.owner_before(owner.material_bindings)||owner.material_bindings.owner_before(surface.material_bindings))throw std::invalid_argument("Native HDR borrowed a foreign material control block");if(surface.deformation.owner_before(owner.deformation)||owner.deformation.owner_before(surface.deformation)||surface.rig_source!=owner.rig_source||surface.rig_source.owner_before(owner.rig_source)||owner.rig_source.owner_before(surface.rig_source))throw std::invalid_argument("Native HDR borrowed a foreign current model control block");const auto attachment=owner.painted->paint_sampling_attachment();if(attachment!=surface.paint_sampling_attachment||attachment.owner_before(surface.paint_sampling_attachment)||surface.paint_sampling_attachment.owner_before(attachment)||surface.paint_corner_coordinates!=attachment->domain()->corner_coordinates(owner.painted->mesh()))throw std::invalid_argument("Native HDR surface borrowed another paint coordinate owner");}
  EmissionInterchangeImage image;
  if(result.streaming){
@@ -324,7 +354,7 @@ EmissionExportPrepared prepare_emission_export(std::span<const ObjectSurface> ob
   image.width=image.height=source.resolution;
   image.version=source.version;
  }else image=materialize(owning_raster(owner,cancelled,authored_mtoon,false));
- auto &safe=result.surfaces[i];safe.material.emissive={};safe.textures=EmissionExportAccess::other_channels(*owner.painted,safe.material,cancelled);if(safe.material_bindings&&!native_domain&&!canonical){auto binding=std::make_shared<SourceMaterialBindings>(*safe.material_bindings);binding->physical_emission.reset();if(!binding->native_paint_sampling&&!binding->canonical_paint_sampling)binding->native_reference.emission={};safe.material_bindings=std::move(binding);}EmissionExportImage entry;entry.authored_mtoon=authored_mtoon;entry.object=surface.id;entry.native_paint_domain=native_domain;entry.canonical_paint_domain=canonical;entry.image=std::move(image);if(native_domain||canonical){if(!proof){proof=std::shared_ptr<EmissionExportProof>(new EmissionExportProof);proof->scene=options.scene;}proof->entries.push_back({safe.id,safe.material,safe.textures,safe.material_bindings});}result.images.push_back(std::move(entry));}
+ safe.material.emissive={};safe.textures=EmissionExportAccess::other_channels(*owner.painted,safe.material,cancelled);if(safe.material_bindings&&!native_domain&&!canonical){auto binding=std::make_shared<SourceMaterialBindings>(*safe.material_bindings);binding->physical_emission.reset();if(!binding->native_paint_sampling&&!binding->canonical_paint_sampling)binding->native_reference.emission={};safe.material_bindings=std::move(binding);}EmissionExportImage entry;entry.authored_mtoon=authored_mtoon;entry.object=surface.id;entry.native_paint_domain=native_domain;entry.canonical_paint_domain=canonical;entry.image=std::move(image);if(native_domain||canonical){if(!proof){proof=std::shared_ptr<EmissionExportProof>(new EmissionExportProof);proof->scene=options.scene;}proof->entries.push_back({safe.id,safe.material,safe.textures,safe.material_bindings});}result.images.push_back(std::move(entry));}
  if(proof)result.proof=std::move(proof);return result;
 }
 void finish_emission_export(GltfDocument &document,EmissionExportPrepared &prepared,const NativeEmissionExport &options,size_t max_bytes,const std::function<bool()> &cancelled){
@@ -420,9 +450,7 @@ std::vector<ObjectSurface> emission_export_surfaces(const Scene &scene,const std
  for(const auto &original:scene.objects()){
   if(cancelled&&cancelled())throw std::runtime_error("HDR export surface extraction cancelled");
   if(!original.visible||original.texture_sets)continue;
-  if(!detail::hdr_emission(original.material.emissive)&&
-     !(original.painted&&original.painted->has_physical_emission())&&
-     !(original.material_bindings&&detail::physical_emission(*original.material_bindings)))continue;
+  if(!detail::object_has_hdr(original))continue;
   auto &object=detached.object(original.id);
   if(object.painted&&object.painted->has_physical_emission())
    object.painted=detail::EmissionExportAccess::without_emission(*object.painted);
@@ -441,8 +469,7 @@ std::vector<ObjectSurface> emission_export_surfaces(const Scene &scene,const std
   surface.material=original.material;
   surface.material_bindings=original.material_bindings;
   surface.retopo_mtoon_export=detail::RetopoMToonExport::capture(original,cancelled);
-  if(original.painted&&(original.painted->has_physical_emission()||detail::hdr_emission(original.material.emissive)||
-      (original.material_bindings&&detail::physical_emission(*original.material_bindings)))){
+  if(original.painted&&detail::object_has_hdr(original)){
    auto maps=std::make_shared<TextureMaps>(*surface.textures);
    maps->overlay=detail::PaintOverlayFactory::capture(*original.painted,cancelled);
    surface.textures=std::move(maps);

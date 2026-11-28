@@ -3,6 +3,7 @@
 #include "mtoon-render.cpp"
 #undef main
 #include "dome/document.hpp"
+#include "dome/emission-native.hpp"
 #include "dome/import-authoring.hpp"
 #include "dome/material-bindings.hpp"
 #include "import-authoring-fixtures.hpp"
@@ -448,6 +449,83 @@ void spatial_paint(const std::filesystem::path &out,const Scene &initial,const I
        file_bytes(refused)==std::vector<uint8_t>({'e','x','i','s','t','i','n','g',' ','G','L','B'}),
        "Varying alpha that cannot preserve an exact MASK cutoff leaves the previous file and native project intact");
 }
+void mixed_emission(const std::filesystem::path &out,Fbo &fbo,
+                    prepared_normal_consumer::Renderer &consumer) {
+ auto scene=Scene::load(out/"spatial-color.dsculpt");
+ const auto painted_id=scene.active().id;
+ const auto light_id=scene.add("Physical light",Volume{});
+ scene.select(painted_id);
+ auto &light=scene.object(light_id);
+ light.mesh_active=true;
+ light.painted=std::make_shared<PaintedMesh>(quad(),64);
+ light.material.emissive={8,.125f,.04f};
+ PaintSettings ink;
+ ink.channel=PaintChannel::Emission;
+ ink.emission_units=PaintEmissionUnits::Physical;
+ ink.emission={96,.005f,.0003f};
+ ink.front_only=false;
+ paint_uniform(*light.painted,ink,.32f);
+
+ color_consumer::Model ordinary(out/"spatial-color.glb");
+ fbo.bind();
+ consumer.render(ordinary.data);
+ const auto ordinary_pixels=read();
+ for(const bool visible:{true,false}){
+  light.visible=visible;
+  const auto exact=scene.encode();
+  const auto stem=visible?"mixed-source":"mixed-source-hidden";
+  const auto path=out/(std::string(stem)+".glb"),saved=out/(std::string(stem)+".dsculpt");
+  Document doc;
+  doc.replace(scene.snapshot());
+  auto written=doc.export_asset(path);
+  auto save=doc.save_async(saved);
+  written.get();
+  save.get();
+
+  const auto bytes=file_bytes(path);
+  auto restored=extract_native_emission(bytes);
+  check(restored&&restored->encode()==exact&&doc.copy_scene().encode()==exact&&
+        Scene::load(saved).encode()==exact,"Mixed Standard GLB, queued Save and live document retain both native owners exactly");
+  const size_t json_size=bytes.at(12)|(size_t(bytes.at(13))<<8)|(size_t(bytes.at(14))<<16)|(size_t(bytes.at(15))<<24);
+  const auto json=nlohmann::json::parse(bytes.begin()+20,bytes.begin()+20+json_size);
+  const auto &images=json.at("extras").at("domeSculptEmission").at("images");
+  check(images.size()==size_t(visible),"Only emitted physical light owns an HDR field");
+
+  color_consumer::Model mixed(path);
+  if(visible){
+   const auto &entry=images.at(0);
+   check(entry.at("object")==light_id,"HDR field is attached only to the physical light");
+   auto &node=mixed.data->nodes[entry.at("node").get<size_t>()];
+   check(node.mesh&&node.mesh->primitives[0].material->has_emissive_strength&&
+         node.mesh->primitives[0].material->emissive_texture.texture,
+         "The separate light has its measured standard emissive fallback");
+   const auto &view=json.at("bufferViews").at(entry.at("bufferView").get<size_t>());
+   const auto exr=decode_emission_exr(std::span(bytes).subspan(28+json_size+view.at("byteOffset").get<size_t>(),
+                                                               view.at("byteLength").get<size_t>()));
+   check(exr.width==64&&exr.height==64&&std::any_of(exr.pixels.begin(),exr.pixels.end(),[](const auto &pixel){
+    return pixel[0]>90&&pixel[2]>0&&pixel[2]<.002f;
+   }),"Mixed Standard GLB keeps the light's bright and dim native FLOAT emission in the same samples");
+   node.mesh=nullptr;
+  }
+  check(mixed.data->meshes_count==(visible?2u:1u),"Hidden physical light remains in the native project only");
+  const auto &primitive=mixed.data->meshes[0].primitives[0];
+  const auto &material=*primitive.material;
+  check(material.pbr_metallic_roughness.base_color_texture.texcoord==2&&material.emissive_texture.texcoord==2&&
+        material.normal_texture.texcoord==1&&material.pbr_metallic_roughness.metallic_roughness_texture.texcoord==1&&
+        primitive.targets_count==ordinary.data->meshes[0].primitives[0].targets_count,
+        "Mixed export preserves editable paint atlas, independent original channels and morphs in core GLB");
+  fbo.bind();
+  consumer.render(mixed.data);
+  const auto error=delta(ordinary_pixels,read());
+  std::cout<<"MIXED_STANDARD "<<stem<<" max="<<error<<'\n';
+  check(error==0,"Independent GLB consumer sees identical ordinary material with HDR packaging present");
+
+  const auto retry=out/(std::string(stem)+"-retry.glb");
+  doc.replace(std::move(*restored));
+  doc.export_asset(retry).get();
+  check(file_bytes(retry)==bytes,"Native mixed scene extraction and re-export reproduce the exact GLB");
+ }
+}
 }
 int main(int argc,char **argv)try{
  if(argc<2||argc>3)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
@@ -489,5 +567,6 @@ int main(int argc,char **argv)try{
  certified_paint(out,initial,options,native,fbo,separate_roles);
  uniform_coat(out,initial,options,native,fbo,separate_roles);
  spatial_paint(out,initial,options,native,fbo,separate_roles);
+ mixed_emission(out,fbo,separate_roles);
  std::cout<<"PASS "<<checks<<" source-aware original standard export checks maxerror="<<maximum<<'\n';return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
