@@ -467,6 +467,21 @@ GLB as the file worker. CUDA and ROCm compile the texel rewrite and
 refuse missing hardware.
 [Uniform source coat evidence](validation/uniform-source-coat-20261128.json)
 
+Uniform-coat Standard GLB can now keep the original alpha texture when
+painting changes a cutout. With constant vertex alpha, the exporter moves
+the cutoff into the unchanged texture and vertex alpha domain. It also
+preserves full pass or full discard when the combined texture and vertex
+alpha bounds lie on one side of the cutoff. The original alpha bytes and
+samplers survive in each case. Crossing masks with varying vertex alpha
+still require explicit portable export.
+
+All four new fixtures pass Khronos validation with zero errors or warnings
+and render within one output byte of the native preview on Intel Arc.
+Twelve focused Release tests pass. The Arc and headless sanitizer runs
+each pass 517 checks. Native DomeD Wayland and synthetic OpenXR produce
+the same GLB as the file worker and the native project saves byte-exactly.
+[Uniform mask cutoff evidence](validation/uniform-mask-cutoff-20261128.json)
+
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
 their hashes verified and their workspace paths preserved. The same sweep

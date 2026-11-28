@@ -1,0 +1,95 @@
+{
+  "date": "2026-11-28",
+  "product": "64f4871707b96ef053c67dd5e6c3fdccff8111e6",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Uniform Core PBR coat on varying original alpha in Standard GLB MASK materials.",
+  "admission": {
+    "cutoff_transport": "Solve for the cutoff of unmodified texture alpha times the constant vertex alpha.",
+    "all_pass_or_discard": "A conservative envelope from original alpha texels and indexed vertex alpha supports a uniform decision.",
+    "preservation": "Alpha bytes, UV binding, image dimensions and filtering survive. GPU applies the independent RGB and material rewrites.",
+    "crossing_fixtures": "Actual rendered samples exercise both sides of the cutoff with absent or non-unit constant vertex alpha.",
+    "refusal": "Varying vertex alpha with an unresolved crossing retains earlier export and native owner.",
+    "size_for_test": [
+      193,
+      89
+    ]
+  },
+  "arc": {
+    "device": "Intel Arc A770, oneAPI Level Zero and hardware EGL",
+    "checks": 517
+  },
+  "release_ctest": [
+    "emission-raster-finite-compute",
+    "source-material-raster-compute",
+    "emission-raster-mapped-compute",
+    "emission-raster-mapped-missing-gpu",
+    "emission-raster-texture-set-compute",
+    "source-paint-export",
+    "source-paint-bake",
+    "source-paint-authoring",
+    "source-paint-physical-authoring",
+    "vrm1-source-export",
+    "raw-hdr-authoring",
+    "xr-editable-export"
+  ],
+  "asan_ubsan": {
+    "mode": "opt-in headless CPU reference",
+    "checks": 517
+  },
+  "fixtures": {
+    "uniform-mask-cross": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 9264,
+      "sha256": "98e526883365742fef5b60880641cb918d3f4b761424f88089ab9c3a948b1b9a",
+      "errors": 0,
+      "warnings": 0,
+      "arc_render_error_bytes": 1
+    },
+    "uniform-mask-vertex": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 9468,
+      "sha256": "b5f57e60479b5d9beb7a3312e90dd17a57cd85ba38687b98a701eecc679537b8",
+      "errors": 0,
+      "warnings": 0,
+      "arc_render_error_bytes": 1
+    },
+    "uniform-mask-pass": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 9448,
+      "sha256": "332fb7eacbe8731b334fcb482bc45e387480a7518057d155cb5c80c90d1fa040",
+      "errors": 0,
+      "warnings": 0,
+      "arc_render_error_bytes": 1
+    },
+    "uniform-mask-reject": {
+      "validator": "2.0.0-dev.3.10",
+      "bytes": 9464,
+      "sha256": "843d30f1a5b500b112a131fb918533db7c0593203a9fe65c4961b9927bd9da55",
+      "errors": 0,
+      "warnings": 0,
+      "arc_render_error_bytes": 0
+    }
+  },
+  "prior_glbs_byte_identical": {
+    "uniform-coat.glb": "46fa973d49b84e51227102181a397a220b179df61a1b56bae704f60a2d91e759",
+    "uniform-masked.glb": "0e71640d3acbd4900d4b02b2db9274e2817a4ea2f9886ccae58ab2b444811123",
+    "certified-factors.glb": "41d7b80eab1fa1bc7b4adead9bc31ae2f1cd9637f3e0697ef6757c632ed7bf53",
+    "spatial-color.glb": "e68f51a66633e6f97b50b960578072e9968b38851e87419a4027ff42e54824a0",
+    "spatial-orm.glb": "9b48b8c432f9c434719b7399d0be6f33958908b6c6ec7eb772dbfdf3f4eb9cd8",
+    "spatial-cover.glb": "4d01f02d33a75905bf9cb660bf8f13d30082955de757d6eea742348503eb9f34"
+  },
+  "native_wayland": {
+    "checks": 7,
+    "artifact_sha256": "98e526883365742fef5b60880641cb918d3f4b761424f88089ab9c3a948b1b9a"
+  },
+  "openxr": {
+    "checks": 10,
+    "synthetic_tracking": true,
+    "artifact_sha256": "98e526883365742fef5b60880641cb918d3f4b761424f88089ab9c3a948b1b9a",
+    "before_and_after_native_sha256": "8dba592ac7ff293bb68f68f0cd63610cab731b29e83fc7b947cfaf480f91870e"
+  },
+  "open": [
+    "Cutoffs with crossing, independently varying vertex and texture alpha.",
+    "General varying paint over independently varying source textures and physical headset validation."
+  ]
+}

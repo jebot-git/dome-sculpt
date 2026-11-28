@@ -136,6 +136,12 @@ in linear light for color, metallic-roughness and emission. The export
 keeps the sampler, original image size, and untouched packed channels.
 [Uniform source coat evidence](validation/uniform-source-coat-20261128.json)
 
+Uniform-coat Standard GLB supports varying texture alpha with a
+transported cutoff when vertex alpha is constant. When vertex alpha
+varies, a proved all-pass or all-discard mask preserves exact visibility.
+Both paths keep the original alpha texture bytes and sampling.
+[Uniform mask cutoff evidence](validation/uniform-mask-cutoff-20261128.json)
+
 ## Current validation — 2026-11-27
 
 The [current handoff](HANDOFF.md) records the exact combined Release, Arc,
