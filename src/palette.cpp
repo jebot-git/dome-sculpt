@@ -362,7 +362,10 @@ void SpatialPalette::raster(const EditorState &s) {
         if(row==2)label=value>=.5f?"Matching source triangles":"Ray projection";
         else label=std::string(row==0?"Partial projection: ":"Backfaces: ")+(value>=.5f?"Allow":"Refuse");
       }
-      else if(c.parameter==VrParameter::BakeQuality)label+=std::to_string(int(std::lround(value*(row==0?256:64))))+(row==1?" px":"");
+      else if(c.parameter==VrParameter::BakeQuality){
+        if(row==2)label=value>=.5f?"Sampling: 4 per texel":"Sampling: 1 per texel";
+        else label+=std::to_string(int(std::lround(value*(row==0?256:64))))+(row==1?" px":"");
+      }
       else if(c.parameter==VrParameter::BakeDistances){char size[48];snprintf(size,sizeof(size),value>0&&value<.01f?"%.3g mm":"%.2f mm",double(value));label+=size;}
       else if(c.parameter==VrParameter::CutOffset){char size[48];snprintf(size,sizeof(size),"%.2f mm",double(value));label+=size;}
       else if (c.parameter == VrParameter::RigRotation || c.parameter==VrParameter::CutDirection)

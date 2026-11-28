@@ -63,7 +63,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
       "Paint weights", "Next joint", "Previous joint", "Mode",
       "Strength", "Target", "Symmetry", "Joint lock",
       "Back", "Linked parts", "Brush size", "Bind / transfer"};
-  static const std::array<const char *,12> baking={"Source / cage", "Projection bounds", "AO / padding", "Bake surface", "Clear baked", "Cancel work", "Undo", "Redo", "Back", "Preparation policy", "Export glTF", "Projection policy"};
+  static const std::array<const char *,12> baking={"Source / cage", "Projection bounds", "Bake quality", "Bake surface", "Clear baked", "Cancel work", "Undo", "Redo", "Back", "Preparation policy", "Export glTF", "Projection policy"};
   static const std::array<const char *,12> skin={"Source", "Method", "Distances", "Falloff", "Influence cap", "Prune", "Use locks", "Bind / transfer", "Back", "Undo", "Redo", "Cancel work"};
   static const std::array<const char *,12> retopo = {
       "New patch", "Tool mode", "Make face", "Connect edge", "Delete points", "Relax",
@@ -405,13 +405,13 @@ int control_components(VrParameter parameter) {
   switch(parameter) {
   case VrParameter::BakeSource:
   case VrParameter::ProceduralGrid:
-  case VrParameter::BakeQuality:
   case VrParameter::CutDirection:
     return 2;
   case VrParameter::ProceduralCoverage:
   case VrParameter::ShapeMirror:
   case VrParameter::BakeProjection:
   case VrParameter::BakeDistances:
+  case VrParameter::BakeQuality:
   case VrParameter::SkinDistances:
   case VrParameter::RigRotation:
   case VrParameter::InkEmission:

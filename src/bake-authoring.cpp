@@ -475,6 +475,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   options.ray_bias = .0001f / target_world.scale;
   options.ao_samples = settings.ao_samples;
   options.padding = settings.padding;
+  options.supersample = settings.supersample;
+  if(options.supersample)options.max_texels=16'777'216; // Four samples across the largest 2048² paint atlas.
   options.fail_on_miss = !settings.allow_partial;options.allow_backfaces=settings.allow_backfaces;
   options.separate_pbr_color=separate;
   options.cancelled = cancelled;
@@ -608,6 +610,12 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     };
   }
   const auto &low_mesh=low?*low:target.painted->mesh();
+  if(options.supersample){
+    // The laid-out normal and retained UV bases may have split raster
+    // vertices. Their corner order still names the original logical mesh.
+    options.chart_corners=target.painted->mesh().indices;
+    options.chart_seams=target.painted->mesh().uv_seams;
+  }
   const auto retained_uv=target.material_bindings?target.material_bindings->canonical_uv:nullptr;
   const bool native_recipient=retained_recipient&&
       retained_recipient->model()==detail::PolygonSurfaceNormalModel::NativeNOnly;
@@ -624,9 +632,9 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   const uint64_t projection_rays=!settings.corresponding_topology;
   // Keep a nonzero valid allowance if a matching normal-only second pass
   // follows a primary pass that uses the complete projected AO budget.
-  const uint64_t sufficient_rays=uint64_t(options.resolution)*options.resolution*
+  const uint64_t sufficient_rays=(options.supersample?4u:1u)*(uint64_t(options.resolution)*options.resolution*
       (uint64_t(options.ao_samples)+projection_rays)+
-      (separate_normal_pass?uint64_t(normal_resolution)*normal_resolution*projection_rays:0)+1;
+      (separate_normal_pass?uint64_t(normal_resolution)*normal_resolution*projection_rays:0))+1;
   options.max_rays=std::max(options.max_rays,std::min(sufficient_rays,detail::bake_ray_limit));
   const auto target_triangles=recipient?recipient->domain->triangles():std::span<const uint32_t>{};
   const auto encode_retained=[&](BakeOptions &options){

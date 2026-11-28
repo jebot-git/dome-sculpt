@@ -14,6 +14,7 @@
 #endif
 #include <algorithm>
 #include <iostream>
+#include <limits>
 #include <nlohmann/json.hpp>
 using namespace dome;
 namespace {
@@ -48,6 +49,107 @@ std::array<uint8_t,4> pixel(const Image &image,int x,int y) {
   auto p=image.rgba.data()+(size_t(y)*image.width+x)*4;return {p[0],p[1],p[2],p[3]};
 }
 bool near(int a,int b,int tolerance=1) {return std::abs(a-b)<=tolerance;}
+void supersampling(){
+  BakeOptions options;
+  options.resolution=8;options.ao_samples=0;options.padding=0;options.supersample=true;
+  BakeSource source;source.mesh=quad();
+  source.materials.resize(2);
+  source.materials[0].material.color={1,0,0,1};
+  source.materials[1].material.color={0,0,1,.5f};
+  source.triangle_materials={0,1};
+  const auto maximum=std::numeric_limits<float>::max();
+  source.materials[0].resolved_emission=[=](auto,auto){return std::array{4.f,maximum,-0.f};};
+  source.materials[1].resolved_emission=[=](auto,auto){return std::array{16.f,maximum,-0.f};};
+  source.materials[0].normal_map=std::make_shared<Image>(constant({255,128,255,255}));
+  source.materials[1].normal_map=std::make_shared<Image>(constant({128,128,255,255}));
+  // Retained Bake can duplicate all triangle corners. A continuous UV edge
+  // must still contribute from both sides to the same output texel.
+  Mesh split;
+  for(uint32_t vertex:source.mesh.indices){
+    split.indices.push_back(uint32_t(split.positions.size()));
+    split.positions.push_back(source.mesh.positions[vertex]);
+    split.normals.push_back(source.mesh.normals[vertex]);
+    split.uv.push_back(source.mesh.uv[vertex]);
+  }
+  options.source_triangles={0,1};
+  options.source_corner_barycentrics={{1,0,0},{0,1,0},{0,0,1},{1,0,0},{0,1,0},{0,0,1}};
+  options.chart_corners=source.mesh.indices;
+  const auto resolved=bake_mesh(split,source,options);
+  const auto color=pixel(resolved.maps.color,3,3);
+  check(resolved.projected==64&&resolved.overlapping==0&&resolved.rays==0&&
+        near(color[0],170)&&color[1]==0&&near(color[2],203)&&color[3]==159,
+        "Four samples join split UV corners and resolve linear alpha-associated color before encoding");
+  const auto hdr=resolved.emission_field->texel(3*8+3);
+  check(hdr.absolute[0]==13&&hdr.absolute[1]==maximum&&std::signbit(hdr.absolute[2])&&hdr.coverage==1,
+        "HDR resolves all four samples without RGB8 conversion, overflow or loss of signed zero");
+  const auto normal=pixel(resolved.normal,3,3);
+  check(normal[0]>148&&normal[0]<158&&normal[2]>=250,
+        "The averaged world direction is normalized and encoded once in the target tangent basis");
+  source.colors.assign(4,{.5f,.25f,.25f,1});
+  options.separate_pbr_color=true;
+  const auto separate=bake_mesh(split,source,options);
+  const auto pbr=pixel(separate.maps.pbr_color,3,3);
+  check(pixel(separate.maps.color,3,3)==color&&near(pbr[0],124)&&pbr[1]==0&&near(pbr[2],108)&&pbr[3]==159,
+        "Supersampling retains the independent resolved PBR color and original common color");
+  const std::array<uint8_t,6> seam{0,0,1,1,0,0};
+  options.chart_seams=seam;
+  const auto seamed=bake_mesh(split,source,options);
+  check(pixel(seamed.maps.color,3,3)==std::array<uint8_t,4>{255,0,0,255},
+        "A declared UV seam separates the original logical edge even with identical coordinates");
+  options.chart_corners={};options.chart_seams={};
+
+  auto packed=quad(-1,0,0,0,.5f);
+  append(packed,quad(0,1,0,.5f,1));
+  source=BakeSource{};source.mesh=packed;source.materials.resize(2);
+  source.materials[0].material.color={1,0,0,1};
+  source.materials[1].material.color={0,0,1,1};
+  source.triangle_materials={0,0,1,1};
+  options.resolution=9;options.separate_pbr_color=false;options.source_triangles={0,1,2,3};
+  options.source_corner_barycentrics.insert(options.source_corner_barycentrics.end(),
+      {{1,0,0},{0,1,0},{0,0,1},{1,0,0},{0,1,0},{0,0,1}});
+  const auto islands=bake_mesh(packed,source,options);
+  check(islands.overlapping==0&&pixel(islands.maps.color,4,4)==std::array<uint8_t,4>{255,0,0,255}&&
+        pixel(islands.maps.color,5,4)==std::array<uint8_t,4>{0,0,255,255},
+        "Touching UV charts with coincident geometry keep independent colors in a shared output texel");
+  auto stacked=packed;append(stacked,packed);
+  auto stacked_options=options;
+  stacked_options.source_triangles.clear();stacked_options.source_corner_barycentrics.clear();
+  check(rejects([&]{bake_mesh(stacked,source,stacked_options);}),"Strict supersampling refuses overlapping UV sample claims");
+  stacked_options.fail_on_overlap=false;
+  const auto overlap=bake_mesh(stacked,source,stacked_options);
+  check(overlap.overlapping==9*9*4&&overlap.maps.color.rgba==islands.maps.color.rgba,
+        "Permissive supersampling counts four repeated claims per texel and retains the original owner");
+
+  options=BakeOptions{};options.resolution=8;options.ao_samples=0;options.padding=1;
+  const auto thin=quad(-1,1,0,.025f,.045f);
+  source=BakeSource{};source.mesh=quad();
+  check(rejects([&]{bake_mesh(thin,source,options);}),"A UV strip narrower than a texel can fall between texel centers");
+  options.supersample=true;
+  options.writable.assign(64,1);options.writable[4*8]=0;
+  const auto strip=bake_mesh(thin,source,options);
+  check(strip.projected==7&&strip.rays==14&&strip.coverage[4*8]==4&&strip.coverage[4*8+1]==2&&
+        pixel(strip.maps.color,0,3)[3]==255&&pixel(strip.maps.color,0,4)[3]==0,
+        "Subpixel coverage recovers a narrow UV strip, protects all samples in a masked texel and pads in output pixels");
+
+  const auto low=quad();
+  source.mesh=quad(-1,.125f);
+  options.writable.clear();
+  check(rejects([&]{bake_mesh(low,source,options);}),"Strict supersampling rejects a texel with any missed in-chart sample");
+  options.fail_on_miss=false;
+  const auto partial=bake_mesh(low,source,options);
+  check(partial.projected==40&&partial.missed==32&&partial.coverage[3*8+4]==1&&
+        partial.coverage[3*8+5]==3&&!partial.padded,
+        "Partial supersampling reports mixed texels and keeps padding out of complete misses");
+  source.mesh=low;options.ao_samples=2;
+  const auto ambient=bake_mesh(low,source,options);
+  check(ambient.rays==8*8*4*3&&pixel(ambient.ambient_occlusion,3,3)[0]==255,
+        "AO consumes two rays at each of the four admitted projection samples");
+  options.max_rays=ambient.rays-1;
+  check(rejects([&]{bake_mesh(low,source,options);}),"Supersampling charges every projection and AO ray to the budget");
+  options.max_rays=ambient.rays;
+  options.max_texels=8*8*4-1;
+  check(rejects([&]{bake_mesh(low,source,options);}),"Supersampling checks sample capacity before allocation");
+}
 void edge_projection() {
   const auto target=quad(-1,1,0,1.f/64,63.f/64,1.f/64,63.f/64);
   BakeOptions settings;settings.resolution=32;settings.ao_samples=0;settings.padding=0;
@@ -669,6 +771,7 @@ void padding_device_ownership(){
 #endif
 } // namespace
 int main()try {
+  supersampling();
   edge_projection();
   ordered_raster_batches();
 #ifdef DOME_TEST_BAKE_RAY_DEVICE

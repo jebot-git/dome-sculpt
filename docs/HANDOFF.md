@@ -237,6 +237,13 @@ repeat time was 2.15 seconds with the summary and 2.14 seconds with the
 preceding writer in one paired trial.
 [GPU HDR Bake storage evidence](validation/bake-hdr-storage-20261128.json)
 
+Bake now offers four GPU samples per texel in the desktop dialog and the XR
+Bake quality panel. The worker filters linear channels and normal directions
+within the same UV chart before encoding. Writability and padding use output
+texels. Recipe Recall restores the saved sample mode.
+One sample remains the default for older recipes. See
+[four-sample Bake](BAKE-RECIPES.md#four-samples-per-texel).
+
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing
 GLB. The same command on Intel Arc reproduced the reference GLB byte for byte.

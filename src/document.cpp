@@ -2626,7 +2626,11 @@ void Document::finish_control_locked(bool accept) {
         state_.bake_settings.corresponding_topology=c.value[2]>=.5f;
         if(state_.bake_settings.corresponding_topology)state_.bake_settings.cage_object=0;
       }
-      else {state_.bake_settings.ao_samples=uint32_t(std::lround(c.value[0]*256));state_.bake_settings.padding=uint32_t(std::lround(c.value[1]*64));}
+      else {
+        state_.bake_settings.ao_samples=uint32_t(std::lround(c.value[0]*256));
+        state_.bake_settings.padding=uint32_t(std::lround(c.value[1]*64));
+        state_.bake_settings.supersample=c.value[2]>=.5f;
+      }
     }
     control_before_.reset();control_changed_=false;state_.controls={};return;
   }
@@ -2862,8 +2866,9 @@ void Document::control_event_locked(VrControlEvent event) {
                state_.bake_settings.allow_backfaces?1.f:0.f,
                state_.bake_settings.corresponding_topology?1.f:0.f,0};break;
     case VrParameter::BakeQuality:
-      c.title="AO samples / seam padding";c.components=2;
-      c.value={state_.bake_settings.ao_samples/256.f,state_.bake_settings.padding/64.f,0,0};break;
+      c.title="AO, padding and sampling";c.components=3;
+      c.value={state_.bake_settings.ao_samples/256.f,state_.bake_settings.padding/64.f,
+               state_.bake_settings.supersample?1.f:0.f,0};break;
     case VrParameter::WeightStrength:
       c.title = "Weight stroke strength"; c.value[0] = state_.weights.strength;
       break;

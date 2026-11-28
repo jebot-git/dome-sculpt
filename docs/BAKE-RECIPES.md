@@ -23,6 +23,31 @@ legacy fixtures. The published Scene29 readers explicitly reject Scene30;
 opening a new recipe-bearing project with an older binary is unsupported.
 The C++ object/control layouts change and require coherent consumer rebuilds.
 
+## Four samples per texel
+
+Enable **Four samples per texel** in the desktop Bake dialog. In OpenXR,
+open **Bake quality** on the Baking page and set **Sampling** to **4 per texel**.
+The setting is stored in the last successful recipe. Older recipes default
+to one sample per texel. Recipe version 3 records four-sample bakes, including
+those using matching triangles or an explicit cage.
+
+The selected GPU rasterizes UV coverage at the four quarter-texel positions
+and runs the corresponding projection rays, normal and material texture
+sampling, and AO. The worker resolves samples from the same UV chart using
+original vertex identities, matching UVs and explicit seams. If different
+charts reach the same output texel, the first target face with coverage
+determines the chart. The worker averages linear channels and world normals
+within that chart, then encodes the output once. It weights color by alpha
+and keeps FLOAT emission in linear radiance. Writability and the padding
+radius apply to the requested output resolution. Strict projection refuses a
+miss in any admitted sample. Partial projection averages the hits and reports
+each affected output texel once. Complete misses remain barriers to padding.
+
+The application supports four samples on atlases through 2048 × 2048.
+Projection and AO share the existing work budgets, including for separate
+normal-coordinate passes. Four-sample authoring uses additional worker
+memory and submits more GPU work than the default.
+
 ## Recorded qualification
 
 This private milestone has 39 native recipe checks per Release/sanitizer profile,

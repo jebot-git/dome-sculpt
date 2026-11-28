@@ -45,24 +45,26 @@ void ObjectBakeRecipe::validate()const{
 }
 nlohmann::json ObjectBakeRecipe::encode()const{
   validate();const auto &s=settings;
-  nlohmann::json out={{"version",s.corresponding_topology?2:1},{"source",encode_reference(source)},
+  nlohmann::json out={{"version",s.supersample?3:(s.corresponding_topology?2:1)},{"source",encode_reference(source)},
     {"cage",cage?nlohmann::json(encode_reference(*cage)):nlohmann::json(nullptr)},
     {"settings",{{"front_mm",s.front_mm},{"back_mm",s.back_mm},{"ao_distance_mm",s.ao_distance_mm},
       {"ao_samples",s.ao_samples},{"padding",s.padding},{"allow_partial",s.allow_partial},
       {"allow_backfaces",s.allow_backfaces},{"prepare_colors",s.prepare_colors},
       {"color_error",s.color_error},{"prepare_normals",s.prepare_normals},{"normal_error",s.normal_error}}}};
   if(s.corresponding_topology)out["settings"]["corresponding_topology"]=true;
+  if(s.supersample)out["settings"]["supersample"]=true;
   return out;
 }
 std::shared_ptr<const ObjectBakeRecipe> ObjectBakeRecipe::decode(const nlohmann::json &j){
   if(!j.is_object()||j.size()!=4||!j.at("version").is_number_integer()||
-      (j.at("version")!=1&&j.at("version")!=2))
+      (j.at("version")!=1&&j.at("version")!=2&&j.at("version")!=3))
     throw std::invalid_argument("Invalid bake recipe record");
-  const bool corresponding=j.at("version")==2;
+  const bool supersampled=j.at("version")==3;
   auto result=std::make_shared<ObjectBakeRecipe>();result->source=decode_reference(j.at("source"));
   if(!j.at("cage").is_null())result->cage=decode_reference(j.at("cage"));
   const auto &v=j.at("settings");auto &s=result->settings;
-  if(!v.is_object()||v.size()!=(corresponding?12u:11u))
+  const bool corresponding=j.at("version")==2||(supersampled&&v.contains("corresponding_topology"));
+  if(!v.is_object()||v.size()!=11u+unsigned(corresponding)+unsigned(supersampled))
     throw std::invalid_argument("Incomplete bake recipe settings");
   auto real=[&](const char *key){if(!v.at(key).is_number())throw std::invalid_argument("Invalid bake recipe scalar");return v.at(key).get<float>();};
   auto flag=[&](const char *key){if(!v.at(key).is_boolean())throw std::invalid_argument("Invalid bake recipe flag");return v.at(key).get<bool>();};
@@ -75,7 +77,10 @@ std::shared_ptr<const ObjectBakeRecipe> ObjectBakeRecipe::decode(const nlohmann:
   s.prepare_normals=flag("prepare_normals");s.normal_error=real("normal_error");
   if(corresponding&&!flag("corresponding_topology"))
     throw std::invalid_argument("Invalid matching topology bake recipe");
+  if(supersampled&&!flag("supersample"))
+    throw std::invalid_argument("Invalid four-sample bake recipe");
   s.corresponding_topology=corresponding;
+  s.supersample=supersampled;
   s.cage_object=result->cage?result->cage->object:0;
   result->validate();return result;
 }

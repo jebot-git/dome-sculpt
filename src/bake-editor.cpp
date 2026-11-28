@@ -99,6 +99,9 @@ void edit_bake_dialog(Document &doc){
   Fl_Check_Button corresponding(20,y,width-56,row,"Match source triangles");
   corresponding.value(settings.corresponding_topology);y+=row;
   corresponding.tooltip("Use the same ordered vertices and triangles within the chosen projection bounds.");
+  Fl_Check_Button sampling(20,y,width-56,row,"Four samples per texel");
+  sampling.value(settings.supersample);y+=row;
+  sampling.tooltip("Sample UV coverage and projection at four positions per texel. This increases bake time and memory use.");
   Fl_Check_Button colors(20,y,width-56,row,"Prepare source colors");colors.value(settings.prepare_colors);y+=row;
   color_error.position(label,y);y+=row;
   Fl_Check_Button normals(20,y,width-56,row,"Author portable normal targets");normals.value(settings.prepare_normals);normals.tooltip("Authors portable normal and tangent targets. Pose and morph shading can differ from legacy dynamic shading; original source data is retained.");y+=row;
@@ -114,7 +117,7 @@ void edit_bake_dialog(Document &doc){
   Fl_Box status(16,y,width-48,row*2);status.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);y+=row*2;
   content.size(width-24,y);content.end();scroll.end();
   Fl_Button close(24,height-row*2+8,width/2-36,row,"Cancel"),bake(width/2+12,height-row*2+8,width/2-36,row,"Bake");
-  struct Run {Document *doc;Fl_Window *window;Fl_Choice *source,*cage;std::array<BakeSlider*,7> fields;std::vector<uint64_t>*ids,*cage_ids;AssetSource *expected;Fl_Check_Button *partial,*backfaces,*corresponding,*colors,*normals;std::shared_ptr<const ObjectBakeRecipe> recipe;bool running=false,ever_ran=false;} run{&doc,&window,&source,&cage,sliders,&ids,&cage_ids,&expected,&partial,&backfaces,&corresponding,&colors,&normals,state->bake_recipe};
+  struct Run {Document *doc;Fl_Window *window;Fl_Choice *source,*cage;std::array<BakeSlider*,7> fields;std::vector<uint64_t>*ids,*cage_ids;AssetSource *expected;Fl_Check_Button *partial,*backfaces,*corresponding,*sampling,*colors,*normals;std::shared_ptr<const ObjectBakeRecipe> recipe;bool running=false,ever_ran=false;} run{&doc,&window,&source,&cage,sliders,&ids,&cage_ids,&expected,&partial,&backfaces,&corresponding,&sampling,&colors,&normals,state->bake_recipe};
   recall.callback([](Fl_Widget*,void *p){auto &r=*static_cast<Run*>(p);try{
     if(!r.recipe)throw std::logic_error("No successful bake has been saved for this target");
     r.recipe->validate();const auto &v=r.recipe->settings;
@@ -126,6 +129,7 @@ void edit_bake_dialog(Document &doc){
     for(size_t i=0;i<r.fields.size();++i){r.fields[i]->physical(values[i]);r.fields[i]->redraw();}
     r.partial->value(v.allow_partial);r.backfaces->value(v.allow_backfaces);
     r.corresponding->value(v.corresponding_topology);
+    r.sampling->value(v.supersample);
     r.colors->value(r.colors->active()&&v.prepare_colors);r.normals->value(r.normals->active()&&v.prepare_normals);r.window->redraw();
   }catch(const std::exception &e){r.doc->report_error(e.what());}},&run);
   close.callback([](Fl_Widget*w,void*p){auto &r=*static_cast<Run*>(p);if(r.running && r.doc->frame().state->asset_busy)r.doc->cancel_asset_work();else w->window()->hide();},&run);
@@ -135,6 +139,7 @@ void edit_bake_dialog(Document &doc){
     s.prepare_normals=r.normals->value();s.normal_error=float(r.fields[6]->physical()/57.29577951308232);
     s.allow_partial=r.partial->value();s.allow_backfaces=r.backfaces->value();
     s.corresponding_topology=r.corresponding->value();
+    s.supersample=r.sampling->value();
     if(!s.corresponding_topology)s.cage_object=r.cage_ids->at(size_t(r.cage->value()));
     r.doc->bake_from_object(r.ids->at(size_t(r.source->value())),s,*r.expected);r.running=r.ever_ran=true;
   }catch(const std::exception&e){r.doc->report_error(e.what());}},&run);
@@ -148,8 +153,8 @@ void edit_bake_dialog(Document &doc){
       if(s->active_object==target && s->generation==expected.generation)expected=doc.draft_scene().source;
     }
     if(s->active_object!=target || s->generation!=expected.generation){window.hide();break;}
-    if(run.running){normals.deactivate();colors.deactivate();partial.deactivate();backfaces.deactivate();corresponding.deactivate();source.deactivate();cage.deactivate();for(auto f:sliders)f->deactivate();bake.deactivate();if(work.cancellable)close.activate();else close.deactivate();close.copy_label(work.cancelling?"Cancelling...":"Cancel bake");progress.value(std::min(99.f,work.progress*100));}
-    else {partial.activate();backfaces.activate();corresponding.activate();source.activate();
+    if(run.running){normals.deactivate();colors.deactivate();partial.deactivate();backfaces.deactivate();corresponding.deactivate();sampling.deactivate();source.deactivate();cage.deactivate();for(auto f:sliders)f->deactivate();bake.deactivate();if(work.cancellable)close.activate();else close.deactivate();close.copy_label(work.cancelling?"Cancelling...":"Cancel bake");progress.value(std::min(99.f,work.progress*100));}
+    else {partial.activate();backfaces.activate();corresponding.activate();sampling.activate();source.activate();
       if(corresponding.value())cage.deactivate();else cage.activate();bake.activate();
       for(size_t i=0;i<(existing_basis?5:sliders.size());++i)sliders[i]->activate();
       if(!existing_basis){colors.activate();normals.activate();}

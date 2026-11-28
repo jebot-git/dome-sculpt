@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/bake-distance.hpp"
+#include "dome/bake-recipe.hpp"
 #include <nlohmann/json.hpp>
 #include <iostream>
 #include <chrono>
@@ -46,10 +47,18 @@ int main(int argc,char**argv)try{
   check(doc.frame().state->bake_settings.front_mm==50 && doc.copy_scene().encode()==before,"Ray Cancel discards staged projection bounds exactly");
   driver.sector(1);c=doc.frame().state->controls;driver.value(float(bake_distance_to_unit(20)));driver.confirm();
   check(std::abs(doc.frame().state->bake_settings.front_mm-20)<.01f,"Joystick confirmation retains the chosen world-millimetre bounds");
-  driver.sector(2);check(doc.frame().state->controls.components==2,"AO sampling and seam padding expose independent controller rows");driver.value(0);driver.value(.125f,1);driver.confirm();
-  check(doc.frame().state->bake_settings.ao_samples==0 && doc.frame().state->bake_settings.padding==8 && !doc.frame().state->dirty,"Quality confirmation selects integer AO samples and padding without dirtying the scene");
+  driver.sector(2);check(doc.frame().state->controls.components==3,"AO, padding and supersampling expose independent controller rows");
+  driver.value(1,2);driver.ray(.25f,.95f);
+  check(!doc.frame().state->bake_settings.supersample,"Cancel discards a staged sampling change");
+  driver.sector(2);driver.value(0);driver.value(.125f,1);driver.value(1,2);driver.confirm();
+  check(doc.frame().state->bake_settings.ao_samples==0 && doc.frame().state->bake_settings.padding==8 &&
+        doc.frame().state->bake_settings.supersample && !doc.frame().state->dirty,
+        "Quality confirmation selects four samples without dirtying the scene");
   driver.sector(3);check(doc.wait_asset() && doc.frame().state->error.empty(),"Controller Bake runs the guarded native worker");
   auto baked=doc.copy_scene().encode();check(doc.copy_scene().active().painted->baked() && bake_readonly_sources(doc.copy_scene())==readonly_sources && doc.frame().state->can_clear_bake,"Accepted baking retains both complete hidden sources and enables Clear");
+  const auto reopened=Scene::decode(baked);
+  check(reopened.active().bake_recipe&&reopened.active().bake_recipe->settings.supersample,
+        "The successful controller recipe preserves supersampling after decoding");
   check(doc.undo() && doc.copy_scene().encode()==before && doc.redo() && doc.copy_scene().encode()==baked,"Baking is one exact global Undo/Redo transaction");
   doc.clear_bake();check(doc.wait_asset() && !doc.copy_scene().active().painted->baked() && doc.undo() && doc.copy_scene().encode()==baked,"Explicit Clear removes only the baked base and is exactly undoable");
   auto confirmed_front=doc.frame().state->bake_settings.front_mm;
@@ -60,7 +69,7 @@ int main(int argc,char**argv)try{
   auto until=std::chrono::steady_clock::now()+std::chrono::seconds(3);while(!started && std::chrono::steady_clock::now()<until)std::this_thread::yield();
   check(started && doc.frame().state->can_cancel_asset,"An executing detached job exposes cancellation without blocking input");doc.cancel_asset_work();
   check(doc.wait_asset() && doc.copy_scene().encode()==before && !doc.frame().state->can_undo && doc.frame().state->error.empty() && doc.frame().state->message.find("cancelled")!=std::string::npos,"Cancellation rejects even a returned mutated candidate with no scene/history changes");
-  auto large=fixture(512);auto original=large.encode();doc.replace(large);ObjectBakeSettings options;options.ao_samples=256;
+  auto large=fixture(512);auto original=large.encode();doc.replace(large);ObjectBakeSettings options;options.ao_samples=256;options.supersample=true;
   doc.bake_from_object(large.objects()[1].id,options);
   until=std::chrono::steady_clock::now()+std::chrono::seconds(5);float previous=0;bool monotonic=true;
   while(doc.frame().state->asset_busy && doc.asset_status().progress<.13f && std::chrono::steady_clock::now()<until){auto p=doc.asset_status().progress;monotonic&=p>=previous;previous=p;std::this_thread::sleep_for(std::chrono::milliseconds(1));}

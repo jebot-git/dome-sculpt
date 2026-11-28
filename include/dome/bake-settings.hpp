@@ -10,6 +10,7 @@ struct ObjectBakeSettings {
   float color_error = .04f;
   bool prepare_normals=false;
   bool corresponding_topology=false; // Shared ordered topology within the projection bounds.
+  bool supersample=false;
   float normal_error=.02f;
   // Explicit existing mesh with the target's ordered vertex/index identities.
   // Zero uses the ordinary normal-offset projection. Session configuration;

@@ -25,7 +25,7 @@ editable layers and is also one global Undo step.
 
 The headset route is Objects → Mesh tools → Baking. This replaces the duplicate
 Sculpt layers shortcut on Mesh tools; Sculpt layers remains under Objects.
-Select Source, Projection bounds or AO / padding with the joystick. Aim + trigger
+Select Source / cage, Projection bounds or Bake quality with the joystick. Aim + trigger
 drags the large sliders. Left/right adjusts continuously; up/down selects a
 component on multi-row panels, and a scalar panel has the existing fine-wheel
 adjustment. Source names and hidden state are displayed. Done/joystick commits
@@ -35,11 +35,10 @@ the worker. Its page shows progress and enables Cancel work while running.
 Accepted completion publishes maps and closes the spatial menu for inspection.
 Reopen the page to rebake/clear or use the normal Undo/Redo/save/export commands.
 
-Settings are session controls; generated maps and retained editable sources are
-persisted in native projects. A durable bake recipe,
-partial masks/multiple source selection, supersampling and production-scale
-quality/performance remain further work. This is an implemented projection-bake
-workflow, not completion of every production requirement.
+Native projects store generated maps, retained editable sources and the last
+successful recipe. Bake quality includes the four-sample setting. Partial
+masks, multiple source selection and broader production-scale quality and
+performance are still open. [Saved bake recipes](BAKE-RECIPES.md)
 
 Worker and cancellation contract
 -------------------------------

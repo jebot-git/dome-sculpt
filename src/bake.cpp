@@ -10,6 +10,7 @@
 #include "bake-material-input.hpp"
 #include "bake-emission-storage.hpp"
 #include "bake-sampler-cache.hpp"
+#include "bake-supersample.hpp"
 #include "bake-ray-query.hpp"
 #include "bake-paint-coordinates.hpp"
 #include "emission-bake-source.hpp"
@@ -198,6 +199,14 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o,
       !std::isfinite(o.ray_bias)||o.ray_bias<=0||o.ray_bias>.1f||
       !std::isfinite(o.ao_distance)||o.ao_distance<0||(o.ao_samples&&o.ao_distance<=o.ray_bias)||o.ao_distance>100)
     throw std::invalid_argument("Invalid bake bounds or resource budget");
+  if(o.supersample){
+    if(4*uint64_t(o.resolution)*o.resolution>o.max_texels)
+      throw std::length_error("Four-sample Bake exceeds the texel sample budget");
+    if((!o.chart_corners.empty()&&o.chart_corners.size()!=low.indices.size())||
+       (!o.chart_seams.empty()&&(o.chart_seams.size()!=low.indices.size()||
+         std::ranges::any_of(o.chart_seams,[](auto flag){return flag>1;}))))
+      throw std::invalid_argument("Bake chart topology differs from the original target corner order");
+  }
   if ((!o.writable.empty()&&o.writable.size()!=size_t(o.resolution)*o.resolution)||std::any_of(o.writable.begin(),o.writable.end(),[](auto v){return v>1;})) throw std::invalid_argument("Invalid bake writable mask");
   if (!o.cage_positions.empty()) {
     if (o.cage_positions.size()!=low.positions.size()) throw std::invalid_argument("Cage vertex identities differ from low mesh");
@@ -464,13 +473,42 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
         basis(source.mesh, t, normalized(source.mesh.normals[source.mesh.indices[t*3]]), {1,0,0});
     }
   }
-  size_t pixels=size_t(o.resolution)*o.resolution;
+  const size_t pixels=size_t(o.resolution)*o.resolution;
+  const uint32_t raster_resolution=o.resolution*(o.supersample?2u:1u);
+  const size_t sample_sites=size_t(raster_resolution)*raster_resolution;
+  std::vector<detail::BakeSampleSum> sample_sums;
+  std::vector<detail::BakeSampleSum::Color> pbr_sums;
+  std::vector<uint32_t> chart;
+  if(o.supersample){
+    const auto corners=o.chart_corners.empty()?std::span(low.indices):o.chart_corners;
+    const auto seams=o.chart_seams.empty()?std::span(low.uv_seams):o.chart_seams;
+    chart=detail::bake_sample_charts(low,target_triangles,corners,seams,[&]{cancel(o);});
+    sample_sums.resize(pixels);
+    if(o.separate_pbr_color)pbr_sums.resize(pixels);
+  }
+  const auto sample_texel=[&](size_t at){
+    return (at/raster_resolution/2)*o.resolution+(at%raster_resolution)/2;
+  };
   BakeResult result; result.coverage.resize(pixels);
   std::vector<std::array<float,3>> emission;if(float_emission)emission.resize(pixels);
 #ifndef DOME_BAKE_RAY_REFERENCE
-  const bool summarize_radiance=float_emission&&(!target_triangles.empty()||
+  const bool summarize_radiance=!o.supersample&&float_emission&&(!target_triangles.empty()||
       pixels*sizeof(BakedEmissionSample)>emission_budget);
   detail::BakeRadianceSummary radiance_summary;
+#endif
+  const auto write_radiance=[&](size_t at,const std::array<float,3> &value){
+    if(o.supersample){
+      auto &sum=sample_sums[sample_texel(at)];
+      for(size_t c=0;c<3;++c){
+        if(!std::isfinite(value[c])||value[c]<0)
+          throw std::invalid_argument("Invalid linear radiance in Bake sample");
+        if(!sum.radiance_samples)sum.emission[c]=value[c];
+        else sum.emission[c]+=value[c];
+      }
+      ++sum.radiance_samples;
+    }else emission[at]=value;
+  };
+#ifndef DOME_BAKE_RAY_REFERENCE
   // Each sampler cache retains up to 32 MiB of tracked device buffers. An
   // individual larger job can use the original single-sampler path.
   constexpr size_t sampler_cache_bytes=32u*1024*1024;
@@ -482,7 +520,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   const bool gpu_emission=std::ranges::any_of(source.materials,
       [](const auto &m){return bool(m.emission_batch);})||
       std::ranges::any_of(source_fields,[](const auto &field){return field.emission_background.has_value();});
-  const size_t emission_capacity=gpu_emission?std::min(RadianceDevice::mapped_batch,pixels):0;
+  const size_t emission_capacity=gpu_emission?std::min(RadianceDevice::mapped_batch,sample_sites):0;
   std::vector<EmissionHit> pending;
   pending.reserve(emission_capacity);
   std::vector<RadianceDevice::BakeRadianceSample> emission_samples(emission_capacity);
@@ -517,7 +555,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       radiance.read_bake_radiance(std::span(emission_samples).first(count),
           std::span(emission_values).first(count),o.cancelled,summarize_radiance?&radiance_summary:nullptr);
       cancel(o);
-      for(size_t i=0;i<count;++i)emission[pending[first+i].texel]=emission_values[i];
+      for(size_t i=0;i<count;++i)write_radiance(pending[first+i].texel,emission_values[i]);
       first=end;
     }
     pending.clear();
@@ -539,6 +577,10 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     std::fill_n(result.ambient_occlusion.rgba.data()+at*4,3,value);
     result.ambient_occlusion.rgba[at*4+3]=255;
   };
+  const auto store_ambient=[&](size_t at,float ao){
+    if(o.supersample)sample_sums[sample_texel(at)].ao+=ao;
+    else write_ambient(at,ao);
+  };
 #ifndef DOME_BAKE_RAY_REFERENCE
   namespace device=detail::bake_rays;
   std::unique_ptr<device::Query> device_query;
@@ -550,7 +592,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   std::vector<uint16_t> ambient_counts;
   size_t ambient_capacity=0;
   if(!ambient_samples.empty()){
-    ambient_capacity=std::min({pixels,device::max_texels_per_batch,
+    ambient_capacity=std::min({sample_sites,device::max_texels_per_batch,
                                device::max_rays_per_batch/ambient_samples.size()});
     ambient_texels.reserve(ambient_capacity);
     ambient_frames.reserve(ambient_capacity);
@@ -561,7 +603,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     device_query->count_blocked(ambient_frames,std::span(ambient_counts).first(ambient_frames.size()),o.cancelled);
     for(size_t i=0;i<ambient_frames.size();++i){
       const auto [at,material_ao]=ambient_texels[i];
-      write_ambient(at,material_ao*(1-float(ambient_counts[i])/ambient_samples.size()));
+      store_ambient(at,material_ao*(1-float(ambient_counts[i])/ambient_samples.size()));
     }
     ambient_texels.clear();
     ambient_frames.clear();
@@ -577,6 +619,57 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     std::array<float,2> high_uv,paint_uv;
   };
   namespace shade_device=detail::bake_material;
+  const auto write_normal=[&](size_t at,size_t triangle,const std::array<float,3> &bary,
+                              const TangentFrame &frame,const std::array<Vec3,2> &desired){
+    if(canonical_pair_error){
+      std::array<detail::NormalBakeVertex,3> columns;
+      for(size_t k=0;k<3;++k){
+        const auto corner=triangle*3+k,vertex=size_t(low.indices[corner]);
+        const auto &t=o.low_tangents.empty()?low_frames[corner]:o.low_tangents[vertex];
+        columns[k]=detail::normal_bake_vertex(low.normals[vertex],{t[0],t[1],t[2]},t[3],
+            detail::NormalVertexBitangent::RawCross);
+      }
+      const auto basis=detail::normal_bake_basis(columns,{bary[0],bary[1],bary[2]},detail::NormalFragmentBasis::RawColumns);
+      const std::array outputs{&result.normal,&result.maps.mtoon_normal};
+      for(size_t role=0;role<outputs.size();++role){
+        const auto encoded=detail::encode_normal_bake(basis,desired[role]);
+        if(!encoded||encoded->quantized_angle_radians>*canonical_pair_error)
+          throw std::invalid_argument("Projected normal exceeds the writable Mikk basis conditioning or quantization limit");
+        std::copy_n(encoded->rgba.begin(),4,outputs[role]->rgba.data()+at*4);
+      }
+    }else if(o.encode_target_normal){
+      const auto pbr=o.encode_target_normal(uint32_t(triangle),bary,desired[0]);
+      if(pbr[0][3]!=255)throw std::invalid_argument("Explicit target normal encoder returned malformed normal data alpha");
+      std::copy_n(pbr[0].begin(),4,result.normal.rgba.data()+at*4);
+      if(o.normal_y_down)result.normal.rgba[at*4+1]=255-result.normal.rgba[at*4+1];
+      if(dual_normal){
+        const auto toon=source_normals?o.encode_target_normal(uint32_t(triangle),bary,desired[1]):pbr;
+        if(toon[1][3]!=255)throw std::invalid_argument("Explicit target normal encoder returned malformed normal data alpha");
+        std::copy_n(toon[1].begin(),4,result.maps.mtoon_normal.rgba.data()+at*4);
+        if(o.normal_y_down)result.maps.mtoon_normal.rgba[at*4+1]=255-result.maps.mtoon_normal.rgba[at*4+1];
+      }
+    }else{
+      auto mapped=frame.to_tangent(desired[0]);
+      if(o.normal_y_down)mapped.y=-mapped.y;
+      result.normal.rgba[at*4]=byte(mapped.x*.5f+.5f);
+      result.normal.rgba[at*4+1]=byte(mapped.y*.5f+.5f);
+      result.normal.rgba[at*4+2]=byte(mapped.z*.5f+.5f);
+      result.normal.rgba[at*4+3]=255;
+    }
+  };
+  const auto write_channels=[&](size_t at,const Channels &channels,const std::array<float,4> &pbr_color){
+    for (int c=0;c<3;++c) {
+      result.maps.color.rgba[at*4+c]=byte(linear_to_srgb(channels.color[c]));
+      if(!float_emission)result.maps.emission.rgba[at*4+c]=byte(linear_to_srgb(channels.emission[c]));
+    }
+    result.maps.color.rgba[at*4+3]=byte(channels.color[3]);
+    if(o.separate_pbr_color)for(int c=0;c<4;++c)result.maps.pbr_color.rgba[at*4+c]=byte(c<3?linear_to_srgb(pbr_color[c]):pbr_color[c]);
+    if(!float_emission)result.maps.emission.rgba[at*4+3]=255;
+    result.maps.metal_rough.rgba[at*4+1]=byte(channels.roughness);
+    result.maps.metal_rough.rgba[at*4+2]=byte(channels.metallic); result.maps.metal_rough.rgba[at*4+3]=255;
+    result.maps.transparent|=channels.color[3]<.9999f;
+    result.coverage[at]=1; ++result.projected;
+  };
   auto shade_resolved=[&](const ShadePoint &point,const shade_device::Values *sampled){
     const auto &[at,triangle,bary,frame,projection,material_id,retained,high_uv,paint_uv]=point;
     const auto *hit=&projection;
@@ -590,8 +683,8 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       if(retained&&source_fields[material_id].emission_background){
 #ifdef DOME_BAKE_RAY_REFERENCE
         const auto values=detail::sample_overlay_values(*m.maps->overlay,retained->paint_uv[0],retained->paint_uv[1],false);
-        emission[at]=BakedEmissionSample{{values[2][0],values[2][1],values[2][2]},
-            {values[4][0],values[4][1],values[4][2]},values[3][3]}.resolve(*source_fields[material_id].emission_background,1);
+        write_radiance(at,BakedEmissionSample{{values[2][0],values[2][1],values[2][2]},
+            {values[4][0],values[4][1],values[4][2]},values[3][3]}.resolve(*source_fields[material_id].emission_background,1));
 #else
         queue_emission(material_id,at,{{retained->paint_uv[0],retained->paint_uv[1]}, {}});
 #endif
@@ -600,9 +693,10 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       else if(m.emission_batch)queue_emission(material_id,at,m.emission_batch->sample(hit->triangle,hit->barycentric));
 #endif
       else{
-        emission[at]=m.resolved_emission?m.resolved_emission(hit->triangle,hit->barycentric):channels.emission;
+        const auto value=m.resolved_emission?m.resolved_emission(hit->triangle,hit->barycentric):channels.emission;
+        write_radiance(at,value);
 #ifndef DOME_BAKE_RAY_REFERENCE
-        if(summarize_radiance)radiance_summary.include(emission[at]);
+        if(summarize_radiance)radiance_summary.include(value);
 #endif
       }
     }
@@ -681,42 +775,28 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     }
     auto desired=source_normals?source_normals(hit->triangle,hit->barycentric):std::array<Vec3,2>{high_normal,high_normal};
     if(source_normals)for(auto &direction:desired){if(!finite(direction)||length(direction)<1e-10f)throw std::invalid_argument("Source normal resolver returned a singular direction");direction=normalized(direction);}
-    high_normal=desired[0];Vec3 mapped;
     if(!canonical_pair_error&&(!o.encode_target_normal||!dual_normal)&&source_normals&&length(desired[0]-desired[1])>1e-6f)
       throw std::invalid_argument("Source PBR/MToon normals differ; enable genuine target normal preparation to retain both roles");
-    if(canonical_pair_error){
-      std::array<detail::NormalBakeVertex,3> columns;
-      for(size_t k=0;k<3;++k){
-        const auto corner=triangle*3+k,vertex=size_t(low.indices[corner]);
-        const auto &t=o.low_tangents.empty()?low_frames[corner]:o.low_tangents[vertex];
-        columns[k]=detail::normal_bake_vertex(low.normals[vertex],{t[0],t[1],t[2]},t[3],
-            detail::NormalVertexBitangent::RawCross);
+    if(o.supersample){
+      const auto output=sample_texel(at);
+      auto &sum=sample_sums[output];
+      if(!sum.hits){
+        sum.triangle=uint32_t(triangle);
+        sum.bary=bary;
       }
-      const auto basis=detail::normal_bake_basis(columns,{bary[0],bary[1],bary[2]},detail::NormalFragmentBasis::RawColumns);
-      const std::array outputs{&result.normal,&result.maps.mtoon_normal};
-      for(size_t role=0;role<outputs.size();++role){
-        const auto encoded=detail::encode_normal_bake(basis,desired[role]);
-        if(!encoded||encoded->quantized_angle_radians>*canonical_pair_error)
-          throw std::invalid_argument("Projected normal exceeds the writable Mikk basis conditioning or quantization limit");
-        std::copy_n(encoded->rgba.begin(),4,outputs[role]->rgba.data()+at*4);
-      }
-    }else if(o.encode_target_normal){
-      const auto pbr=o.encode_target_normal(uint32_t(triangle),bary,desired[0]);
-      if(pbr[0][3]!=255)throw std::invalid_argument("Explicit target normal encoder returned malformed normal data alpha");
-      std::copy_n(pbr[0].begin(),4,result.normal.rgba.data()+at*4);
-      if(o.normal_y_down)result.normal.rgba[at*4+1]=255-result.normal.rgba[at*4+1];
-      if(dual_normal){
-        const auto toon=source_normals?o.encode_target_normal(uint32_t(triangle),bary,desired[1]):pbr;
-        if(toon[1][3]!=255)throw std::invalid_argument("Explicit target normal encoder returned malformed normal data alpha");
-        std::copy_n(toon[1].begin(),4,result.maps.mtoon_normal.rgba.data()+at*4);
-        if(o.normal_y_down)result.maps.mtoon_normal.rgba[at*4+1]=255-result.maps.mtoon_normal.rgba[at*4+1];
-      }
-    }else mapped=frame.to_tangent(high_normal);
-    if (o.normal_y_down) mapped.y=-mapped.y;
+      ++sum.hits;
+      for(size_t role=0;role<desired.size();++role)sum.normal[role]+=desired[role];
+      sum.color.add(channels.color);
+      if(o.separate_pbr_color)pbr_sums[output].add(pbr_color);
+      sum.roughness+=channels.roughness;
+      sum.metallic+=channels.metallic;
+      if(!float_emission)
+        for(size_t c=0;c<3;++c)sum.emission[c]+=channels.emission[c];
+    }else write_normal(at,triangle,bary,frame,desired);
 #ifdef DOME_BAKE_RAY_REFERENCE
     const float occlusion=ambient_samples.empty()?1:
         ambient(*query,hit->position,normalized(hit->normal),ambient_samples,o,result);
-    write_ambient(at,channels.ao*occlusion);
+    store_ambient(at,channels.ao*occlusion);
 #else
     if(!ambient_samples.empty()){
       if(ambient_samples.size()>o.max_rays-result.rays)throw std::length_error("Bake ray budget exceeded");
@@ -724,21 +804,9 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       ambient_texels.push_back({uint32_t(at),channels.ao});
       ambient_frames.push_back(ambient_frame(hit->position,normalized(hit->normal),o.ray_bias));
       if(ambient_frames.size()==ambient_capacity)flush_ambient();
-    }else write_ambient(at,channels.ao);
+    }else store_ambient(at,channels.ao);
 #endif
-    for (int c=0;c<3;++c) {
-      result.maps.color.rgba[at*4+c]=byte(linear_to_srgb(channels.color[c]));
-      if(!float_emission)result.maps.emission.rgba[at*4+c]=byte(linear_to_srgb(channels.emission[c]));
-    }
-    result.maps.color.rgba[at*4+3]=byte(channels.color[3]);
-    if(o.separate_pbr_color)for(int c=0;c<4;++c)result.maps.pbr_color.rgba[at*4+c]=byte(c<3?linear_to_srgb(pbr_color[c]):pbr_color[c]);
-    if(!float_emission)result.maps.emission.rgba[at*4+3]=255;
-    result.maps.metal_rough.rgba[at*4+1]=byte(channels.roughness);
-    result.maps.metal_rough.rgba[at*4+2]=byte(channels.metallic); result.maps.metal_rough.rgba[at*4+3]=255;
-    if(!o.encode_target_normal&&!canonical_pair_error){result.normal.rgba[at*4]=byte(mapped.x*.5f+.5f);result.normal.rgba[at*4+1]=byte(mapped.y*.5f+.5f);
-      result.normal.rgba[at*4+2]=byte(mapped.z*.5f+.5f);result.normal.rgba[at*4+3]=255;}
-    result.maps.transparent|=channels.color[3]<.9999f;
-    result.coverage[at]=1; ++result.projected;
+    if(!o.supersample)write_channels(at,channels,pbr_color);
   };
 #ifndef DOME_BAKE_RAY_REFERENCE
   std::vector<shade_device::MaterialInput> material_inputs;
@@ -756,7 +824,7 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     device_material[i]=input.needs_sampling();
     maximum_coordinate_columns=std::max(maximum_coordinate_columns,size_t(input.transfer.coordinates.count));
   }
-  const auto material_capacity=maximum_coordinate_columns?std::min(pixels,shade_device::batch_capacity):0;
+  const auto material_capacity=maximum_coordinate_columns?std::min(sample_sites,shade_device::batch_capacity):0;
   std::vector<ShadePoint> material_points;
   material_points.reserve(material_capacity);
   std::vector<size_t> material_order;
@@ -813,7 +881,11 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       if(source_placement.reverse_winding)facing=-facing;
       backface=facing<=0;
     }
-    if (!hit||(!o.allow_backfaces&&backface)) { result.coverage[at]=3; ++result.missed; return; }
+    if(!hit||(!o.allow_backfaces&&backface)){
+      if(o.supersample)++sample_sums[sample_texel(at)].misses;
+      else {result.coverage[at]=3;++result.missed;}
+      return;
+    }
     auto material_id=source.triangle_materials.empty()?0:source.triangle_materials[hit->triangle];
     std::optional<detail::RetainedSourceBakeHit> retained;
     if(retained_field(material_id))
@@ -836,21 +908,30 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   SurfaceQueryOptions ray_options;
   ray_options.cancelled=o.cancelled;
 #endif
+  const auto target_frame=[&](size_t triangle,const std::array<float,3> &bary){
+    if(o.low_tangents.empty()){
+      auto frame=tangent_frame(low,low_frames,triangle,bary);
+      return std::pair{frame,normalized(frame.normal)};
+    }
+    const auto normal=interpolate(low,triangle,bary,true);
+    const auto supplied=basis(low,triangle,normal,bary,o.low_tangents);
+    return std::pair{TangentFrame{supplied.tangent,supplied.bitangent,supplied.normal},normal};
+  };
   auto project_texel=[&](size_t at,size_t triangle,const std::array<float,3> &bary,
 #ifdef DOME_BAKE_RAY_REFERENCE
                          double rounding_radius){
 #else
                          const device::ProjectionHit *projected){
 #endif
-    auto normal=interpolate(low,triangle,bary,true);
-    TangentFrame frame;
-    if (o.low_tangents.empty()) {
-      frame = tangent_frame(low, low_frames, triangle, bary);
-      normal = normalized(frame.normal);
-    } else {
-      auto supplied = basis(low,triangle,normal,bary,o.low_tangents);
-      frame = {supplied.tangent, supplied.bitangent, supplied.normal};
+#ifdef DOME_BAKE_RAY_REFERENCE
+    if(ray_projection&&++result.rays>o.max_rays)throw std::length_error("Bake ray budget exceeded");
+#endif
+    if(o.supersample){
+      auto &owner=sample_sums[sample_texel(at)].chart;
+      if(owner==UINT32_MAX)owner=chart[triangle];
+      if(owner!=chart[triangle])return;
     }
+    const auto [frame,normal]=target_frame(triangle,bary);
     std::optional<SurfaceHit> hit;
     if(corresponding_topology){
       const auto position=interpolate(low,triangle,bary,false);
@@ -869,7 +950,6 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       }
       const float front=length(offset);
       const auto direction=front>1e-8f?offset/front:normal;
-      if(++result.rays>o.max_rays)throw std::length_error("Bake ray budget exceeded");
       hit=detail::BakeRayQuery::cast(*query,position+offset,direction*-1,front+o.back_distance,
                                      rounding_radius,ray_options);
 #else
@@ -885,15 +965,27 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     shade(at,triangle,bary,normal,frame,hit);
   };
 #ifdef DOME_BAKE_RAY_REFERENCE
-  std::vector<uint32_t> owner(pixels,UINT32_MAX);
+  std::vector<uint32_t> owner(sample_sites,UINT32_MAX);
 #else
   namespace raster=detail::bake_raster;
-  std::vector<float> axis(o.resolution);
-  for(uint32_t i=0;i<o.resolution;++i)axis[i]=(i+.5f)/o.resolution;
+  std::vector<float> axis(raster_resolution);
+  for(uint32_t i=0;i<raster_resolution;++i)axis[i]=(i+.5f)/raster_resolution;
   const raster::ProjectionSettings projection_settings{o.front_distance,o.back_distance,
       !o.low_tangents.empty(),!o.cage_positions.empty()};
-  auto atlas=ray_projection?device_query->create_projection_target(axis,o.writable,projection_settings):
-                            raster::create(axis,o.writable);
+  auto atlas=[&]{
+    std::span<const uint8_t> writable=o.writable;
+    std::vector<uint8_t> expanded;
+    if(o.supersample&&!writable.empty()){
+      expanded.resize(sample_sites);
+      for(size_t at=0;at<sample_sites;++at){
+        if(at%raster_resolution==0)cancel(o);
+        expanded[at]=writable[sample_texel(at)];
+      }
+      writable=expanded;
+    }
+    return ray_projection?device_query->create_projection_target(axis,writable,projection_settings):
+                          raster::create(axis,writable);
+  }();
   std::vector<raster::Span> raster_spans;
   std::vector<uint32_t> raster_faces;
   std::vector<raster::ProjectionFace> projection_faces;
@@ -936,22 +1028,26 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     if (!uvscale||std::abs(area)<=uvscale*1e-12) throw std::runtime_error("Low mesh contains a degenerate UV triangle");
     float minx=std::min({uv[0][0],uv[1][0],uv[2][0]}),maxx=std::max({uv[0][0],uv[1][0],uv[2][0]}),
           miny=std::min({uv[0][1],uv[1][1],uv[2][1]}),maxy=std::max({uv[0][1],uv[1][1],uv[2][1]});
-    int left=std::max(0,int(std::ceil(minx*o.resolution-.5f))),right=std::min(int(o.resolution)-1,int(std::floor(maxx*o.resolution-.5f))),
-        bottom=std::max(0,int(std::ceil(miny*o.resolution-.5f))),top=std::min(int(o.resolution)-1,int(std::floor(maxy*o.resolution-.5f)));
+    int left=std::max(0,int(std::ceil(minx*raster_resolution-.5f))),right=std::min(int(raster_resolution)-1,int(std::floor(maxx*raster_resolution-.5f))),
+        bottom=std::max(0,int(std::ceil(miny*raster_resolution-.5f))),top=std::min(int(raster_resolution)-1,int(std::floor(maxy*raster_resolution-.5f)));
 #ifdef DOME_BAKE_RAY_REFERENCE
     for (int y=bottom;y<=top;++y) for (int x=left;x<=right;++x) {
       if (!(result.raster_samples++%64)) cancel(o);
       if (result.raster_samples>o.max_raster_samples) throw std::length_error("Bake UV raster budget exceeded");
-      std::array<float,2> pixel{(x+.5f)/o.resolution,(y+.5f)/o.resolution};
-      std::array<float,3> bary{float(edge(uv[1],uv[2],pixel)/area),float(edge(uv[2],uv[0],pixel)/area),float(edge(uv[0],uv[1],pixel)/area)};
+      std::array<float,2> pixel{(x+.5f)/raster_resolution,(y+.5f)/raster_resolution};
+      const std::array edges{edge(uv[1],uv[2],pixel),edge(uv[2],uv[0],pixel),edge(uv[0],uv[1],pixel)};
+      std::array<float,3> bary{float(edges[0]/area),float(edges[1]/area),float(edges[2]/area)};
       bool inside=true;
       for (int i=0;i<3;++i) {
         auto a=uv[(i+1)%3],b=uv[(i+2)%3]; if (area<0) std::swap(a,b);
-        if (bary[i]<-1e-7f||(std::abs(bary[i])<=1e-7f&&!top_left(a,b))) inside=false;
+        if(o.supersample){
+          const double side=area<0?-edges[i]:edges[i];
+          if(side<0||(side==0&&!top_left(a,b)))inside=false;
+        }else if(bary[i]<-1e-7f||(std::abs(bary[i])<=1e-7f&&!top_left(a,b)))inside=false;
       }
       if (!inside) continue;
-      auto at=size_t(y)*o.resolution+x;
-      if (result.coverage[at]==4) continue;
+      auto at=size_t(y)*raster_resolution+x;
+      if(result.coverage[o.supersample?sample_texel(at):at]==4)continue;
       if (owner[at]!=UINT32_MAX) { ++result.overlapping; continue; }
       owner[at]=uint32_t(triangle);
       project_texel(at,triangle,bary,rounding_radius);
@@ -1003,15 +1099,55 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   flush_materials();
   material_cache.clear();
 #endif
-  if (result.overlapping&&o.fail_on_overlap) throw std::runtime_error("Overlapping low UV coverage: "+std::to_string(result.overlapping)+" texels");
-  if (result.missed&&o.fail_on_miss) throw std::runtime_error("Projection missed "+std::to_string(result.missed)+" low UV texels");
-  if (!result.projected) throw std::runtime_error("No low UV texels projected onto the high source");
+  if(result.overlapping&&o.fail_on_overlap)
+    throw std::runtime_error("Overlapping low UV coverage: "+std::to_string(result.overlapping)+
+                             (o.supersample?" sample sites":" texels"));
+  const auto validate_coverage=[&]{
+    if(result.missed&&o.fail_on_miss)
+      throw std::runtime_error("Projection missed "+std::to_string(result.missed)+" low UV texels");
+    if(!result.projected)throw std::runtime_error("No low UV texels projected onto the high source");
+  };
+  if(!o.supersample)validate_coverage();
 #ifndef DOME_BAKE_RAY_REFERENCE
   flush_ambient();
   device_query.reset();
   flush_emission();
   radiance_cache.clear();
 #endif
+  if(o.supersample){
+    for(size_t at=0;at<pixels;++at){
+      if(at%o.resolution==0)cancel(o);
+      const auto &sum=sample_sums[at];
+      if(sum.misses)++result.missed;
+      if(!sum.hits){
+        if(sum.misses)result.coverage[at]=3;
+        continue;
+      }
+      const auto mean_emission=std::array{float(sum.emission[0]/sum.hits),
+          float(sum.emission[1]/sum.hits),float(sum.emission[2]/sum.hits)};
+      if(float_emission){
+        if(sum.radiance_samples!=sum.hits)throw std::logic_error("Incomplete Bake sample radiance");
+        emission[at]=mean_emission;
+#ifndef DOME_BAKE_RAY_REFERENCE
+        radiance_summary.include(mean_emission);
+#endif
+      }
+      const auto frame=target_frame(sum.triangle,sum.bary).first;
+      std::array<Vec3,2> direction;
+      // Opposite source directions can have no usable mean. The chosen
+      // target frame supplies a deterministic, neutral normal in that case.
+      for(size_t role=0;role<direction.size();++role)
+        direction[role]=length(sum.normal[role])>1e-8f?normalized(sum.normal[role]):normalized(frame.normal);
+      write_normal(at,sum.triangle,sum.bary,frame,direction);
+      const Channels channels{sum.color.resolve(sum.hits),mean_emission,
+          sum.roughness/float(sum.hits),sum.metallic/float(sum.hits)};
+      write_channels(at,channels,o.separate_pbr_color?pbr_sums[at].resolve(sum.hits):std::array<float,4>{});
+      write_ambient(at,float(sum.ao/sum.hits));
+    }
+    validate_coverage();
+    std::vector<detail::BakeSampleSum>().swap(sample_sums);
+    std::vector<detail::BakeSampleSum::Color>().swap(pbr_sums);
+  }
   if(o.progress)o.progress(.9f);
   cancel(o); if (o.padding) pad(result,o,emission); cancel(o);
   if(float_emission){

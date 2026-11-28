@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "scene.hpp"
+#include <span>
 namespace dome {
 namespace detail { struct EmissionBakeBatch; }
 struct BakeMaterial {
@@ -52,6 +53,14 @@ struct BakeOptions {
   // and versioned-MToon RGBA8 exactly once; no float/byte recoding can invalidate
   // the callback's quantization receipt. Callers retain the declared model.
   std::function<std::array<std::array<uint8_t,4>,2>(uint32_t,std::array<float,3>,Vec3)> encode_target_normal;
+  // Trace four evenly spaced samples per output texel. The texel budget
+  // counts all sample sites; padding and writability count output texels.
+  bool supersample=false;
+  // Optional original vertex IDs and seam flags in low-mesh corner order.
+  // Borrowed for bake_mesh; used when a captured tangent/UV basis splits
+  // vertices for sampling. Empty spans use the original low mesh attributes.
+  std::span<const uint32_t> chart_corners;
+  std::span<const uint8_t> chart_seams;
 };
 struct BakeResult {
   TextureMaps maps; // Composited sRGB base/emission; linear ORM R=AO,G=rough,B=metal.
@@ -62,6 +71,9 @@ struct BakeResult {
   // 0=outside UV, 1=projected hit, 2=padding, 3=missed projection, 4=protected. Missed/protected texels
   // are never filled by padding, so projection errors cannot be concealed.
   std::vector<uint8_t> coverage;
+  // Projection and padding count output texels. Missed counts affected output
+  // texels, including mixed hits and misses in four-sample mode. Overlap
+  // counts repeated sample claims.
   uint64_t projected = 0, missed = 0, overlapping = 0, padded = 0, rays = 0, raster_samples = 0;
 };
 // Pure native worker operation. Low, high and cage must already share one

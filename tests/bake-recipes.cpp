@@ -202,6 +202,16 @@ int main(int argc,char **argv)try{
   if(argc==3&&(std::string_view(argv[1])=="--ui-fixture"||std::string_view(argv[1])=="--ui-wide-fixture")){
     auto scene=cage_scene(128);auto settings=cage_settings();if(std::string_view(argv[1])=="--ui-wide-fixture"){settings.front_mm=100000;settings.back_mm=0;settings.ao_distance_mm=.00001f;}bake_object(scene,2,settings);scene.active().painted->clear_bake();scene.save(argv[2]);return 0;
   }
+  if(argc==4&&std::string_view(argv[1])=="--ui-supersample-reference"){
+    auto scene=Scene::load(argv[2]);
+    const auto recipe=scene.active().bake_recipe;
+    require_cage(bool(recipe),"Supersampled fixture needs a saved source and projection recipe");
+    auto settings=recipe->settings;
+    settings.supersample=true;
+    bake_object(scene,recipe->source.object,settings);
+    scene.save(argv[3]);
+    return 0;
+  }
   if(argc==3&&std::string_view(argv[1])=="--inspect"){
     auto scene=Scene::load(argv[2]);std::cout<<nlohmann::json{{"scene",scene.encode()},{"sources",cage_sources(scene)},{"baked",bool(scene.active().painted->baked())}}.dump()<<'\n';return 0;
   }
@@ -218,6 +228,18 @@ int main(int argc,char **argv)try{
   scene.save(out/"recipe.dsculpt");auto reopened=Scene::load(out/"recipe.dsculpt");
   require_cage(reopened.encode()==encoded&&reopened.active().bake_recipe->encode()==recipe->encode(),
     "Recipe, geometry, paint and complete source data restart exactly in the native project");
+  auto sampling=*recipe;sampling.settings.supersample=true;
+  auto sampling_record=sampling.encode();
+  require_cage(!recipe->settings.supersample&&sampling_record["version"]==3&&
+      ObjectBakeRecipe::decode(sampling_record)->settings.supersample,
+      "Four-sample recipes round-trip while legacy recipes default to one sample");
+  sampling_record["settings"]["supersample"]=false;
+  require_cage(rejected_cage([&]{ObjectBakeRecipe::decode(sampling_record);}),
+      "Version three requires a true, typed supersampling flag");
+  sampling.cage.reset();sampling.settings.cage_object=0;sampling.settings.corresponding_topology=true;
+  const auto matched=ObjectBakeRecipe::decode(sampling.encode());
+  require_cage(matched->settings.supersample&&matched->settings.corresponding_topology,
+      "Matching source triangles and supersampling can share one saved recipe");
   auto malformed=encoded;malformed["version"]=28;
   require_cage(rejected_cage([&]{Scene::decode(malformed);}),"Recipe fields cannot be relabelled as an older Scene capability");
   malformed=encoded;for(auto &o:malformed["objects"])o["bake_recipe"]=nullptr;

@@ -59,12 +59,25 @@ std::string cage_mode(){auto p=getenv("DOME_XR_FIXTURE_CAGE");return p?p:canonic
 bool canonical_conversion_click(){return frame==8||frame==14||frame==20||frame==26||frame==32;}
 int canonical_conversion_sector(){if(frame>=12&&frame<=14)return 8;if(frame>=18&&frame<=20)return 9;if(frame>=24&&frame<=26)return 6;if(frame>=30&&frame<=32)return 0;return -1;}
 bool bake_recipe_fixture(){return getenv("DOME_XR_FIXTURE_RECIPE")!=nullptr;}
+bool bake_sampling_fixture(){return getenv("DOME_XR_FIXTURE_BAKE_SAMPLING")&&cage_mode()=="accept";}
+bool bake_cage_trigger(){return frame==38||frame==56||(frame==62&&cage_mode()=="cancel")||
+                               (frame==74&&bake_sampling_fixture());}
 
 std::string expression_mode(){auto p=getenv("DOME_XR_FIXTURE_EXPRESSIONS");return p?p:"";}
 bool expression_click(){return frame==8||frame==16||frame==24||frame==32||frame==52||frame==60||frame==72||frame==80||(frame==100&&expression_mode()!="focus");}
 int expression_sector(){if(frame>=14&&frame<=16)return 9;if(frame>=22&&frame<=24)return 9;if(frame>=30&&frame<=32)return 3;if((frame>=50&&frame<=52)||(frame>=58&&frame<=60))return 3;if(frame>=70&&frame<=72)return 9;if(frame>=78&&frame<=80)return 7;if(frame>=98&&frame<=100&&expression_mode()!="focus")return expression_mode()=="cancel"?6:5;return -1;}
-bool cage_click(){return frame==8||frame==14||frame==20||frame==26||frame==32||frame==44||frame==50||(cage_mode()=="accept"&&(frame==62||frame==68));}
-int cage_sector(){if(frame>=12&&frame<=14)return 8;if(frame>=18&&frame<=20)return 9;if(frame>=24&&frame<=26)return 6;if(frame>=30&&frame<=32)return 1;if(frame>=48&&frame<=50)return 0;if(frame>=66&&frame<=68&&cage_mode()=="accept")return 3;return -1;}
+bool cage_click(){return frame==8||frame==14||frame==20||frame==26||frame==32||frame==44||frame==50||
+    (cage_mode()=="accept"&&(frame==62||frame==68))||(bake_sampling_fixture()&&(frame==80||frame==86));}
+int cage_sector(){
+  if(frame>=12&&frame<=14)return 8;
+  if(frame>=18&&frame<=20)return 9;
+  if(frame>=24&&frame<=26)return 6;
+  if(frame>=30&&frame<=32)return 1;
+  if(frame>=48&&frame<=50)return 0;
+  if(frame>=66&&frame<=68&&cage_mode()=="accept")return bake_sampling_fixture()?2:3;
+  if(frame>=84&&frame<=86&&bake_sampling_fixture())return 3;
+  return -1;
+}
 std::string mirror_mode(){auto p=getenv("DOME_XR_FIXTURE_MIRROR");return p?p:"";}
 int mirror_method(){auto p=getenv("DOME_XR_FIXTURE_MIRROR_METHOD");return p?std::clamp(std::atoi(p),0,2):0;}
 bool mirror_click(){return frame==8||frame==14||frame==20||frame==26||frame==32;}
@@ -464,7 +477,8 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
       for(int y=int(s->height)-1;y>=0;--y)for(unsigned x=0;x<s->width;++x)for(int c=0;c<3;++c)capture.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+c])));
     }
   }
-  if(!cage_mode().empty()&&(frame==54||frame==58||frame==64||(bake_recipe_fixture()&&(frame==34||frame==40)))){
+  if(!cage_mode().empty()&&(frame==54||frame==58||frame==64||(bake_recipe_fixture()&&(frame==34||frame==40))||
+                             (bake_sampling_fixture()&&frame==76))){
     report["cage_images"][std::to_string(frame)][std::to_string(s->eye)]=std::count_if(bytes.begin(),bytes.end(),[](uint8_t v){return v!=0;});
     if(auto path=getenv("DOME_XR_FIXTURE_REPORT")){
       std::ofstream capture(std::string(path)+".cage-"+std::to_string(frame)+"-"+std::to_string(s->eye)+".ppm",std::ios::binary);capture<<"P6\n"<<s->width<<' '<<s->height<<"\n255\n";
@@ -1171,7 +1185,7 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
   }
   if(!projection_mode().empty()){if(right(p->subactionPath)&&a->name=="paint_pressure"&&frame>=76&&frame<=82)out->currentState=1;return XR_SUCCESS;}
   if(!canonical_conversion_mode().empty()){if(right(p->subactionPath)&&a->name=="paint_pressure"&&frame>=38&&frame<=42)out->currentState=.9f;return XR_SUCCESS;}
-  if(!cage_mode().empty()){if(right(p->subactionPath)&&a->name=="paint_pressure"&&(frame==38||frame==56||(frame==62&&cage_mode()=="cancel")))out->currentState=.9f;return XR_SUCCESS;}
+  if(!cage_mode().empty()){if(right(p->subactionPath)&&a->name=="paint_pressure"&&bake_cage_trigger())out->currentState=.9f;return XR_SUCCESS;}
   if(!mirror_mode().empty()){if(right(p->subactionPath)&&a->name=="paint_pressure"&&(frame==40||frame==50||frame==60||(frame==78&&mirror_mode()!="focus")))out->currentState=.9f;return XR_SUCCESS;}
   if(!import_atlas_mode().empty())return XR_SUCCESS;
   if(selection_fixture()){if(right(p->subactionPath)){if(a->name=="paint_pressure"&&(frame==18||frame==22||frame==26||frame==36))out->currentState=.9f;if(a->name=="canvas_grab"&&frame>=25&&frame<=27)out->currentState=1;}return XR_SUCCESS;}
@@ -1514,9 +1528,10 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   if(!expression_mode().empty()){p->pose.orientation={0,0,0,1};p->pose.position=s->action?XrVector3f{right(s->hand)?0.f:-.3f,1.48f,-.5f}:XrVector3f{0,1.6f,0};return XR_SUCCESS;}
   if(!cage_mode().empty()){
     p->pose.orientation={0,0,0,1};p->pose.position=s->action?XrVector3f{right(s->hand)?0.f:-.3f,1.48f,-.48f}:XrVector3f{0,1.6f,0};
-    if(s->action&&right(s->hand)&&s->action->name=="aim_pose"&&(frame==38||frame==56||(frame==62&&cage_mode()=="cancel"))){
+    if(s->action&&right(s->hand)&&s->action->name=="aim_pose"&&bake_cage_trigger()){
       float x=frame==38?100+420*float(dome::bake_distance_to_unit(bake_recipe_fixture()?40:100)):frame==56?(bake_recipe_fixture()?320:520):170;
       float y=frame==38?240:frame==56?(bake_recipe_fixture()?432:320):609;
+      if(frame==74){x=520;y=400;}
       p->pose.position={(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
     }
     return XR_SUCCESS;
