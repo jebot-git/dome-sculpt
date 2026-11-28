@@ -152,10 +152,24 @@ void certified_paint(const std::filesystem::path &out,const Scene &initial,
 
 void uniform_coat(const std::filesystem::path &out,const Scene &initial,const ImportAuthoringOptions &options,
     SurfaceRenderer &native,Fbo &fbo,prepared_normal_consumer::Renderer &consumer) {
- const auto make_scene=[&](std::string_view name,bool masked){
-  auto fixture=source(1,false,masked?"MASK":"BLEND",.65f);
+ enum class Coat { Blend, ConstantAlpha, TextureMask, VertexMask, PassMask, RejectMask };
+ const auto make_scene=[&](std::string_view name,Coat coat){
+  auto fixture=source(1,false,coat==Coat::Blend?"BLEND":"MASK",.65f);
   auto &material=fixture.j["materials"][0];
   auto &pbr=material["pbrMetallicRoughness"];
+  auto &attrs=fixture.j["meshes"][0]["primitives"][0]["attributes"];
+  if(coat==Coat::TextureMask){
+   attrs.erase("COLOR_0");
+   material["alphaCutoff"]=.57f;
+  }
+  if(coat==Coat::VertexMask){
+   while(fixture.bin.size()%4)fixture.bin.push_back(0);
+   attrs["COLOR_0"]=fixture.values({.5f,.2f,.8f,.72f,.2f,.7f,.3f,.72f,
+                                  .8f,.1f,.2f,.72f,.3f,.4f,.5f,.72f},4,"VEC4");
+   material["alphaCutoff"]=.426f;
+  }
+  if(coat==Coat::PassMask)material["alphaCutoff"]=.15f;
+  if(coat==Coat::RejectMask)material["alphaCutoff"]=.9f;
   pbr["metallicFactor"]=.62f;
   pbr["roughnessFactor"]=.67f;
   pbr["metallicRoughnessTexture"]={{"index",0},{"texCoord",1}};
@@ -172,7 +186,7 @@ void uniform_coat(const std::filesystem::path &out,const Scene &initial,const Im
    image.rgba[at]=uint8_t((x+y)%2?210:44);
    image.rgba[at+1]=uint8_t(64+(x/11+y/9)%6*19);
    image.rgba[at+2]=uint8_t(36+(x/7+2*(y/6))%7*28);
-   image.rgba[at+3]=masked?255:uint8_t(96+(x/11+y/7)%8*19);
+   image.rgba[at+3]=coat==Coat::ConstantAlpha?255:uint8_t(96+(x/11+y/7)%8*19);
   }
   const auto png=image.png();
   while(fixture.bin.size()%4)fixture.bin.push_back(0);
@@ -198,9 +212,14 @@ void uniform_coat(const std::filesystem::path &out,const Scene &initial,const Im
   object.painted->layer_properties("Paint",true,.43f);
   return scene;
  };
- for(bool masked:{false,true}){
-  const std::string name=masked?"uniform-masked":"uniform-coat";
-  auto scene=make_scene(name,masked);
+ const std::array cases{
+     std::pair{Coat::Blend,"uniform-coat"},std::pair{Coat::ConstantAlpha,"uniform-masked"},
+     std::pair{Coat::TextureMask,"uniform-mask-cross"},std::pair{Coat::VertexMask,"uniform-mask-vertex"},
+     std::pair{Coat::PassMask,"uniform-mask-pass"},std::pair{Coat::RejectMask,"uniform-mask-reject"}};
+ for(const auto &[coat,stem]:cases){
+  const std::string name=stem;
+  const bool transported=coat!=Coat::Blend&&coat!=Coat::ConstantAlpha;
+  auto scene=make_scene(name,coat);
   const auto exact=scene.encode();
   const auto &object=scene.active();
   const auto &raw=*object.painted->source_sampling_original()->source_maps();
@@ -247,6 +266,7 @@ void uniform_coat(const std::filesystem::path &out,const Scene &initial,const Im
   for(size_t at=0;at<color.rgba.size();at+=4){
    const auto &input=raw.color.image->rgba;
    for(unsigned c=0;c<4;++c){
+    if(transported&&c==3){untouched&=color.rgba[at+c]==input[at+c];continue;}
     const auto decode=[&](uint8_t byte){return c<3?linear(byte):byte/255.f;};
     const float expected=object.material.color[c]*decode(input[at+c])*(1-ink[3][0])+ink[0][c];
     formula&=std::abs(expected-pbr.base_color_factor[c]*decode(color.rgba[at+c]))<=(c<3?.0045f:.002f);
@@ -260,11 +280,11 @@ void uniform_coat(const std::filesystem::path &out,const Scene &initial,const Im
    untouched&=orm.rgba[at]==input[at]&&orm.rgba[at+1]==input[at+1]&&orm.rgba[at+3]==input[at+3];
   }
   check(formula&&untouched,"All rewritten texels obey the independent linear coat equation and preserve untouched packed bytes");
-  if(masked){
+  if(coat==Coat::ConstantAlpha){
    const float alpha=object.material.color[3]*(1-ink[3][0])+ink[0][3];
    check(material.alpha_mode==cgltf_alpha_mode_mask&&pbr.base_color_factor[3]==alpha,
          "A constant masked alpha travels in the exact factor outside the RGB rewrite");
-  }else{
+  }else if(coat==Coat::Blend){
    scene.active().material.alpha=Material::AlphaMode::Mask;
    scene.active().material.alpha_cutoff=.48f;
    const auto state=scene.encode();
@@ -273,6 +293,50 @@ void uniform_coat(const std::filesystem::path &out,const Scene &initial,const Im
    auto refused=strict.export_asset(path);
    check(rejects([&]{refused.get();})&&strict.copy_scene().encode()==state&&file_bytes(path)==previous,
          "Uncertified varying mask alpha preserves the earlier GLB and exact editable owner");
+  }else{
+   const bool crossing=coat==Coat::TextureMask||coat==Coat::VertexMask;
+   const float vertex=coat==Coat::VertexMask?.72f:1.f;
+   const float scale=object.material.color[3]*(1-ink[3][0]);
+   check(material.alpha_mode==cgltf_alpha_mode_mask,"Transported cutouts retain the glTF MASK material mode");
+   if(crossing){
+    const auto cutoff=(object.material.alpha_cutoff-ink[0][3]*vertex)/scale;
+    check(pbr.base_color_factor[3]==1&&std::abs(material.alpha_cutoff-cutoff)<2e-6f,
+          "The cutoff moves to the untouched alpha texture and constant vertex domain");
+   }else if(coat==Coat::PassMask){
+    check(material.alpha_cutoff==0&&pbr.base_color_factor[3]==1,
+          "Bounded varying vertex alpha preserves the fully surviving mask");
+   }else{
+    check(material.alpha_cutoff==object.material.alpha_cutoff&&pbr.base_color_factor[3]==0,
+          "Bounded varying vertex alpha preserves the fully discarded mask");
+   }
+   bool agrees=true;
+   unsigned pass=0,reject=0;
+   const auto eval=[&](float alpha,float vertex_alpha){
+    const bool before=(scale*alpha+ink[0][3])*vertex_alpha>=object.material.alpha_cutoff;
+    const bool after=pbr.base_color_factor[3]*alpha*vertex_alpha>=material.alpha_cutoff;
+    agrees&=before==after;
+    if(before)++pass;else ++reject;
+   };
+   const auto &rgba=raw.color.image->rgba;
+   for(size_t at=3;at<rgba.size();at+=4){
+    const float alpha=rgba[at]/255.f;
+    if(crossing)eval(alpha,vertex);
+    else for(float v:{.4f,.6f,.8f,1.f})eval(alpha,v);
+   }
+   check(agrees&&(crossing?(pass>0&&reject>0):(coat==Coat::PassMask?reject==0:pass==0)),
+         "Original and parsed GLB alpha predicates agree across every original texel");
+   size_t visible=0;
+   for(size_t at=3;at<reference.size();at+=4)visible+=reference[at]!=0;
+   if(crossing){
+    auto all=std::make_shared<MeshSnapshot>(*doc.frame().surface);
+    for(auto &range:all->ranges)range.material.alpha_cutoff=0;
+    const auto opaque=draw(native,all);
+    size_t covered=0;
+    for(size_t at=3;at<opaque.size();at+=4)covered+=opaque[at]!=0;
+    check(visible>0&&visible<covered,"Independent rendering exercises both sides of the transported cutoff");
+   }else{
+    check(coat==Coat::PassMask?visible>0:visible==0,"Rendered cutoff envelope fixes complete pass or discard");
+   }
   }
  }
 }

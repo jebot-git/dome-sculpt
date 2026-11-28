@@ -2,6 +2,7 @@
 #include "source-paint-export.hpp"
 #include "dome/brush.hpp"
 #include "dome/material-visibility.hpp"
+#include "current-colors.hpp"
 #include "emission-raster-device.hpp"
 #include "paint-overlay-sample.hpp"
 #include "source-extra-uv-authority.hpp"
@@ -100,6 +101,64 @@ struct UniformChannel {
   float coverage=0,addition=0;
 };
 
+struct UniformMask {
+  const ObjectSurface &object;
+  Material &material;
+};
+
+void transport_mask_cutoff(const UniformMask &mask,const Image &image,float coverage,float addition,ProofWork &work) {
+  auto &material=mask.material;
+  auto &factor=material.color[3];
+  auto &cutoff=material.alpha_cutoff;
+  if(cutoff==0){factor=1;return;}
+
+  // Use the same REST color stream as the glTF writer. Only indexed
+  // vertices can contribute alpha to this material's triangles.
+  const auto colors=current_vertex_colors(mask.object,work.cancelled);
+  float minimum_vertex=1,maximum_vertex=colors.empty()?1:0;
+  if(!colors.empty()){
+    work.charge(mask.object.mesh.indices.size());
+    size_t i=0;
+    for(const auto vertex:mask.object.mesh.indices){
+      if((i++&1023)==0)work.stop();
+      const auto alpha=colors.at(vertex)[3];
+      if(!std::isfinite(alpha)||alpha<0||alpha>1)portable_required();
+      minimum_vertex=std::min(minimum_vertex,alpha);
+      maximum_vertex=std::max(maximum_vertex,alpha);
+    }
+  }
+  if(maximum_vertex==0){factor=0;return;}
+  const double scale=double(factor)*(1.f-coverage);
+  if(minimum_vertex==maximum_vertex){
+    // Native visibility compares (scale * sourceAlpha + addition) * vertexAlpha
+    // with the cutoff. Move the threshold into sourceAlpha * vertexAlpha.
+    const double transported=(double(cutoff)-double(addition)*minimum_vertex)/scale;
+    if(transported<=minimum_vertex&&float(transported)>0){
+      cutoff=float(transported);
+      factor=1;
+      return;
+    }
+  }
+
+  // When vertex alpha varies, a single translated crossing is insufficient.
+  // Every wrapped, filtered or mipmapped source alpha remains in the
+  // original texel envelope. Preserve the result if that full envelope is
+  // on one side of the cutoff, with room for FLOAT compositing roundoff.
+  uint8_t low=255,high=0;
+  work.charge(image.rgba.size()/4);
+  for(size_t at=3;at<image.rgba.size();at+=4){
+    if((at&16383)==3)work.stop();
+    low=std::min(low,image.rgba[at]);
+    high=std::max(high,image.rgba[at]);
+  }
+  constexpr double roundoff=16*std::numeric_limits<float>::epsilon();
+  const double lower=(scale*(double(low)/255)+addition)*minimum_vertex;
+  const double upper=(scale*(double(high)/255)+addition)*maximum_vertex;
+  if(lower>=double(cutoff)+roundoff){factor=1;cutoff=0;return;}
+  if(upper<double(cutoff)-roundoff){factor=0;return;}
+  portable_required();
+}
+
 void rewrite_uniform_image(PaintSourceTexture &texture,const SourceUvSampler::TexelAffine &affine,
     bool srgb,ProofWork &work) {
   const auto &original=*texture.image;
@@ -123,7 +182,7 @@ void rewrite_uniform_image(PaintSourceTexture &texture,const SourceUvSampler::Te
 }
 
 void fold_uniform_image(PaintSourceTexture &texture,const std::array<UniformChannel,4> &channels,
-    bool srgb,bool masked,ProofWork &work) {
+    bool srgb,const UniformMask *mask,ProofWork &work) {
   SourceUvSampler::TexelAffine affine;
   bool keep_image=false;
   for(unsigned c=0;c<channels.size();++c){
@@ -141,15 +200,18 @@ void fold_uniform_image(PaintSourceTexture &texture,const std::array<UniformChan
     }
     auto original=scale==0?std::optional<float>(0):
         constant_source_channel(*texture.image,c,srgb&&c<3,work);
-    affine.channels|=1u<<c;
     if(original){
+      affine.channels|=1u<<c;
       factor=factor*(*original)*(1-channel.coverage)+offset;
       affine.offset[c]=1;
       continue;
     }
-    // The new alpha texture must preserve cutout decisions. A varying affine
-    // alpha can move a crossing after PNG quantization or mip regeneration.
-    if(masked&&c==3)portable_required();
+    if(mask&&c==3){
+      transport_mask_cutoff(*mask,*texture.image,channel.coverage,offset,work);
+      keep_image=true;
+      continue;
+    }
+    affine.channels|=1u<<c;
     factor=scale+offset;
     if(factor>1)portable_required();
     affine.scale[c]=scale/factor;
@@ -197,7 +259,7 @@ uint8_t unorm8(float value) {
 
 template<size_t N>
 void fold_color(PaintSourceTexture &,std::array<float,N> &,const std::array<float,4> &,float,
-                ProofWork &,bool rewrite=false,bool masked=false);
+                ProofWork &,bool rewrite=false,const UniformMask *mask=nullptr);
 void fold_orm(PaintSourceTexture &,Material &,const PaintOverlayValues &,ProofWork &,bool rewrite=false);
 
 // Preserve masked coverage exactly. A constant alpha can be carried outside
@@ -228,7 +290,7 @@ struct PaintAtlas {
   bool transparent=false;
 };
 
-PaintAtlas compile_atlas(const PaintedMesh &paint,const PaintOverlayPacket &packet,
+PaintAtlas compile_atlas(const PaintedMesh &paint,const ObjectSurface &object,const PaintOverlayPacket &packet,
     const OverlayRange &range,PaintSourceMaps &source,Material &material,ProofWork &work) {
   const auto &value=range.low;
   const bool color=range.high[3][0]!=0&&(range.varies(3,0)||range.low[0]!=range.high[0]);
@@ -249,7 +311,9 @@ PaintAtlas compile_atlas(const PaintedMesh &paint,const PaintOverlayPacket &pack
     }
     material.color={1,1,1,alpha.constant.value_or(1)};
   }else if(range.high[3][0]!=0){
-    fold_color(source.color,material.color,value[0],value[3][0],work,true,material.alpha==Material::AlphaMode::Mask);
+    const UniformMask mask{object,material};
+    fold_color(source.color,material.color,value[0],value[3][0],work,true,
+               material.alpha==Material::AlphaMode::Mask?&mask:nullptr);
   }
   if(orm){
     background.roughness=atlas_background(source.metal_rough,1,false,material.roughness,value[3][2],work);
@@ -323,7 +387,7 @@ PaintAtlas compile_atlas(const PaintedMesh &paint,const PaintOverlayPacket &pack
 
 template<size_t N>
 void fold_color(PaintSourceTexture &texture,std::array<float,N> &factor,
-    const std::array<float,4> &addition,float coverage,ProofWork &work,bool rewrite,bool masked) {
+    const std::array<float,4> &addition,float coverage,ProofWork &work,bool rewrite,const UniformMask *mask) {
   if(std::ranges::all_of(std::span(addition).first(N),[](float value){return value==0;})){
     for(auto &value:factor)value*=1-coverage;
     return;
@@ -331,7 +395,7 @@ void fold_color(PaintSourceTexture &texture,std::array<float,N> &factor,
   if(rewrite){
     std::array<UniformChannel,4> channels{};
     for(unsigned c=0;c<N;++c)channels[c]={&factor[c],coverage,addition[c]};
-    fold_uniform_image(texture,channels,true,masked,work);
+    fold_uniform_image(texture,channels,true,mask,work);
     return;
   }
   for(unsigned channel=0;channel<N;++channel){
@@ -348,7 +412,7 @@ void fold_orm(PaintSourceTexture &texture,Material &material,const PaintOverlayV
     std::array<UniformChannel,4> channels{};
     channels[1]={&material.roughness,value[3][2],value[1][1]};
     channels[2]={&material.metallic,value[3][1],value[1][2]};
-    fold_uniform_image(texture,channels,false,false,work);
+    fold_uniform_image(texture,channels,false,nullptr,work);
     return;
   }
   std::array<bool,4> neutral{};
@@ -388,11 +452,12 @@ PaintAtlas compile_source_paint(const PaintedMesh &paint,const ObjectSurface &ob
       overlay_uses_float_emission(packet)||range.high[1][3]!=0)portable_required();
   if(value!=range.high){
     if(object.material.toon)portable_required();
-    return compile_atlas(paint,packet,range,sources,material,work);
+    return compile_atlas(paint,object,packet,range,sources,material,work);
   }
   const bool rewrite=allow_atlas&&!object.material.toon;
+  const UniformMask mask{object,material};
   fold_color(sources.color,material.color,value[0],value[3][0],work,rewrite,
-             material.alpha==Material::AlphaMode::Mask);
+             material.alpha==Material::AlphaMode::Mask?&mask:nullptr);
   fold_color(sources.emission,material.emissive,value[2],value[3][3],work,rewrite);
   if(std::ranges::any_of(material.emissive,[](float channel){return channel>1;}))portable_required();
   fold_orm(sources.metal_rough,material,value,work,rewrite);
