@@ -1,0 +1,111 @@
+{
+  "date": "2026-11-28",
+  "product": "68ba137e9afb8f3e40bbd27e924089545350c821",
+  "preceding": "b56b88ffa4440c0f7dad631bc34e6d293c16bec7",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Native Refined Surface Mirror preserves strict same-grid Bake textures and recipes. Normal detail requires a retained constant canonical tangent frame with zero keyed normal and tangent changes.",
+  "arc_a770": {
+    "application_sha256": "f51417893a06741eb5bc9dca580c6439ba39322069bc474bc14b0547a9828c35",
+    "render_node": "/dev/dri/renderD129",
+    "release": {
+      "tests": [
+        "bake-workflow",
+        "baked-emission-workflow",
+        "key-mirror-vertex",
+        "bake-recipes",
+        "bake-projection-policy",
+        "key-mirror-refinement",
+        "xr-mirror-control-faults",
+        "key-mirror-refinement-authoring",
+        "xr-mirror-controls",
+        "key-mirror-refinement-baked",
+        "application-missing-gpu",
+        "key-mirror-relative-owning",
+        "key-mirror-refinement-rigged",
+        "baked-textures",
+        "key-mirror-correspondence",
+        "key-mirror-refinement-missing-gpu",
+        "shapekey-mirror-openxr"
+      ],
+      "log_sha256": "4b7c4a0cdacaa809c52217aac8651a43df14156aa5f19307ac44ce5e439d0c38"
+    },
+    "native_bake": {
+      "workflow_checks": 33,
+      "last_projection_recipe_rebakes_full_and_masked_coverage": true,
+      "preserves_raw_canonical_normals_orm_material_and_coverage": true,
+      "preserves_independent_masked_float_emission": true,
+      "preserves_read_only_bake_and_recipe_owners": true,
+      "legacy_dynamic_bake_refusal_is_atomic": true,
+      "full_coverage_glb_tangent_and_morph_accessors_validate": true,
+      "independent_png_matches_exact_embedded_normal_map": true,
+      "native_outputs_equal_headless_reference": true,
+      "outputs": {
+        "source-baked.dsculpt": "4b8eef3df90151bee534b5f0452b7119a8d09604db72b6216faddfddf5510739",
+        "source-masked.dsculpt": "fddb6242e3642731be6bae92f528bffdc006b9a45983d7b79f6a047dc79d64e7",
+        "refined-baked.dsculpt": "2ae3fca1e93e7bfac172cd634fa88b2d464b8ba74f0cbb7536e3e304f481f0e2",
+        "refined-masked.dsculpt": "185958de69164ba1eef033b0f74f6cdef37be35d36765adc67211892b28ccf13",
+        "refined-baked.glb": "9192a6d0a6c9bfd596355b829fb9ae32d1a1c30bf95d096d06127ab5a9b1da9b"
+      }
+    },
+    "nested_domed_wayland": {
+      "driver_checks": 9,
+      "saved_project_checks": 10,
+      "report_sha256": "89664fb52d4a6e790276be95b58f914db4adae3f16dbc22a7632e49da0a4bd1d",
+      "full_log_sha256": "a8ba9c1c05af5c3b7b0b4f679e9f25caf6b4bf331820ed8609e96e757cccdb6a",
+      "compute_trace_sha256": "ea2059cbf7704a221c8fd0c7421f33d6362c62458d4c934429352d84b4573184",
+      "saved_projects": {
+        "mirror-before.dsculpt": "4b8eef3df90151bee534b5f0452b7119a8d09604db72b6216faddfddf5510739",
+        "mirror-after.dsculpt": "c9175c03b62545edf7a4b0345ea6220cfb1edb322a6e479b359581492a7b7ef4"
+      }
+    },
+    "synthetic_openxr": {
+      "checks": 58,
+      "physical_headset": false,
+      "report_sha256": "9ec4c2875e39e54340b9b12c62c889f8342a02b241b6d82ed10da408c1c0dcab",
+      "new_baked_projects": {
+        "refined-source-baked.dsculpt": "a2cf31112226b95e72c536f75a46489b69f4a71d1421a4900e013bbacac49859",
+        "accept-3-baked.dsculpt": "bb804807d500899eefa5f31b259fc047944f7b84adebd6e7c93fd3b93c9de041"
+      },
+      "unchanged_preceding_captures": {
+        "accept-0.dsculpt": "cf3a4871e1d88af8e8313ba2772e406fef16e5c9bbbf2129b9be5347437e3992",
+        "accept-1.dsculpt": "6a5ce46bca85bcde074bc2251b1ddf69684d6a3b1336aeb83ff2b0db3b481080",
+        "accept-2.dsculpt": "16ea54370d05fb55095be502ff9926c03c06e953f724b123304b080f361b0451",
+        "cancel-0.dsculpt": "8e16ca54b46ba261d92562c5aa0667c14121df4db80cd233367e66799910d23d",
+        "focus-0.dsculpt": "8e16ca54b46ba261d92562c5aa0667c14121df4db80cd233367e66799910d23d",
+        "source.dsculpt": "8e16ca54b46ba261d92562c5aa0667c14121df4db80cd233367e66799910d23d",
+        "refined-source-rigged.dsculpt": "9f89bb6ff21e692de351404d6471f6c14e11b8a803fda9c1a0cef28903b7e950",
+        "accept-3-rigged.dsculpt": "dc20f2f37bbb8bbcf37be7fd0986049816f3eb67e501fd9e939b659df0d19d88"
+      }
+    }
+  },
+  "headless_reference": {
+    "tests": [
+      "cpu-reference-install-refused",
+      "key-mirror-refinement",
+      "key-mirror-refinement-authoring",
+      "key-mirror-refinement-rigged",
+      "key-mirror-refinement-baked",
+      "xr-mirror-controls"
+    ],
+    "log_sha256": "c442509877b5a5e439c906203181dca83eda6ab4827e247f5d5a29bed6ba6cd6"
+  },
+  "scoped_asan_ubsan": {
+    "instrumented": [
+      "src/shapekey-refinement.cpp",
+      "src/key-mirror-refinement.cpp",
+      "tests/key-mirror-refinement.cpp"
+    ],
+    "detached_geometry_checks": 99,
+    "baked_authoring_checks": 33,
+    "geometry_log_sha256": "71b281c74dc9ecdd2f6d29c16321f7b5e915468d87a098096f543e52c621d21a",
+    "baked_authoring_log_sha256": "625ae23bbf20f688d0469a245796d218b418876d1c6d541816f0fdd2cef6954a",
+    "leak_detection": false
+  },
+  "remaining_domains": [
+    "legacy dynamic and varying normal frames",
+    "imported and retained materials and texture sets",
+    "topology-bound projection recipes",
+    "physical headset",
+    "positive AMD and NVIDIA execution"
+  ]
+}

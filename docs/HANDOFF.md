@@ -212,10 +212,24 @@ the native mesh within 6.7e-8 metres for the test fixture. All 16 selected
 Arc Release tests pass, including 52 synthetic OpenXR assertions. The
 separate nested DomeD Wayland run passes. The native project and exported GLB
 match the headless reference byte for byte. The focused ASan/UBSan runs pass.
-Imported rigs, linked source rigs, retained materials, baked textures and
-varying frames outside the native direction contract remain open. Positive
-AMD and NVIDIA execution and physical headset testing are still pending.
+Imported rigs, linked source rigs, retained material domains and varying
+frames outside the native direction contract remain open. Positive AMD
+and NVIDIA execution and physical headset testing are still pending.
 [Native rigged Mirror evidence](validation/key-mirror-rigged-20261128.json)
+
+Refined surface keeps ordinary native Bake maps and the saved projection
+recipe on the same strict writable UV0 grid. The fixed canonical tangent
+frame keeps its exact authored direction deltas through the subdivision.
+Full normal and material Bake and masked FLOAT-emission Bake preserve their
+stored bytes, and the saved projection recipe rebakes on the new topology.
+The full-coverage GLB carries the original embedded normal texture, baked
+tangents and both keys. All 17 selected Arc Release tests pass, including
+58 synthetic OpenXR assertions. Nested DomeD Wayland and scoped ASan/UBSan
+pass. The two native projects and full-coverage GLB match the headless
+reference byte for byte. Retained materials, legacy dynamic normals, and
+rebaking with a topology-bound cage or matching source still need their
+own adapters.
+[Native baked Mirror evidence](validation/key-mirror-baked-20261128.json)
 
 Ambient occlusion in Bake now traces the biased hemisphere on the selected
 GPU against the existing immutable source BVH. The device returns one
