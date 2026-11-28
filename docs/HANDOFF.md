@@ -106,9 +106,21 @@ resolutions and the rectangle work budget follow the native rules. Arc
 matches the host across 573,467 candidates and passes the 2048² retained
 Bake. The 1024² projection fixture saves the same project. Median warm time
 is 0.59 seconds with device rasterization and 0.58 seconds on the preceding
-revision. The host prepares triangle bounds and cage rays and resolves
-materials.
+revision.
 [GPU Bake target raster evidence](validation/bake-raster-gpu-20261128.json)
+
+The compacted atlas now feeds automatic and explicit cage-ray preparation
+and BVH projection on the same device queue. The worker uploads corner
+data once per raster span. It receives ordered target samples and source
+hits after projection. Source provenance and matching-topology bakes use
+their existing direct mapping. The native worker still builds the final
+tangent frames and resolves materials from the projected samples. Arc
+matches 16,384 host-prepared ray records bit for bit. In the byte-identical
+1024² fixture, 32 corner uploads carry 4 KiB in place of 256 ray uploads
+carrying 40 MiB. Warm Bake stays near 0.64 seconds. The first Bake takes
+7.27 seconds with resident preparation and 6.53 seconds on the preceding
+revision.
+[Resident cage-ray evidence](validation/bake-resident-cage-20261128.json)
 
 The `7dd412a1` policy recheck refused all five CPU configurations outside that
 test mode. Without a compute device, command-line export preserved an existing

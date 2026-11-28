@@ -91,7 +91,7 @@ DOME_AMBIENT_INLINE uint16_t count_blocked_rays(const uint32_t *states,size_t sa
   return total;
 }
 
-inline constexpr uint32_t more_nodes=1,needs_boundary=2,triangle_limit_exceeded=4;
+inline constexpr uint32_t more_nodes=1,needs_boundary=2,triangle_limit_exceeded=4,invalid_ray=8;
 
 template<class Real> struct ProjectionProgress {
   uint32_t node,visited;

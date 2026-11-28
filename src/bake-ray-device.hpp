@@ -5,6 +5,11 @@
 #include <memory>
 #include <span>
 
+namespace dome::detail::bake_raster {
+class Raster;
+struct ProjectionSettings;
+template<class Api> class DeviceRaster;
+}
 namespace dome::detail::bake_rays {
 struct Node {
   Vec3 lo,hi;
@@ -41,6 +46,10 @@ public:
                              const std::function<bool()> &cancelled)=0;
   virtual void project(std::span<const ProjectionRay>,std::span<ProjectionHit>,
                        uint32_t triangle_budget,const std::function<bool()> &cancelled)=0;
+  // The projection target shares this query's device and ordered queue.
+  // The query owns its source and ray buffers and outlives the target.
+  virtual std::unique_ptr<bake_raster::Raster> create_projection_target(std::span<const float> axis,
+      std::span<const uint8_t> writable,const bake_raster::ProjectionSettings &)=0;
 };
 std::unique_ptr<Query> upload(const Surface &,std::span<const Vec3> pattern,float ao_maximum,bool projection);
 } // namespace dome::detail::bake_rays

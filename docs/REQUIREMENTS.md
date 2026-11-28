@@ -28,6 +28,13 @@ budget. GPU batches read back only winning barycentrics and ordered block
 ranges for the existing target-frame and material stages.
 [GPU Bake target raster evidence](validation/bake-raster-gpu-20261128.json)
 
+For ray-based Bake, compacted target samples feed cage-ray preparation and
+source projection on one device queue. Per-span corner data replaces the
+host upload of one ray per target texel. Destination samples, hit records
+and ordered block ranges are read after tracing. Cage bounds, overlap,
+protection, cancellation and both work budgets retain their native rules.
+[Resident cage-ray evidence](validation/bake-resident-cage-20261128.json)
+
 Eligible 512–2048 current-grid RGB8 Bake materials now composite color, ORM
 and legacy emission on the selected GPU. Their ordered paint, coverage,
 native normal-map output, and GLB export match the preceding implementation.

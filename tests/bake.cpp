@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake.hpp"
 #ifdef DOME_TEST_BAKE_RAY_DEVICE
+#include "bake-raster-device.hpp"
 #include "bake-ray-device.hpp"
 #include "bake-ray-query.hpp"
 #endif
@@ -203,6 +204,60 @@ void oblique_device_precision(){
   check(host&&projected&&projected->barycentric==host->barycentric&&projected->distance==host->distance,
         "Oblique edge-adjacent projection keeps every bit of the wide reciprocal and resulting barycentrics");
 }
+
+void resident_cage_projection(){
+  namespace raster=detail::bake_raster;
+  namespace rays=detail::bake_rays;
+  constexpr uint32_t resolution=37;
+  std::array<float,resolution> axis{};
+  for(uint32_t i=0;i<resolution;++i)axis[i]=(i+.5f)/resolution;
+  const raster::Span span{std::bit_cast<uint64_t>(1.),{{0,0},{1,0},{0,1}},0,0,0,resolution,0,1};
+  const SurfaceQuery reference(quad(-1,1,.047f));
+  auto query=detail::BakeRayQuery::upload(reference,{},0,true,{});
+  const std::array<Vec3,3> points{{{-.4f,-.4f,-.01f},{.4f,-.4f,.01f},{-.4f,.4f,0}}};
+  const std::array<Vec3,3> normals{{{-.12f,.07f,.9f},{.18f,-.1f,1.f},{.13f,.15f,1.1f}}};
+  for(bool supplied:{false,true})for(bool explicit_cage:{false,true}){
+    auto target=query->create_projection_target(axis,{},raster::ProjectionSettings{.11f,.09f,supplied,explicit_cage});
+    raster::ProjectionFace face{};
+    face.radius_bits=std::bit_cast<uint64_t>(1e-6);
+    face.geometric_normal=normalized(cross(points[1]-points[0],points[2]-points[0]));
+    for(size_t i=0;i<3;++i){
+      face.positions[i]=points[i];
+      face.normals[i]=supplied?normals[i]:normalized(normals[i]);
+      face.cage[i]=points[i]+Vec3{-.02f+.01f*float(i),.03f,.09f+.005f*float(i)};
+    }
+    const auto result=target->rasterize_and_project(std::span(&span,1),std::span(&face,1),
+                                                    resolution*resolution,2000,2000,{});
+    std::vector<rays::ProjectionRay> packets;
+    for(const auto &sample:result.samples){
+      Vec3 position,normal,cage;
+      for(size_t i=0;i<3;++i){
+        position+=face.positions[i]*sample.barycentric[i];
+        normal+=face.normals[i]*sample.barycentric[i];
+        cage+=face.cage[i]*sample.barycentric[i];
+      }
+      normal=supplied&&length(normal)<=1e-8f?face.geometric_normal:normalized(normal);
+      const auto offset=explicit_cage?cage-position:normal*.11f;
+      const float front=length(offset);
+      packets.push_back(detail::BakeRayQuery::projection_ray(position+offset,
+          (front>1e-8f?offset/front:normal)*-1,front+.09f,1e-6));
+    }
+    std::vector<rays::ProjectionHit> hits(packets.size());
+    query->project(packets,hits,2000,{});
+    bool same=hits.size()>650&&result.hits.size()==hits.size()&&!result.overlaps;
+    for(size_t i=0;i<hits.size();++i){
+      const auto &a=hits[i],&b=result.hits[i];
+      same&=a.triangle==b.triangle&&a.triangle!=UINT32_MAX&&a.distance==b.distance&&
+          a.position.x==b.position.x&&a.position.y==b.position.y&&a.position.z==b.position.z&&
+          std::ranges::equal(a.barycentric,b.barycentric);
+    }
+    check(same,"Resident cage rays match host-prepared hits for interpolated and supplied normals");
+  }
+  auto limited=query->create_projection_target(axis,{},raster::ProjectionSettings{.11f,.09f,false,false});
+  raster::ProjectionFace face{};
+  check(rejects([&]{limited->rasterize_and_project(std::span(&span,1),std::span(&face,1),
+        resolution*resolution,1,2000,{});}),"The resident pipeline refuses an insufficient ray budget before tracing");
+}
 #endif
 } // namespace
 int main()try {
@@ -211,6 +266,7 @@ int main()try {
 #ifdef DOME_TEST_BAKE_RAY_DEVICE
   ambient_device_traversal();
   oblique_device_precision();
+  resident_cage_projection();
 #endif
   auto low=quad();BakeSource source;source.mesh=quad();
   BakeOptions options;options.resolution=32;options.padding=0;options.ao_samples=0;

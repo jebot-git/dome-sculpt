@@ -6,6 +6,7 @@
 #include <cuda_runtime.h>
 #define DOME_GPU(name) cuda##name
 #endif
+#include "bake-cage-ray-kernel.hpp"
 #include "bake-raster-device-job.hpp"
 #include "bake-ray-device-query.hpp"
 #include "paint-composite-kernel.hpp"
@@ -80,6 +81,17 @@ __global__ void compact_bake(bake_raster::View view,const bake_raster::Sample *c
                                       AddCount{&totals->samples},AddCount{&totals->overlaps});
 }
 
+__global__ void prepare_cage(const bake_raster::ProjectionFace *faces,bake_raster::ProjectionSettings settings,
+    const bake_raster::Sample *samples,size_t count,ProjectionRay *rays,uint32_t *status){
+  const size_t i=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
+  if(i>=count)return;
+  const auto &sample=samples[i];
+  if(!bake_raster::prepare_ray(faces[sample.span],sample,settings,rays[i])){
+    rays[i]={{},{0,1,0},0,0};
+    atomicOr(status,invalid_ray);
+  }
+}
+
 class GpuApi {
   DOME_GPU(Stream_t) stream_{};
 public:
@@ -119,6 +131,12 @@ public:
                uint32_t blocks,bake_raster::Block *ranges,bake_raster::Sample *output,bake_raster::Totals *totals){
     constexpr unsigned lanes=128;
     compact_bake<<<(blocks+lanes-1)/lanes,lanes,0,stream_>>>(view,candidates,count,first,blocks,ranges,output,totals);
+    checked(DOME_GPU(GetLastError)());
+  }
+  void prepare_cage_rays(const bake_raster::ProjectionFace *faces,bake_raster::ProjectionSettings settings,
+                         const bake_raster::Sample *samples,size_t count,ProjectionRay *rays,uint32_t *status){
+    constexpr unsigned lanes=128;
+    prepare_cage<<<(count+lanes-1)/lanes,lanes,0,stream_>>>(faces,settings,samples,count,rays,status);
     checked(DOME_GPU(GetLastError)());
   }
 

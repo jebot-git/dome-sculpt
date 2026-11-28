@@ -6,6 +6,7 @@
 namespace dome::detail::bake_rays {
 template<class Api>
 class DeviceQuery final:public Query {
+  friend class bake_raster::DeviceRaster<Api>;
   using Progress=ProjectionProgress<typename Api::Precision::Scalar>;
   template<class T> using Buffer=BakeDeviceBuffer<Api,T>;
   Api api_;
@@ -22,6 +23,25 @@ class DeviceQuery final:public Query {
   SurfaceView view_;
   static void poll(const std::function<bool()> &cancelled){
     if(cancelled&&cancelled())throw std::runtime_error("Mesh baking cancelled");
+  }
+  void trace_resident(size_t count,ProjectionHit *hits,uint32_t budget,
+                      const std::function<bool()> &cancelled,bool prepared){
+    auto run_pass=[&](bool boundary){
+      bool first=true;
+      uint32_t status,summary=0;
+      do {
+        if(!prepared||boundary||!first)api_.reset(remaining_.data);
+        api_.project(view_,rays_.data,hits,progress_.data,count,budget,remaining_.data,first,boundary);
+        api_.read(&status,remaining_.data,sizeof(status));
+        poll(cancelled);
+        if(status&invalid_ray)throw std::invalid_argument("Invalid surface ray");
+        if(status&triangle_limit_exceeded)throw std::length_error("Surface ray triangle budget exceeded");
+        summary|=status;
+        first=false;
+      }while(status&more_nodes);
+      return summary;
+    };
+    if(run_pass(false)&needs_boundary)run_pass(true);
   }
 public:
   DeviceQuery(const Surface &surface,std::span<const Vec3> pattern,float maximum,bool projection)
@@ -70,27 +90,16 @@ public:
     if(!rays_.data||rays.empty()||rays.size()>projection_batch_capacity||rays.size()!=results.size()||!budget)
       throw std::logic_error("Invalid Bake projection device batch");
     poll(cancelled);
-    auto run_pass=[&](bool boundary){
-      bool first=true;
-      uint32_t status,summary=0;
-      do {
-        api_.reset(remaining_.data);
-        api_.project(view_,rays_.data,hits_.data,progress_.data,rays.size(),budget,remaining_.data,first,boundary);
-        api_.read(&status,remaining_.data,sizeof(status));
-        poll(cancelled);
-        if(status&triangle_limit_exceeded)throw std::length_error("Surface ray triangle budget exceeded");
-        summary|=status;
-        first=false;
-      }while(status&more_nodes);
-      return summary;
-    };
     try {
       api_.upload(rays_.data,rays.data(),rays.size_bytes());
-      if(run_pass(false)&needs_boundary)run_pass(true);
+      trace_resident(rays.size(),hits_.data,budget,cancelled,false);
       api_.read(results.data(),hits_.data,results.size_bytes());
       poll(cancelled);
     }catch(...){api_.drain();throw;}
   }
+
+  std::unique_ptr<bake_raster::Raster> create_projection_target(std::span<const float>,
+      std::span<const uint8_t>,const bake_raster::ProjectionSettings &) override;
 };
 
 template<class Api>

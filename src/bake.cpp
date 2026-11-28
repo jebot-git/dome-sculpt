@@ -665,38 +665,17 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     result.maps.transparent|=channels.color[3]<.9999f;
     result.coverage[at]=1; ++result.projected;
   };
-#ifndef DOME_BAKE_RAY_REFERENCE
-  struct ProjectionTexel {
-    uint32_t index,triangle;
-    std::array<float,3> bary;
-    Vec3 normal;
-    TangentFrame frame;
-  };
-  const auto projection_capacity=ray_projection?std::min(pixels,device::projection_batch_capacity):0;
-  std::vector<device::ProjectionRay> projection_rays;
-  std::vector<device::ProjectionHit> projection_hits(projection_capacity);
-  std::vector<ProjectionTexel> projection_texels;
-  projection_rays.reserve(projection_capacity);
-  projection_texels.reserve(projection_capacity);
-  auto flush_projection=[&]{
-    if(projection_rays.empty())return;
-    device_query->project(projection_rays,std::span(projection_hits).first(projection_rays.size()),
-                          uint32_t(SurfaceQueryOptions{}.max_triangle_tests),o.cancelled);
-    for(size_t i=0;i<projection_texels.size();++i){
-      if(i%64==0)cancel(o);
-      const auto &[at,triangle,bary,normal,frame]=projection_texels[i];
-      shade(at,triangle,bary,normal,frame,detail::BakeRayQuery::resolve(*query,projection_hits[i]));
-    }
-    projection_rays.clear();
-    projection_texels.clear();
-  };
-#endif
 #ifdef DOME_BAKE_RAY_REFERENCE
   SurfaceQueryOptions ray_options;
   ray_options.cancelled=o.cancelled;
 #endif
-  auto project_texel=[&](size_t at,size_t triangle,const std::array<float,3> &bary,double rounding_radius){
-    auto position=interpolate(low,triangle,bary,false),normal=interpolate(low,triangle,bary,true);
+  auto project_texel=[&](size_t at,size_t triangle,const std::array<float,3> &bary,
+#ifdef DOME_BAKE_RAY_REFERENCE
+                         double rounding_radius){
+#else
+                         const device::ProjectionHit *projected){
+#endif
+    auto normal=interpolate(low,triangle,bary,true);
     TangentFrame frame;
     if (o.low_tangents.empty()) {
       frame = tangent_frame(low, low_frames, triangle, bary);
@@ -707,11 +686,14 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
     }
     std::optional<SurfaceHit> hit;
     if(corresponding_topology){
+      const auto position=interpolate(low,triangle,bary,false);
       const auto matched=interpolate(source.mesh,triangle,bary,false);
       if(within_projection_bounds(position,matched,normal,o))
         hit=SurfaceHit{uint32_t(triangle),matched,
                        interpolate(source.mesh,triangle,bary,true),bary,0};
     }else if(ray_projection){
+#ifdef DOME_BAKE_RAY_REFERENCE
+      const auto position=interpolate(low,triangle,bary,false);
       Vec3 offset=normal*o.front_distance;
       if(!o.cage_positions.empty()){
         Vec3 cage;
@@ -721,15 +703,10 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       const float front=length(offset);
       const auto direction=front>1e-8f?offset/front:normal;
       if(++result.rays>o.max_rays)throw std::length_error("Bake ray budget exceeded");
-#ifdef DOME_BAKE_RAY_REFERENCE
       hit=detail::BakeRayQuery::cast(*query,position+offset,direction*-1,front+o.back_distance,
                                      rounding_radius,ray_options);
 #else
-      projection_rays.push_back(detail::BakeRayQuery::projection_ray(position+offset,direction*-1,
-                                front+o.back_distance,rounding_radius));
-      projection_texels.push_back({uint32_t(at),uint32_t(triangle),bary,normal,frame});
-      if(projection_rays.size()==projection_capacity)flush_projection();
-      return;
+      hit=detail::BakeRayQuery::resolve(*query,*projected);
 #endif
     }else{
       std::array<float,3> mapped{};
@@ -746,27 +723,37 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
   namespace raster=detail::bake_raster;
   std::vector<float> axis(o.resolution);
   for(uint32_t i=0;i<o.resolution;++i)axis[i]=(i+.5f)/o.resolution;
-  auto atlas=raster::create(axis,o.writable);
-  struct RasterFace {uint32_t triangle;double rounding_radius;};
+  const raster::ProjectionSettings projection_settings{o.front_distance,o.back_distance,
+      !o.low_tangents.empty(),!o.cage_positions.empty()};
+  auto atlas=ray_projection?device_query->create_projection_target(axis,o.writable,projection_settings):
+                            raster::create(axis,o.writable);
   std::vector<raster::Span> raster_spans;
-  std::vector<RasterFace> raster_faces;
+  std::vector<uint32_t> raster_faces;
+  std::vector<raster::ProjectionFace> projection_faces;
   raster_spans.reserve(raster::span_capacity);
   raster_faces.reserve(raster::span_capacity);
+  if(ray_projection)projection_faces.reserve(raster::span_capacity);
   uint32_t pending_candidates=0;
   auto flush_raster=[&]{
     if(!pending_candidates)return;
-    const auto batch=atlas->rasterize(raster_spans,pending_candidates,o.cancelled);
+    const auto batch=ray_projection?
+        atlas->rasterize_and_project(raster_spans,projection_faces,pending_candidates,o.max_rays-result.rays,
+                                    uint32_t(SurfaceQueryOptions{}.max_triangle_tests),o.cancelled):
+        atlas->rasterize(raster_spans,pending_candidates,o.cancelled);
     result.overlapping+=batch.overlaps;
+    result.rays+=batch.hits.size();
     for(const auto &block:batch.blocks){
       cancel(o);
-      for(const auto &sample:batch.samples.subspan(block.offset,block.count)){
-        const auto &face=raster_faces[sample.span];
-        project_texel(sample.pixel,face.triangle,
-            {sample.barycentric[0],sample.barycentric[1],sample.barycentric[2]},face.rounding_radius);
+      for(uint32_t index=block.offset;index<block.offset+block.count;++index){
+        const auto &sample=batch.samples[index];
+        project_texel(sample.pixel,raster_faces[sample.span],
+            {sample.barycentric[0],sample.barycentric[1],sample.barycentric[2]},
+            ray_projection?&batch.hits[index]:nullptr);
       }
     }
     raster_spans.clear();
     raster_faces.clear();
+    projection_faces.clear();
     pending_candidates=0;
   };
 #endif
@@ -815,12 +802,28 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
       if(area<0)std::swap(a,b);
       if(top_left(a,b))descriptor.top_left_edges|=1u<<i;
     }
+    raster::ProjectionFace projection{};
+    if(ray_projection){
+      projection.radius_bits=std::bit_cast<uint64_t>(rounding_radius);
+      for(unsigned i=0;i<3;++i){
+        const auto vertex=low.indices[triangle*3+i];
+        projection.positions[i]=low.positions[vertex];
+        const auto normal=low.normals[vertex];
+        projection.normals[i]=projection_settings.supplied_tangents?normal:normalized(normal);
+        if(projection_settings.explicit_cage)projection.cage[i]=o.cage_positions[vertex];
+      }
+      if(projection_settings.supplied_tangents){
+        const auto *p=projection.positions;
+        projection.geometric_normal=normalized(cross(p[1]-p[0],p[2]-p[0]));
+      }
+    }
     for(uint32_t first=0;first<count;){
       const auto accepted=std::min(count-first,raster::candidate_capacity-pending_candidates);
       descriptor.first=pending_candidates;
       descriptor.rectangle_offset=first;
       raster_spans.push_back(descriptor);
-      raster_faces.push_back({uint32_t(triangle),rounding_radius});
+      raster_faces.push_back(uint32_t(triangle));
+      if(ray_projection)projection_faces.push_back(projection);
       first+=accepted;
       pending_candidates+=accepted;
       if(pending_candidates==raster::candidate_capacity||raster_spans.size()==raster::span_capacity)flush_raster();
@@ -830,7 +833,6 @@ static BakeResult bake_mesh_impl(const Mesh &low,const BakeSource &source,const 
 #ifndef DOME_BAKE_RAY_REFERENCE
   flush_raster();
   atlas.reset();
-  flush_projection();
 #endif
   if (result.overlapping&&o.fail_on_overlap) throw std::runtime_error("Overlapping low UV coverage: "+std::to_string(result.overlapping)+" texels");
   if (result.missed&&o.fail_on_miss) throw std::runtime_error("Projection missed "+std::to_string(result.missed)+" low UV texels");

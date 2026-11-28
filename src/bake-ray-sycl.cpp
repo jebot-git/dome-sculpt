@@ -9,6 +9,8 @@ namespace dome::detail {
 namespace bake_raster {
 void launch_raster(sycl::queue &,View,const Span *,uint32_t span_count,uint32_t count,uint32_t first,Sample *);
 void launch_compact(sycl::queue &,View,const Sample *,uint32_t count,uint32_t first,uint32_t blocks,Block *,Sample *,Totals *);
+void launch_cage_rays(sycl::queue &,const ProjectionFace *,ProjectionSettings,const Sample *,size_t,
+                      bake_rays::ProjectionRay *,uint32_t *status);
 }
 namespace bake_rays {
 void launch_boundary(sycl::queue &,SurfaceView,const ProjectionRay *,ProjectionHit *,
@@ -42,6 +44,10 @@ public:
   void compact(bake_raster::View view,const bake_raster::Sample *candidates,uint32_t count,uint32_t first,
                uint32_t blocks,bake_raster::Block *ranges,bake_raster::Sample *output,bake_raster::Totals *totals){
     bake_raster::launch_compact(queue_,view,candidates,count,first,blocks,ranges,output,totals);
+  }
+  void prepare_cage_rays(const bake_raster::ProjectionFace *faces,bake_raster::ProjectionSettings settings,
+                         const bake_raster::Sample *samples,size_t count,ProjectionRay *rays,uint32_t *status){
+    bake_raster::launch_cage_rays(queue_,faces,settings,samples,count,rays,status);
   }
 
   void trace(SurfaceView surface,const Frame *frames,const Vec3 *pattern,size_t samples,float maximum,
