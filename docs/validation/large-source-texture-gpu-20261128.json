@@ -1,0 +1,261 @@
+{
+  "date": "2026-11-28",
+  "product_commit": "82eb9a6f5bebf3000fd4829e8ec0e57a5d9e8273",
+  "previous_published_commit": "a90ea4b6c2a9cfbc546233446e253f73db115059",
+  "domed_toolkit_commit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "gpu": "Intel Arc A770 / PCI 0000:03:00.0 / renderD129",
+  "scope": "Native current-grid UV0 color, prepared PBR, ORM, occlusion and emission with original source images up to the existing dimensions and per-output pixel cap.",
+  "application": {
+    "file": "artifacts/large-source-texture-gpu-20261128/evidence/oneapi/dome-sculpt",
+    "sha256": "f65f8546a3b716e58b214649d92340a03540ff5463d9768e8fca930fbeda5d9e"
+  },
+  "focused_release": {
+    "junit": {
+      "file": "artifacts/large-source-texture-gpu-20261128/evidence/oneapi/large-source-texture-gpu.xml",
+      "sha256": "4da1d469ba6807575413fe1523466261ad4dc2bc542cd08a4ebb47b58f5527ba"
+    },
+    "passed": 9,
+    "tests": [
+      "current-color-source-bake",
+      "paint-overlay-gpu",
+      "color-preparation",
+      "current-color-target-preparation",
+      "paint-sampling-grid",
+      "paint-composite-compute",
+      "paint-composite-native",
+      "paint-composite-render",
+      "native-paint-sampling"
+    ]
+  },
+  "synthetic_openxr": {
+    "bake_policy_checks": 20,
+    "bake_report": {
+      "file": "artifacts/large-source-texture-gpu-20261128/evidence/oneapi/bake-policy-report.json",
+      "sha256": "5d4fce8613ab15f59b797e104484b0178a7d91102b5a53bd3740dbe6efc44dd4"
+    },
+    "bake_policy_suite": {
+      "junit": {
+        "file": "artifacts/large-source-texture-gpu-20261128/evidence/oneapi/bake-policy-hardware.xml",
+        "sha256": "3d4f81616e4829131bc1cc0aec93c5c0d940cf0df2e11da53e68bd3c4e1804ce"
+      },
+      "passed": 1,
+      "tests": [
+        "bake-policy-openxr"
+      ]
+    },
+    "expanded_project_report": {
+      "file": "artifacts/large-source-texture-gpu-20261128/evidence/xr-coupled.json",
+      "sha256": "78b3ddeeb8a5bf3f2fe64c5efbf8a5e4d5b491deac9ca997872a61de5a3317d5"
+    },
+    "saved_archive": {
+      "file": "artifacts/large-source-texture-gpu-20261128/evidence/xr-coupled.dsculpt",
+      "sha256": "0d8659cae708c4b91c868358f07d8c175d10b65dffb72cc24051540e512eccfe"
+    },
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "acquires_waits_releases": 12,
+    "scope": "Synthetic input with hardware stereo. Both eyes contain images and the expanded project saves byte for byte."
+  },
+  "nested_domed_wayland": {
+    "report": {
+      "file": "artifacts/large-source-texture-gpu-20261128/evidence/wayland/report.json",
+      "sha256": "6c894ea162805589ff9bcec4129087f7eb19d4f63e5b7a8ad98d0e88f09c964f"
+    },
+    "compositor_log": {
+      "file": "artifacts/large-source-texture-gpu-20261128/evidence/wayland/compositor.log",
+      "sha256": "eaae60489558a6e9183b2b3dc38e41f150def98a899a599592ba113445804382"
+    },
+    "checks": 4,
+    "scope": "Native Wayland identity, universal menu, exact Save and orderly close. The outer Xvfb presenter lacks DRI3."
+  },
+  "reference_sanitizers": {
+    "compute": {
+      "file": "artifacts/large-source-texture-gpu-20261128/evidence/asan/paint-composite-compute.cpp.log",
+      "sha256": "a61d238060adee7243c19b3dc5298be254e77c475530889a0ab9418c69507e2d"
+    },
+    "native": {
+      "file": "artifacts/large-source-texture-gpu-20261128/evidence/asan/paint-composite-native.cpp.log",
+      "sha256": "aee303b563fc45622e73dd18448fcf32eea3773561078f97424d9e6f05c001e3"
+    },
+    "scope": "Changed sampler, paint and compositor objects were built with ASan/UBSan and linked with the preceding test-only headless reference archive."
+  },
+  "missing_device": {
+    "oneapi": {
+      "file": "artifacts/large-source-texture-gpu-20261128/missing-device.log",
+      "sha256": "d37f0303e6b9b56189f931ac7e02abcad5806bd9d01d9213788505603cfec32c"
+    },
+    "cuda": {
+      "file": "artifacts/large-source-texture-gpu-20261128/cuda-missing.log",
+      "sha256": "f50f28ad5b8c7b9cdbd72d66290b891a9328e4ae8780ae7f1d072a22f876e291"
+    },
+    "rocm": {
+      "file": "artifacts/large-source-texture-gpu-20261128/rocm-missing.log",
+      "sha256": "c70d2c0d0f453f5256499809f699f01a0e682d0ce71362490623e8d87d1daf48"
+    }
+  },
+  "benchmark": {
+    "probe": {
+      "file": "artifacts/large-source-texture-gpu-20261128/evidence/probe.cpp",
+      "sha256": "c205d5e3b1864a82ee2293313a80ab2bb7205ebad5aa85d484ee2665bce31a6d"
+    },
+    "fixture_builder": {
+      "file": "artifacts/large-source-texture-gpu-20261128/evidence/source-color-fixtures.hpp",
+      "sha256": "d749e8fc86cf6ae94377307d8fd29d447439248e51627c6ff4b7d1afaf9fa081"
+    },
+    "paint_extent": [
+      1024,
+      1024
+    ],
+    "large_source_extent": [
+      1601,
+      569
+    ],
+    "scope": "Three fresh processes per build, alternating order. Measurements after project open include staging and transfers.",
+    "native": {
+      "fixture": {
+        "file": "artifacts/large-source-texture-gpu-20261128/evidence/native.dsculpt",
+        "sha256": "4be20372524e566c8f9450504e8a7c325516250d3cd8ea28722cd13e17082493"
+      },
+      "before": {
+        "runs": [
+          {
+            "file": "artifacts/large-source-texture-gpu-20261128/evidence/measure-native-before-1.log",
+            "sha256": "fd05a0576f24829d4f00c7d5f3837a5341c545aa5784c21c880dd15779923503",
+            "elapsed_ns": 50257871
+          },
+          {
+            "file": "artifacts/large-source-texture-gpu-20261128/evidence/measure-native-before-2.log",
+            "sha256": "e02917c79b75b9f8de1eda48cc5b439e56bec3188474ec28acc2c1d4b72da6a4",
+            "elapsed_ns": 63807891
+          },
+          {
+            "file": "artifacts/large-source-texture-gpu-20261128/evidence/measure-native-before-3.log",
+            "sha256": "e853b3e6a299a00ac23c1ed41906a38c18dff28129e179b9a8f241b20c819006",
+            "elapsed_ns": 52592838
+          }
+        ],
+        "median_ns": 52592838
+      },
+      "after": {
+        "runs": [
+          {
+            "file": "artifacts/large-source-texture-gpu-20261128/evidence/measure-native-after-1.log",
+            "sha256": "8634179fb9f484d0f8c6884932d25e21a8b523b5f018a134c13db52364b6b125",
+            "elapsed_ns": 89217971
+          },
+          {
+            "file": "artifacts/large-source-texture-gpu-20261128/evidence/measure-native-after-2.log",
+            "sha256": "dcaaac4bf710852f02f9e3e9d42c5e3c11e8acf2ef746b2c6d7d3cb8d36b674d",
+            "elapsed_ns": 42716572
+          },
+          {
+            "file": "artifacts/large-source-texture-gpu-20261128/evidence/measure-native-after-3.log",
+            "sha256": "2a5adaba3c490adedfcfa4bd90e9f10d876f23e20adbc28fe4efac864f48f8ec",
+            "elapsed_ns": 41348309
+          }
+        ],
+        "median_ns": 42716572
+      },
+      "output_extents": [
+        "1024x1024",
+        "1024x1024",
+        "1024x1024",
+        "1024x1024"
+      ],
+      "map_digests_and_alpha": [
+        "60f254f4dc12d5ab",
+        "5643db8a0c214da5",
+        "6426331b06abd3a9",
+        "40bede9a1c1e18ad",
+        "cbf29ce484222325",
+        "f564eedf2f1aa2c0",
+        "bb140926bc8e0de6",
+        "cbf29ce484222325",
+        "cbf29ce484222325",
+        "1",
+        "1"
+      ]
+    },
+    "large": {
+      "fixture": {
+        "file": "artifacts/large-source-texture-gpu-20261128/evidence/large.dsculpt",
+        "sha256": "0d8659cae708c4b91c868358f07d8c175d10b65dffb72cc24051540e512eccfe"
+      },
+      "before": {
+        "runs": [
+          {
+            "file": "artifacts/large-source-texture-gpu-20261128/evidence/measure-large-before-1.log",
+            "sha256": "5a964359263abdcd110b91c94bfc93f8874ead7f0c678600161f7fdf20c466ab",
+            "elapsed_ns": 339593382
+          },
+          {
+            "file": "artifacts/large-source-texture-gpu-20261128/evidence/measure-large-before-2.log",
+            "sha256": "23169f33e3b197fa9a230fe6590fdf78f3c530fadec9fd96cba0d1bed6e4dc12",
+            "elapsed_ns": 344455907
+          },
+          {
+            "file": "artifacts/large-source-texture-gpu-20261128/evidence/measure-large-before-3.log",
+            "sha256": "4420248c90d643757e587121e5f87335f6b452aff9df6630a3b7ce59b5400104",
+            "elapsed_ns": 338827943
+          }
+        ],
+        "median_ns": 339593382
+      },
+      "after": {
+        "runs": [
+          {
+            "file": "artifacts/large-source-texture-gpu-20261128/evidence/measure-large-after-1.log",
+            "sha256": "118b863c3fa218666dc219300e8bd32e96cd5f82b7e31e8a76e5a14b2cbc32ce",
+            "elapsed_ns": 88306905
+          },
+          {
+            "file": "artifacts/large-source-texture-gpu-20261128/evidence/measure-large-after-2.log",
+            "sha256": "5a95ea5fc0d51e3c8d50124b5e4e1631f711b6f7c0330406ae33910a9dd74bb8",
+            "elapsed_ns": 81562344
+          },
+          {
+            "file": "artifacts/large-source-texture-gpu-20261128/evidence/measure-large-after-3.log",
+            "sha256": "260787ddae826e65fa16265017bc6777836b7fad6b22119c0d2f4eb64a11ae7e",
+            "elapsed_ns": 79146303
+          }
+        ],
+        "median_ns": 81562344
+      },
+      "output_extents": [
+        "1601x1024",
+        "1024x1024",
+        "1024x1024",
+        "1601x1024"
+      ],
+      "map_digests_and_alpha": [
+        "e281f3eee78ea6c0",
+        "ef70e21418518a91",
+        "6426331b06abd3a9",
+        "40bede9a1c1e18ad",
+        "cbf29ce484222325",
+        "b8186f40adadd188",
+        "bb140926bc8e0de6",
+        "cbf29ce484222325",
+        "cbf29ce484222325",
+        "1",
+        "1"
+      ]
+    }
+  },
+  "exact_cli_export": {
+    "glb": {
+      "file": "artifacts/large-source-texture-gpu-20261128/evidence/after.glb",
+      "sha256": "d1f3cd4c7a79bd89f348569b85aabcb5cd2428e6671926fee1aa1b1ed02355d6"
+    },
+    "trace": {
+      "file": "artifacts/large-source-texture-gpu-20261128/export-after.log",
+      "sha256": "edb6a85c5a4e204a2c69478961b900447f4e0c77877f578f87736da0794f6f0e"
+    },
+    "dispatches": {
+      "launch_source_coordinates": 78,
+      "paint_compute9composite": 126
+    },
+    "readback_copies": 352,
+    "material_readback_bytes": 70936576,
+    "scratch_bytes_per_composite": 1572864
+  }
+}

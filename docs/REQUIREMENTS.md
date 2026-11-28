@@ -36,9 +36,17 @@ need GPU coverage. [Original texture evidence](validation/source-texture-gpu-202
 Rotated and sheared UV0 source textures that fit the native grid now use the
 selected GPU. It resolves coupled taps in bounded batches and preserves the
 original nearest and bilinear rounding. Arc validation covers mixed and fully
-coupled material roles, native Bake and prepared alpha. Larger source images
-and independent retained paint coordinates still need GPU coverage.
+coupled material roles, native Bake and prepared alpha.
 [Coupled UV0 texture evidence](validation/coupled-source-texture-gpu-20261128.json)
+
+The selected GPU also composites original UV0 textures larger than the paint
+grid. Color and prepared PBR, ORM with separate occlusion, and emission keep
+their respective output dimensions within the existing limits of 8,192 texels
+per side and 16,777,216 pixels per image. Paint, padding and Bake sample the original
+native grid. Device readback is bounded and carries the requested planes for
+each output size. Independent retained paint coordinates, physical FLOAT
+emission and other source-aware baking still need GPU coverage.
+[Larger source texture evidence](validation/large-source-texture-gpu-20261128.json)
 
 ## Current validation — 2026-11-27
 

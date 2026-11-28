@@ -164,8 +164,23 @@ compositing time was 50 milliseconds, down from 267, across three paired
 fresh processes on Intel Arc A770. The same project opens in synthetic
 OpenXR with hardware stereo and saves byte for byte. The Arc Release and
 headless sanitizer suites pass. CUDA and ROCm compile and refuse missing
-hardware. Larger images and retained-coordinate sampling remain open.
+hardware.
 [Coupled UV0 texture evidence](validation/coupled-source-texture-gpu-20261128.json)
+
+Original UV0 textures can now exceed the paint-grid width or height. Each
+material output preserves its own dimensions. The GPU shares the uploaded
+native paint, padding and Bake data across output shapes and reads back the
+requested planes in bounded chunks. Prepared vertex color uses the original
+bilinear filter. A rotated 1601×569 source on a 1024² paint grid keeps 1601×1024
+color and PBR outputs and 1024² ORM and emission. Its map digests, alpha and
+application GLB match the preceding implementation. On Arc A770, median
+compositing time across three paired fresh processes fell from 340 to 82 ms.
+Nine focused Release cases pass. Nested DomeD Wayland and synthetic OpenXR
+both save the expanded fixture byte for byte. The nested Xvfb presenter lacks
+DRI3, so that run verifies the Wayland window and menu workflow. CUDA and
+ROCm compile and refuse missing devices. Independent retained-coordinate
+workflows remain open.
+[Larger source texture evidence](validation/large-source-texture-gpu-20261128.json)
 
 The preceding Arc sweep reached 29 MiB of workspace space and was held after
 1,096 cases. Completed artifacts were moved to the local Media drive with
