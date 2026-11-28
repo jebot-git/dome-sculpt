@@ -1,0 +1,65 @@
+{
+  "date": "2026-11-28",
+  "product": "d345032c539a4c7ec92676e620e60a7c7b877ae0",
+  "preceding": "fef27225d77255cb8ab91665dc742f4e4aa7e7a2",
+  "canonical_domed": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Native cross-rig weight transfer with verified joint identity, preserving the recipient skeleton and source attachment.",
+  "oneapi_arc_release": {
+    "application_sha256": "d7a602f0290f8d7e703ae649999005e045fca264bafaddc0af32bafd2b3c8294",
+    "focused": {
+      "passed": 14,
+      "junit_sha256": "8d4c92f031558c445674dc5b08c9c80c8db6535dd4ab0f9dcf878feda1deaee5"
+    },
+    "complete_ctest_log_sha256": "52e9f94cdd5d5a64b03ae17351343b7a6048428639409ac1be967495e23fffcb",
+    "native_cases": [
+      "Reordered joints matched by name and renamed joints matched by declared humanoid role",
+      "Recipient rest rig, inverse binds, pose, morphs, paint and weight locks preserved",
+      "Exact native Undo and Redo, repeat is a no-op, and incompatible ancestry is refused",
+      "Zero sampled unmatched influences are accepted and nonzero unmatched influences refuse the transaction",
+      "Foreign transfer keeps the original avatar link, bind matrices, paint, morph and pose on native reopen"
+    ]
+  },
+  "corresponding_native_wayland_and_synthetic_openxr_archive_sha256": "0db3febd2834deb79c7e6f26863e5fd09ebe891da1f63b55305a2205a14ff8fc",
+  "prior_native_and_export_archives": {
+    "byte_identical": 38,
+    "manifest": "gpu-weight-transfer-20261128.json"
+  },
+  "nested_wayland": {
+    "checks": 7,
+    "report_sha256": "8c54cf504d0a6544b8151844e1352c3cb9042afc43a65b0c9613924694d4190d",
+    "universal_menu_transfer_and_exact_undo_redo": true,
+    "dma_buf_render_node": "/dev/dri/renderD129"
+  },
+  "synthetic_openxr": {
+    "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "stereo_submissions": 77,
+    "acquires": 154,
+    "image_waits": 154,
+    "releases": 154,
+    "left_eye_nonblank": 76,
+    "right_eye_nonblank": 76,
+    "swapchains_created": 2,
+    "swapchains_destroyed": 2,
+    "report_sha256": "f877bbe308ead94de45d2b52a0baa004ce1ba5cb66261043e96a5091749907a1"
+  },
+  "headless_reference": {
+    "focused": {
+      "passed": 2,
+      "junit_sha256": "f07a3276be66d03daaaa9d41c879e455babc083bd88716e7bfff9f157dac45de"
+    },
+    "scoped_asan_ubsan": {
+      "sources": [
+        "src/skin-authoring.cpp",
+        "src/skin-joint-transfer.cpp",
+        "src/rig.cpp",
+        "tests/skin-authoring.cpp"
+      ],
+      "log_sha256": "a0b0af63f0d84bc9c33a70db018c32518655d473d02db6de9636d2ff58cca5ac"
+    }
+  },
+  "limits": [
+    "Joint correspondence requires authenticated original identities, declared humanoid roles or hierarchy-compatible exact names. Arbitrary rigs still need manual mapping.",
+    "Joint identity and native weight publication run on the host. The existing source BVH query uses the selected GPU. The CPU reference is headless test code.",
+    "This milestone qualifies Intel Arc. Physical OpenXR, CUDA and ROCm device runs were outside this qualification."
+  ]
+}
